@@ -1,0 +1,7 @@
+{
+  "name": "Invoice-amdc",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
