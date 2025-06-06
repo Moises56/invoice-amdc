@@ -1,0 +1,236 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Logs de Auditoría</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="exportLogs()" [disabled]="loading()">
+        <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button (click)="showFilters.set(!showFilters())" [color]="hasActiveFilters() ? 'warning' : ''">
+        <ion-icon name="filter-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Logs de Auditoría</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Barra de búsqueda -->
+  <div class="p-4 bg-gray-50">
+    <ion-searchbar
+      placeholder="Buscar por acción, tabla o usuario..."
+      debounce="500"
+      (ionInput)="onSearchChange($event)"
+      class="custom-searchbar"
+    ></ion-searchbar>
+  </div>
+
+  <!-- Panel de filtros -->
+  <ion-card *ngIf="showFilters()" class="mx-4 mb-4">
+    <ion-card-header>
+      <ion-card-title class="text-lg">Filtros Avanzados</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" sizeMd="6">
+            <ion-item>
+              <ion-select 
+                placeholder="Acción"
+                [ngModel]="selectedAction()"
+                (ngModelChange)="selectedAction.set($event)"
+                interface="popover"
+              >
+                <ion-select-option value="">Todas las acciones</ion-select-option>
+                <ion-select-option *ngFor="let action of availableActions()" [value]="action">
+                  {{ action }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+          <ion-col size="12" sizeMd="6">
+            <ion-item>
+              <ion-select 
+                placeholder="Tabla"
+                [ngModel]="selectedTable()"
+                (ngModelChange)="selectedTable.set($event)"
+                interface="popover"
+              >
+                <ion-select-option value="">Todas las tablas</ion-select-option>
+                <ion-select-option *ngFor="let table of availableTables()" [value]="table">
+                  {{ table }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12" sizeMd="6">            <ion-item button (click)="startDatePopover.present()">
+              <ion-icon name="calendar-outline" slot="start"></ion-icon>
+              <ion-label>
+                Fecha inicio
+                <p *ngIf="startDate()">{{ getFormattedStartDate() }}</p>
+              </ion-label>
+            </ion-item>
+            <ion-popover #startDatePopover trigger="start-date-trigger" showBackdrop="true">
+              <ng-template>
+                <ion-datetime
+                  [ngModel]="startDate()"
+                  (ngModelChange)="startDate.set($event)"
+                  presentation="date"
+                  locale="es-ES"
+                ></ion-datetime>
+              </ng-template>
+            </ion-popover>
+          </ion-col>
+          <ion-col size="12" sizeMd="6">            <ion-item button (click)="endDatePopover.present()">
+              <ion-icon name="calendar-outline" slot="start"></ion-icon>
+              <ion-label>
+                Fecha fin
+                <p *ngIf="endDate()">{{ getFormattedEndDate() }}</p>
+              </ion-label>
+            </ion-item>
+            <ion-popover #endDatePopover trigger="end-date-trigger" showBackdrop="true">
+              <ng-template>
+                <ion-datetime
+                  [ngModel]="endDate()"
+                  (ngModelChange)="endDate.set($event)"
+                  presentation="date"
+                  locale="es-ES"
+                ></ion-datetime>
+              </ng-template>
+            </ion-popover>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      
+      <div class="flex gap-2 mt-4">
+        <ion-button expand="block" (click)="applyFilters()" class="flex-1">
+          Aplicar Filtros
+        </ion-button>
+        <ion-button expand="block" fill="outline" (click)="clearFilters()" class="flex-1">
+          Limpiar
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Refresher -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Lista de logs -->
+  <div class="px-4">
+    <!-- Skeleton loading -->
+    <div *ngIf="loading() && auditLogs().length === 0">
+      <ion-card *ngFor="let item of [1,2,3,4,5]" class="mb-4">
+        <ion-card-content>
+          <div class="flex items-center gap-3 mb-2">
+            <ion-skeleton-text animated style="width: 80px; height: 20px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 100px; height: 20px;"></ion-skeleton-text>
+          </div>
+          <ion-skeleton-text animated style="width: 60%; height: 16px;" class="mb-1"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 40%; height: 14px;"></ion-skeleton-text>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Lista de logs -->
+    <ion-list *ngIf="!loading() || auditLogs().length > 0">
+      <ion-card 
+        *ngFor="let log of filteredAuditLogs(); trackBy: trackByFn"
+        class="mb-4 cursor-pointer hover:shadow-lg transition-shadow"
+        button
+        (click)="viewDetails(log)"
+      >
+        <ion-card-content class="p-4">
+          <!-- Header del log -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <ion-chip [color]="getActionColor(log.accion)" class="text-xs font-medium">
+                <ion-icon [name]="getActionIcon(log.accion)" class="mr-1"></ion-icon>
+                {{ log.accion }}
+              </ion-chip>
+              <ion-badge color="medium" class="text-xs">{{ log.tabla }}</ion-badge>
+            </div>
+            <ion-note class="text-xs">
+              <ion-icon name="time-outline" class="mr-1"></ion-icon>
+              {{ formatDate(log.createdAt) }}
+            </ion-note>
+          </div>
+
+          <!-- Información del usuario -->
+          <div class="flex items-center gap-2 mb-2" *ngIf="log.user">
+            <ion-icon name="person-outline" class="text-gray-500"></ion-icon>
+            <span class="text-sm font-medium">
+              {{ log.user.nombre }} {{ log.user.apellido }}
+            </span>
+            <span class="text-xs text-gray-500">{{ log.user.correo }}</span>
+          </div>
+
+          <!-- ID del registro afectado -->
+          <div class="text-xs text-gray-600" *ngIf="log.registro_id">
+            <strong>Registro ID:</strong> {{ log.registro_id }}
+          </div>
+
+          <!-- Información adicional -->
+          <div class="mt-2 pt-2 border-t border-gray-200" *ngIf="log.ip_address">
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+              <span>IP: {{ log.ip_address }}</span>
+              <span *ngIf="log.user_agent" class="truncate max-w-xs">
+                {{ log.user_agent }}
+              </span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+
+    <!-- Mensaje cuando no hay datos -->
+    <div *ngIf="!loading() && filteredAuditLogs().length === 0" class="text-center py-8">
+      <ion-icon name="document-text-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
+      <h3 class="text-lg font-medium text-gray-500 mb-2">No hay logs de auditoría</h3>
+      <p class="text-gray-400">
+        {{ hasActiveFilters() ? 'No se encontraron logs con los filtros aplicados' : 'Aún no hay actividad registrada' }}
+      </p>
+      <ion-button 
+        *ngIf="hasActiveFilters()" 
+        fill="outline" 
+        (click)="clearFilters()"
+        class="mt-4"
+      >
+        Limpiar Filtros
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Infinite scroll -->
+  <ion-infinite-scroll 
+    threshold="100px" 
+    [disabled]="isInfiniteDisabled()"
+    (ionInfinite)="onLoadMore($event)"
+  >
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Cargando más logs..."
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Toast -->
+  <ion-toast
+    [isOpen]="isToastOpen()"
+    [message]="toastMessage()"
+    [duration]="3000"
+    [color]="toastColor()"
+    position="top"
+    (didDismiss)="isToastOpen.set(false)"
+  ></ion-toast>
+</ion-content>

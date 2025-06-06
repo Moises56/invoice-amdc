@@ -1,0 +1,241 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <ion-buttons slot="start">
+      <ion-menu-button class="text-white"></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="text-white font-semibold">Gestión de Mercados</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="showFilters.set(!showFilters())">
+        <ion-icon name="filter-outline" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="exportMercados()">
+        <ion-icon name="download-outline" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Filters Section -->
+  <ion-toolbar *ngIf="showFilters()" class="bg-white border-b">
+    <div class="p-4 space-y-4">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="4">
+            <ion-select
+              placeholder="Estado"
+              [(ngModel)]="selectedEstado"
+              (ionChange)="selectedEstado.set($event.detail.value)">
+              <ion-select-option [value]="undefined">Todos</ion-select-option>
+              <ion-select-option [value]="true">Activo</ion-select-option>
+              <ion-select-option [value]="false">Inactivo</ion-select-option>
+            </ion-select>
+          </ion-col>
+          <ion-col size="12" size-md="4">
+            <ion-select
+              placeholder="Municipio"
+              [(ngModel)]="selectedMunicipio"
+              (ionChange)="selectedMunicipio.set($event.detail.value)">
+              <ion-select-option value="">Todos</ion-select-option>
+              <ion-select-option *ngFor="let municipio of availableMunicipios()" [value]="municipio">
+                {{ municipio }}
+              </ion-select-option>
+            </ion-select>
+          </ion-col>
+          <ion-col size="12" size-md="4" class="flex space-x-2">
+            <ion-button expand="block" (click)="applyFilters()" color="primary">
+              <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+              Aplicar
+            </ion-button>
+            <ion-button expand="block" fill="outline" (click)="clearFilters()" color="medium">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Limpiar
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <!-- Active Filters Indicator -->
+      <div *ngIf="hasActiveFilters()" class="flex items-center space-x-2">
+        <span class="text-sm text-gray-600">Filtros activos:</span>
+        <ion-chip *ngIf="selectedEstado() !== undefined" color="primary" outline>
+          Estado: {{ selectedEstado() ? 'Activo' : 'Inactivo' }}
+        </ion-chip>
+        <ion-chip *ngIf="selectedMunicipio()" color="primary" outline>
+          Municipio: {{ selectedMunicipio() }}
+        </ion-chip>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="bg-gray-50">
+  <!-- Search Bar -->
+  <div class="sticky top-0 z-10 bg-white shadow-sm">
+    <ion-searchbar
+      [(ngModel)]="searchText"
+      (ionInput)="onSearchChange($event)"
+      placeholder="Buscar mercados por nombre, dirección..."
+      debounce="500"
+      showClearButton="focus"
+      class="px-4 py-2">
+    </ion-searchbar>
+  </div>
+
+  <!-- Refresh Component -->
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="circles"
+      refreshingText="Actualizando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading Skeletons -->
+  <div *ngIf="loading() && mercados().length === 0" class="p-4 space-y-4">
+    <ion-card *ngFor="let i of [1,2,3,4,5]" class="mb-4">
+      <ion-card-content class="space-y-3">
+        <ion-skeleton-text animated style="width: 60%; height: 20px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%; height: 16px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 40%; height: 16px;"></ion-skeleton-text>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Markets List -->
+  <div *ngIf="!loading() || mercados().length > 0" class="p-4">
+    <!-- Empty State -->
+    <div *ngIf="filteredMercados().length === 0" class="text-center py-12">
+      <ion-icon name="business-outline" class="text-6xl text-gray-400 mb-4"></ion-icon>
+      <h3 class="text-lg font-medium text-gray-600 mb-2">No hay mercados disponibles</h3>
+      <p class="text-gray-500 mb-6">
+        {{ searchText() ? 'No se encontraron mercados que coincidan con tu búsqueda' : 'Comienza creando tu primer mercado' }}
+      </p>
+      <ion-button *ngIf="canCreate() && !searchText()" (click)="createMercado()" color="primary">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Crear Mercado
+      </ion-button>
+    </div>
+
+    <!-- Markets Grid -->
+    <ion-grid>
+      <ion-row>
+        <ion-col 
+          *ngFor="let mercado of filteredMercados(); trackBy: trackByFn"
+          size="12" 
+          size-md="6" 
+          size-lg="4">
+          <ion-card class="h-full shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer">
+            <!-- Card Header -->
+            <ion-card-header class="pb-2">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <ion-card-title class="text-lg font-semibold text-gray-800 line-clamp-2">
+                    {{ mercado.nombre_mercado }}
+                  </ion-card-title>
+                </div>
+                <div class="flex items-center space-x-2 ml-2">
+                  <ion-chip [color]="getStatusColor(mercado.isActive)" class="font-medium">
+                    <ion-icon [name]="getStatusIcon(mercado.isActive)" class="mr-1"></ion-icon>
+                    {{ mercado.isActive ? 'Activo' : 'Inactivo' }}
+                  </ion-chip>
+                  <ion-button 
+                    fill="clear" 
+                    size="small" 
+                    (click)="showMercadoOptions(mercado); $event.stopPropagation()">
+                    <ion-icon name="ellipsis-vertical" slot="icon-only" class="text-gray-500"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+            </ion-card-header>
+
+            <!-- Card Content -->
+            <ion-card-content (click)="viewMercado(mercado)" class="space-y-3">
+              <!-- Address -->
+              <div class="flex items-start space-x-2">
+                <ion-icon name="location-outline" class="text-blue-500 mt-1 flex-shrink-0"></ion-icon>
+                <span class="text-sm text-gray-600 line-clamp-2">{{ mercado.direccion }}</span>
+              </div>
+
+              <!-- Description -->
+              <div *ngIf="mercado.descripcion" class="flex items-start space-x-2">
+                <ion-icon name="document-text-outline" class="text-green-500 mt-1 flex-shrink-0"></ion-icon>
+                <span class="text-sm text-gray-600 line-clamp-2">{{ mercado.descripcion }}</span>
+              </div>
+
+              <!-- Stats -->
+              <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                <div class="flex items-center space-x-2">
+                  <ion-icon name="business-outline" class="text-purple-500"></ion-icon>
+                  <span class="text-sm text-gray-600">
+                    {{ mercado._count?.locales || 0 }} locales
+                  </span>
+                </div>
+                <div *ngIf="mercado.latitud && mercado.longitud" 
+                     class="flex items-center space-x-1 text-blue-600 cursor-pointer"
+                     (click)="showOnMap(mercado); $event.stopPropagation()">
+                  <ion-icon name="map-outline" class="text-sm"></ion-icon>
+                  <span class="text-xs">Ver mapa</span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex space-x-2 pt-2">
+                <ion-button 
+                  size="small" 
+                  fill="outline" 
+                  color="primary"
+                  (click)="viewMercado(mercado); $event.stopPropagation()">
+                  <ion-icon name="eye-outline" slot="start"></ion-icon>
+                  Ver
+                </ion-button>
+                <ion-button 
+                  *ngIf="canEdit()"
+                  size="small" 
+                  fill="outline" 
+                  color="medium"
+                  (click)="editMercado(mercado); $event.stopPropagation()">
+                  <ion-icon name="create-outline" slot="start"></ion-icon>
+                  Editar
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll
+    *ngIf="!isInfiniteDisabled()"
+    (ionInfinite)="onLoadMore($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="crescent"
+      loadingText="Cargando más mercados...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Floating Action Button -->
+  <ion-fab *ngIf="canCreate()" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="createMercado()" color="primary">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <!-- Action Sheet -->
+  <ion-action-sheet
+    [isOpen]="isActionSheetOpen()"
+    (didDismiss)="isActionSheetOpen.set(false)"
+    header="Opciones del Mercado"
+    [buttons]="getActionSheetButtons()">
+  </ion-action-sheet>
+
+  <!-- Toast -->
+  <ion-toast
+    [isOpen]="isToastOpen()"
+    [message]="toastMessage()"
+    [duration]="3000"
+    [color]="toastColor()"
+    position="bottom"
+    (didDismiss)="isToastOpen.set(false)">
+  </ion-toast>
+</ion-content>

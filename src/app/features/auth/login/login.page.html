@@ -1,0 +1,114 @@
+<ion-content class="ion-padding bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <div class="flex items-center justify-center min-h-full py-8">
+    <div class="w-full max-w-md">
+      <!-- Logo y título -->
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+          <ion-icon name="business-outline" class="text-3xl text-white"></ion-icon>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
+        <!-- <p class="text-gray-600">Iniciar Sesión</p> -->
+      </div>
+
+      <!-- Formulario de login -->
+      <ion-card class="municipal-card shadow-2xl">
+        <ion-card-header class="text-center pb-2">
+          <ion-card-title class="text-xl font-semibold text-gray-800">
+            AMDC
+          </ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <!-- Campo de usuario/email -->
+            <ion-item class="rounded-lg border border-gray-200 mb-4" [class.ion-invalid]="hasError('identifier')">
+              <ion-icon name="person-outline" slot="start" class="text-gray-500"></ion-icon>
+              <ion-label position="stacked">Usuario o Correo</ion-label>
+              <ion-input 
+                formControlName="identifier"
+                type="text"
+                placeholder="Ingrese su usuario o correo"
+                autocomplete="username"
+                [class.ion-invalid]="hasError('identifier')">
+              </ion-input>
+            </ion-item>
+            <div *ngIf="hasError('identifier')" class="px-4 -mt-2 mb-2">
+              <ion-text color="danger" class="text-sm">
+                {{ getErrorMessage('identifier') }}
+              </ion-text>
+            </div>
+
+            <!-- Campo de contraseña -->
+            <ion-item class="rounded-lg border border-gray-200 mb-4" [class.ion-invalid]="hasError('contrasena')">
+              <ion-icon name="lock-closed-outline" slot="start" class="text-gray-500"></ion-icon>
+              <ion-label position="stacked">Contraseña</ion-label>
+              <ion-input 
+                formControlName="contrasena"
+                [type]="showPassword() ? 'text' : 'password'"
+                placeholder="Ingrese su contraseña"
+                autocomplete="current-password"
+                [class.ion-invalid]="hasError('contrasena')">
+              </ion-input>
+              <ion-button 
+                fill="clear" 
+                slot="end" 
+                (click)="togglePasswordVisibility()"
+                size="small">
+                <ion-icon 
+                  [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'"
+                  class="text-gray-500">
+                </ion-icon>
+              </ion-button>
+            </ion-item>
+            <div *ngIf="hasError('contrasena')" class="px-4 -mt-2 mb-2">
+              <ion-text color="danger" class="text-sm">
+                {{ getErrorMessage('contrasena') }}
+              </ion-text>
+            </div>
+
+            <!-- Recordar sesión -->
+            <div class="flex items-center justify-between px-4 mb-6">
+              <ion-item lines="none" class="p-0 min-h-0">
+                <ion-checkbox 
+                  [checked]="rememberMe()"
+                  (ionChange)="toggleRememberMe()"
+                  slot="start"
+                  class="mr-2">
+                </ion-checkbox>
+                <ion-label class="text-sm text-gray-600 ml-2">
+                  Recordar sesión
+                </ion-label>
+              </ion-item>
+            </div>
+
+            <!-- Botón de login -->
+            <ion-button 
+              type="submit"
+              expand="block"
+              size="large"
+              [disabled]="!loginForm.valid || isLoading()"
+              class="mt-6 h-12 font-semibold text-white"
+              style="--background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);">
+              
+              <div *ngIf="!isLoading()" class="flex items-center">
+                <ion-icon name="log-in-outline" class="mr-2"></ion-icon>
+                Iniciar Sesión
+              </div>
+              
+              <div *ngIf="isLoading()" class="flex items-center">
+                <ion-spinner name="crescent" class="mr-2"></ion-spinner>
+                Autenticando...
+              </div>
+            </ion-button>
+          </form>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Información adicional -->
+      <div class="text-center mt-6 text-sm text-gray-600">
+        <p>¿Problemas para acceder?</p>
+        <p>Contacte al administrador del sistema</p>
+      </div>
+    </div>
+  </div>
+</ion-content>

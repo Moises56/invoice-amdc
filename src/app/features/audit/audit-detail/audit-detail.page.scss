@@ -1,0 +1,95 @@
+pre {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #374151;
+}
+
+.font-mono {
+  font-family: 'Courier New', monospace;
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
+/* Grid responsive */
+@media (max-width: 768px) {
+  .grid {
+    display: block;
+  }
+  
+  .grid > div {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Custom colors for data comparison */
+.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.border-red-200 {
+  border-color: #fecaca;
+}
+
+.bg-green-50 {
+  background-color: #f0fdf4;
+}
+
+.border-green-200 {
+  border-color: #bbf7d0;
+}
+
+.bg-yellow-50 {
+  background-color: #fffbeb;
+}
+
+.border-gray-200 {
+  border-color: #e5e7eb;
+}
+
+/* Copy button styling */
+ion-button[fill="clear"] {
+  --color: var(--ion-color-medium);
+}
+
+ion-button[fill="clear"]:hover {
+  --color: var(--ion-color-primary);
+}
+
+/* Card animations */
+ion-card {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .p-4 {
+    padding: 1rem;
+  }
+  
+  ion-card-content {
+    padding: 1rem;
+  }
+}

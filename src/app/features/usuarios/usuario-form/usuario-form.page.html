@@ -1,0 +1,221 @@
+<ion-header>
+  <ion-toolbar class="municipal-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/usuarios"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-white font-semibold">
+      {{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50">
+  <div class="p-4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      
+      <!-- Información básica -->
+      <ion-card class="shadow-sm mb-4">
+        <ion-card-header class="pb-2">
+          <ion-card-title class="text-lg text-gray-800 flex items-center">
+            <ion-icon name="person-outline" class="mr-2 text-primary"></ion-icon>
+            Información Básica
+          </ion-card-title>
+        </ion-card-header>
+        
+        <ion-card-content class="pt-0">
+          <!-- Nombre -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Nombre Completo *
+            </ion-label>
+            <ion-input
+              formControlName="name"
+              placeholder="Ingrese el nombre completo"
+              [class.is-invalid]="hasError('name')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError('name')" class="error-message">
+            {{ getErrorMessage('name') }}
+          </div>
+
+          <!-- Email -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Correo Electrónico *
+            </ion-label>
+            <ion-input
+              formControlName="email"
+              type="email"
+              placeholder="usuario@ejemplo.com"
+              [class.is-invalid]="hasError('email')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError('email')" class="error-message">
+            {{ getErrorMessage('email') }}
+          </div>
+
+          <!-- Teléfono -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Teléfono
+            </ion-label>
+            <ion-input
+              formControlName="phone"
+              type="tel"
+              placeholder="Número de teléfono"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+
+          <!-- Dirección -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Dirección
+            </ion-label>
+            <ion-textarea
+              formControlName="address"
+              placeholder="Dirección completa"
+              rows="3"
+              class="mt-1">
+            </ion-textarea>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Configuración de acceso -->
+      <ion-card class="shadow-sm mb-4">
+        <ion-card-header class="pb-2">
+          <ion-card-title class="text-lg text-gray-800 flex items-center">
+            <ion-icon name="key-outline" class="mr-2 text-primary"></ion-icon>
+            Configuración de Acceso
+          </ion-card-title>
+        </ion-card-header>
+        
+        <ion-card-content class="pt-0">
+          <!-- Rol -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Rol *
+            </ion-label>
+            <ion-select
+              formControlName="role"
+              placeholder="Seleccione un rol"
+              [class.is-invalid]="hasError('role')"
+              class="mt-1">
+              <ion-select-option *ngFor="let role of availableRoles" [value]="role">
+                {{ getRoleText(role) }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <div *ngIf="hasError('role')" class="error-message">
+            {{ getErrorMessage('role') }}
+          </div>
+
+          <!-- Password -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Contraseña {{ isEditing() ? '(dejar vacío para mantener actual)' : '*' }}
+            </ion-label>
+            <ion-input
+              formControlName="password"
+              type="password"
+              placeholder="Ingrese la contraseña"
+              [class.is-invalid]="hasError('password')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError('password')" class="error-message">
+            {{ getErrorMessage('password') }}
+          </div>
+
+          <!-- Confirmar Password -->
+          <ion-item 
+            *ngIf="form.get('password')?.value" 
+            class="mb-3 rounded-lg custom-input" 
+            lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Confirmar Contraseña *
+            </ion-label>
+            <ion-input
+              formControlName="confirmPassword"
+              type="password"
+              placeholder="Confirme la contraseña"
+              [class.is-invalid]="hasError('confirmPassword')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError('confirmPassword')" class="error-message">
+            {{ getErrorMessage('confirmPassword') }}
+          </div>
+
+          <!-- Estado activo -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label class="text-sm font-medium text-gray-700">
+              Usuario Activo
+            </ion-label>
+            <ion-toggle 
+              formControlName="isActive" 
+              slot="end"
+              color="primary">
+            </ion-toggle>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Mercado (para roles específicos) -->
+      <ion-card 
+        *ngIf="form.get('role')?.value === 'MARKET' || form.get('role')?.value === 'USER'"
+        class="shadow-sm mb-4">
+        <ion-card-header class="pb-2">
+          <ion-card-title class="text-lg text-gray-800 flex items-center">
+            <ion-icon name="business-outline" class="mr-2 text-primary"></ion-icon>
+            Asignación de Mercado
+          </ion-card-title>
+        </ion-card-header>
+        
+        <ion-card-content class="pt-0">
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Mercado
+            </ion-label>
+            <ion-select
+              formControlName="marketId"
+              placeholder="Seleccione un mercado"
+              class="mt-1">
+              <ion-select-option value="">Sin asignar</ion-select-option>
+              <!-- TODO: Cargar mercados dinámicamente -->
+              <ion-select-option value="1">Mercado Central</ion-select-option>
+              <ion-select-option value="2">Mercado Norte</ion-select-option>
+              <ion-select-option value="3">Mercado Sur</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Botones de acción -->
+      <div class="flex gap-3 mt-6">
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          color="medium"
+          (click)="goBack()"
+          class="flex-1">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Cancelar
+        </ion-button>
+        
+        <ion-button 
+          expand="block" 
+          type="submit"
+          [disabled]="form.invalid || isLoading()"
+          class="flex-1">
+          <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
+          <ion-icon *ngIf="!isLoading()" name="save-outline" slot="start"></ion-icon>
+          {{ isEditing() ? 'Actualizar' : 'Crear' }}
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

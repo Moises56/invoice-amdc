@@ -1,0 +1,193 @@
+ion-header {
+  ion-toolbar {
+    --background: #3880ff;
+    --color: white;
+    
+    ion-title {
+      font-weight: 600;
+    }
+  }
+}
+
+ion-content {
+  --background: #f5f5f5;
+}
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.profile-header {
+  text-align: center;
+  padding: 24px 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  .avatar {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 16px;
+    border: 4px solid #3880ff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .user-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  
+  .user-email {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  .user-role {
+    margin-top: 12px;
+  }
+}
+
+.profile-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  
+  .section-header {
+    padding: 16px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+  }
+  
+  ion-item {
+    --border-color: #e9ecef;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    
+    ion-icon {
+      color: #3880ff;
+      margin-right: 12px;
+    }
+    
+    ion-label {
+      h2 {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+      }
+      
+      p {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  
+  ion-button {
+    --border-radius: 8px;
+    height: 48px;
+    font-weight: 500;
+    
+    &.edit-button {
+      --background: #3880ff;
+      --color: white;
+    }
+    
+    &.change-password-button {
+      --background: #28a745;
+      --color: white;
+    }
+    
+    &.logout-button {
+      --background: #dc3545;
+      --color: white;
+    }
+  }
+}
+
+.password-form {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 16px;
+  
+  .form-header {
+    text-align: center;
+    margin-bottom: 24px;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+  }
+  
+  .form-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    
+    ion-button {
+      flex: 1;
+      --border-radius: 8px;
+      height: 44px;
+      font-weight: 500;
+      
+      &.save-button {
+        --background: #28a745;
+        --color: white;
+      }
+      
+      &.cancel-button {
+        --background: #6c757d;
+        --color: white;
+      }
+    }
+  }
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  margin-left: 16px;
+}
+
+// Responsive design
+@media (min-width: 768px) {
+  .profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .action-buttons {
+    flex-direction: row;
+    
+    ion-button {
+      flex: 1;
+    }
+  }
+}

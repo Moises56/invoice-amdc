@@ -1,0 +1,194 @@
+<ion-header>
+  <ion-toolbar class="municipal-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-white font-semibold">Mi Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50">
+  <div class="p-4">
+    
+    <!-- Header con avatar -->
+    <div class="text-center mb-6">
+      <ion-avatar class="w-24 h-24 mx-auto mb-4">        <div class="w-full h-full bg-primary rounded-full flex items-center justify-center">
+          <span class="text-white text-2xl font-bold">
+            {{ currentUser() ? getInitials(currentUser()!.name || currentUser()!.nombre || 'U') : 'U' }}
+          </span>
+        </div>
+      </ion-avatar>
+      <h2 class="text-xl font-semibold text-gray-800 mb-1">
+        {{ currentUser()?.name }}
+      </h2>
+      <p class="text-sm text-gray-500 mb-2">{{ currentUser()?.email }}</p>
+      <ion-chip [color]="currentUser()?.role === 'ADMIN' ? 'danger' : 'primary'" outline>
+        <ion-label>{{ currentUser()?.role }}</ion-label>
+      </ion-chip>
+    </div>
+
+    <!-- Formulario de perfil -->
+    <ion-card class="shadow-sm mb-4">
+      <ion-card-header class="pb-2">
+        <ion-card-title class="text-lg text-gray-800 flex items-center">
+          <ion-icon name="person-outline" class="mr-2 text-primary"></ion-icon>
+          Información Personal
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content class="pt-0">
+        <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+          
+          <!-- Nombre -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Nombre Completo *
+            </ion-label>
+            <ion-input
+              formControlName="name"
+              placeholder="Ingrese su nombre completo"
+              [class.is-invalid]="hasError(profileForm, 'name')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError(profileForm, 'name')" class="error-message">
+            {{ getErrorMessage(profileForm, 'name') }}
+          </div>
+
+          <!-- Email -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Correo Electrónico *
+            </ion-label>
+            <ion-input
+              formControlName="email"
+              type="email"
+              placeholder="su-email@ejemplo.com"
+              [class.is-invalid]="hasError(profileForm, 'email')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError(profileForm, 'email')" class="error-message">
+            {{ getErrorMessage(profileForm, 'email') }}
+          </div>
+
+          <!-- Teléfono -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Teléfono
+            </ion-label>
+            <ion-input
+              formControlName="phone"
+              type="tel"
+              placeholder="Número de teléfono"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+
+          <!-- Dirección -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Dirección
+            </ion-label>
+            <ion-textarea
+              formControlName="address"
+              placeholder="Dirección completa"
+              rows="3"
+              class="mt-1">
+            </ion-textarea>
+          </ion-item>
+
+          <!-- Botón actualizar perfil -->
+          <ion-button 
+            expand="block" 
+            type="submit"
+            [disabled]="profileForm.invalid || isLoading()"
+            class="mt-4">
+            <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
+            <ion-icon *ngIf="!isLoading()" name="save-outline" slot="start"></ion-icon>
+            Actualizar Perfil
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Cambiar contraseña -->
+    <ion-card class="shadow-sm mb-4">
+      <ion-card-header class="pb-2">
+        <ion-card-title class="text-lg text-gray-800 flex items-center">
+          <ion-icon name="key-outline" class="mr-2 text-primary"></ion-icon>
+          Cambiar Contraseña
+        </ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content class="pt-0">
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          
+          <!-- Contraseña actual -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Contraseña Actual *
+            </ion-label>
+            <ion-input
+              formControlName="currentPassword"
+              type="password"
+              placeholder="Ingrese su contraseña actual"
+              [class.is-invalid]="hasError(passwordForm, 'currentPassword')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError(passwordForm, 'currentPassword')" class="error-message">
+            {{ getErrorMessage(passwordForm, 'currentPassword') }}
+          </div>
+
+          <!-- Nueva contraseña -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Nueva Contraseña *
+            </ion-label>
+            <ion-input
+              formControlName="newPassword"
+              type="password"
+              placeholder="Ingrese la nueva contraseña"
+              [class.is-invalid]="hasError(passwordForm, 'newPassword')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError(passwordForm, 'newPassword')" class="error-message">
+            {{ getErrorMessage(passwordForm, 'newPassword') }}
+          </div>
+
+          <!-- Confirmar nueva contraseña -->
+          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
+            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+              Confirmar Nueva Contraseña *
+            </ion-label>
+            <ion-input
+              formControlName="confirmPassword"
+              type="password"
+              placeholder="Confirme la nueva contraseña"
+              [class.is-invalid]="hasError(passwordForm, 'confirmPassword')"
+              class="mt-1">
+            </ion-input>
+          </ion-item>
+          <div *ngIf="hasError(passwordForm, 'confirmPassword')" class="error-message">
+            {{ getErrorMessage(passwordForm, 'confirmPassword') }}
+          </div>
+
+          <!-- Botón cambiar contraseña -->
+          <ion-button 
+            expand="block" 
+            type="submit"
+            fill="outline"
+            color="primary"
+            [disabled]="passwordForm.invalid"
+            class="mt-4">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+            Cambiar Contraseña
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+</ion-content>

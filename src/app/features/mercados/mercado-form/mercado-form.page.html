@@ -1,0 +1,119 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/mercados"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditing() ? 'Editar Mercado' : 'Nuevo Mercado' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container mx-auto p-4">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Información del Mercado</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <ion-item class="mb-4">
+            <ion-label position="stacked">Nombre del Mercado *</ion-label>
+            <ion-input 
+              formControlName="nombre_mercado"
+              placeholder="Ingrese el nombre del mercado"
+              [class.ion-invalid]="isFieldInvalid('nombre_mercado')"
+              [class.ion-touched]="form.get('nombre_mercado')?.touched">
+            </ion-input>
+            <div class="error-message" *ngIf="getFieldError('nombre_mercado')">
+              {{ getFieldError('nombre_mercado') }}
+            </div>
+          </ion-item>
+
+          <ion-item class="mb-4">
+            <ion-label position="stacked">Dirección *</ion-label>
+            <ion-textarea 
+              formControlName="direccion"
+              placeholder="Ingrese la dirección completa"
+              [rows]="3"
+              [class.ion-invalid]="isFieldInvalid('direccion')"
+              [class.ion-touched]="form.get('direccion')?.touched">
+            </ion-textarea>
+            <div class="error-message" *ngIf="getFieldError('direccion')">
+              {{ getFieldError('direccion') }}
+            </div>
+          </ion-item>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <ion-item>
+              <ion-label position="stacked">Latitud *</ion-label>
+              <ion-input 
+                formControlName="latitud"
+                type="number"
+                step="any"
+                placeholder="-12.0464"
+                [class.ion-invalid]="isFieldInvalid('latitud')"
+                [class.ion-touched]="form.get('latitud')?.touched">
+                <ion-icon name="location-outline" slot="end"></ion-icon>
+              </ion-input>
+              <div class="error-message" *ngIf="getFieldError('latitud')">
+                {{ getFieldError('latitud') }}
+              </div>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Longitud *</ion-label>
+              <ion-input 
+                formControlName="longitud"
+                type="number"
+                step="any"
+                placeholder="-77.0428"
+                [class.ion-invalid]="isFieldInvalid('longitud')"
+                [class.ion-touched]="form.get('longitud')?.touched">
+                <ion-icon name="location-outline" slot="end"></ion-icon>
+              </ion-input>
+              <div class="error-message" *ngIf="getFieldError('longitud')">
+                {{ getFieldError('longitud') }}
+              </div>
+            </ion-item>
+          </div>
+
+          <ion-item class="mb-6">
+            <ion-label position="stacked">Descripción</ion-label>
+            <ion-textarea 
+              formControlName="descripcion"
+              placeholder="Descripción adicional del mercado (opcional)"
+              [rows]="4">
+            </ion-textarea>
+          </ion-item>
+
+          <div class="flex justify-end space-x-4">
+            <ion-button 
+              fill="clear" 
+              color="medium"
+              (click)="router.navigate(['/mercados'])">
+              Cancelar
+            </ion-button>
+            
+            <ion-button 
+              type="submit"
+              [disabled]="!form.valid || isLoading()"
+              color="primary">
+              <ion-spinner *ngIf="isLoading()" name="crescent" class="mr-2"></ion-spinner>
+              <ion-icon name="save-outline" slot="start" *ngIf="!isLoading()"></ion-icon>
+              {{ isLoading() ? 'Guardando...' : (isEditing() ? 'Actualizar' : 'Crear') }}
+            </ion-button>
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <ion-toast
+    [isOpen]="isToastOpen()"
+    [message]="toastMessage()"
+    [duration]="3000"
+    color="success"
+    position="top"
+    (didDismiss)="isToastOpen.set(false)">
+  </ion-toast>
+</ion-content>

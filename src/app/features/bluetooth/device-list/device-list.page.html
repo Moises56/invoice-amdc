@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Dispositivos Bluetooth</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="isScanning" class="flex flex-col items-center justify-center p-8">
+    <ion-spinner name="circular"></ion-spinner>
+    <ion-text class="mt-4 text-center">
+      <p>Buscando dispositivos Bluetooth...</p>
+    </ion-text>
+  </div>
+  <div *ngIf="!isScanning && devices.length === 0" class="flex flex-col items-center justify-center p-8">
+    <ion-icon name="bluetooth-outline" size="large" color="medium"></ion-icon>
+    <ion-text class="mt-4 text-center">
+      <h4>No se encontraron dispositivos</h4>
+      <p>Asegúrate de que Bluetooth esté activado y los dispositivos estén cerca.</p>
+    </ion-text><ion-button class="mt-4" (click)="scanDevices()">
+      <ion-icon name="refresh-circle" slot="start"></ion-icon>
+      Buscar Dispositivos
+    </ion-button>
+  </div>
+
+  <ion-list *ngIf="devices.length > 0">
+    <ion-list-header>
+      <ion-label>Dispositivos disponibles</ion-label>
+    </ion-list-header>
+      <ion-item *ngFor="let device of devices" button detail (click)="selectDevice(device)">
+      <ion-icon name="print-outline" slot="start" *ngIf="device.name?.toLowerCase().includes('printer')"></ion-icon>
+      <ion-icon name="hardware-chip-outline" slot="start" *ngIf="!device.name?.toLowerCase().includes('printer')"></ion-icon>
+      <ion-label>
+        <h2>{{ device.name || 'Dispositivo sin nombre' }}</h2>
+        <p>{{ device.id }}</p>
+      </ion-label>
+      <ion-badge slot="end" color="primary" *ngIf="device.connected">Conectado</ion-badge>
+    </ion-item>
+  </ion-list>
+  <div class="flex justify-center mt-4">
+    <ion-button (click)="scanDevices()" [disabled]="isScanning">
+      <ion-icon name="refresh-circle" slot="start"></ion-icon>
+      Actualizar
+    </ion-button>
+  </div>
+</ion-content>

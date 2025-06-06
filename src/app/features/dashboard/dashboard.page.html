@@ -1,0 +1,154 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="municipal-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button color="light"></ion-menu-button>
+    </ion-buttons>
+    
+    <ion-title class="text-white font-semibold">
+      Dashboard
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="refresh()" [disabled]="isLoading()">
+        <ion-icon name="refresh-outline" color="light"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" (click)="logout()">
+        <ion-icon name="log-out-outline" color="light"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="bg-gray-50">
+  <!-- Header de bienvenida -->
+  <div class="welcome-header p-6 bg-gradient-to-r from-primary to-secondary text-white">
+    <h1 class="text-2xl font-bold mb-2">
+      ¡Bienvenido, {{ userName() }}!
+    </h1>
+    <p class="text-blue-100 opacity-90">
+      {{ user()?.role }} - Sistema de Facturación Municipal
+    </p>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading()" class="flex justify-center items-center py-8">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!isLoading()" class="p-4">
+    <!-- Estadísticas rápidas -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div *ngFor="let stat of quickStats()" 
+           class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+        <div class="text-xs text-gray-500 mb-1">{{ stat.label }}</div>
+        <div class="text-lg font-bold text-gray-900 mb-1">{{ stat.value }}</div>
+        <ion-badge [color]="getTrendColor(stat.trend)" class="text-xs">
+          {{ stat.trend === 'up' ? '↗' : stat.trend === 'down' ? '↘' : '→' }}
+        </ion-badge>
+      </div>
+    </div>
+
+    <!-- Cards principales -->
+    <ion-grid class="p-0">
+      <ion-row>
+        <ion-col 
+          *ngFor="let card of dashboardCards()" 
+          size="12" 
+          size-md="6" 
+          size-lg="3"
+          class="p-1">
+          <ion-card 
+            button="true"
+            (click)="navigateTo(card.route)"
+            class="dashboard-card h-full shadow-md hover:shadow-lg transition-shadow duration-200">
+            <ion-card-content class="p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-1">
+                    {{ card.title }}
+                  </h3>
+                  <p class="text-sm text-gray-500">
+                    {{ card.subtitle }}
+                  </p>
+                </div>
+                <div class="flex-shrink-0 ml-3">
+                  <div class="w-12 h-12 rounded-full flex items-center justify-center"
+                       [ngClass]="'bg-' + card.color + '-100'">
+                    <ion-icon 
+                      [name]="card.icon" 
+                      [color]="card.color"
+                      class="text-xl">
+                    </ion-icon>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-end justify-between">
+                <div class="text-2xl font-bold" [ngClass]="'text-' + card.color">
+                  {{ card.count }}
+                </div>
+                <ion-icon 
+                  name="chevron-forward-outline" 
+                  class="text-gray-400 text-sm">
+                </ion-icon>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Acciones rápidas -->
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Acciones Rápidas</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <!-- Crear Factura -->
+        <ion-card 
+          button="true"
+          (click)="navigateTo('/facturas/crear')"
+          class="quick-action-card">
+          <ion-card-content class="p-4 text-center">
+            <ion-icon name="add-outline" color="primary" class="text-2xl mb-2"></ion-icon>
+            <h4 class="text-sm font-medium text-gray-700">Nueva Factura</h4>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Ver Reportes -->
+        <ion-card 
+          button="true"
+          (click)="navigateTo('/reportes')"
+          class="quick-action-card">
+          <ion-card-content class="p-4 text-center">
+            <ion-icon name="stats-chart-outline" color="secondary" class="text-2xl mb-2"></ion-icon>
+            <h4 class="text-sm font-medium text-gray-700">Ver Reportes</h4>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Configuración -->
+        <ion-card 
+          button="true"
+          (click)="navigateTo('/configuracion')"
+          class="quick-action-card">
+          <ion-card-content class="p-4 text-center">
+            <ion-icon name="settings-outline" color="tertiary" class="text-2xl mb-2"></ion-icon>
+            <h4 class="text-sm font-medium text-gray-700">Configuración</h4>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Información del sistema -->
+    <div class="mt-8 p-4 bg-white rounded-lg border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-sm font-medium text-gray-900">Sistema de Facturación Municipal</h3>          <p class="text-xs text-gray-500 mt-1">
+            Versión 1.0.0 - Última actualización: {{ getCurrentDate() }}
+          </p>
+        </div>
+        <ion-badge color="success">Activo</ion-badge>
+      </div>
+    </div>
+  </div>
+</ion-content>

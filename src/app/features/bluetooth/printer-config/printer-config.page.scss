@@ -1,0 +1,49 @@
+ion-card {
+  margin: 16px;
+  border-radius: 12px;
+}
+
+ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+ion-card-content {
+  padding: 16px;
+}
+
+ion-button {
+  margin: 8px 0;
+}
+
+ion-list {
+  margin-bottom: 16px;
+}
+
+ion-item {
+  --border-color: transparent;
+  --background: var(--ion-color-light);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+ion-select {
+  max-width: none;
+}
+
+.status-connected {
+  color: var(--ion-color-success);
+}
+
+.status-disconnected {
+  color: var(--ion-color-danger);
+}
+
+ion-icon[name="checkmark-circle-outline"] {
+  color: var(--ion-color-success);
+}
+
+ion-icon[name="close-circle-outline"] {
+  color: var(--ion-color-danger);
+}

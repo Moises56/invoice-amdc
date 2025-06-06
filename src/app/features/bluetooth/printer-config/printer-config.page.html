@@ -1,0 +1,123 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/bluetooth"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Configuración de Impresora</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Configuración</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Printer Connection Status -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon [name]="isConnected ? 'checkmark-circle-outline' : 'close-circle-outline'" 
+                  [color]="isConnected ? 'success' : 'danger'"></ion-icon>
+        Estado de Conexión
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ isConnected ? 'Conectado' : 'Desconectado' }}</p>
+      <ion-button *ngIf="!isConnected" (click)="connectToPrinter()" fill="solid" color="primary">
+        <ion-icon name="printer-outline" slot="start"></ion-icon>
+        Conectar
+      </ion-button>
+      <ion-button *ngIf="isConnected" (click)="disconnectPrinter()" fill="solid" color="danger">
+        Desconectar
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Printer Selection -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Selección de Impresora</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-select 
+            [(ngModel)]="selectedPrinter" 
+            placeholder="Selecciona una impresora"
+            interface="action-sheet">
+            <ion-select-option *ngFor="let printer of availablePrinters" [value]="printer.id">
+              {{ printer.name }} ({{ printer.type }})
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+      
+      <ion-button (click)="refreshPrinters()" fill="outline" color="medium">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Actualizar Lista
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Printer Settings -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="settings-outline"></ion-icon>
+        Configuraciones
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item>
+          <ion-label>Tamaño de Papel</ion-label>
+          <ion-select [(ngModel)]="printerSettings.paperSize" slot="end">
+            <ion-select-option value="58mm">58mm</ion-select-option>
+            <ion-select-option value="80mm">80mm</ion-select-option>
+            <ion-select-option value="A4">A4</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Codificación</ion-label>
+          <ion-select [(ngModel)]="printerSettings.encoding" slot="end">
+            <ion-select-option value="UTF-8">UTF-8</ion-select-option>
+            <ion-select-option value="ISO-8859-1">ISO-8859-1</ion-select-option>
+            <ion-select-option value="Windows-1252">Windows-1252</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Conexión Automática</ion-label>
+          <ion-toggle [(ngModel)]="printerSettings.autoConnect" slot="end"></ion-toggle>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Test Print -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Prueba de Impresión</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Envía una página de prueba para verificar la configuración.</p>
+      <ion-button (click)="testPrint()" fill="solid" color="secondary" [disabled]="!isConnected">
+        <ion-icon name="printer-outline" slot="start"></ion-icon>
+        Imprimir Prueba
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Alert -->
+  <ion-alert
+    [isOpen]="isAlertOpen"
+    (didDismiss)="onAlertDismiss()"
+    header="Información"
+    [message]="alertMessage"
+    [buttons]="['OK']">
+  </ion-alert>
+
+</ion-content>

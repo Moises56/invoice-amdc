@@ -1,0 +1,79 @@
+ion-content {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+}
+
+.bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #f0f9ff, #e0e7ff);
+}
+
+.from-blue-50 {
+  --tw-gradient-from: #eff6ff;
+}
+
+.to-indigo-100 {
+  --tw-gradient-to: #e0e7ff;
+}
+
+.municipal-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+ion-item {
+  --border-radius: 0.5rem;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --inner-padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 0.5rem;
+}
+
+ion-item.ion-invalid {
+  --border-color: var(--error);
+  --highlight-color-focused: var(--error);
+}
+
+ion-input.ion-invalid {
+  --color: var(--error);
+}
+
+ion-button[type="submit"] {
+  --border-radius: 0.75rem;
+  --box-shadow: 0 4px 14px 0 rgba(92, 206, 223, 0.4);
+  margin-top: 1.5rem;
+  font-weight: 600;
+  height: 3rem;
+}
+
+ion-button[type="submit"]:hover {
+  --box-shadow: 0 6px 20px 0 rgba(92, 206, 223, 0.6);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+ion-checkbox {
+  --color-checked: var(--primary);
+  --border-color-checked: var(--primary);
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.min-h-full {
+  min-height: 100%;
+}
+
+@media (max-width: 768px) {
+  .max-w-md {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+}
