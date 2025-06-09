@@ -16,7 +16,10 @@ import {
   personOutline, callOutline, mailOutline, checkmarkCircleOutline,
   closeCircleOutline, timeOutline, helpCircleOutline, documentTextOutline,
   addOutline, createOutline, trashOutline, eyeOutline, searchOutline,
-  closeSharp, refreshOutline, receiptOutline, statsChartOutline, downloadOutline, alertCircleOutline, filterOutline, documentOutline, checkmarkOutline, closeOutline } from 'ionicons/icons';
+  closeSharp, refreshOutline, receiptOutline, statsChartOutline, downloadOutline, 
+  alertCircleOutline, filterOutline, documentOutline, checkmarkOutline, 
+  closeOutline, add, pauseOutline, playOutline
+} from 'ionicons/icons';
 
 import { LocalesService } from '../locales.service';
 import { FacturasService } from '../../facturas/facturas.service';
@@ -112,7 +115,15 @@ export class LocalDetailPage implements OnInit {
     const user = this.authService.user();
     return user && [Role.ADMIN, Role.MARKET, Role.USER].includes(user.role);
   });  constructor() {
-    addIcons({createOutline,refreshOutline,alertCircleOutline,businessOutline,locationOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,addOutline,filterOutline,documentOutline,calendarOutline,checkmarkOutline,closeOutline,closeSharp,cardOutline,personOutline,callOutline,mailOutline,helpCircleOutline,trashOutline,eyeOutline,searchOutline,receiptOutline,statsChartOutline,downloadOutline});
+    addIcons({
+      createOutline, refreshOutline, alertCircleOutline, documentTextOutline, 
+      checkmarkCircleOutline, timeOutline, closeCircleOutline, addOutline, 
+      filterOutline, documentOutline, calendarOutline, checkmarkOutline, 
+      closeOutline, add, businessOutline, locationOutline, closeSharp, 
+      cardOutline, personOutline, callOutline, mailOutline, helpCircleOutline, 
+      trashOutline, eyeOutline, searchOutline, receiptOutline, statsChartOutline, 
+      downloadOutline, pauseOutline, playOutline
+    });
   }
 
   ngOnInit() {
@@ -474,19 +485,6 @@ export class LocalDetailPage implements OnInit {
    */
   trackByFacturaId(index: number, factura: Factura): string {
     return factura.id;
-  }
-  /**
-   * Ver ubicación en mapa
-   */
-  verEnMapa() {
-    const mercado = this.local()?.mercado;
-    if (mercado?.latitud && mercado?.longitud) {
-      // Abrir Google Maps con las coordenadas
-      const url = `https://www.google.com/maps/search/?api=1&query=${mercado.latitud},${mercado.longitud}`;
-      window.open(url, '_blank');
-    } else {
-      this.showToast('No hay coordenadas disponibles para este mercado', 'warning');
-    }
   }
 
   /**

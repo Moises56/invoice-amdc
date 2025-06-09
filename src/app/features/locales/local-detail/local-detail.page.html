@@ -90,56 +90,7 @@
               <p>{{ local()?.createdAt | date:'dd/MM/yyyy' }}</p>
             </ion-label>
           </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Información del Mercado -->
-    <ion-card class="mercado-info-card">
-      <ion-card-header>
-        <ion-card-title>
-          <ion-icon name="business-outline"></ion-icon>
-          Información del Mercado
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="mercado-details">
-          <div class="detail-item">
-            <ion-label>
-              <h3>Nombre</h3>
-              <p>{{ local()?.mercado?.nombre_mercado || 'No disponible' }}</p>
-            </ion-label>
-          </div>
-          
-          <div class="detail-item">
-            <ion-label>
-              <h3>Dirección</h3>
-              <p>{{ local()?.mercado?.direccion || 'No disponible' }}</p>
-            </ion-label>
-          </div>
-          
-          <div class="detail-item">
-            <ion-label>
-              <h3>Fecha de Creación</h3>
-              <p>{{ local()?.mercado?.createdAt | date:'dd/MM/yyyy' }}</p>
-            </ion-label>
-          </div>
-          
-          <div class="detail-item location-item">
-            <ion-label>
-              <h3>Ubicación</h3>
-            </ion-label>
-            <ion-button 
-              fill="outline" 
-              size="small" 
-              (click)="verEnMapa()"
-              [disabled]="!local()?.mercado?.latitud || !local()?.mercado?.longitud">
-              <ion-icon name="location-outline" slot="start"></ion-icon>
-              Ver en Mapa
-            </ion-button>
-          </div>
-        </div>
-      </ion-card-content>
+        </div>      </ion-card-content>
     </ion-card>
 
     <!-- Estadísticas del Local -->
