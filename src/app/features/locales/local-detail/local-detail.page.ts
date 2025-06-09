@@ -8,7 +8,7 @@ import {
   IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
   IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
   IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
-  AlertController, ToastController
+  AlertController, ToastController, LoadingController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -26,7 +26,7 @@ import { FacturasService } from '../../facturas/facturas.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { 
   Local, Factura, EstadoLocal, EstadoFactura, 
-  TipoLocal, Role, User 
+  TipoLocal, Role, User, CreateFacturaRequest 
 } from '../../../shared/interfaces';
 
 @Component({
@@ -43,14 +43,13 @@ import {
     IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption
   ]
 })
-export class LocalDetailPage implements OnInit {
-  private localesService = inject(LocalesService);
+export class LocalDetailPage implements OnInit {  private localesService = inject(LocalesService);
   private facturasService = inject(FacturasService);
   private authService = inject(AuthService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  private route = inject(ActivatedRoute);  private router = inject(Router);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
+  private loadingController = inject(LoadingController);
 
   // Signals
   local = signal<Local | null>(null);
@@ -114,8 +113,7 @@ export class LocalDetailPage implements OnInit {
   canCreateFactura = computed(() => {
     const user = this.authService.user();
     return user && [Role.ADMIN, Role.MARKET, Role.USER].includes(user.role);
-  });  constructor() {
-    addIcons({
+  });  constructor() {    addIcons({
       createOutline, refreshOutline, alertCircleOutline, documentTextOutline, 
       checkmarkCircleOutline, timeOutline, closeCircleOutline, addOutline, 
       filterOutline, documentOutline, calendarOutline, checkmarkOutline, 
@@ -249,15 +247,368 @@ export class LocalDetailPage implements OnInit {
     } catch (error) {
       this.showToast('Error al cambiar estado del local', 'danger');
     }
-  }
-  /**
+  }  /**
    * Crear nueva factura
    */
-  crearFactura() {
-    // Navegar a la página de creación de factura
-    this.router.navigate(['/facturas/crear'], { 
-      queryParams: { localId: this.localId() } 
+  async crearFactura() {
+    // Generar opciones de meses (últimos 3 meses y próximos 12 meses)
+    const currentDate = new Date();
+    const monthOptions = [];
+    
+    // Mes actual como primera opción
+    const currentValue = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    const currentLabel = `${this.getMonthName(currentDate.getMonth() + 1)} ${currentDate.getFullYear()} (Mes Actual)`;
+    
+    // Últimos 3 meses
+    for (let i = 3; i >= 1; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const label = `${this.getMonthName(date.getMonth() + 1)} ${date.getFullYear()}`;
+      monthOptions.push({ text: label, value, type: 'past' });
+    }
+    
+    // Próximos 11 meses (sin incluir el actual)
+    for (let i = 1; i <= 11; i++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+      const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const label = `${this.getMonthName(date.getMonth() + 1)} ${date.getFullYear()}`;
+      monthOptions.push({ text: label, value, type: 'future' });
+    }
+
+    // Preparar inputs para el alert
+    const radioInputs = [
+      {
+        name: 'mes',
+        type: 'radio' as any,
+        label: currentLabel,
+        value: currentValue,
+        checked: true
+      },
+      // Separador visual (disabled option)
+      ...monthOptions.map((option) => ({
+        name: 'mes',
+        type: 'radio' as any,
+        label: option.text + (option.type === 'past' ? ' (Anterior)' : ''),
+        value: option.value,
+        checked: false
+      }))
+    ];
+
+    const alert = await this.alertController.create({
+      header: 'Crear Nueva Factura',
+      message: 'Seleccione el mes para el cual desea generar la factura:',
+      inputs: radioInputs,
+      cssClass: 'month-selector-alert',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Siguiente',
+          handler: async (selectedMonth) => {
+            if (selectedMonth) {
+              await this.mostrarFormularioObservaciones(selectedMonth);
+              return true;
+            } else {
+              this.showToast('Debe seleccionar un mes', 'warning');
+              return false;
+            }
+          }
+        }
+      ]
     });
+    
+    await alert.present();
+  }
+  /**
+   * Mostrar formulario de observaciones después de seleccionar el mes
+   */
+  async mostrarFormularioObservaciones(mesSeleccionado: string) {
+    // Validar si ya existe una factura para este mes
+    const facturaExiste = await this.validarFacturaExistente(mesSeleccionado);
+    
+    if (facturaExiste) {
+      const [year, month] = mesSeleccionado.split('-');
+      const monthName = this.getMonthName(parseInt(month));
+        const alert = await this.alertController.create({
+        header: 'Factura Ya Existente',
+        message: `
+          <div class="text-center">
+            <ion-icon name="information-circle-outline" color="primary" style="font-size: 48px; margin-bottom: 16px;"></ion-icon>
+            <p>Ya existe una factura para <strong>${monthName} ${year}</strong>.</p>
+            <p>¿Desea continuar de todos modos o elegir otro mes?</p>
+          </div>
+        `,
+        cssClass: 'error-alert',
+        buttons: [
+          {
+            text: 'Elegir Otro Mes',
+            cssClass: 'primary',
+            handler: () => {
+              this.crearFactura(); // Volver al selector de mes
+            }
+          },
+          {
+            text: 'Ver Factura Existente',
+            cssClass: 'secondary',
+            handler: () => {
+              this.buscarYMostrarFacturaExistente(monthName, year);
+            }
+          },
+          {
+            text: 'Continuar Anyway',
+            role: 'destructive',
+            cssClass: 'danger',
+            handler: () => {
+              this.continuarConFormularioObservaciones(mesSeleccionado, true);
+            }
+          }
+        ]
+      });
+      
+      await alert.present();
+      return;
+    }
+    
+    // Si no existe, continuar normalmente
+    this.continuarConFormularioObservaciones(mesSeleccionado, false);
+  }
+
+  /**
+   * Continuar con el formulario de observaciones
+   */
+  private async continuarConFormularioObservaciones(mesSeleccionado: string, forceCreate: boolean = false) {
+    const [year, month] = mesSeleccionado.split('-');
+    const monthName = this.getMonthName(parseInt(month));
+
+    const alert = await this.alertController.create({
+      header: 'Crear Factura',
+      message: `Generar factura para <strong>${monthName} ${year}</strong>${forceCreate ? ' (Se intentará crear aunque exista una similar)' : ''}`,
+      inputs: [
+        {
+          name: 'observaciones',
+          type: 'textarea',
+          placeholder: 'Observaciones adicionales (opcional)',
+          attributes: {
+            rows: 3
+          }
+        }
+      ],
+      buttons: [
+        {
+          text: 'Atrás',
+          handler: () => {
+            this.crearFactura(); // Volver al selector de mes
+          }
+        },
+        {
+          text: 'Crear Factura',
+          handler: (data) => {
+            this.procesarCreacionFactura(mesSeleccionado, data.observaciones || '');
+            return true;
+          }
+        }
+      ]
+    });
+    
+    await alert.present();
+  }  /**
+   * Procesar la creación de la factura
+   */  async procesarCreacionFactura(mes: string, observaciones: string = '') {
+    // Mostrar loading
+    const loading = await this.loadingController.create({
+      message: 'Creando factura...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+
+    try {
+      const local = this.local();
+      const currentUser = this.authService.user();
+      
+      if (!local || !currentUser) {
+        await loading.dismiss();
+        this.showToast('Error: Información insuficiente para crear la factura', 'danger');
+        return;
+      }
+
+      // Parsear el mes seleccionado
+      const [year, month] = mes.split('-');
+      const monthName = this.getMonthName(parseInt(month));
+      
+      // Calcular fecha de vencimiento (15 del mes siguiente)
+      const nextMonth = parseInt(month) === 12 ? 1 : parseInt(month) + 1;
+      const nextYear = parseInt(month) === 12 ? parseInt(year) + 1 : parseInt(year);
+      const fechaVencimiento = new Date(nextYear, nextMonth - 1, 15);
+
+      // Convertir monto_mensual a number de forma segura
+      const montoMensual = typeof local.monto_mensual === 'string' 
+        ? parseFloat(local.monto_mensual) 
+        : (local.monto_mensual || 0);      const facturaData: CreateFacturaRequest = {
+        concepto: `Cuota mensual ${monthName} ${year}`,
+        mes: mes,
+        anio: parseInt(year),
+        monto: montoMensual,
+        estado: EstadoFactura.PENDIENTE,
+        fecha_vencimiento: fechaVencimiento.toISOString(),
+        observaciones: observaciones || 'Factura generada automáticamente',
+        localId: local.id,
+        createdByUserId: currentUser.id
+      };
+
+      const response = await this.facturasService.createFactura(facturaData).toPromise();
+      
+      await loading.dismiss();
+      
+      if (response) {
+        this.showToast('Factura creada exitosamente', 'success');
+        this.loadFacturas(true);
+        this.cargarEstadisticasFacturas();
+      }
+    } catch (error: any) {
+      await loading.dismiss();
+      console.error('Error creating factura:', error);
+      
+      // Manejar errores específicos
+      if (error.status === 409) {
+        // Error de conflicto - factura duplicada
+        const [year, month] = mes.split('-');
+        const monthName = this.getMonthName(parseInt(month));
+        
+        await this.mostrarErrorFacturaDuplicada(monthName, year, error);
+      } else if (error.status === 400) {
+        // Error de validación
+        const errorMessage = error.error?.message || 'Datos inválidos para crear la factura';
+        this.showToast(errorMessage, 'danger');
+      } else if (error.status === 403) {
+        // Error de permisos
+        this.showToast('No tiene permisos para crear facturas', 'danger');
+      } else if (error.status === 500) {
+        // Error del servidor
+        this.showToast('Error interno del servidor. Intente nuevamente', 'danger');
+      } else if (error.status === 0 || !error.status) {
+        // Error de conectividad
+        this.showToast('Error de conexión. Verifique su red', 'danger');
+      } else {
+        // Error genérico
+        this.showToast('Error al crear la factura. Intente nuevamente', 'danger');
+      }
+    }
+  }
+  /**
+   * Mostrar error específico para factura duplicada con opciones
+   */
+  async mostrarErrorFacturaDuplicada(monthName: string, year: string, error: any) {
+    const errorMessage = error.error?.message || `Ya existe una factura para ${monthName} ${year}`;
+    
+    const alert = await this.alertController.create({
+      header: 'Factura Duplicada',
+      message: `
+        <div class="text-center">
+          <ion-icon name="warning-outline" color="warning" style="font-size: 48px; margin-bottom: 16px;"></ion-icon>
+          <p><strong>${errorMessage}</strong></p>
+          <p>¿Qué desea hacer?</p>
+        </div>
+      `,
+      cssClass: 'error-alert',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary'
+        },
+        {
+          text: 'Ver Factura Existente',
+          cssClass: 'primary',
+          handler: () => {
+            this.buscarYMostrarFacturaExistente(monthName, year);
+          }
+        },
+        {
+          text: 'Elegir Otro Mes',
+          cssClass: 'tertiary',
+          handler: () => {
+            // Volver al selector de mes
+            setTimeout(() => this.crearFactura(), 300);
+          }
+        }
+      ]
+    });
+    
+    await alert.present();
+  }
+
+  /**
+   * Buscar y mostrar la factura existente para el mes especificado
+   */
+  async buscarYMostrarFacturaExistente(monthName: string, year: string) {
+    try {
+      const facturas = this.facturas();
+      const facturaExistente = facturas.find(f => 
+        f.mes.includes(monthName) && f.anio.toString() === year
+      );
+      
+      if (facturaExistente) {
+        this.verDetalleFactura(facturaExistente);
+      } else {
+        // Si no la encontramos en la lista local, recargar las facturas
+        await this.loadFacturas(true);
+        this.showToast(`Busque la factura de ${monthName} ${year} en la lista`, 'medium');
+      }
+    } catch (error) {
+      console.error('Error finding existing factura:', error);
+      this.showToast('No se pudo encontrar la factura existente', 'warning');
+    }
+  }
+
+  /**
+   * Validar si ya existe una factura para el mes seleccionado
+   */
+  private async validarFacturaExistente(mes: string): Promise<boolean> {
+    const [year, month] = mes.split('-');
+    const monthName = this.getMonthName(parseInt(month));
+    
+    // Buscar en las facturas locales primero
+    const facturas = this.facturas();
+    const facturaExistente = facturas.find(f => 
+      f.mes.includes(monthName) && f.anio.toString() === year
+    );
+    
+    return !!facturaExistente;
+  }
+
+  /**
+   * Obtener nombre del mes
+   */
+  private getMonthName(month: number): string {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    return months[month - 1] || 'Mes desconocido';
+  }
+
+  /**
+   * Cargar estadísticas de facturas
+   */
+  async cargarEstadisticasFacturas() {
+    try {
+      // Aquí deberías llamar a un servicio que obtenga las estadísticas
+      // Por ahora, calculamos basado en las facturas cargadas
+      const facturas = this.facturas();
+      const estadisticas = {
+        total: facturas.length,
+        pagadas: facturas.filter(f => f.estado === 'PAGADA').length,
+        pendientes: facturas.filter(f => f.estado === 'PENDIENTE').length,
+        vencidas: facturas.filter(f => f.estado === 'VENCIDA').length
+      };
+      
+      this.estadisticasFacturas.set(estadisticas);
+    } catch (error) {
+      console.error('Error loading estadisticas:', error);
+    }
   }
 
   /**
@@ -498,13 +849,54 @@ export class LocalDetailPage implements OnInit {
       position: 'top'
     });
     await toast.present();
-  }
-
-  /**
+  }  /**
    * Manejar cambio en la búsqueda
    */
   onSearchChange(event: any) {
     const query = event.target.value;
     this.searchTerm.set(query);
+  }
+
+  /**
+   * Ver detalle completo del local en modal
+   */
+  async verDetalleCompleto() {
+    // Por ahora, mostraremos un alert con la información
+    const alert = await this.alertController.create({
+      header: 'Información Completa del Local',
+      message: this.buildLocalInfoMessage(),
+      buttons: ['Cerrar'],
+      cssClass: 'local-info-alert'
+    });
+    
+    await alert.present();
+  }
+
+  /**
+   * Construir mensaje con información del local
+   */
+  private buildLocalInfoMessage(): string {
+    const local = this.local();
+    if (!local) return 'No hay información disponible';
+    
+    return `
+      <div class="local-info-content">
+        <p><strong>ID:</strong> ${local.id}</p>
+        <p><strong>Nombre:</strong> ${local.nombre_local || 'No especificado'}</p>
+        <p><strong>Número:</strong> ${local.numero_local}</p>
+        <p><strong>Permiso de Operación:</strong> ${local.permiso_operacion || 'No especificado'}</p>
+        <p><strong>Tipo:</strong> ${local.tipo_local}</p>
+        <p><strong>Dirección:</strong> ${local.direccion_local || 'No especificada'}</p>
+        <p><strong>Estado:</strong> ${local.estado_local}</p>
+        <p><strong>Monto Mensual:</strong> L ${local.monto_mensual}</p>
+        <p><strong>Propietario:</strong> ${local.propietario || 'No especificado'}</p>
+        <p><strong>DNI Propietario:</strong> ${local.dni_propietario || 'No especificado'}</p>
+        <p><strong>Teléfono:</strong> ${local.telefono || 'No especificado'}</p>
+        <p><strong>Email:</strong> ${local.email || 'No especificado'}</p>
+        <p><strong>Coordenadas:</strong> ${local.latitud}, ${local.longitud}</p>
+        <p><strong>Fecha de Creación:</strong> ${this.formatDate(local.createdAt!)}</p>
+        <p><strong>Última Actualización:</strong> ${this.formatDate(local.updatedAt!)}</p>
+      </div>
+    `;
   }
 }
