@@ -8,6 +8,7 @@ import {
   IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
   IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
   IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
+  IonModal,
   AlertController, ToastController, LoadingController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -18,8 +19,9 @@ import {
   addOutline, createOutline, trashOutline, eyeOutline, searchOutline,
   closeSharp, refreshOutline, receiptOutline, statsChartOutline, downloadOutline, 
   alertCircleOutline, filterOutline, documentOutline, checkmarkOutline, 
-  closeOutline, add, pauseOutline, playOutline
-} from 'ionicons/icons';
+  closeOutline, add, pauseOutline, playOutline, cashOutline, close, 
+  chevronDownOutline, chatbubbleOutline, addCircleOutline, walletOutline,
+  documentAttachOutline, informationCircleOutline } from 'ionicons/icons';
 
 import { LocalesService } from '../locales.service';
 import { FacturasService } from '../../facturas/facturas.service';
@@ -33,20 +35,26 @@ import {
   selector: 'app-local-detail',
   templateUrl: './local-detail.page.html',
   styleUrls: ['./local-detail.page.scss'],
-  standalone: true,  imports: [
+  standalone: true,
+  imports: [
     CommonModule,
     FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonButtons,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel,
     IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
     IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
-    IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption
+    IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
+    IonModal
   ]
 })
-export class LocalDetailPage implements OnInit {  private localesService = inject(LocalesService);
+export class LocalDetailPage implements OnInit {
+  
+  // Service injections
+  private localesService = inject(LocalesService);
   private facturasService = inject(FacturasService);
   private authService = inject(AuthService);
-  private route = inject(ActivatedRoute);  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private loadingController = inject(LoadingController);
@@ -61,7 +69,6 @@ export class LocalDetailPage implements OnInit {  private localesService = injec
   currentPage = signal(1);
   totalPages = signal(1);
   isInfiniteDisabled = signal(false);
-
   // Signals adicionales
   error = signal<string | null>(null);
   mercadoId = signal<string>('');
@@ -71,6 +78,11 @@ export class LocalDetailPage implements OnInit {  private localesService = injec
     pendientes: 0,
     vencidas: 0
   });
+  
+  // Invoice Modal signals
+  showInvoiceModal = signal(false);
+  selectedMonth = signal<number>(0);
+  isCreatingInvoice = signal(false);
   
   // Filtros
   filtroEstado = '';
@@ -113,14 +125,16 @@ export class LocalDetailPage implements OnInit {  private localesService = injec
   canCreateFactura = computed(() => {
     const user = this.authService.user();
     return user && [Role.ADMIN, Role.MARKET, Role.USER].includes(user.role);
-  });  constructor() {    addIcons({
-      createOutline, refreshOutline, alertCircleOutline, documentTextOutline, 
-      checkmarkCircleOutline, timeOutline, closeCircleOutline, addOutline, 
-      filterOutline, documentOutline, calendarOutline, checkmarkOutline, 
-      closeOutline, add, businessOutline, locationOutline, closeSharp, 
-      cardOutline, personOutline, callOutline, mailOutline, helpCircleOutline, 
-      trashOutline, eyeOutline, searchOutline, receiptOutline, statsChartOutline, 
-      downloadOutline, pauseOutline, playOutline
+  });  constructor() {
+    addIcons({
+      eyeOutline, createOutline, refreshOutline, alertCircleOutline, documentTextOutline,
+      checkmarkCircleOutline, timeOutline, closeCircleOutline, addOutline, filterOutline,
+      documentOutline, calendarOutline, checkmarkOutline, closeOutline, add, close,
+      cashOutline, chevronDownOutline, chatbubbleOutline, addCircleOutline, businessOutline,
+      locationOutline, closeSharp, cardOutline, personOutline, callOutline, mailOutline,
+      helpCircleOutline, trashOutline, searchOutline, receiptOutline, statsChartOutline,
+      downloadOutline, pauseOutline, playOutline, walletOutline, documentAttachOutline,
+      informationCircleOutline
     });
   }
 
@@ -248,7 +262,89 @@ export class LocalDetailPage implements OnInit {  private localesService = injec
       this.showToast('Error al cambiar estado del local', 'danger');
     }
   }  /**
-   * Crear nueva factura
+   * Abrir modal de crear factura
+   */
+  openInvoiceModal() {
+    this.selectedMonth.set(new Date().getMonth() + 1);
+    this.isCreatingInvoice.set(false);
+    this.showInvoiceModal.set(true);
+  }
+
+  /**
+   * Cerrar modal de crear factura
+   */
+  closeInvoiceModal() {
+    this.showInvoiceModal.set(false);
+    this.selectedMonth.set(0);
+    this.isCreatingInvoice.set(false);
+  }
+
+  /**
+   * Crear factura desde el modal
+   */
+  async createInvoice() {
+    if (!this.selectedMonth() || this.selectedMonth() === 0) {
+      this.showToast('Debe seleccionar un mes', 'warning');
+      return;
+    }
+
+    this.isCreatingInvoice.set(true);
+
+    try {
+      const local = this.local();
+      const currentUser = this.authService.user();
+      
+      if (!local || !currentUser) {
+        this.showToast('Error: Información insuficiente', 'danger');
+        return;
+      }
+
+      const currentYear = new Date().getFullYear();
+      const monthName = this.getMonthName(this.selectedMonth());
+      const mes = `${currentYear}-${String(this.selectedMonth()).padStart(2, '0')}`;
+      
+      // Calcular fecha de vencimiento (15 del mes seleccionado)
+      const dueDate = new Date(currentYear, this.selectedMonth() - 1, 15);
+      
+      const montoMensual = typeof local.monto_mensual === 'string' 
+        ? parseFloat(local.monto_mensual) 
+        : (local.monto_mensual || 0);
+
+      const facturaData: CreateFacturaRequest = {
+        concepto: `Cuota mensual ${monthName} ${currentYear}`,
+        mes: mes,
+        anio: currentYear,
+        monto: montoMensual,
+        estado: EstadoFactura.PENDIENTE,
+        fecha_vencimiento: dueDate.toISOString(),
+        observaciones: `Factura generada para ${monthName} ${currentYear}`,
+        localId: local.id,
+        createdByUserId: currentUser.id
+      };
+
+      const response = await this.facturasService.createFactura(facturaData).toPromise();
+      
+      if (response) {
+        this.showToast('Factura creada exitosamente', 'success');
+        this.closeInvoiceModal();
+        this.loadFacturas(true);
+        this.cargarEstadisticasFacturas();
+      }
+    } catch (error: any) {
+      console.error('Error creating factura:', error);
+      
+      if (error.status === 409) {
+        this.showToast('Ya existe una factura para este mes', 'danger');
+      } else {
+        this.showToast('Error al crear la factura', 'danger');
+      }
+    } finally {
+      this.isCreatingInvoice.set(false);
+    }
+  }
+
+  /**
+   * Crear nueva factura (método original mantenido para compatibilidad)
    */
   async crearFactura() {
     // Generar opciones de meses (últimos 3 meses y próximos 12 meses)
@@ -578,11 +674,10 @@ export class LocalDetailPage implements OnInit {  private localesService = injec
     
     return !!facturaExistente;
   }
-
   /**
    * Obtener nombre del mes
    */
-  private getMonthName(month: number): string {
+  getMonthName(month: number): string {
     const months = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -870,9 +965,7 @@ export class LocalDetailPage implements OnInit {  private localesService = injec
     });
     
     await alert.present();
-  }
-
-  /**
+  }  /**
    * Construir mensaje con información del local
    */
   private buildLocalInfoMessage(): string {
@@ -898,5 +991,36 @@ export class LocalDetailPage implements OnInit {  private localesService = injec
         <p><strong>Última Actualización:</strong> ${this.formatDate(local.updatedAt!)}</p>
       </div>
     `;
+  }
+
+  /**
+   * Obtener fecha actual formateada
+   */
+  getCurrentFormattedDate(): string {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+  /**
+   * Obtener año actual
+   */
+  getCurrentYear(): number {
+    return new Date().getFullYear();
+  }
+
+  /**
+   * Obtener mes actual formateado
+   */
+  getCurrentFormattedMonth(): string {
+    return String(new Date().getMonth() + 1).padStart(2, '0');
+  }
+
+  /**
+   * Obtener mes seleccionado formateado
+   */
+  getFormattedSelectedMonth(): string {
+    return String(this.selectedMonth()).padStart(2, '0');
   }
 }

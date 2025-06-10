@@ -657,3 +657,139 @@ ion-alert.error-alert {
     }
   }
 }
+
+// Modern Invoice Modal - Using Tailwind CSS for consistent design
+// Note: Modal is now styled with Tailwind classes in the HTML template
+// Keeping minimal custom styles for Ionic-specific elements
+
+.invoice-modal {
+  // Custom styles for specific Ionic elements that need override
+  ion-select {
+    --placeholder-color: #6b7280;
+    --color: #111827;
+  }
+  
+  // Ensure backdrop opacity
+  --backdrop-opacity: 0.5;
+}
+
+// Ultra Compact Invoice Modal - Optimized for minimal footprint
+.invoice-modal {
+  // Enhanced backdrop opacity for better focus
+  --backdrop-opacity: 0.75;
+  
+  // Ultra compact styles for Ionic select component
+  ion-select {
+    --placeholder-color: #6b7280;
+    --color: #1f2937;
+    --background: transparent;
+    font-weight: 500;
+    font-size: 13px;
+    
+    &:focus-within {
+      --color: #3b82f6;
+    }
+  }
+  
+  // Minimalist select item styling
+  ion-item {
+    &.month-selector-modern {
+      --background: transparent;
+      --border-color: transparent;
+      --inner-padding-start: 0;
+      --inner-padding-end: 0;
+      --padding-start: 0;
+      --padding-end: 0;
+      --min-height: 32px; // Even more compact
+      
+      &:hover {
+        --background: rgba(59, 130, 246, 0.05);
+      }
+    }
+  }
+  
+  // Compact button styling
+  button {
+    &:hover {
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+  
+  // Accessibility improvements
+  &:focus-within {
+    --backdrop-opacity: 0.8;
+  }
+}
+
+// Smooth and fast animation for compact modal
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Optimized animation class for ultra compact modal
+.modal-slide-in {
+  animation: modalSlideIn 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+// Mobile-specific optimizations for ultra compact modal
+@media (max-width: 640px) {
+  .invoice-modal {
+    // Smaller text on mobile
+    ion-select {
+      font-size: 12px;
+    }
+    
+    // Even faster animation on mobile
+    .modal-slide-in {
+      animation-duration: 0.2s;
+    }
+    
+    // Compact spacing adjustments
+    .modal-slide-in {
+      max-width: 300px !important;
+    }
+  }
+}
+
+// Enhanced backdrop blur for modern browsers
+@supports (backdrop-filter: blur(4px)) {
+  .invoice-modal {
+    .fixed.inset-0 {
+      backdrop-filter: blur(4px);
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .invoice-modal {
+    ion-select {
+      --border-width: 2px;
+      --color: #000;
+    }
+  }
+}
+
+// Reduced motion support for accessibility
+@media (prefers-reduced-motion: reduce) {
+  .modal-slide-in {
+    animation: none;
+  }
+  
+  .invoice-modal {
+    * {
+      transition: none !important;
+    }
+  }
+}

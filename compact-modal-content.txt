@@ -1,0 +1,105 @@
+              <div class="relative">
+                <ion-select 
+                  [(ngModel)]="selectedMonth"
+                  placeholder="Elegir mes"
+                  interface="popover"
+                  aria-label="Seleccionar mes para la factura"
+                  class="w-full bg-gray-50 border border-gray-200 hover:border-blue-400 focus:border-blue-500 rounded-lg px-3 py-2 text-sm text-gray-800 font-medium">
+                  <ion-select-option value="1">Enero</ion-select-option>
+                  <ion-select-option value="2">Febrero</ion-select-option>
+                  <ion-select-option value="3">Marzo</ion-select-option>
+                  <ion-select-option value="4">Abril</ion-select-option>
+                  <ion-select-option value="5">Mayo</ion-select-option>
+                  <ion-select-option value="6">Junio</ion-select-option>
+                  <ion-select-option value="7">Julio</ion-select-option>
+                  <ion-select-option value="8">Agosto</ion-select-option>
+                  <ion-select-option value="9">Septiembre</ion-select-option>
+                  <ion-select-option value="10">Octubre</ion-select-option>
+                  <ion-select-option value="11">Noviembre</ion-select-option>
+                  <ion-select-option value="12">Diciembre</ion-select-option>
+                </ion-select>
+                <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <ion-icon name="chevron-down-outline" class="text-gray-400 text-sm"></ion-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compact Invoice Details -->
+            <div *ngIf="selectedMonth() > 0" class="bg-gray-50 rounded-lg p-3 border border-gray-100">
+              <div class="flex items-center justify-center mb-3">
+                <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wide">Detalle Factura</h3>
+              </div>
+              
+              <div class="space-y-2 text-xs">
+                <!-- Mes -->
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-600 flex items-center">
+                    <ion-icon name="calendar-outline" class="mr-1 text-blue-500"></ion-icon>
+                    Mes
+                  </span>
+                  <span class="font-semibold text-gray-900">{{ getMonthName(selectedMonth()) }}</span>
+                </div>
+                
+                <!-- Concepto -->
+                <div class="flex justify-between items-start">
+                  <span class="text-gray-600 flex items-center">
+                    <ion-icon name="document-outline" class="mr-1 text-purple-500"></ion-icon>
+                    Concepto
+                  </span>
+                  <span class="font-semibold text-gray-900 text-right text-xs leading-tight max-w-36">
+                    Cuota {{ getMonthName(selectedMonth()) }} {{ getCurrentYear() }}
+                  </span>
+                </div>
+                
+                <!-- Vencimiento -->
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-600 flex items-center">
+                    <ion-icon name="time-outline" class="mr-1 text-orange-500"></ion-icon>
+                    Vencimiento
+                  </span>
+                  <span class="font-semibold text-gray-900">{{ getCurrentYear() }}-{{ getFormattedSelectedMonth() }}-15</span>
+                </div>
+                
+                <!-- Estado -->
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-600 flex items-center">
+                    <ion-icon name="information-circle-outline" class="mr-1 text-yellow-500"></ion-icon>
+                    Estado
+                  </span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    PENDIENTE
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compact Action Buttons -->
+            <div class="space-y-2 pt-1">
+              <!-- Create Button -->
+              <button 
+                [disabled]="!selectedMonth() || selectedMonth() === 0 || isCreatingInvoice()"
+                (click)="createInvoice()"
+                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:scale-100 disabled:cursor-not-allowed shadow-md hover:shadow-lg disabled:shadow-none flex items-center justify-center space-x-2 text-sm">
+                <div *ngIf="isCreatingInvoice()" class="flex items-center space-x-2">
+                  <ion-spinner name="circular" class="w-4 h-4 text-white"></ion-spinner>
+                  <span class="font-bold uppercase tracking-wide">Creando...</span>
+                </div>
+                <div *ngIf="!isCreatingInvoice()" class="flex items-center space-x-2">
+                  <ion-icon name="add-circle-outline" class="text-lg"></ion-icon>
+                  <span class="font-bold uppercase tracking-wide">Crear</span>
+                </div>
+              </button>
+              
+              <!-- Cancel Button -->
+              <button 
+                (click)="closeInvoiceModal()"
+                class="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 text-sm">
+                <ion-icon name="close-circle-outline" class="text-base"></ion-icon>
+                <span>Cancelar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
