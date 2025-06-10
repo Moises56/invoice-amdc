@@ -316,35 +316,31 @@
     </ion-fab-button>
   </ion-fab>  <!-- Compact Invoice Creation Modal -->  <ion-modal [isOpen]="showInvoiceModal()" (didDismiss)="closeInvoiceModal()" class="invoice-modal">
     <ng-template>
-      <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-3 z-50">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-[320px] mx-auto modal-slide-in transform transition-all duration-300 overflow-hidden">
-          
-          <!-- Ultra Compact Header -->
-          <div class="relative bg-gradient-to-r from-blue-500 to-blue-600 p-3">
-            <!-- Close Button -->
+      <div class="fixed inset-0 bg-gray-100 bg-opacity-70 flex items-center justify-center p-3 z-50">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-[320px] mx-auto modal-slide-in transform transition-all duration-300 overflow-hidden">          <!-- Ultra Compact Header -->
+          <div class="relative bg-gradient-to-r from-[#5ccedf] to-[#4ab8c7] p-3">            <!-- Close Button -->
             <button 
               (click)="closeInvoiceModal()" 
-              class="absolute top-2 right-2 w-5 h-5 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all duration-200">
-              <ion-icon name="close-outline" class="text-white text-xs"></ion-icon>
+              class="absolute top-2 right-2 w-6 h-6 bg-dark bg-opacity-20 hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all duration-200 z-10">
+              <span class="text-white text-lg font-bold leading-none" style="margin-top: -2px;">×</span>
             </button>
             
             <!-- Minimal Amount Display -->
             <div class="text-center text-white">
-              <div class="inline-flex items-center justify-center w-8 h-8 bg-white bg-opacity-20 rounded-full mb-1">
-                <ion-icon name="wallet-outline" class="text-base"></ion-icon>
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-white bg-opacity-20 rounded-full mb-1">
+                <img src="assets/logos/logoAmdc.png" alt="AMDC Logo" class="w-8 h-8 object-contain">
               </div>
               <div>
                 <p class="text-xs font-medium opacity-90">Monto Mensual</p>
                 <p class="text-base font-bold">LPS. {{ local()?.monto_mensual | currency:'':'':'1.0-0' }}</p>
               </div>
             </div>
-          </div>          <!-- Ultra Compact Content -->
+          </div><!-- Ultra Compact Content -->
           <div class="p-3 space-y-3">
-            
-            <!-- Minimalist Month Selector -->
+              <!-- Minimalist Month Selector -->
             <div class="space-y-1">
               <label class="block text-xs font-medium text-gray-600 flex items-center">
-                <ion-icon name="calendar-outline" class="mr-1 text-blue-500 text-xs"></ion-icon>
+                <ion-icon name="calendar-outline" class="mr-1 text-[#5ccedf] text-xs"></ion-icon>
                 Mes a Facturar
               </label>
               <div class="relative">
@@ -353,7 +349,7 @@
                   placeholder="Seleccionar mes"
                   interface="popover"
                   aria-label="Seleccionar mes para la factura"
-                  class="w-full bg-gray-50 border border-gray-200 hover:border-blue-400 focus:border-blue-500 rounded-lg px-3 py-2 transition-all duration-200 text-sm text-gray-800">
+                  class="w-full bg-gray-50 border border-gray-200 hover:border-[#5ccedf] focus:border-[#5ccedf] rounded-lg px-3 py-2 transition-all duration-200 text-sm text-gray-800">
                   <ion-select-option value="1">Enero</ion-select-option>
                   <ion-select-option value="2">Febrero</ion-select-option>
                   <ion-select-option value="3">Marzo</ion-select-option>
@@ -374,7 +370,7 @@
             </div>            <!-- Compact Invoice Summary -->
             <div *ngIf="selectedMonth() > 0" class="bg-gray-50 rounded-lg p-3 border border-gray-200">
               <div class="flex items-center justify-center mb-2">
-                <ion-icon name="document-text-outline" class="text-blue-600 text-base mr-1"></ion-icon>
+                <ion-icon name="document-text-outline" class="text-[#5ccedf] text-base mr-1"></ion-icon>
                 <h3 class="text-xs font-semibold text-gray-700">Resumen de Factura</h3>
               </div>
               
@@ -406,32 +402,42 @@
                     PENDIENTE
                   </span>
                 </div>
+
+                <!-- Observaciones -->
+                <div class="flex justify-between items-start">
+                  <span class="text-gray-600">Observaciones:</span>
+                  <span class="font-medium text-gray-900 text-right max-w-32 leading-tight">
+                    Factura generada automáticamente
+                  </span>
+                </div>
               </div>
-            </div>            <!-- Compact Action Buttons -->
-            <div class="space-y-2 pt-1">
+            </div>            <!-- Compact Action Buttons - Side by Side -->
+
+             <div class="flex space-x-2 pt-1">
+              <!-- Cancel Button -->
+              <button 
+                (click)="closeInvoiceModal()"
+                class=" btn-cancelar flex-1 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-medium py-2.5 px-4 rounded-[1rem] transition-all duration-200 flex items-center justify-center space-x-2 border border-gray-200 hover:border-gray-300 text-sm">
+                <ion-icon name="close-circle-outline" class="text-base"></ion-icon>
+                <span>Cancelar</span>
+              </button>
+              
               <!-- Create Button -->
               <button 
                 [disabled]="!selectedMonth() || selectedMonth() === 0 || isCreatingInvoice()"
                 (click)="createInvoice()"
-                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed shadow-md hover:shadow-lg disabled:shadow-none flex items-center justify-center space-x-2 text-sm">
+                class="btn-crear flex-1 bg-gradient-to-r from-[#5ccedf] to-[#4ab8c7] hover:from-[#4ab8c7] hover:to-[#3aa3b0] disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold py-2.5 px-4 rounded-[1rem] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed shadow-md hover:shadow-lg disabled:shadow-none flex items-center justify-center space-x-2 text-sm">
                 <div *ngIf="isCreatingInvoice()" class="flex items-center space-x-2">
                   <ion-spinner name="circular" class="w-4 h-4 text-white"></ion-spinner>
                   <span>Creando...</span>
                 </div>
                 <div *ngIf="!isCreatingInvoice()" class="flex items-center space-x-2">
                   <ion-icon name="add-circle-outline" class="text-base"></ion-icon>
-                  <span>Crear Factura</span>
+                  <span>Crear</span>
                 </div>
               </button>
-              
-              <!-- Cancel Button -->
-              <button 
-                (click)="closeInvoiceModal()"
-                class="w-full bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 border border-gray-200 hover:border-gray-300 text-sm">
-                <ion-icon name="close-circle-outline" class="text-base"></ion-icon>
-                <span>Cancelar</span>
-              </button>
             </div>
+            
           </div>
         </div>
       </div>

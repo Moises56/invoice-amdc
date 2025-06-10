@@ -687,7 +687,7 @@ ion-alert.error-alert {
     font-size: 13px;
     
     &:focus-within {
-      --color: #3b82f6;
+      --color: #5ccedf;
     }
   }
   
@@ -703,7 +703,7 @@ ion-alert.error-alert {
       --min-height: 32px; // Even more compact
       
       &:hover {
-        --background: rgba(59, 130, 246, 0.05);
+        --background: rgba(92, 206, 223, 0.05);
       }
     }
   }
@@ -792,4 +792,48 @@ ion-alert.error-alert {
       transition: none !important;
     }
   }
+}
+
+
+
+.btn-crear{
+  border-radius: 1rem;
+  padding: 0.5rem 
+  1rem;
+  background-color: var(--ion-color-primary);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  margin: 0.5rem;
+  border: none;
+  outline: none;
+}
+
+.btn-crear:hover {
+  background-color: var(--ion-color-primary-shade);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+.btn-cancelar {
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--ion-color-medium);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  margin: 0.5rem;
+  border: none;
+  outline: none;
+}
+
+.btn-cancelar:hover {
+  background-color: var(--ion-color-medium-shade);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
