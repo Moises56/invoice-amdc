@@ -4,8 +4,9 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api'
+  // apiUrl: 'http://localhost:3000/api'
   // apiUrl: 'https://merc-fact-back.onrender.com/api'
+  apiUrl: 'https://factback.amdc.hn/api'
 };
 
 /*

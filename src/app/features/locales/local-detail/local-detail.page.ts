@@ -21,7 +21,7 @@ import {
   alertCircleOutline, filterOutline, documentOutline, checkmarkOutline, 
   closeOutline, add, pauseOutline, playOutline, cashOutline, close, 
   chevronDownOutline, chatbubbleOutline, addCircleOutline, walletOutline,
-  documentAttachOutline, informationCircleOutline } from 'ionicons/icons';
+  documentAttachOutline, informationCircleOutline, storefrontOutline } from 'ionicons/icons';
 
 import { LocalesService } from '../locales.service';
 import { FacturasService } from '../../facturas/facturas.service';
@@ -40,7 +40,7 @@ import {
     CommonModule,
     FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonButtons,
-    IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel,
+    IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem,
     IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
     IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
     IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
@@ -126,16 +126,7 @@ export class LocalDetailPage implements OnInit {
     const user = this.authService.user();
     return user && [Role.ADMIN, Role.MARKET, Role.USER].includes(user.role);
   });  constructor() {
-    addIcons({
-      eyeOutline, createOutline, refreshOutline, alertCircleOutline, documentTextOutline,
-      checkmarkCircleOutline, timeOutline, closeCircleOutline, addOutline, filterOutline,
-      documentOutline, calendarOutline, checkmarkOutline, closeOutline, add, close,
-      cashOutline, chevronDownOutline, chatbubbleOutline, addCircleOutline, businessOutline,
-      locationOutline, closeSharp, cardOutline, personOutline, callOutline, mailOutline,
-      helpCircleOutline, trashOutline, searchOutline, receiptOutline, statsChartOutline,
-      downloadOutline, pauseOutline, playOutline, walletOutline, documentAttachOutline,
-      informationCircleOutline
-    });
+    addIcons({eyeOutline,createOutline,refreshOutline,alertCircleOutline,storefrontOutline,personOutline,callOutline,businessOutline,locationOutline,cashOutline,calendarOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,addOutline,filterOutline,documentOutline,checkmarkOutline,closeOutline,add,chevronDownOutline,addCircleOutline,close,chatbubbleOutline,closeSharp,cardOutline,mailOutline,helpCircleOutline,trashOutline,searchOutline,receiptOutline,statsChartOutline,downloadOutline,pauseOutline,playOutline,walletOutline,documentAttachOutline,informationCircleOutline});
   }
 
   ngOnInit() {

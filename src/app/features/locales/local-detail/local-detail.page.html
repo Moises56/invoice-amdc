@@ -37,106 +37,140 @@
   <div *ngIf="!isLoading() && !error() && local()" class="content-container">
     
     <!-- Información del Local -->
-    <ion-card class="local-info-card">
-      <ion-card-header>
-        <div class="card-header-flex">
-          <div class="local-title">            <ion-card-title>Local {{ local()?.numero_local }}</ion-card-title>            <ion-badge [color]="getEstadoColor(local()?.estado_local || '')" class="estado-badge">
-              {{ local()?.estado_local }}
-            </ion-badge>
+    <ion-card class="local-info-card m-2 shadow-md border-0 bg-white">
+      <ion-card-header class="pb-2">
+        <div class="iten-local flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <ion-icon name="storefront-outline" class="text-white text-sm"></ion-icon>
+            </div>
+            <div>
+              <ion-card-title class="text-lg font-bold text-gray-800 leading-tight">
+                Local {{ local()?.numero_local }}
+              </ion-card-title>
+              <ion-badge 
+                [color]="getEstadoColor(local()?.estado_local || '')" 
+                class="text-xs px-2 py-1 mt-1">
+                {{ local()?.estado_local }}
+              </ion-badge>
+            </div>
           </div>
+          
           <div class="local-actions" *ngIf="canEditLocal()">
-            <ion-button fill="clear" size="small" (click)="toggleEstadoLocal()">
-              <ion-icon [name]="local()?.estado_local === 'ACTIVO' ? 'pause-outline' : 'play-outline'"></ion-icon>
+            <ion-button 
+              fill="clear" 
+              size="small" 
+              (click)="toggleEstadoLocal()"
+              class="w-8 h-8">
+              <ion-icon 
+                [name]="local()?.estado_local === 'ACTIVO' ? 'pause-outline' : 'play-outline'"
+                class="text-gray-600 text-sm">
+              </ion-icon>
             </ion-button>
           </div>
         </div>
       </ion-card-header>
       
-      <ion-card-content>
-        <div class="local-details-grid">
-          <div class="detail-item">
-            <ion-label>
-              <h3>Propietario</h3>
-              <p>{{ local()?.propietario || 'No asignado' }}</p>
-            </ion-label>
+      <ion-card-content class="pt-0 px-4 pb-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+          <!-- Propietario -->
+          <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+            <ion-icon name="person-outline" class="text-emerald-500 text-base flex-shrink-0"></ion-icon>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs text-gray-500 font-medium mb-0">Propietario</p>
+              <p class="text-gray-800 font-medium text-xs truncate leading-tight">{{ local()?.propietario || 'No asignado' }}</p>
+            </div>
           </div>
-          
-          <div class="detail-item">
-            <ion-label>
-              <h3>Teléfono</h3>
-              <p>{{ local()?.telefono || 'No registrado' }}</p>
-            </ion-label>
-          </div>
-            <div class="detail-item">
-            <ion-label>
-              <h3>Tipo</h3>
-              <p>{{ local()?.tipo_local || 'No especificado' }}</p>
-            </ion-label>
-          </div>
-          
-          <div class="detail-item">
-            <ion-label>
-              <h3>Dirección</h3>
-              <p>{{ local()?.direccion_local || 'No registrada' }}</p>
-            </ion-label>
-          </div>
-          
-          <div class="detail-item">
-            <ion-label>
-              <h3>Tarifa Mensual</h3>
-              <p class="price">L. {{ local()?.monto_mensual | currency:'':'':'1.2-2' }}</p>
-            </ion-label>
-          </div>
-            <div class="detail-item">
-            <ion-label>
-              <h3>Fecha de Registro</h3>
-              <p>{{ local()?.createdAt | date:'dd/MM/yyyy' }}</p>
-            </ion-label>
-          </div>
-        </div>      </ion-card-content>
-    </ion-card>
 
-    <!-- Estadísticas del Local -->
-    <ion-card class="stats-card">
-      <ion-card-header>
-        <ion-card-title>Estadísticas</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <ion-icon name="document-text-outline" color="primary"></ion-icon>
-            <div class="stat-content">
-              <h4>{{ estadisticasFacturas()?.total || 0 }}</h4>
-              <p>Total Facturas</p>
+          <!-- Teléfono -->
+          <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+            <ion-icon name="call-outline" class="text-blue-500 text-base flex-shrink-0"></ion-icon>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs text-gray-500 font-medium mb-0">Teléfono</p>
+              <p class="text-gray-800 font-medium text-xs leading-tight">{{ local()?.telefono || 'No registrado' }}</p>
             </div>
           </div>
-          
-          <div class="stat-item">
-            <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-            <div class="stat-content">
-              <h4>{{ estadisticasFacturas()?.pagadas || 0 }}</h4>
-              <p>Pagadas</p>
+
+          <!-- Tipo -->
+          <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+            <ion-icon name="business-outline" class="text-purple-500 text-base flex-shrink-0"></ion-icon>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs text-gray-500 font-medium mb-0">Tipo</p>
+              <p class="text-gray-800 font-medium text-xs leading-tight">{{ local()?.tipo_local || 'No especificado' }}</p>
             </div>
           </div>
-          
-          <div class="stat-item">
-            <ion-icon name="time-outline" color="warning"></ion-icon>
-            <div class="stat-content">
-              <h4>{{ estadisticasFacturas()?.pendientes || 0 }}</h4>
-              <p>Pendientes</p>
+
+          <!-- Dirección -->
+          <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg col-span-2 md:col-span-1">
+            <ion-icon name="location-outline" class="text-orange-500 text-base flex-shrink-0"></ion-icon>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs text-gray-500 font-medium mb-0">Dirección</p>
+              <p class="text-gray-800 font-medium text-xs leading-tight">{{ local()?.direccion_local || 'No registrada' }}</p>
             </div>
           </div>
-          
-          <div class="stat-item">
-            <ion-icon name="close-circle-outline" color="danger"></ion-icon>
-            <div class="stat-content">
-              <h4>{{ estadisticasFacturas()?.vencidas || 0 }}</h4>
-              <p>Vencidas</p>
+
+          <!-- Tarifa Mensual -->
+          <div class="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-100">
+            <ion-icon name="cash-outline" class="text-green-600 text-base flex-shrink-0"></ion-icon>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs text-green-600 font-medium mb-0">Tarifa Mensual</p>
+              <p class="text-green-700 font-bold text-sm leading-tight">L. {{ local()?.monto_mensual | currency:'':'':'1.2-2' }}</p>
+            </div>
+          </div>
+
+          <!-- Fecha de Registro -->
+          <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+            <ion-icon name="calendar-outline" class="text-indigo-500 text-base flex-shrink-0"></ion-icon>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs text-gray-500 font-medium mb-0">Registro</p>
+              <p class="text-gray-800 font-medium text-xs leading-tight">{{ local()?.createdAt | date:'dd/MM/yyyy' }}</p>
             </div>
           </div>
         </div>
       </ion-card-content>
     </ion-card>
+
+        <!-- Estadísticas del Local -->
+        <ion-card class="stats-card">
+          <ion-card-header>
+            <ion-card-title>Estadísticas</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <ion-icon name="document-text-outline" color="primary"></ion-icon>
+                <div class="stat-content">
+                  <h4>{{ estadisticasFacturas()?.total || 0 }}</h4>
+                  <p>Total Facturas</p>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+                <div class="stat-content">
+                  <h4>{{ estadisticasFacturas()?.pagadas || 0 }}</h4>
+                  <p>Pagadas</p>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <ion-icon name="time-outline" color="warning"></ion-icon>
+                <div class="stat-content">
+                  <h4>{{ estadisticasFacturas()?.pendientes || 0 }}</h4>
+                  <p>Pendientes</p>
+                </div>
+              </div>
+              
+              <div class="stat-item">
+                <ion-icon name="close-circle-outline" color="danger"></ion-icon>
+                <div class="stat-content">
+                  <h4>{{ estadisticasFacturas()?.vencidas || 0 }}</h4>
+                  <p>Vencidas</p>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
 
     <!-- Sección de Facturas -->
     <ion-card class="facturas-card">
