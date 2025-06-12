@@ -21,7 +21,9 @@ import {
   IonSpinner,
   IonText,
   IonButtons,
-  IonMenuButton
+  IonMenuButton,
+  IonSkeletonText,
+  IonChip
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -34,9 +36,19 @@ import {
   settingsOutline,
   logOutOutline,
   refreshOutline,
-  addOutline, chevronForwardOutline } from 'ionicons/icons';
+  addOutline,
+  chevronForwardOutline,
+  trendingUpOutline,
+  trendingDownOutline,
+  alertCircleOutline,
+  checkmarkCircleOutline,
+  cashOutline,
+  walletOutline
+} from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../shared/enums';
+import { MercadosService } from '../mercados/mercados.service';
+import { StatsService, LocalesStats, FacturasStats } from '../../shared/services/stats.service';
 
 interface DashboardCard {
   title: string;
@@ -67,6 +79,8 @@ interface QuickStat {
     IonToolbar,
     IonCard,
     IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
     IonButton,
     IonIcon,
     IonGrid,
@@ -75,55 +89,165 @@ interface QuickStat {
     IonSpinner,
     IonButtons,
     IonMenuButton,
-    IonBadge
+    IonBadge,
+    IonItem,
+    IonLabel,
+    IonText,
+    IonSkeletonText,
+    IonChip
   ]
 })
 export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private mercadosService = inject(MercadosService);
+  private statsService = inject(StatsService);
 
   // Signals
   isLoading = signal<boolean>(true);
   dashboardCards = signal<DashboardCard[]>([]);
   quickStats = signal<QuickStat[]>([]);
+  
+  // Statistics Signals
+  mercadosStats = signal<any>(null);
+  localesStats = signal<LocalesStats | null>(null);
+  facturasStats = signal<FacturasStats | null>(null);
+  statsLoading = signal(true);
+  statsError = signal<string | null>(null);
 
   // Computed signals
   user = this.authService.user;
   userRole = this.authService.userRole;
   userName = this.authService.userName;
-
   constructor() {
-    addIcons({refreshOutline,logOutOutline,chevronForwardOutline,addOutline,statsChartOutline,settingsOutline,homeOutline,businessOutline,storefrontOutline,receiptOutline,peopleOutline});
+    addIcons({
+      refreshOutline, logOutOutline, chevronForwardOutline, addOutline,
+      statsChartOutline, settingsOutline, homeOutline, businessOutline,
+      storefrontOutline, receiptOutline, peopleOutline, trendingUpOutline, 
+      trendingDownOutline, alertCircleOutline, checkmarkCircleOutline,
+      cashOutline, walletOutline
+    });
   }
 
   ngOnInit() {
     this.initializeDashboard();
-  }
-
-  /**
+  }  /**
    * Inicializar dashboard
    */
   private async initializeDashboard(): Promise<void> {
     this.isLoading.set(true);
+    this.statsLoading.set(true);
     
     try {
-      await this.loadDashboardData();
+      // Initialize dashboard cards
       this.setupDashboardCards();
+      
+      // Load stats from API
+      await this.loadStats();
+      
+      // Initialize quick stats
       this.setupQuickStats();
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error('Error initializing dashboard:', error);
+      this.statsError.set('Error al cargar datos del dashboard');
     } finally {
       this.isLoading.set(false);
+      this.statsLoading.set(false);
+    }try {
+      // Inicializar tarjetas del dashboard
+      this.setupDashboardCards();
+      
+      // Cargar estadísticas
+      await this.loadStats();
+      
+      // Setupear quick stats
+      this.setupQuickStats();
+    } catch (error) {
+      console.error('Error initializing dashboard:', error);
+      this.statsError.set('Error al cargar estadísticas');
+    } finally {
+      this.isLoading.set(false);
+      this.statsLoading.set(false);
     }
   }
-
+  
   /**
-   * Cargar datos del dashboard
+   * Cargar estadísticas
+   */
+  private async loadStats(): Promise<void> {
+    try {
+      // Fetch all stats in parallel      // Only use for demo - replace with real API calls and proper error handling
+      try {
+        const mercadosStats = await this.mercadosService.getAllMarketStats().toPromise();
+        this.mercadosStats.set(mercadosStats);
+      } catch (error) {
+        console.error('Error fetching mercados stats:', error);
+      }
+      
+      try {
+        const localesStats = await this.statsService.getLocalesStats().toPromise();
+        this.localesStats.set(localesStats || null);
+      } catch (error) {
+        console.error('Error fetching locales stats:', error);
+      }
+      
+      try {
+        const facturasStats = await this.statsService.getFacturasStats().toPromise();
+        this.facturasStats.set(facturasStats || null);
+      } catch (error) {
+        console.error('Error fetching facturas stats:', error);
+      }
+      
+      // Update cards with real statistics
+      this.updateCardCounts();
+      
+      // Setup quick stats based on real data
+      this.setupQuickStats();
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      this.statsError.set('Error al cargar estadísticas');
+    }
+  }
+  
+  /**
+   * Update card counts with real statistics
+   */
+  private updateCardCounts(): void {
+    const cards = [...this.dashboardCards()];
+    
+    // Update Mercados card
+    if (this.mercadosStats()) {
+      const mercadoCard = cards.find(card => card.title === 'Mercados');
+      if (mercadoCard) {
+        mercadoCard.count = this.mercadosStats().total_mercados || 0;
+        mercadoCard.subtitle = `${this.mercadosStats().locales_ocupados || 0} ocupados`;
+      }
+    }
+      // Update Locales card
+    if (this.localesStats()) {
+      const localCard = cards.find(card => card.title === 'Locales');
+      if (localCard) {
+        localCard.count = this.localesStats()?.total_locales || 0;
+        localCard.subtitle = `${this.localesStats()?.locales_activos || 0} activos`;
+      }
+    }
+    
+    // Update Facturas card
+    if (this.facturasStats()) {
+      const facturaCard = cards.find(card => card.title === 'Facturas');
+      if (facturaCard) {
+        facturaCard.count = this.facturasStats()?.total_facturas || 0;
+        facturaCard.subtitle = `${this.facturasStats()?.facturas_pendientes || 0} pendientes`;
+      }
+    }
+      this.dashboardCards.set(cards);
+  }
+  /**
+   * Cargar datos del dashboard de forma simulada (para desarrollo)
    */
   private async loadDashboardData(): Promise<void> {
-    // Aquí cargaríamos las estadísticas desde los servicios
-    // Por ahora usaremos datos simulados
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Simular carga para propósitos de desarrollo
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 
   /**

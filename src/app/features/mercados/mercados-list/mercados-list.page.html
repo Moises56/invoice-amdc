@@ -114,10 +114,8 @@
         <ion-icon name="add-outline" slot="start"></ion-icon>
         Crear Mercado
       </ion-button>
-    </div>
-
-    <!-- Markets Grid -->
-    <ion-grid>
+    </div>    <!-- Markets Grid -->
+    <ion-grid class="market-grid">
       <ion-row>
         <ion-col 
           *ngFor="let mercado of filteredMercados(); trackBy: trackByFn"

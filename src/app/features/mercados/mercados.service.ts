@@ -83,8 +83,13 @@ export class MercadosService {
    */
   toggleMarketStatus(id: string): Observable<ApiResponse<Mercado>> {
     return this.http.patch<ApiResponse<Mercado>>(`${this.apiUrl}/${id}/toggle-status`, {});
+  }  /**
+   * Obtener estadísticas generales de todos los mercados
+   */
+  getAllMarketStats(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/stats`);
   }
-
+  
   /**
    * Obtener lista de municipios únicos
    */

@@ -102,3 +102,71 @@
 .municipal-button-secondary:hover {
   opacity: 0.9;
 }
+
+/* Status bar and safe area adjustments for mobile */
+:root {
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
+  --ion-safe-area-left: env(safe-area-inset-left);
+  --ion-safe-area-right: env(safe-area-inset-right);
+  
+  /* Status bar heights for different platforms */
+  --status-bar-height: 44px; /* iOS default */
+}
+
+/* Platform specific status bar heights */
+.ios {
+  --status-bar-height: 44px;
+}
+
+.md {
+  --status-bar-height: 24px;
+}
+
+/* Mobile status bar and safe area fixes */
+@media (max-width: 768px) {
+  ion-header {
+    padding-top: var(--ion-safe-area-top, 0);
+  }
+
+  ion-content {
+    --padding-top: max(var(--ion-safe-area-top, 0), 0px);
+  }
+
+  /* Fix for iOS status bar overlap */
+  @supports (padding: max(0px)) {
+    ion-header ion-toolbar:first-of-type {
+      padding-top: max(var(--ion-safe-area-top, 0), 0px);
+      min-height: calc(56px + max(var(--ion-safe-area-top, 0), 0px));
+    }
+  }
+
+  /* Ensure content doesn't overlap with status bar */
+  .ion-page {
+    padding-top: 0;
+  }
+
+  /* Better mobile viewport handling */
+  ion-app {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+}
+
+/* Enhanced mobile status bar handling for Android */
+.capacitor.android {
+  ion-header {
+    margin-top: var(--status-bar-height);
+  }
+  
+  ion-content {
+    --padding-top: var(--status-bar-height);
+  }
+}
+
+/* Prevent status bar overlap on iOS */
+.capacitor.ios {
+  ion-app {
+    padding-top: var(--ion-safe-area-top);
+  }
+}
