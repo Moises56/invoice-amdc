@@ -49,12 +49,11 @@ export class MercadosService {
 
     return this.http.get<PaginationResponse<Mercado>>(this.apiUrl, { params });
   }
-
   /**
    * Obtener mercado por ID
    */
-  getMarketById(id: string): Observable<ApiResponse<Mercado>> {
-    return this.http.get<ApiResponse<Mercado>>(`${this.apiUrl}/${id}`);
+  getMarketById(id: string): Observable<Mercado> {
+    return this.http.get<Mercado>(`${this.apiUrl}/${id}`);
   }
 
   /**
@@ -89,12 +88,30 @@ export class MercadosService {
   getAllMarketStats(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/stats`);
   }
-  
   /**
    * Obtener lista de municipios únicos
-   */
-  getUniqueMunicipios(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/municipios`);
+   * Nota: Se actualiza para utilizar filter en la respuesta de getMarkets ya que el endpoint /municipios no existe
+   */  getUniqueMunicipios(): Observable<string[]> {
+    // Usamos getMarkets con límite alto para extraer municipios únicos
+    return new Observable<string[]>(observer => {
+      this.getMarkets({ limit: 100 }).subscribe({
+        next: (response: PaginationResponse<Mercado>) => {
+          // Extraer municipios únicos de los datos
+          const mercados = response.data || [];
+          const uniqueMunicipios = [...new Set(mercados
+            .map((mercado: any) => mercado.direccion ? mercado.direccion.split(',').pop()?.trim() : '')
+            .filter((municipio: string) => municipio && municipio.trim() !== '')
+          )];
+          observer.next(uniqueMunicipios);
+          observer.complete();
+        },
+        error: (error: any) => {
+          console.error('Error al obtener municipios:', error);
+          observer.next([]);
+          observer.complete();
+        }
+      });
+    });
   }
 
   /**

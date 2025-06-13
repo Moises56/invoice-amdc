@@ -84,10 +84,7 @@
               placeholder="Descripción adicional del mercado (opcional)"
               [rows]="4">
             </ion-textarea>
-          </ion-item>
-
-          <div class="flex justify-end space-x-4">
-            <ion-button 
+          </ion-item>          <div class="flex justify-end space-x-4">            <ion-button 
               fill="clear" 
               color="medium"
               (click)="router.navigate(['/mercados'])">
@@ -99,8 +96,7 @@
               [disabled]="!form.valid || isLoading()"
               color="primary">
               <ion-spinner *ngIf="isLoading()" name="crescent" class="mr-2"></ion-spinner>
-              <ion-icon name="save-outline" slot="start" *ngIf="!isLoading()"></ion-icon>
-              {{ isLoading() ? 'Guardando...' : (isEditing() ? 'Actualizar' : 'Crear') }}
+              <ion-icon name="save-outline" slot="start" *ngIf="!isLoading()"></ion-icon>              {{ isLoading() ? 'Guardando...' : (isEditing() ? 'Actualizar' : 'Crear') }}
             </ion-button>
           </div>
         </form>

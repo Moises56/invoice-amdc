@@ -12,6 +12,7 @@ import { saveOutline, locationOutline } from 'ionicons/icons';
 
 import { MercadosService } from '../mercados.service';
 import { Mercado, CreateMercadoRequest, UpdateMercadoRequest } from '../../../shared/interfaces';
+import { EventService } from '../../../shared/services/event.service';
 
 @Component({
   selector: 'app-mercado-form',
@@ -30,7 +31,8 @@ export class MercadoFormPage implements OnInit {
   private mercadosService = inject(MercadosService);
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
-  public router = inject(Router); // Make public for template access
+  private eventService = inject(EventService);
+  public router = inject(Router);
 
   form!: FormGroup;
   mercado = signal<Mercado | null>(null);
@@ -40,11 +42,10 @@ export class MercadoFormPage implements OnInit {
   isToastOpen = signal(false);
 
   constructor() {
-    addIcons({ saveOutline, locationOutline });
+    addIcons({locationOutline, saveOutline});
     this.initializeForm();
   }
-
-  ngOnInit() {
+    ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditing.set(true);
@@ -60,30 +61,38 @@ export class MercadoFormPage implements OnInit {
       longitud: ['', [Validators.required, Validators.min(-180), Validators.max(180)]],
       descripcion: ['']
     });
-  }
+  }  private loadMercado(id: string) {
+    this.isLoading.set(true);
 
-  private async loadMercado(id: string) {
-    try {
-      this.isLoading.set(true);
-      const mercado = await this.mercadosService.getMarketById(id).toPromise();
-      if (mercado?.data) {
-        this.mercado.set(mercado.data);
-        this.form.patchValue({
-          nombre_mercado: mercado.data.nombre_mercado,
-          direccion: mercado.data.direccion,
-          latitud: mercado.data.latitud,
-          longitud: mercado.data.longitud,
-          descripcion: mercado.data.descripcion || ''
-        });
+    this.mercadosService.getMarketById(id).subscribe({
+      next: (mercadoData) => {
+        if (mercadoData && mercadoData.id) {
+          this.mercado.set(mercadoData);
+          
+          // Use patchValue to populate the form
+          this.form.patchValue({
+            nombre_mercado: mercadoData.nombre_mercado || '',
+            direccion: mercadoData.direccion || '',
+            latitud: mercadoData.latitud || 0,
+            longitud: mercadoData.longitud || 0,
+            descripcion: mercadoData.descripcion || ''
+          });
+          
+          // Mark as pristine to avoid showing validation errors initially
+          this.form.markAsPristine();
+          this.form.markAsUntouched();
+        } else {
+          this.showToast('No se pudo cargar la información del mercado');
+        }
+        this.isLoading.set(false);
+      },
+      error: (error: any) => {
+        this.showToast('Error al cargar el mercado');
+        this.isLoading.set(false);
       }
-    } catch (error) {
-      console.error('Error loading mercado:', error);
-      this.showToast('Error al cargar el mercado');
-    } finally {
-      this.isLoading.set(false);
-    }
+    });
   }
-
+  
   async onSubmit() {
     if (this.form.valid) {
       try {
@@ -91,20 +100,20 @@ export class MercadoFormPage implements OnInit {
         
         if (this.isEditing()) {
           const updateData: UpdateMercadoRequest = this.form.value;
-          await this.mercadosService.updateMarket(this.mercado()!.id, updateData).toPromise();
+          const response = await this.mercadosService.updateMarket(this.mercado()!.id, updateData).toPromise();
           this.showToast('Mercado actualizado exitosamente');
+          this.eventService.emit('mercado:updated', response?.data);
         } else {
           const createData: CreateMercadoRequest = this.form.value;
-          await this.mercadosService.createMarket(createData).toPromise();
+          const response = await this.mercadosService.createMarket(createData).toPromise();
           this.showToast('Mercado creado exitosamente');
+          this.eventService.emit('mercado:created', response?.data);
         }
         
         setTimeout(() => {
           this.router.navigate(['/mercados']);
-        }, 1500);
-        
-      } catch (error) {
-        console.error('Error saving mercado:', error);
+        }, 1000);
+          } catch (error) {
         this.showToast('Error al guardar el mercado');
       } finally {
         this.isLoading.set(false);
@@ -136,7 +145,6 @@ export class MercadoFormPage implements OnInit {
     }
     return '';
   }
-
   isFieldInvalid(fieldName: string): boolean {
     const field = this.form.get(fieldName);
     return !!(field?.invalid && field.touched);

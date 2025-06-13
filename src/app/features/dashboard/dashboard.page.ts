@@ -8,22 +8,16 @@ import {
   IonToolbar, 
   IonCard, 
   IonCardContent, 
-  IonCardHeader, 
-  IonCardTitle,
   IonButton,
   IonIcon,
   IonGrid,
   IonRow,
   IonCol,
-  IonItem,
-  IonLabel,
   IonBadge,
   IonSpinner,
-  IonText,
   IonButtons,
   IonMenuButton,
-  IonSkeletonText,
-  IonChip
+  IonSkeletonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -71,16 +65,13 @@ interface QuickStat {
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
-  standalone: true,  imports: [
-    CommonModule,
+  standalone: true,  imports: [    CommonModule,
     IonContent,
     IonHeader,
     IonTitle,
     IonToolbar,
     IonCard,
     IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
     IonButton,
     IonIcon,
     IonGrid,
@@ -90,11 +81,7 @@ interface QuickStat {
     IonButtons,
     IonMenuButton,
     IonBadge,
-    IonItem,
-    IonLabel,
-    IonText,
-    IonSkeletonText,
-    IonChip
+    IonSkeletonText
   ]
 })
 export class DashboardPage implements OnInit {

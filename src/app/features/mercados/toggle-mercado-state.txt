@@ -1,0 +1,23 @@
+  /**
+   * Cambiar estado del mercado
+   */
+  async toggleMercadoState(mercado: Mercado) {
+    try {
+      const updatedMercado = await this.mercadosService
+        .toggleMarketStatus(mercado.id)
+        .toPromise();
+      
+      if (updatedMercado?.data) {
+        this.mercados.update(mercados =>
+          mercados.map(m => m.id === mercado.id ? updatedMercado.data : m) as Mercado[]
+        );
+        await this.showToast(
+          `Mercado ${updatedMercado.data.isActive ? 'activado' : 'desactivado'} exitosamente`,
+          'success'
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling market state:', error);
+      await this.showToast('Error al cambiar estado del mercado', 'danger');
+    }
+  }
