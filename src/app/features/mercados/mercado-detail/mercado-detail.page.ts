@@ -5,19 +5,28 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonButtons,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel,
-  IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
-  IonSearchbar, IonChip
+  IonBadge, IonButton, IonSpinner, IonIcon, IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { locationOutline, businessOutline, calendarOutline, createOutline,
-  mapOutline, listOutline, statsChartOutline, storefrontOutline, addOutline, 
-  checkmarkCircleOutline, closeCircleOutline, timeOutline, helpCircleOutline, 
-  refreshOutline, searchOutline, cardOutline, personOutline, callOutline, 
-  chevronForwardOutline, close } from 'ionicons/icons';
+import { 
+  locationOutline, businessOutline, statsChartOutline, storefrontOutline,
+  checkmarkCircleOutline, closeCircleOutline, timeOutline, helpCircleOutline,
+  refreshOutline, cardOutline, personOutline, callOutline, chevronForwardOutline,
+  chevronBackOutline, trendingUpOutline, walletOutline, homeOutline, keyOutline, searchOutline, addOutline, mapOutline, listOutline, createOutline } from 'ionicons/icons';
 
 import { MercadosService } from '../mercados.service';
 import { Mercado, Local } from '../../../shared/interfaces';
 import { EstadoLocal } from '../../../shared/enums';
+
+// Interface para las estadísticas del mercado
+interface MercadoStats {
+  total_mercados: number;
+  total_locales: number;
+  locales_ocupados: number;
+  locales_libres: number;
+  ocupacion_percentage: number;
+  total_recaudado: number;
+}
 
 @Component({
   selector: 'app-mercado-detail',
@@ -27,72 +36,72 @@ import { EstadoLocal } from '../../../shared/enums';
     CommonModule,
     FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonButtons,
-    IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel,
-    IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
-    IonSearchbar, IonChip
+    IonBadge, IonButton, IonSpinner, IonIcon
   ]
 })
 export class MercadoDetailPage implements OnInit {
   private mercadosService = inject(MercadosService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  
+  // Signals principales
   mercado = signal<Mercado | null>(null);
   isLoading = signal(true);
   mercadoId = signal<string>('');
-  searchTerm = signal<string>('');
-
-  // Computed signal para filtrar los locales basado en el término de búsqueda
+  
+  // Signals para estadísticas
+  stats = signal<MercadoStats | null>(null);
+  isLoadingStats = signal(false);
+  
+  // Signals para paginación
+  currentPage = signal(1);
+  itemsPerPage = signal(8); // 4 columnas en desktop x 2 filas = 8 items
+  
+  // Computed signals
   filteredLocales = computed(() => {
     const locales = this.mercado()?.locales || [];
-    const search = this.searchTerm().toLowerCase().trim();
-    
-    if (!search) {
-      return locales;
-    }
-    
-    return locales.filter(local => 
-      local.numero_local?.toString().includes(search) ||
-      local.dni_propietario?.toLowerCase().includes(search) ||
-      local.propietario?.toLowerCase().includes(search) ||
-      local.nombre_local?.toLowerCase().includes(search)
-    );
+    return locales;
   });
-  constructor() {
-    addIcons({businessOutline,locationOutline,calendarOutline,statsChartOutline,storefrontOutline,searchOutline,close,refreshOutline,cardOutline,personOutline,callOutline,chevronForwardOutline,addOutline,mapOutline,listOutline,createOutline,checkmarkCircleOutline,closeCircleOutline,timeOutline,helpCircleOutline});
+  
+  paginatedLocales = computed(() => {
+    const locales = this.filteredLocales();
+    const page = this.currentPage();
+    const perPage = this.itemsPerPage();
+    const startIndex = (page - 1) * perPage;
+    const endIndex = startIndex + perPage;
+    return locales.slice(startIndex, endIndex);
+  });
+  
+  totalPages = computed(() => {
+    const locales = this.filteredLocales();
+    const perPage = this.itemsPerPage();
+    return Math.ceil(locales.length / perPage);
+  });
+    constructor() {
+    addIcons({
+      businessOutline, locationOutline, statsChartOutline, storefrontOutline,
+      refreshOutline, cardOutline, personOutline, callOutline, chevronForwardOutline,
+      chevronBackOutline, checkmarkCircleOutline, closeCircleOutline, timeOutline, 
+      helpCircleOutline, trendingUpOutline, walletOutline, homeOutline, keyOutline
+    });
   }
-
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.mercadoId.set(id);
       this.loadMercado(id);
+      this.loadStats(id);
     }
-  }  private async loadMercado(id: string) {
+  }
+
+  private async loadMercado(id: string) {
     try {
       this.isLoading.set(true);
-      console.log('Loading mercado with ID:', id);
       const response = await this.mercadosService.getMarketById(id).toPromise();
-      console.log('API Response:', response);
       
-      // Handle both response formats: direct object or wrapped in data property
-      let mercadoData: any = null;
-      if (response && 'data' in response && response.data) {
-        // Wrapped format: { data: mercado }
-        mercadoData = response.data;
-        console.log('Using wrapped format - Mercado data:', mercadoData);
-      } else if (response && 'id' in response) {
-        // Direct format: mercado object directly
-        mercadoData = response;
-        console.log('Using direct format - Mercado data:', mercadoData);
-      }
-      
-      if (mercadoData) {
-        this.mercado.set(mercadoData);
-        console.log('Mercado data set successfully');
-        console.log('Locales count:', mercadoData.locales?.length);
-        console.log('Mercado signal value after set:', this.mercado());
+      if (response && response.id) {
+        this.mercado.set(response);
       } else {
-        console.error('Invalid response format:', response);
         this.mercado.set(null);
       }
     } catch (error) {
@@ -100,31 +109,30 @@ export class MercadoDetailPage implements OnInit {
       this.mercado.set(null);
     } finally {
       this.isLoading.set(false);
-      console.log('Loading finished, isLoading:', this.isLoading());
-      console.log('Final mercado value:', this.mercado());
-      console.log('Condition check: !isLoading() && mercado():', !this.isLoading() && !!this.mercado());
     }
   }
-
-  editMercado() {
-    if (this.mercadoId()) {
-      this.router.navigate(['/mercados/editar', this.mercadoId()]);
-    }
-  }
-
-  viewInMap() {
-    const market = this.mercado();
-    if (market) {
-      const url = `https://www.google.com/maps?q=${market.latitud},${market.longitud}`;
-      window.open(url, '_blank');
-    }
-  }
-
-  viewLocales() {
-    if (this.mercadoId()) {
-      this.router.navigate(['/locales'], { 
-        queryParams: { mercado: this.mercadoId() } 
-      });
+  private async loadStats(id: string) {
+    try {
+      this.isLoadingStats.set(true);
+      
+      // Llamada real a la API
+      const response = await this.mercadosService.getMarketStats(id).toPromise();
+      this.stats.set(response);
+      
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      // En caso de error, usar datos simulados
+      const defaultStats: MercadoStats = {
+        total_mercados: 1,
+        total_locales: this.mercado()?.locales?.length || 0,
+        locales_ocupados: 0,
+        locales_libres: this.mercado()?.locales?.length || 0,
+        ocupacion_percentage: 0,
+        total_recaudado: 0
+      };
+      this.stats.set(defaultStats);
+    } finally {
+      this.isLoadingStats.set(false);
     }
   }
 
@@ -134,28 +142,28 @@ export class MercadoDetailPage implements OnInit {
 
   getStatusText(isActive: boolean): string {
     return isActive ? 'Activo' : 'Inactivo';
-  }  formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('es-PE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  }
+  // Métodos de paginación
+  nextPage() {
+    const current = this.currentPage();
+    const total = this.totalPages();
+    if (current < total) {
+      this.currentPage.set(current + 1);
+    }
   }
 
-  /**
-   * Manejar cambios en el campo de búsqueda
-   */
-  onSearchChange(event: any) {
-    this.searchTerm.set(event.target.value || '');
+  prevPage() {
+    const current = this.currentPage();
+    if (current > 1) {
+      this.currentPage.set(current - 1);
+    }
   }
 
-  /**
-   * Limpiar la búsqueda
-   */
-  clearSearch() {
-    this.searchTerm.set('');
+  goToPage(page: number) {
+    const total = this.totalPages();
+    if (page >= 1 && page <= total) {
+      this.currentPage.set(page);
+    }
   }
 
   /**
@@ -170,15 +178,6 @@ export class MercadoDetailPage implements OnInit {
    */
   viewLocal(local: Local) {
     this.router.navigate(['/locales', local.id]);
-  }
-
-  /**
-   * Agregar nuevo local al mercado
-   */
-  addLocal() {
-    this.router.navigate(['/locales/nuevo'], {
-      queryParams: { mercado: this.mercadoId() }
-    });
   }
 
   /**
