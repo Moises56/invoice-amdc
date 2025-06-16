@@ -135,21 +135,9 @@ export class MercadoDetailPage implements OnInit {
     
     return pages;
   });
+
   canGoToPrevious = computed(() => this.currentPage() > 1);
   canGoToNext = computed(() => this.currentPage() < this.totalPages());
-  
-  // Computed para mostrar "..." en la paginación
-  showStartEllipsis = computed(() => {
-    const visible = this.visiblePages();
-    return visible.length > 0 && typeof visible[0] === 'number' && visible[0] > 1;
-  });
-  
-  showEndEllipsis = computed(() => {
-    const visible = this.visiblePages();
-    const total = this.totalPages();
-    const lastVisible = visible[visible.length - 1];
-    return visible.length > 0 && typeof lastVisible === 'number' && lastVisible < total;
-  });
   
   constructor() {
     addIcons({
@@ -347,14 +335,4 @@ export class MercadoDetailPage implements OnInit {
 
   // Exponer Math para usar en el template
   Math = Math;
-
-  // Helper method para verificar si una página es un número
-  isPageNumber(page: string | number): page is number {
-    return typeof page === 'number';
-  }
-
-  // Helper method para hacer cast seguro a número
-  asPageNumber(page: string | number): number {
-    return page as number;
-  }
 }

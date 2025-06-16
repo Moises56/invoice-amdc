@@ -106,11 +106,9 @@
             <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
               <ion-icon name="wallet-outline" class="text-white text-lg"></ion-icon>
             </div>
-          </div>
-        </div>      </div>
-    </div>
-
-    <!-- Locales del Mercado -->
+          </div>        </div>
+      </div>
+    </div>    <!-- Locales del Mercado -->
     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" *ngIf="mercado()?.locales && mercado()!.locales!.length > 0">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
@@ -126,18 +124,56 @@
           </span>
         </div>
       </div>
-      
-      <!-- Grid de Locales -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Buscador -->
+      <div class="mb-6">
+        <ion-searchbar
+          [value]="searchTerm()"
+          (ionInput)="onSearchChange($event)"
+          placeholder="Buscar por número de local o DNI del propietario..."
+          debounce="300"
+          show-clear-button="focus"
+          class="bg-gray-50 rounded-xl">
+        </ion-searchbar>
+        
+        <!-- Chip de búsqueda activa -->
+        <div class="flex flex-wrap gap-2 mt-3" *ngIf="searchTerm()">
+          <ion-chip color="primary" class="text-xs">
+            <ion-icon name="search-outline" class="mr-1"></ion-icon>
+            Búsqueda: "{{ searchTerm() }}"
+            <ion-icon name="close-outline" (click)="clearSearch()"></ion-icon>
+          </ion-chip>
+        </div>
+      </div>
+        <div class="mt-3" *ngIf="searchTerm()">
+          <ion-chip color="primary" class="text-sm">
+            <ion-icon name="search-outline" class="mr-2"></ion-icon>
+            Búsqueda: "{{ searchTerm() }}"
+            <ion-icon name="close-outline" (click)="clearSearch()" class="ml-2 cursor-pointer"></ion-icon>
+          </ion-chip>
+        </div>
+        
+        <!-- Mensaje de no resultados -->
+        <div *ngIf="searchTerm() && filteredLocales().length === 0" class="text-center py-8">
+          <ion-icon name="search-outline" class="text-4xl text-gray-400 mb-2"></ion-icon>
+          <h3 class="text-lg font-medium text-gray-600 mb-2">No se encontraron locales</h3>
+          <p class="text-gray-500 mb-4">Intenta con otros términos de búsqueda</p>
+          <ion-button fill="outline" color="primary" (click)="clearSearch()">
+            <ion-icon name="close-outline" slot="start"></ion-icon>
+            Limpiar búsqueda
+          </ion-button>
+        </div>
+      </div>
+        <!-- Grid de Locales -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
         <div 
           *ngFor="let local of paginatedLocales(); trackBy: trackByLocalId" 
-          class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+          class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer hover-lift"
           (click)="viewLocal(local)">
           
           <!-- Header del Local -->
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center"
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center"
                    [class.bg-green-100]="local.estado_local === 'OCUPADO'"
                    [class.bg-yellow-100]="local.estado_local === 'LIBRE'"
                    [class.bg-blue-100]="local.estado_local === 'ACTIVO'"
@@ -150,89 +186,129 @@
                   [class.text-blue-600]="local.estado_local === 'ACTIVO'"
                   [class.text-red-600]="local.estado_local === 'INACTIVO' || local.estado_local === 'SUSPENDIDO'"
                   [class.text-gray-600]="local.estado_local === 'PENDIENTE'"
-                  class="text-sm">
+                  class="text-base">
                 </ion-icon>
               </div>
-              <span class="text-xs font-medium"
-                    [class.text-green-600]="local.estado_local === 'OCUPADO'"
-                    [class.text-yellow-600]="local.estado_local === 'LIBRE'"
-                    [class.text-blue-600]="local.estado_local === 'ACTIVO'"
-                    [class.text-red-600]="local.estado_local === 'INACTIVO' || local.estado_local === 'SUSPENDIDO'"
-                    [class.text-gray-600]="local.estado_local === 'PENDIENTE'">
-                {{ getLocalStatusText(local.estado_local) }}
-              </span>
+              <div class="flex flex-col">
+                <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Estado</span>
+                <span class="text-sm font-semibold"
+                      [class.text-green-600]="local.estado_local === 'OCUPADO'"
+                      [class.text-yellow-600]="local.estado_local === 'LIBRE'"
+                      [class.text-blue-600]="local.estado_local === 'ACTIVO'"
+                      [class.text-red-600]="local.estado_local === 'INACTIVO' || local.estado_local === 'SUSPENDIDO'"
+                      [class.text-gray-600]="local.estado_local === 'PENDIENTE'">
+                  {{ getLocalStatusText(local.estado_local) }}
+                </span>
+              </div>
             </div>
-            <ion-icon name="chevron-forward-outline" class="text-gray-400 text-sm"></ion-icon>
+            <ion-icon name="chevron-forward-outline" class="text-gray-400 text-lg"></ion-icon>
           </div>
           
           <!-- Información del Local -->
-          <div class="space-y-2">
-            <h3 class="font-semibold text-gray-800 text-sm">
+          <div class="space-y-3">
+            <h3 class="font-bold text-gray-800 text-base leading-tight">
               {{ local.nombre_local || 'Local #' + local.numero_local }}
             </h3>
             
-            <div class="flex items-center gap-2 text-xs text-gray-600">
-              <ion-icon name="business-outline" class="text-blue-500"></ion-icon>
-              <span>N° {{ local.numero_local }}</span>
-            </div>
-            
-            <div class="flex items-center gap-2 text-xs text-gray-600" *ngIf="local.propietario">
-              <ion-icon name="person-outline" class="text-purple-500"></ion-icon>
-              <span class="truncate">{{ local.propietario }}</span>
-            </div>
-            
-            <div class="flex items-center gap-2 text-xs text-gray-600" *ngIf="local.dni_propietario">
-              <ion-icon name="card-outline" class="text-green-500"></ion-icon>
-              <span>{{ local.dni_propietario }}</span>
+            <!-- Info Grid más espaciado -->
+            <div class="space-y-2">
+              <div class="flex items-center gap-3 text-sm text-gray-600">
+                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                  <ion-icon name="business-outline" class="text-blue-600 text-xs"></ion-icon>
+                </div>
+                <span class="font-medium">Local N° {{ local.numero_local }}</span>
+              </div>
+              
+              <div class="flex items-center gap-3 text-sm text-gray-600" *ngIf="local.propietario">
+                <div class="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                  <ion-icon name="person-outline" class="text-purple-600 text-xs"></ion-icon>
+                </div>
+                <span class="truncate font-medium">{{ local.propietario }}</span>
+              </div>
+              
+              <div class="flex items-center gap-3 text-sm text-gray-600" *ngIf="local.dni_propietario">
+                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                  <ion-icon name="card-outline" class="text-green-600 text-xs"></ion-icon>
+                </div>
+                <span class="font-medium">{{ local.dni_propietario }}</span>
+              </div>
+              
+              <div class="flex items-center gap-3 text-sm text-gray-600" *ngIf="local.telefono">
+                <div class="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center">
+                  <ion-icon name="call-outline" class="text-orange-600 text-xs"></ion-icon>
+                </div>
+                <span class="font-medium">{{ local.telefono }}</span>
+              </div>
             </div>
             
             <!-- Precio -->
-            <div class="mt-3 pt-2 border-t border-gray-200" *ngIf="local.monto_mensual">
-              <div class="text-center bg-green-50 rounded-lg py-2">
-                <p class="text-sm font-bold text-green-700">L {{ local.monto_mensual | number:'1.2-2' }}</p>
-                <p class="text-xs text-green-600">mensual</p>
+            <div class="mt-4 pt-3 border-t border-gray-200" *ngIf="local.monto_mensual">
+              <div class="bg-green-50 rounded-lg p-3 text-center border border-green-100">
+                <p class="text-base font-bold text-green-700">L {{ local.monto_mensual | number:'1.2-2' }}</p>
+                <p class="text-xs text-green-600 uppercase tracking-wide">mensual</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <!-- Paginación -->
-      <div class="flex items-center justify-between" *ngIf="totalPages() > 1">
+        <!-- Paginación Mejorada -->
+      <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-200" *ngIf="totalPages() > 1 && filteredLocales().length > 0">
         <div class="text-sm text-gray-600">
-          Página {{ currentPage() }} de {{ totalPages() }}
+          Mostrando {{ (currentPage() - 1) * itemsPerPage() + 1 }} - {{ Math.min(currentPage() * itemsPerPage(), filteredLocales().length) }} de {{ filteredLocales().length }} locales
         </div>
         
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1">
+          <!-- Primera página -->
           <ion-button 
             fill="clear" 
             size="small"
             [disabled]="currentPage() === 1"
-            (click)="prevPage()">
-            <ion-icon name="chevron-back-outline" slot="icon-only"></ion-icon>
+            (click)="firstPage()"
+            class="text-xs">
+            &laquo;&laquo;
           </ion-button>
           
-          <div class="flex items-center gap-1">
-            <ion-button 
-              *ngFor="let page of [].constructor(totalPages()); let i = index"
-              [fill]="currentPage() === i + 1 ? 'solid' : 'clear'"
-              [color]="currentPage() === i + 1 ? 'primary' : 'medium'"
-              size="small"
-              class="w-8 h-8"
-              (click)="goToPage(i + 1)">
-              {{ i + 1 }}
-            </ion-button>
-          </div>
+          <!-- Página anterior -->
+          <ion-button 
+            fill="clear" 
+            size="small"            [disabled]="currentPage() === 1"
+            (click)="prevPage()"
+            class="text-xs">
+            &laquo;
+          </ion-button>
           
+          <!-- Páginas visibles -->
+          <ng-container *ngFor="let page of visiblePages()">            <ion-button 
+              *ngIf="isPageNumber(page)"
+              [fill]="currentPage() === page ? 'solid' : 'clear'"
+              [color]="currentPage() === page ? 'primary' : 'medium'"
+              size="small"
+              class="w-8 h-8 text-xs"
+              (click)="goToPage(asPageNumber(page))">
+              {{ page }}
+            </ion-button>
+            <span *ngIf="!isPageNumber(page)" class="px-2 text-gray-400">{{ page }}</span></ng-container>
+          
+          <!-- Página siguiente -->
           <ion-button 
             fill="clear" 
             size="small"
             [disabled]="currentPage() === totalPages()"
-            (click)="nextPage()">
-            <ion-icon name="chevron-forward-outline" slot="icon-only"></ion-icon>
+            (click)="nextPage()"
+            class="text-xs">
+            &raquo;
           </ion-button>
-        </div>
-      </div>    </div>
+          
+          <!-- Última página -->
+          <ion-button 
+            fill="clear" 
+            size="small"
+            [disabled]="currentPage() === totalPages()"
+            (click)="lastPage()"
+            class="text-xs">
+            &raquo;&raquo;
+          </ion-button>
+        </div>      </div>
 
     <!-- Estado cuando no hay locales -->
     <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 text-center" *ngIf="mercado()?.locales && mercado()!.locales!.length === 0">
@@ -240,8 +316,7 @@
         <ion-icon name="storefront-outline" class="text-3xl text-gray-400"></ion-icon>
       </div>
       <h3 class="text-lg font-medium text-gray-600 mb-2">No hay locales registrados</h3>
-      <p class="text-gray-500">Este mercado aún no tiene locales registrados</p>
-    </div>
+      <p class="text-gray-500">Este mercado aún no tiene locales registrados</p>    </div>
   </div>
 
   <!-- Error state when no data and not loading -->
