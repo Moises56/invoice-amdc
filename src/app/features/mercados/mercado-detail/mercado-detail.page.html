@@ -56,57 +56,58 @@
         <ion-spinner name="crescent" color="primary"></ion-spinner>
       </div>
       
-      <div *ngIf="!isLoadingStats() && stats()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Total Locales -->
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+      <div *ngIf="!isLoadingStats() && stats()" class="stats-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">        <!-- Total Locales -->
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-blue-600 font-medium mb-1">Total Locales</p>
-              <p class="text-2xl font-bold text-blue-700">{{ stats()?.total_locales | number }}</p>
+            <div class="flex-1">
+              <p class="text-sm text-blue-600 font-semibold mb-2">Total Locales</p>
+              <p class="text-3xl font-bold text-blue-700 mb-1">{{ stats()?.total_locales | number }}</p>
+              <p class="text-xs text-blue-500">Registrados en el sistema</p>
             </div>
-            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-              <ion-icon name="storefront-outline" class="text-white text-lg"></ion-icon>
+            <div class="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+              <ion-icon name="storefront-outline" class="text-white text-xl"></ion-icon>
             </div>
           </div>
         </div>
-        
-        <!-- Locales Ocupados -->
-        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+          <!-- Locales Ocupados -->
+        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200 hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-green-600 font-medium mb-1">Locales Ocupados</p>
-              <p class="text-2xl font-bold text-green-700">{{ stats()?.locales_ocupados | number }}</p>
+            <div class="flex-1">
+              <p class="text-sm text-green-600 font-semibold mb-2">Locales Ocupados</p>
+              <p class="text-3xl font-bold text-green-700 mb-1">{{ stats()?.locales_ocupados | number }}</p>
+              <p class="text-xs text-green-500">Actualmente en uso</p>
             </div>
-            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-              <ion-icon name="key-outline" class="text-white text-lg"></ion-icon>
+            <div class="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center shadow-lg">
+              <ion-icon name="key-outline" class="text-white text-xl"></ion-icon>
             </div>
           </div>
         </div>
-        
-        <!-- Porcentaje de Ocupación -->
-        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+          <!-- Porcentaje de Ocupación -->
+        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200 hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-purple-600 font-medium mb-1">% Ocupación</p>
-              <p class="text-2xl font-bold text-purple-700">{{ stats()?.ocupacion_percentage | number:'1.1-1' }}%</p>
+            <div class="flex-1">
+              <p class="text-sm text-purple-600 font-semibold mb-2">% Ocupación</p>
+              <p class="text-3xl font-bold text-purple-700 mb-1">{{ stats()?.ocupacion_percentage | number:'1.1-1' }}%</p>
+              <p class="text-xs text-purple-500">Tasa de ocupación</p>
             </div>
-            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
-              <ion-icon name="trending-up-outline" class="text-white text-lg"></ion-icon>
+            <div class="w-14 h-14 bg-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+              <ion-icon name="trending-up-outline" class="text-white text-xl"></ion-icon>
             </div>
           </div>
         </div>
-        
-        <!-- Total Recaudado -->
-        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200">
+          <!-- Total Recaudado -->
+        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200 hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-orange-600 font-medium mb-1">Total Recaudado</p>
-              <p class="text-2xl font-bold text-orange-700">L {{ stats()?.total_recaudado | number:'1.2-2' }}</p>
+            <div class="flex-1">
+              <p class="text-sm text-orange-600 font-semibold mb-2">Total Recaudado</p>
+              <p class="text-3xl font-bold text-orange-700 mb-1">L {{ stats()?.total_recaudado | number:'1.2-2' }}</p>
+              <p class="text-xs text-orange-500">Ingresos totales</p>
             </div>
-            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-              <ion-icon name="wallet-outline" class="text-white text-lg"></ion-icon>
+            <div class="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+              <ion-icon name="wallet-outline" class="text-white text-xl"></ion-icon>
             </div>
-          </div>        </div>
+          </div>
+        </div>
       </div>
     </div>    <!-- Locales del Mercado -->
     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" *ngIf="mercado()?.locales && mercado()!.locales!.length > 0">
