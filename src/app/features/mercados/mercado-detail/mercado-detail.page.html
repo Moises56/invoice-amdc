@@ -250,65 +250,55 @@
             </div>
           </div>
         </div>
-      </div>
-        <!-- Paginación Mejorada -->
-      <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-200" *ngIf="totalPages() > 1 && filteredLocales().length > 0">
-        <div class="text-sm text-gray-600">
-          Mostrando {{ (currentPage() - 1) * itemsPerPage() + 1 }} - {{ Math.min(currentPage() * itemsPerPage(), filteredLocales().length) }} de {{ filteredLocales().length }} locales
+      </div>      <!-- Paginación Responsive -->
+      <div class="pagination-container mt-6 pt-6 border-t border-gray-200" *ngIf="totalPages() > 1 && filteredLocales().length > 0">        <!-- Información de paginación universal -->
+        <div class="text-sm text-gray-600 mb-3 text-center pagination-info">
+          Página {{ currentPage() }} de {{ totalPages() }}
         </div>
-        
-        <div class="flex items-center gap-1">
-          <!-- Primera página -->
+          <!-- Paginación Universal - Una sola línea -->
+        <div class="flex items-center justify-center gap-1 overflow-x-auto px-2">          <!-- << (Primera página) -->
           <ion-button 
             fill="clear" 
             size="small"
-            [disabled]="currentPage() === 1"
-            (click)="firstPage()"
-            class="text-xs">
-            &laquo;&laquo;
+            [disabled]="currentPage() === 1"            (click)="firstPage()"
+            class="w-8 h-8 text-base font-bold min-w-8">
+            ≪
           </ion-button>
-          
-          <!-- Página anterior -->
-          <ion-button 
-            fill="clear" 
-            size="small"            [disabled]="currentPage() === 1"
-            (click)="prevPage()"
-            class="text-xs">
-            &laquo;
-          </ion-button>
-          
-          <!-- Páginas visibles -->
-          <ng-container *ngFor="let page of visiblePages()">            <ion-button 
-              *ngIf="isPageNumber(page)"
-              [fill]="currentPage() === page ? 'solid' : 'clear'"
-              [color]="currentPage() === page ? 'primary' : 'medium'"
-              size="small"
-              class="w-8 h-8 text-xs"
-              (click)="goToPage(asPageNumber(page))">
-              {{ page }}
-            </ion-button>
-            <span *ngIf="!isPageNumber(page)" class="px-2 text-gray-400">{{ page }}</span></ng-container>
-          
-          <!-- Página siguiente -->
+            <!-- < (Página anterior) -->
           <ion-button 
             fill="clear" 
             size="small"
-            [disabled]="currentPage() === totalPages()"
-            (click)="nextPage()"
-            class="text-xs">
-            &raquo;
-          </ion-button>
-          
-          <!-- Última página -->
+            [disabled]="currentPage() === 1"            (click)="prevPage()"
+            class="w-8 h-8 text-base font-bold min-w-8">
+            ‹
+          </ion-button>          <!-- Páginas numeradas con bordes -->
+          <ng-container *ngFor="let page of visiblePages(); let i = index">
+              <ion-button                *ngIf="typeof page === 'number'"                fill="outline"
+                [color]="currentPage() === page ? 'primary' : 'dark'"
+                size="small"
+                class="w-8 h-8 text-xs font-bold pagination-number min-w-8"
+                [class.active-page]="currentPage() === page"
+                (click)="goToPage($any(page))">
+                {{ page }}
+              </ion-button>
+              <span *ngIf="typeof page === 'string'" class="text-gray-500 text-sm px-1 font-bold">...</span>            </ng-container><!-- > (Página siguiente) -->
           <ion-button 
             fill="clear" 
             size="small"
-            [disabled]="currentPage() === totalPages()"
-            (click)="lastPage()"
-            class="text-xs">
-            &raquo;&raquo;
+            [disabled]="currentPage() === totalPages()"            (click)="nextPage()"
+            class="w-8 h-8 text-base font-bold min-w-8">
+            ›
           </ion-button>
-        </div>      </div>
+            <!-- >> (Última página) -->
+          <ion-button 
+            fill="clear" 
+            size="small"
+            [disabled]="currentPage() === totalPages()"            (click)="lastPage()"
+            class="w-8 h-8 text-base font-bold min-w-8">
+            ≫
+          </ion-button>
+        </div>
+      </div>
 
     <!-- Estado cuando no hay locales -->
     <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 text-center" *ngIf="mercado()?.locales && mercado()!.locales!.length === 0">

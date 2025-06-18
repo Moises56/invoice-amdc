@@ -448,3 +448,123 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+// Estilos específicos para paginación móvil
+.mobile-pagination {
+  .pagination-button {
+    min-height: 40px; // Reducido de 48px
+    min-width: 40px;  // Reducido de 48px
+    font-size: 14px;  // Reducido de 16px
+    border-radius: 8px; // Reducido de 12px
+    
+    &.page-number {
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); // Sombra más sutil
+      
+      &.active {
+        transform: scale(1.02); // Reducido de 1.05
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2); // Sombra más sutil
+      }
+    }
+    
+    &.nav-button {
+      padding: 8px 12px; // Reducido padding
+      font-weight: 500;
+      
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
+  }
+}
+
+// Estilos para la nueva paginación con diseño específico
+.pagination-number {
+  border: 2px solid #d1d5db !important;
+  border-radius: 6px !important;
+  font-weight: 700 !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  flex-shrink: 0 !important; // Evita que se compriman
+  
+  &.active-page {
+    background-color: var(--ion-color-primary) !important;
+    color: white !important;
+    border-color: var(--ion-color-primary) !important;
+    transform: scale(1.05) !important; // Hace que se vea más prominente
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3) !important;
+  }
+  
+  &:not(.active-page) {
+    background-color: white !important;
+    color: #374151 !important;
+    
+    &:hover {
+      background-color: #f3f4f6 !important;
+    }
+  }
+  
+  // Para dispositivos móviles, hacer más visible el estado activo
+  @media (max-width: 768px) {
+    &.active-page {
+      background-color: #1d4ed8 !important; // Azul más oscuro
+      border-color: #1d4ed8 !important;
+      box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2) !important; // Halo
+    }
+  }
+}
+
+// Animaciones suaves para cambios de página
+.pagination-container {
+  transition: all 0.3s ease;
+  
+  &.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// Asegurar que la paginación esté en una sola línea
+.pagination-container .flex {
+  flex-wrap: nowrap !important;
+  white-space: nowrap;
+  
+  ion-button {
+    flex-shrink: 0; // Los botones no se comprimen
+    min-width: auto;
+  }
+  
+  // En móvil, permitir scroll horizontal si es necesario
+  @media (max-width: 640px) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // IE
+    
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari
+    }
+  }
+}
+
+// Mejor spacing en móvil y tablet
+@media (max-width: 1536px) { // 2xl breakpoint
+  .pagination-info {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  
+  .pagination-controls {
+    gap: 8px;
+    padding: 12px 0;
+  }
+  
+  .mobile-pagination {
+    padding: 16px 0;
+    
+    .w-8 {
+      min-width: 32px;
+      min-height: 32px;
+    }
+  }
+}

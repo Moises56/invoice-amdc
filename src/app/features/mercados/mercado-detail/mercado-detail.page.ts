@@ -57,10 +57,9 @@ export class MercadoDetailPage implements OnInit {
   
   // Signals para búsqueda
   searchTerm = signal<string>('');
-  
-  // Signals para paginación
+    // Signals para paginación  
   currentPage = signal(1);
-  itemsPerPage = signal(8); // 4 columnas en desktop x 2 filas = 8 items
+  itemsPerPage = signal(6); // 3 columnas en desktop x 2 filas, 2 columnas en tablet, 1 en móvil
   
   // Computed signals
   filteredLocales = computed(() => {
@@ -135,6 +134,54 @@ export class MercadoDetailPage implements OnInit {
     
     return pages;
   });
+  
+  // Computed para páginas visibles en móvil (menos páginas)
+  visiblePagesMobile = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: (number | string)[] = [];
+    
+    if (total <= 3) {
+      // Si hay 3 páginas o menos, mostrar todas
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Lógica simplificada para móvil
+      if (current === 1) {
+        // Inicio: 1, 2, 3
+        pages.push(1, 2, 3);
+        if (total > 3) {
+          pages.push('...');
+        }
+      } else if (current === total) {
+        // Final: ..., total-2, total-1, total
+        if (total > 3) {
+          pages.push('...');
+        }
+        pages.push(total - 2, total - 1, total);
+      } else {
+        // Medio: current-1, current, current+1
+        if (current > 2) {
+          pages.push('...');
+        }
+        
+        const start = Math.max(1, current - 1);
+        const end = Math.min(total, current + 1);
+        
+        for (let i = start; i <= end; i++) {
+          pages.push(i);
+        }
+        
+        if (current < total - 1) {
+          pages.push('...');
+        }
+      }
+    }
+    
+    return pages;
+  });
+  
   canGoToPrevious = computed(() => this.currentPage() > 1);
   canGoToNext = computed(() => this.currentPage() < this.totalPages());
   
@@ -356,5 +403,14 @@ export class MercadoDetailPage implements OnInit {
   // Helper method para hacer cast seguro a número
   asPageNumber(page: string | number): number {
     return page as number;
+  }
+
+  /**
+   * Manejar click en página - solo si es un número
+   */
+  handlePageClick(page: string | number) {
+    if (typeof page === 'number') {
+      this.goToPage(page);
+    }
   }
 }
