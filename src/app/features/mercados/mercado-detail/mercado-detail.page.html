@@ -163,9 +163,8 @@
             Limpiar búsqueda
           </ion-button>
         </div>
-      </div>
-        <!-- Grid de Locales -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+      </div>      <!-- Grid de Locales Responsive -->
+      <div class="locales-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div 
           *ngFor="let local of paginatedLocales(); trackBy: trackByLocalId" 
           class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer hover-lift"

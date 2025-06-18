@@ -24,6 +24,38 @@
   }
 }
 
+// Grid de locales - Mismo comportamiento que las estadísticas
+.locales-grid {
+  display: grid !important;
+  gap: 1rem;
+  
+  // Móvil: 1 columna
+  grid-template-columns: repeat(1, 1fr);
+  
+  // Tablet pequeña: 2 columnas
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  // Desktop: 4 columnas (breakpoint más bajo para asegurar activación)
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  
+  // Asegurar que también funcione en pantallas más grandes
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  
+  // Mejorar las tarjetas de locales en desktop
+  @media (min-width: 768px) {
+    .hover-lift:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
 // Animaciones suaves
 .local-card {
   transition: all 0.3s ease;
