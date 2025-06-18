@@ -59,7 +59,7 @@ export class MercadoDetailPage implements OnInit {
   searchTerm = signal<string>('');
     // Signals para paginación  
   currentPage = signal(1);
-  itemsPerPage = signal(6); // 3 columnas en desktop x 2 filas, 2 columnas en tablet, 1 en móvil
+  itemsPerPage = signal(8); // 4 columnas en desktop x 2 filas, 2 columnas en tablet x 4 filas, 1 en móvil x 8 filas
   
   // Computed signals
   filteredLocales = computed(() => {
