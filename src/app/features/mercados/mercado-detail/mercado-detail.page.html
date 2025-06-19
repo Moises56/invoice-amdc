@@ -254,14 +254,13 @@
       <div class="pagination-container mt-6 pt-6 border-t border-gray-200" *ngIf="totalPages() > 1 && filteredLocales().length > 0">        <!-- Información de paginación universal -->
         <div class="text-sm text-gray-600 mb-3 text-center pagination-info">
           Página {{ currentPage() }} de {{ totalPages() }}
-        </div>
-          <!-- Paginación Universal - Una sola línea -->
-        <div class="flex items-center justify-center gap-1 overflow-x-auto px-2">          <!-- << (Primera página) -->
+        </div>        <!-- Paginación Universal Responsive -->
+        <div class="pagination-wrapper flex items-center justify-center gap-1"><!-- << (Primera página) -->
           <ion-button 
             fill="clear" 
             size="small"
             [disabled]="currentPage() === 1"            (click)="firstPage()"
-            class="w-8 h-8 text-base font-bold min-w-8">
+            class="pagination-btn w-8 h-8 md:w-10 md:h-10 text-base font-bold min-w-8 md:min-w-10">
             ≪
           </ion-button>
             <!-- < (Página anterior) -->
@@ -269,14 +268,14 @@
             fill="clear" 
             size="small"
             [disabled]="currentPage() === 1"            (click)="prevPage()"
-            class="w-8 h-8 text-base font-bold min-w-8">
+            class="pagination-btn w-8 h-8 md:w-10 md:h-10 text-base font-bold min-w-8 md:min-w-10">
             ‹
           </ion-button>          <!-- Páginas numeradas con bordes -->
           <ng-container *ngFor="let page of visiblePages(); let i = index">
               <ion-button                *ngIf="typeof page === 'number'"                fill="outline"
                 [color]="currentPage() === page ? 'primary' : 'dark'"
                 size="small"
-                class="w-8 h-8 text-xs font-bold pagination-number min-w-8"
+                class="pagination-number w-8 h-8 md:w-10 md:h-10 text-xs md:text-sm font-bold min-w-8 md:min-w-10"
                 [class.active-page]="currentPage() === page"
                 (click)="goToPage($any(page))">
                 {{ page }}
@@ -286,7 +285,7 @@
             fill="clear" 
             size="small"
             [disabled]="currentPage() === totalPages()"            (click)="nextPage()"
-            class="w-8 h-8 text-base font-bold min-w-8">
+            class="pagination-btn w-8 h-8 md:w-10 md:h-10 text-base font-bold min-w-8 md:min-w-10">
             ›
           </ion-button>
             <!-- >> (Última página) -->
@@ -294,7 +293,7 @@
             fill="clear" 
             size="small"
             [disabled]="currentPage() === totalPages()"            (click)="lastPage()"
-            class="w-8 h-8 text-base font-bold min-w-8">
+            class="pagination-btn w-8 h-8 md:w-10 md:h-10 text-base font-bold min-w-8 md:min-w-10">
             ≫
           </ion-button>
         </div>

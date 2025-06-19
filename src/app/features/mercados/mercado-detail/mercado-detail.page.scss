@@ -568,6 +568,44 @@
       box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2) !important; // Halo
     }
   }
+  
+  // Para desktop, mejorar aún más la visibilidad
+  @media (min-width: 769px) {
+    min-width: 40px !important;
+    min-height: 40px !important;
+    
+    &.active-page {
+      background-color: #1d4ed8 !important; // Azul más oscuro en desktop también
+      border-color: #1d4ed8 !important;
+      transform: scale(1.08) !important; // Ligeramente más grande
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4) !important; // Sombra más prominente
+      font-weight: 800 !important; // Texto más grueso
+    }
+  }
+}
+
+// Contenedor de paginación responsive
+.pagination-wrapper {
+  flex-wrap: nowrap;
+  
+  // En móvil, permitir scroll si es absolutamente necesario
+  @media (max-width: 640px) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 0 8px;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  
+  // En tablet y desktop, sin scroll horizontal
+  @media (min-width: 641px) {
+    overflow: visible;
+    padding: 0;
+  }
 }
 
 // Animaciones suaves para cambios de página
@@ -581,24 +619,36 @@
 }
 
 // Asegurar que la paginación esté en una sola línea
-.pagination-container .flex {
-  flex-wrap: nowrap !important;
-  white-space: nowrap;
-  
-  ion-button {
-    flex-shrink: 0; // Los botones no se comprimen
-    min-width: auto;
+.pagination-container {
+  .flex {
+    flex-wrap: nowrap !important;
+    white-space: nowrap;
+    
+    ion-button {
+      flex-shrink: 0; // Los botones no se comprimen
+      min-width: auto;
+    }
   }
   
-  // En móvil, permitir scroll horizontal si es necesario
+  // En móvil, permitir scroll horizontal solo si es necesario
   @media (max-width: 640px) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; // Firefox
-    -ms-overflow-style: none; // IE
-    
-    &::-webkit-scrollbar {
-      display: none; // Chrome, Safari
+    .pagination-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; // Firefox
+      -ms-overflow-style: none; // IE
+      
+      &::-webkit-scrollbar {
+        display: none; // Chrome, Safari
+      }
+    }
+  }
+  
+  // En tablet y desktop, SIN scroll horizontal
+  @media (min-width: 641px) {
+    .pagination-wrapper {
+      overflow: visible !important;
+      justify-content: center !important;
     }
   }
 }
