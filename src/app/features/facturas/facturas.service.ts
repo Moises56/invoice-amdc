@@ -132,19 +132,16 @@ export class FacturasService {
    */
   anularFactura(id: string, observaciones?: string): Observable<ApiResponse<Factura>> {
     const body = observaciones ? { observaciones } : {};
-    return this.http.patch<ApiResponse<Factura>>(`${this.apiUrl}/${id}/anular`, body).pipe(
+    return this.http.delete<ApiResponse<Factura>>(`${this.apiUrl}/${id}`, { body }).pipe(
       tap(response => {
-        if (response.data) {
-          const currentFacturas = this.facturasSubject.value;
-          const index = currentFacturas.findIndex(f => f.id === id);
-          if (index !== -1) {
-            currentFacturas[index] = response.data;
-            this.facturasSubject.next([...currentFacturas]);
-          }
-        }
+        // Remover la factura de la lista local cuando se anule/elimine
+        const currentFacturas = this.facturasSubject.value;
+        const filteredFacturas = currentFacturas.filter(f => f.id !== id);
+        this.facturasSubject.next(filteredFacturas);
       })
     );
   }
+
   /**
    * Obtener facturas por local
    */

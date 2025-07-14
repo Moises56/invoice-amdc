@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonButtons,
-  IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel,
+  IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonLabel,
   IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
   IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
   IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
@@ -21,15 +21,21 @@ import {
   alertCircleOutline, filterOutline, documentOutline, checkmarkOutline, 
   closeOutline, add, pauseOutline, playOutline, cashOutline, close, 
   chevronDownOutline, chatbubbleOutline, addCircleOutline, walletOutline,
-  documentAttachOutline, informationCircleOutline, storefrontOutline } from 'ionicons/icons';
+  documentAttachOutline, informationCircleOutline, storefrontOutline, printOutline,
+  trendingUpOutline, pieChartOutline, barChartOutline, analyticsOutline,
+  cardOutline as cardIcon, cashOutline as cashIcon, person, storefront, 
+  calendar, time, checkmarkCircle, alertCircle, receipt, chatbubble,
+  print, create, trash } from 'ionicons/icons';
 
 import { LocalesService } from '../locales.service';
 import { FacturasService } from '../../facturas/facturas.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { 
   Local, Factura, EstadoLocal, EstadoFactura, 
-  TipoLocal, Role, User, CreateFacturaRequest 
+  TipoLocal, Role, User, CreateFacturaRequest, LocalStats 
 } from '../../../shared/interfaces';
+import { PrintingService } from '../../../shared/services/printing.service';
+import { BluetoothService } from '../../bluetooth/bluetooth.service';
 
 @Component({
   selector: 'app-local-detail',
@@ -40,7 +46,7 @@ import {
     CommonModule,
     FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonButtons,
-    IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem,
+    IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
     IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
     IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
@@ -48,6 +54,35 @@ import {
   ]
 })
 export class LocalDetailPage implements OnInit {
+  // Nombre del mercado para mostrar en el modal
+  mercadoNombre: string = '';
+  /**
+   * Devuelve la fecha de vencimiento (15 del mes siguiente al seleccionado)
+   */
+  getNextDueDate(selectedMonth: number): string {
+    if (!selectedMonth || selectedMonth < 1 || selectedMonth > 12) return '';
+    // Usar el año y día actuales, pero calcular el mes siguiente al seleccionado
+    const today = new Date();
+    let year = today.getFullYear();
+    let day = today.getDate();
+    let nextMonth = selectedMonth + 1;
+    let nextYear = year;
+    if (nextMonth > 12) {
+      nextMonth = 1;
+      nextYear = year + 1;
+    }
+    // Ajustar el día si el mes siguiente no tiene ese día
+    const daysInNextMonth = new Date(nextYear, nextMonth, 0).getDate();
+    if (day > daysInNextMonth) {
+      day = daysInNextMonth;
+    }
+    // Formato YYYY-MM-DD
+    return `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+  isCloseHovered = false;
+  // Modal de detalle de factura
+  showFacturaDetailModal = signal(false);
+  facturaSeleccionada = signal<Factura | null>(null);
   
   // Service injections
   private localesService = inject(LocalesService);
@@ -58,12 +93,16 @@ export class LocalDetailPage implements OnInit {
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private loadingController = inject(LoadingController);
+  private printingService = inject(PrintingService);
+  private bluetoothService = inject(BluetoothService);
 
   // Signals
   local = signal<Local | null>(null);
   facturas = signal<Factura[]>([]);
+  estadisticas = signal<LocalStats | null>(null);
   isLoading = signal(true);
   isLoadingFacturas = signal(false);
+  isLoadingStats = signal(false);
   localId = signal<string>('');
   searchTerm = signal<string>('');
   currentPage = signal(1);
@@ -72,11 +111,21 @@ export class LocalDetailPage implements OnInit {
   // Signals adicionales
   error = signal<string | null>(null);
   mercadoId = signal<string>('');
-  estadisticasFacturas = signal<any>({
-    total: 0,
-    pagadas: 0,
-    pendientes: 0,
-    vencidas: 0
+  
+  // Computed values for legacy compatibility
+  estadisticasFacturas = computed(() => {
+    const stats = this.estadisticas();
+    return stats ? {
+      total: stats.estadisticas_facturas.total_facturas,
+      pagadas: stats.estadisticas_facturas.facturas_pagadas,
+      pendientes: stats.estadisticas_facturas.facturas_pendientes,
+      vencidas: stats.estadisticas_facturas.facturas_vencidas
+    } : {
+      total: 0,
+      pagadas: 0,
+      pendientes: 0,
+      vencidas: 0
+    };
   });
   
   // Invoice Modal signals
@@ -91,7 +140,6 @@ export class LocalDetailPage implements OnInit {
 
   // Computed signals adicionales
   canEditLocal = computed(() => this.canEdit());
-  canEditFactura = computed(() => this.canEdit());
   hasMoreFacturas = computed(() => this.currentPage() < this.totalPages());
 
   // Computed signals
@@ -111,7 +159,7 @@ export class LocalDetailPage implements OnInit {
     );
   });
 
-  // Permisos
+  // Permisos específicos para facturas
   canEdit = computed(() => {
     const user = this.authService.user();
     return user && [Role.ADMIN, Role.MARKET].includes(user.role);
@@ -125,16 +173,30 @@ export class LocalDetailPage implements OnInit {
   canCreateFactura = computed(() => {
     const user = this.authService.user();
     return user && [Role.ADMIN, Role.MARKET, Role.USER].includes(user.role);
+  });
+
+  // Permisos específicos solo para administradores
+  canEditFactura = computed(() => {
+    const user = this.authService.user();
+    return user && user.role === Role.ADMIN;
+  });
+
+  canAnularFactura = computed(() => {
+    const user = this.authService.user();
+    return user && user.role === Role.ADMIN;
   });  constructor() {
-    addIcons({eyeOutline,createOutline,refreshOutline,alertCircleOutline,storefrontOutline,personOutline,callOutline,businessOutline,locationOutline,cashOutline,calendarOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,addOutline,filterOutline,documentOutline,checkmarkOutline,closeOutline,add,chevronDownOutline,addCircleOutline,close,chatbubbleOutline,closeSharp,cardOutline,mailOutline,helpCircleOutline,trashOutline,searchOutline,receiptOutline,statsChartOutline,downloadOutline,pauseOutline,playOutline,walletOutline,documentAttachOutline,informationCircleOutline});
+    addIcons({eyeOutline,createOutline,refreshOutline,alertCircleOutline,storefrontOutline,personOutline,callOutline,businessOutline,locationOutline,cashOutline,calendarOutline,analyticsOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,trendingUpOutline,walletOutline,pieChartOutline,barChartOutline,receiptOutline,addOutline,filterOutline,documentOutline,person,storefront,checkmarkCircle,alertCircle,checkmarkOutline,closeOutline,add,addCircleOutline,close,receipt,calendar,time,chatbubble,print,create,trash,printOutline,chevronDownOutline,chatbubbleOutline,closeSharp,cardOutline,mailOutline,helpCircleOutline,trashOutline,searchOutline,statsChartOutline,downloadOutline,pauseOutline,playOutline,documentAttachOutline,informationCircleOutline,cardIcon,cashIcon});
   }
 
   ngOnInit() {
+    console.log('LocalDetailPage: ngOnInit ejecutado');
     const id = this.route.snapshot.paramMap.get('id');
+    console.log('Local ID obtenido:', id);
     if (id) {
       this.localId.set(id);
       this.loadLocal(id);
       this.loadFacturas(true);
+      this.cargarEstadisticasFacturas();
     }
   }  /**
    * Cargar datos del local
@@ -146,6 +208,8 @@ export class LocalDetailPage implements OnInit {
       
       if (local) {
         this.local.set(local);
+        // Cargar estadísticas después de cargar el local
+        this.cargarEstadisticasFacturas();
       } else {
         this.local.set(null);
         this.showToast('Local no encontrado', 'danger');
@@ -274,6 +338,29 @@ export class LocalDetailPage implements OnInit {
    * Crear factura desde el modal
    */
   async createInvoice() {
+    // 1. Verificar conexión Bluetooth primero
+    const isConnected = await this.bluetoothService.isConnected();
+    if (!isConnected) {
+      const alert = await this.alertController.create({
+        header: 'Impresora no conectada',
+        message: 'Para crear una factura, primero debe conectar una impresora Bluetooth.',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+          },
+          {
+            text: 'Configurar Impresora',
+            handler: () => {
+              this.router.navigate(['/bluetooth-settings']);
+            },
+          },
+        ],
+      });
+      await alert.present();
+      return;
+    }
+
     if (!this.selectedMonth() || this.selectedMonth() === 0) {
       this.showToast('Debe seleccionar un mes', 'warning');
       return;
@@ -284,23 +371,30 @@ export class LocalDetailPage implements OnInit {
     try {
       const local = this.local();
       const currentUser = this.authService.user();
-      
       if (!local || !currentUser) {
         this.showToast('Error: Información insuficiente', 'danger');
+        this.isCreatingInvoice.set(false);
         return;
       }
-
       const currentYear = new Date().getFullYear();
       const monthName = this.getMonthName(this.selectedMonth());
       const mes = `${currentYear}-${String(this.selectedMonth()).padStart(2, '0')}`;
-      
-      // Calcular fecha de vencimiento (15 del mes seleccionado)
-      const dueDate = new Date(currentYear, this.selectedMonth() - 1, 15);
-      
+      // Calcular fecha de vencimiento correctamente usando el mes seleccionado y el día actual
+      let nextMonth = this.selectedMonth() + 1;
+      let nextYear = currentYear;
+      if (nextMonth > 12) {
+        nextMonth = 1;
+        nextYear = currentYear + 1;
+      }
+      let day = new Date().getDate();
+      const daysInNextMonth = new Date(nextYear, nextMonth, 0).getDate();
+      if (day > daysInNextMonth) {
+        day = daysInNextMonth;
+      }
+      const dueDate = new Date(nextYear, nextMonth - 1, day);
       const montoMensual = typeof local.monto_mensual === 'string' 
         ? parseFloat(local.monto_mensual) 
         : (local.monto_mensual || 0);
-
       const facturaData: CreateFacturaRequest = {
         concepto: `Cuota mensual ${monthName} ${currentYear}`,
         mes: mes,
@@ -312,18 +406,27 @@ export class LocalDetailPage implements OnInit {
         localId: local.id,
         createdByUserId: currentUser.id
       };
-
       const response = await this.facturasService.createFactura(facturaData).toPromise();
-      
-      if (response) {
-        this.showToast('Factura creada exitosamente', 'success');
+      // Manejo robusto: aceptar ApiResponse<Factura> o Factura directa
+      let facturaCreada: Factura | null = null;
+      if (response && typeof response === 'object') {
+        if ('data' in response && response.data && typeof response.data === 'object' && 'id' in response.data) {
+          facturaCreada = response.data;
+        } else if ('id' in response) {
+          facturaCreada = response as unknown as Factura;
+        }
+      }
+      if (facturaCreada) {
         this.closeInvoiceModal();
         this.loadFacturas(true);
         this.cargarEstadisticasFacturas();
+        this.imprimirFactura(facturaCreada);
+      } else {
+        // Log para depuración
+        console.error('Respuesta inesperada al crear factura:', response);
+        this.showToast('No se pudo crear la factura. Respuesta inesperada.', 'danger');
       }
     } catch (error: any) {
-      console.error('Error creating factura:', error);
-      
       if (error.status === 409) {
         this.showToast('Ya existe una factura para este mes', 'danger');
       } else {
@@ -331,6 +434,66 @@ export class LocalDetailPage implements OnInit {
       }
     } finally {
       this.isCreatingInvoice.set(false);
+    }
+  }
+
+  /**
+   * Imprimir factura con manejo de errores y reintentos
+   */
+  async imprimirFactura(factura: Factura) {
+    const loading = await this.loadingController.create({
+      message: 'Preparando impresión...',
+      spinner: 'crescent',
+    });
+    await loading.present();
+    try {
+      // Usar directamente los datos de la factura recibida
+      const printData = {
+        numero_factura: factura.correlativo || factura.numero_factura || factura.id,
+        fecha: factura.createdAt ? new Date(factura.createdAt) : new Date(),
+        fecha_vencimiento: factura.fecha_vencimiento ? new Date(factura.fecha_vencimiento) : undefined,
+        concepto: factura.concepto,
+        monto: factura.monto,
+        mes: factura.mes,
+        anio: factura.anio,
+        nombre_local: factura.local?.nombre_local || `Local ${factura.local?.numero_local}`,
+        numero_local: factura.local?.numero_local,
+        nombre_mercado: factura.mercado_nombre || factura.local?.mercado?.nombre_mercado,
+        direccion_mercado: factura.local?.mercado?.direccion,
+        propietario_nombre: factura.propietario_nombre || factura.local?.propietario,
+        propietario_dni: factura.propietario_dni || factura.local?.dni_propietario,
+        // estado_factura: factura.estado, // Eliminado del ticket
+      };
+      const printString = this.printingService.formatDetailedInvoice(printData);
+      loading.message = 'Enviando a la impresora...';
+      await this.bluetoothService.print(printString);
+      await loading.dismiss();
+      this.showToast('Factura enviada a la impresora correctamente.', 'success');
+    } catch (error) {
+      await loading.dismiss();
+      const alert = await this.alertController.create({
+        header: 'Error de Impresión',
+        message: 'No se pudo imprimir la factura. Verifique la conexión de la impresora Bluetooth.',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+          },
+          {
+            text: 'Reintentar',
+            handler: () => {
+              this.imprimirFactura(factura);
+            },
+          },
+          {
+            text: 'Configurar Impresora',
+            handler: () => {
+              this.router.navigate(['/bluetooth-settings']);
+            },
+          },
+        ],
+      });
+      await alert.present();
     }
   }
 
@@ -503,7 +666,8 @@ export class LocalDetailPage implements OnInit {
     await alert.present();
   }  /**
    * Procesar la creación de la factura
-   */  async procesarCreacionFactura(mes: string, observaciones: string = '') {
+   */
+  async procesarCreacionFactura(mes: string, observaciones: string = '') {
     // Mostrar loading
     const loading = await this.loadingController.create({
       message: 'Creando factura...',
@@ -514,26 +678,23 @@ export class LocalDetailPage implements OnInit {
     try {
       const local = this.local();
       const currentUser = this.authService.user();
-      
       if (!local || !currentUser) {
         await loading.dismiss();
         this.showToast('Error: Información insuficiente para crear la factura', 'danger');
         return;
       }
-
       // Parsear el mes seleccionado
       const [year, month] = mes.split('-');
       const monthName = this.getMonthName(parseInt(month));
-      
       // Calcular fecha de vencimiento (15 del mes siguiente)
       const nextMonth = parseInt(month) === 12 ? 1 : parseInt(month) + 1;
       const nextYear = parseInt(month) === 12 ? parseInt(year) + 1 : parseInt(year);
       const fechaVencimiento = new Date(nextYear, nextMonth - 1, 15);
-
       // Convertir monto_mensual a number de forma segura
       const montoMensual = typeof local.monto_mensual === 'string' 
         ? parseFloat(local.monto_mensual) 
-        : (local.monto_mensual || 0);      const facturaData: CreateFacturaRequest = {
+        : (local.monto_mensual || 0);
+      const facturaData: CreateFacturaRequest = {
         concepto: `Cuota mensual ${monthName} ${year}`,
         mes: mes,
         anio: parseInt(year),
@@ -544,20 +705,47 @@ export class LocalDetailPage implements OnInit {
         localId: local.id,
         createdByUserId: currentUser.id
       };
-
       const response = await this.facturasService.createFactura(facturaData).toPromise();
-      
       await loading.dismiss();
-      
-      if (response) {
+      if (response && response.data) {
         this.showToast('Factura creada exitosamente', 'success');
         this.loadFacturas(true);
         this.cargarEstadisticasFacturas();
+        // --- INICIO INTEGRACIÓN IMPRESIÓN ---
+        try {
+          const factura = response.data;
+          // Adaptar datos para el formato de impresión
+          const printData = {
+            id: factura.numero_factura || factura.id,
+            date: factura.createdAt ? new Date(factura.createdAt) : new Date(),
+            customerName: factura.propietario_nombre || local.propietario || 'N/A',
+            items: [
+              {
+                quantity: 1,
+                description: factura.concepto,
+                price: factura.monto
+              }
+            ],
+            subtotal: factura.monto,
+            tax: 0,
+            total: factura.monto
+          };
+          const printString = this.printingService.formatInvoiceForPrinting(printData);
+          const printing = await this.loadingController.create({
+            message: 'Imprimiendo factura...',
+            spinner: 'dots'
+          });
+          await printing.present();
+          await this.bluetoothService.print(printString);
+          await printing.dismiss();
+          this.showToast('Factura enviada a la impresora', 'success');
+        } catch (printError) {
+          this.showToast('Error al imprimir la factura', 'danger');
+        }
+        // --- FIN INTEGRACIÓN IMPRESIÓN ---
       }
     } catch (error: any) {
       await loading.dismiss();
-      console.error('Error creating factura:', error);
-      
       // Manejar errores específicos
       if (error.status === 409) {
         // Error de conflicto - factura duplicada
@@ -680,40 +868,96 @@ export class LocalDetailPage implements OnInit {
    * Cargar estadísticas de facturas
    */
   async cargarEstadisticasFacturas() {
+    this.isLoadingStats.set(true);
     try {
-      // Aquí deberías llamar a un servicio que obtenga las estadísticas
-      // Por ahora, calculamos basado en las facturas cargadas
-      const facturas = this.facturas();
-      const estadisticas = {
-        total: facturas.length,
-        pagadas: facturas.filter(f => f.estado === 'PAGADA').length,
-        pendientes: facturas.filter(f => f.estado === 'PENDIENTE').length,
-        vencidas: facturas.filter(f => f.estado === 'VENCIDA').length
-      };
+      const localId = this.localId();
+      console.log('Cargando estadísticas para local:', localId);
+      if (!localId) return;
       
-      this.estadisticasFacturas.set(estadisticas);
+      const stats = await this.localesService.getLocalStats(localId).toPromise();
+      console.log('Estadísticas recibidas:', stats);
+      this.estadisticas.set(stats || null);
+      
+      // Actualizar el nombre del mercado para el modal
+      if (stats?.mercado?.nombre) {
+        this.mercadoNombre = stats.mercado.nombre;
+      }
     } catch (error) {
       console.error('Error loading estadisticas:', error);
+      this.estadisticas.set(null);
+    } finally {
+      this.isLoadingStats.set(false);
     }
+  }
+
+  /**
+   * Forzar recarga de estadísticas para debugging
+   */
+  async recargarEstadisticas() {
+    console.log('Forzando recarga de estadísticas...');
+    await this.cargarEstadisticasFacturas();
   }
 
   /**
    * Ver detalle de factura
    */
   verDetalleFactura(factura: Factura) {
-    // Navegar al detalle de la factura
-    this.router.navigate(['/facturas', factura.id]);
-  }  /**
+    this.facturaSeleccionada.set(factura);
+    this.showFacturaDetailModal.set(true);
+  }
+
+  cerrarFacturaDetailModal() {
+    this.showFacturaDetailModal.set(false);
+    this.facturaSeleccionada.set(null);
+  }
+
+  /**
    * Marcar como pagada
    */
   async marcarComoPagada(factura: Factura) {
-    try {
-      await this.facturasService.payFactura(factura.id).toPromise();
-      this.showToast('Factura marcada como pagada', 'success');
-      this.loadFacturas(true);
-    } catch (error) {
-      this.showToast('Error al marcar factura como pagada', 'danger');
-    }
+    const alert = await this.alertController.create({
+      header: 'Confirmar Pago',
+      message: `¿Confirmar el pago de la factura ${factura.correlativo}?`,
+      inputs: [
+        {
+          name: 'fechaPago',
+          type: 'date',
+          value: new Date().toISOString().split('T')[0],
+          placeholder: 'Fecha de pago'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Confirmar Pago',
+          handler: async (data) => {
+            const loading = await this.loadingController.create({
+              message: 'Procesando pago...'
+            });
+            await loading.present();
+
+            try {
+              await this.facturasService.payFactura(factura.id, data.fechaPago).toPromise();
+              await loading.dismiss();
+              
+              this.showToast('Factura marcada como pagada exitosamente', 'success');
+              this.loadFacturas(true);
+              this.cargarEstadisticasFacturas();
+              this.cerrarFacturaDetailModal();
+            } catch (error) {
+              await loading.dismiss();
+              console.error('Error al marcar como pagada:', error);
+              this.showToast('Error al procesar el pago', 'danger');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   /**
@@ -728,22 +972,46 @@ export class LocalDetailPage implements OnInit {
    */
   async anularFactura(factura: Factura) {
     const alert = await this.alertController.create({
-      header: 'Confirmar anulación',
-      message: `¿Está seguro de que desea anular la factura ${factura.numero_factura}?`,
+      header: 'Anular Factura',
+      message: `¿Está seguro de que desea eliminar definitivamente la factura ${factura.correlativo}?`,
+      subHeader: 'Esta acción no se puede deshacer',
+      inputs: [
+        {
+          name: 'observaciones',
+          type: 'textarea',
+          placeholder: 'Motivo de la anulación (opcional)',
+          attributes: {
+            maxlength: 255,
+            rows: 3
+          }
+        }
+      ],
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel'
         },
         {
-          text: 'Anular',
-          role: 'destructive',          handler: async () => {
+          text: 'Eliminar Factura',
+          role: 'destructive',
+          handler: async (data) => {
+            const loading = await this.loadingController.create({
+              message: 'Eliminando factura...'
+            });
+            await loading.present();
+
             try {
-              await this.facturasService.anularFactura(factura.id).toPromise();
-              this.showToast('Factura anulada correctamente', 'success');
+              await this.facturasService.anularFactura(factura.id, data.observaciones).toPromise();
+              await loading.dismiss();
+              
+              this.showToast('Factura eliminada correctamente', 'success');
               this.loadFacturas(true);
+              this.cargarEstadisticasFacturas();
+              this.cerrarFacturaDetailModal();
             } catch (error) {
-              this.showToast('Error al anular factura', 'danger');
+              await loading.dismiss();
+              console.error('Error al eliminar factura:', error);
+              this.showToast('Error al eliminar la factura', 'danger');
             }
           }
         }
@@ -880,16 +1148,6 @@ export class LocalDetailPage implements OnInit {
    */
   getTipoLocalText(tipo: TipoLocal): string {
     switch (tipo) {
-      case TipoLocal.COMIDA:
-        return 'Comida';
-      case TipoLocal.ROPA:
-        return 'Ropa';
-      case TipoLocal.ELECTRODOMESTICOS:
-        return 'Electrodomésticos';
-      case TipoLocal.FARMACIA:
-        return 'Farmacia';
-      case TipoLocal.SERVICIOS:
-        return 'Servicios';
       case TipoLocal.CARNICERIA:
         return 'Carnicería';
       case TipoLocal.OTROS:
@@ -897,6 +1155,7 @@ export class LocalDetailPage implements OnInit {
       default:
         return 'No especificado';
     }
+
   }
 
   /**
@@ -1014,4 +1273,168 @@ export class LocalDetailPage implements OnInit {
   getFormattedSelectedMonth(): string {
     return String(this.selectedMonth()).padStart(2, '0');
   }
+
+  /**
+   * Formatear el mes desde el formato del endpoint (ej: "2025-08") a texto legible
+   */
+  formatMesFromEndpoint(mes: string): string {
+    if (!mes) return 'Mes no especificado';
+    
+    // Si viene en formato "2025-08"
+    if (mes.includes('-')) {
+      const [year, month] = mes.split('-');
+      const monthNumber = parseInt(month);
+      const monthName = this.getMonthName(monthNumber);
+      return `${monthName} ${year}`;
+    }
+    
+    // Si viene como número simple, asumimos el año actual
+    const monthNumber = parseInt(mes);
+    if (monthNumber >= 1 && monthNumber <= 12) {
+      return `${this.getMonthName(monthNumber)} ${this.getCurrentYear()}`;
+    }
+    
+    return mes; // Devolver tal como viene si no se puede parsear
+  }
+
+  /**
+   * Extraer número de mes desde el formato del endpoint
+   */
+  extractMonthNumber(mes: string): number {
+    if (!mes) return 0;
+    
+    if (mes.includes('-')) {
+      const [, month] = mes.split('-');
+      return parseInt(month) || 0;
+    }
+    
+    return parseInt(mes) || 0;
+  }
+
+  /**
+   * Extraer año desde el formato del endpoint
+   */
+  extractYearFromMes(mes: string): number {
+    if (!mes) return this.getCurrentYear();
+    
+    if (mes.includes('-')) {
+      const [year] = mes.split('-');
+      return parseInt(year) || this.getCurrentYear();
+    }
+    
+    return this.getCurrentYear();
+  }
+
+  /**
+   * Reimprimir factura
+   */
+  async reimprimirFactura(factura: Factura) {
+    // Verificar conexión Bluetooth
+    const isConnected = await this.bluetoothService.isConnected();
+    if (!isConnected) {
+      const alert = await this.alertController.create({
+        header: 'Impresora no conectada',
+        message: 'Para reimprimir la factura, primero debe conectar una impresora Bluetooth.',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+          },
+          {
+            text: 'Configurar Impresora',
+            handler: () => {
+              this.router.navigate(['/bluetooth-settings']);
+            },
+          },
+        ],
+      });
+      await alert.present();
+      return;
+    }
+
+    // Confirmar reimpresión
+    const alert = await this.alertController.create({
+      header: 'Reimprimir Factura',
+      message: `¿Desea reimprimir la factura ${factura.correlativo || factura.numero_factura}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Reimprimir',
+          handler: async () => {
+            await this.imprimirFactura(factura);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Obtener acciones disponibles para una factura según su estado
+   */
+  getFacturaActions(factura: Factura): Array<{
+    icon: string;
+    label: string;
+    color: string;
+    action: () => void;
+    condition?: boolean;
+  }> {
+    const actions = [];
+
+    // Ver detalles (siempre disponible)
+    actions.push({
+      icon: 'eye-outline',
+      label: 'Ver',
+      color: 'primary',
+      action: () => this.verDetalleFactura(factura)
+    });
+
+    // Marcar como pagada (solo si está pendiente y el usuario es administrador)
+    if (factura.estado === 'PENDIENTE' && this.canEditFactura()) {
+      actions.push({
+        icon: 'checkmark-circle-outline',
+        label: 'Pagar',
+        color: 'success',
+        action: () => this.marcarComoPagada(factura)
+      });
+    }
+
+    // Reimprimir (siempre disponible si no está anulada)
+    if (factura.estado !== 'ANULADA') {
+      actions.push({
+        icon: 'print-outline',
+        label: 'Imprimir',
+        color: 'secondary',
+        action: () => this.reimprimirFactura(factura)
+      });
+    }
+
+    // Editar (solo si no está anulada y el usuario es administrador)
+    if (factura.estado !== 'ANULADA' && this.canEditFactura()) {
+      actions.push({
+        icon: 'create-outline',
+        label: 'Editar',
+        color: 'warning',
+        action: () => this.editarFactura(factura)
+      });
+    }
+
+    // Anular (solo si no está anulada y el usuario es administrador)
+    if (factura.estado !== 'ANULADA' && this.canAnularFactura()) {
+      actions.push({
+        icon: 'trash-outline',
+        label: 'Anular',
+        color: 'danger',
+        action: () => this.anularFactura(factura)
+      });
+    }
+
+    return actions;
+  }
+
+  // ...existing code...
 }

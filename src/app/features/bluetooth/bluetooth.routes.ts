@@ -2,8 +2,13 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: '',
+    path: 'settings',
     loadComponent: () => import('./bluetooth-settings/bluetooth-settings.page').then(m => m.BluetoothSettingsPage)
+  },
+  {
+    path: '',
+    redirectTo: 'settings',
+    pathMatch: 'full'
   },
   {
     path: 'devices',

@@ -1,77 +1,63 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton,
-  IonText, IonSpinner, IonIcon, IonButton, IonList, IonItem,
-  IonLabel, IonListHeader, IonBadge, IonButtons
+import { FormsModule } from '@angular/forms';
+import {
+  ModalController,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonButton,
+  IonContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonSpinner,
+  IonNote,
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { 
-  bluetoothOutline, 
-  refreshOutline, 
-  printOutline, 
-  hardwareChipOutline,
-  bluetooth,
-  refreshCircle,
-  print,
-  hardwareChip
-} from 'ionicons/icons';
-import { Subscription } from 'rxjs';
+import { BluetoothDevice } from '../../../core/interfaces';
+import { BluetoothService } from '../bluetooth.service';
 
 @Component({
   selector: 'app-device-list',
   templateUrl: './device-list.page.html',
   styleUrls: ['./device-list.page.scss'],
-  standalone: true,  imports: [
+  standalone: true,
+  imports: [
     CommonModule,
-    IonContent, IonHeader, IonTitle, IonToolbar, 
-    IonButtons, IonBackButton, IonText, IonSpinner, 
-    IonIcon, IonButton, IonList, IonItem,
-    IonLabel, IonListHeader, IonBadge
-  ]
+    FormsModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonSpinner,
+    IonNote,
+  ],
 })
-export class DeviceListPage implements OnInit, OnDestroy {
-  isScanning = false;
-  devices: any[] = [];
-  private subscription: Subscription | null = null;
-    constructor() {
-    addIcons({
-      bluetoothOutline,
-      refreshCircle,
-      printOutline,
-      hardwareChipOutline,
-      print,
-      hardwareChip,
-      bluetooth,
-      refreshOutline
-    });
+export class DeviceListPage implements OnInit {
+  devices: BluetoothDevice[] = [];
+  isLoading = true;
+
+  constructor(
+    private bluetoothService: BluetoothService,
+    private modalCtrl: ModalController
+  ) {}
+
+  async ngOnInit() {
+    this.devices = await this.bluetoothService.scanForDevices();
+    this.isLoading = false;
   }
 
-  ngOnInit() {
-    this.scanDevices();
+  selectDevice(device: BluetoothDevice) {
+    this.modalCtrl.dismiss(device);
   }
 
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-
-  scanDevices() {
-    this.isScanning = true;
-    // Mock data for now - would connect to a Bluetooth service in a real app
-    setTimeout(() => {
-      this.devices = [
-        { id: 'AB:CD:EF:12:34:56', name: 'Thermal Printer 58mm', connected: false },
-        { id: '12:34:56:78:9A:BC', name: 'POS Printer 80mm', connected: false },
-        { id: 'DD:EE:FF:AA:BB:CC', name: 'Bluetooth Device', connected: false }
-      ];
-      this.isScanning = false;
-    }, 2000);
-  }
-
-  selectDevice(device: any) {
-    // Would handle device selection and connection in a real app
-    device.connected = !device.connected;
+  closeModal() {
+    this.modalCtrl.dismiss(null);
   }
 }

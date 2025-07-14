@@ -130,79 +130,216 @@
       </ion-card-content>
     </ion-card>
 
-        <!-- Estadísticas del Local -->
-        <ion-card class="stats-card">
-          <ion-card-header>
-            <ion-card-title>Estadísticas</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <div class="stats-grid">
-              <div class="stat-item">
-                <ion-icon name="document-text-outline" color="primary"></ion-icon>
-                <div class="stat-content">
-                  <h4>{{ estadisticasFacturas()?.total || 0 }}</h4>
-                  <p>Total Facturas</p>
-                </div>
-              </div>
-              
-              <div class="stat-item">
-                <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-                <div class="stat-content">
-                  <h4>{{ estadisticasFacturas()?.pagadas || 0 }}</h4>
-                  <p>Pagadas</p>
-                </div>
-              </div>
-              
-              <div class="stat-item">
-                <ion-icon name="time-outline" color="warning"></ion-icon>
-                <div class="stat-content">
-                  <h4>{{ estadisticasFacturas()?.pendientes || 0 }}</h4>
-                  <p>Pendientes</p>
-                </div>
-              </div>
-              
-              <div class="stat-item">
-                <ion-icon name="close-circle-outline" color="danger"></ion-icon>
-                <div class="stat-content">
-                  <h4>{{ estadisticasFacturas()?.vencidas || 0 }}</h4>
-                  <p>Vencidas</p>
-                </div>
-              </div>
+    <!-- Estadísticas del Local -->
+    <ion-card class="stats-card mt-4 mx-2 shadow-lg border-0 bg-white">
+      <ion-card-header class="pb-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+              <ion-icon name="analytics-outline" class="text-white text-lg"></ion-icon>
             </div>
-          </ion-card-content>
-        </ion-card>
+            <div>
+              <ion-card-title class="text-xl font-bold text-gray-800">Estadísticas</ion-card-title>
+              <p class="text-sm text-gray-500 mt-1">Resumen de facturas y finanzas</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <ion-button 
+              fill="clear" 
+              size="small" 
+              (click)="recargarEstadisticas()"
+              class="text-xs">
+              <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-spinner *ngIf="isLoadingStats()" name="lines-small" color="primary"></ion-spinner>
+          </div>
+        </div>
+      </ion-card-header>
+      
+      <ion-card-content class="pt-0 px-4 pb-6">
+        <!-- Estado de carga/error -->
+        <div *ngIf="!estadisticas() && !isLoadingStats()" class="text-center py-8">
+          <ion-icon name="analytics-outline" class="text-gray-400 text-4xl mb-2"></ion-icon>
+          <p class="text-gray-500 text-sm">No hay estadísticas disponibles</p>
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="recargarEstadisticas()" 
+            class="mt-2">
+            Recargar
+          </ion-button>
+        </div>
+
+        <!-- Contenido de estadísticas -->
+        <div *ngIf="estadisticas()">
+          <!-- Estadísticas de Facturas -->
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <ion-icon name="document-text-outline" class="text-blue-500"></ion-icon>
+              Facturas
+            </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="document-text-outline" class="text-blue-600 text-xl"></ion-icon>
+                <span class="text-2xl font-bold text-blue-700">{{ estadisticasFacturas().total || 0 }}</span>
+              </div>
+              <p class="text-sm font-medium text-blue-600">Total Facturas</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="checkmark-circle-outline" class="text-green-600 text-xl"></ion-icon>
+                <span class="text-2xl font-bold text-green-700">{{ estadisticasFacturas().pagadas || 0 }}</span>
+              </div>
+              <p class="text-sm font-medium text-green-600">Pagadas</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="time-outline" class="text-orange-600 text-xl"></ion-icon>
+                <span class="text-2xl font-bold text-orange-700">{{ estadisticasFacturas().pendientes || 0 }}</span>
+              </div>
+              <p class="text-sm font-medium text-orange-600">Pendientes</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-xl border border-red-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="close-circle-outline" class="text-red-600 text-xl"></ion-icon>
+                <span class="text-2xl font-bold text-red-700">{{ estadisticasFacturas().vencidas || 0 }}</span>
+              </div>
+              <p class="text-sm font-medium text-red-600">Vencidas</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas Financieras -->
+        <div *ngIf="estadisticas()?.estadisticas_financieras">
+          <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
+            <ion-icon name="trending-up-outline" class="text-green-500"></ion-icon>
+            Finanzas
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Total Recaudado -->
+            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-xl border border-emerald-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="cash-outline" class="text-emerald-600 text-xl"></ion-icon>
+                <span class="text-xl font-bold text-emerald-700">
+                  L. {{ estadisticas()?.estadisticas_financieras?.total_recaudado || 0 | currency:'':'':'1.2-2' }}
+                </span>
+              </div>
+              <p class="text-sm font-medium text-emerald-600">Total Recaudado</p>
+            </div>
+
+            <!-- Monto Pendiente -->
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-xl border border-amber-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="wallet-outline" class="text-amber-600 text-xl"></ion-icon>
+                <span class="text-xl font-bold text-amber-700">
+                  L. {{ estadisticas()?.estadisticas_financieras?.monto_pendiente || 0 | currency:'':'':'1.2-2' }}
+                </span>
+              </div>
+              <p class="text-sm font-medium text-amber-600">Monto Pendiente</p>
+            </div>
+
+            <!-- Porcentaje de Recaudación -->
+            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-xl border border-indigo-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="pie-chart-outline" class="text-indigo-600 text-xl"></ion-icon>
+                <span class="text-xl font-bold text-indigo-700">
+                  {{ estadisticas()?.estadisticas_financieras?.porcentaje_recaudacion || 0 | number:'1.1-1' }}%
+                </span>
+              </div>
+              <p class="text-sm font-medium text-indigo-600">% Recaudación</p>
+            </div>
+
+            <!-- Recaudo Esperado Mensual -->
+            <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 p-4 rounded-xl border border-cyan-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="calendar-outline" class="text-cyan-600 text-xl"></ion-icon>
+                <span class="text-xl font-bold text-cyan-700">
+                  L. {{ estadisticas()?.estadisticas_financieras?.recaudo_esperado_mensual || 0 | currency:'':'':'1.2-2' }}
+                </span>
+              </div>
+              <p class="text-sm font-medium text-cyan-600">Esperado Mensual</p>
+            </div>
+
+            <!-- Recaudo Esperado Anual -->
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="bar-chart-outline" class="text-purple-600 text-xl"></ion-icon>
+                <span class="text-xl font-bold text-purple-700">
+                  L. {{ estadisticas()?.estadisticas_financieras?.recaudo_esperado_anual || 0 | currency:'':'':'1.2-2' }}
+                </span>
+              </div>
+              <p class="text-sm font-medium text-purple-600">Esperado Anual</p>
+            </div>
+
+            <!-- Monto Total Facturas -->
+            <div class="bg-gradient-to-br from-slate-50 to-slate-100 p-4 rounded-xl border border-slate-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="receipt-outline" class="text-slate-600 text-xl"></ion-icon>
+                <span class="text-xl font-bold text-slate-700">
+                  L. {{ estadisticas()?.estadisticas_financieras?.monto_total_facturas || 0 | currency:'':'':'1.2-2' }}
+                </span>
+              </div>
+              <p class="text-sm font-medium text-slate-600">Total Facturado</p>
+            </div>
+          </div>
+        </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
 
     <!-- Sección de Facturas -->
-    <ion-card class="facturas-card">
-      <ion-card-header>
-        <div class="facturas-header">
-          <ion-card-title>Facturas</ion-card-title>          <ion-button *ngIf="canCreateFactura()" fill="outline" size="small" (click)="openInvoiceModal()">
+    <ion-card class="facturas-card mt-4 mx-2 shadow-lg border-0 bg-white">
+      <ion-card-header class="pb-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+              <ion-icon name="receipt-outline" class="text-white text-lg"></ion-icon>
+            </div>
+            <div>
+              <ion-card-title class="text-xl font-bold text-gray-800 leading-tight">Facturas</ion-card-title>
+              <p class="text-sm text-gray-500 mt-1">Gestión de facturas del local</p>
+            </div>
+          </div>
+          <ion-button 
+            *ngIf="canCreateFactura()" 
+            fill="solid" 
+            size="default" 
+            (click)="openInvoiceModal()"
+            class="px-4 py-2 font-semibold"
+            color="primary">
             <ion-icon name="add-outline" slot="start"></ion-icon>
             Nueva Factura
           </ion-button>
         </div>
       </ion-card-header>
       
-      <ion-card-content>
+      <ion-card-content class="px-4 pb-6">
         <!-- Filtros y Búsqueda -->
-        <div class="filters-section">
+        <div class="filters-section mb-6">
           <!-- Barra de búsqueda -->
-          <ion-searchbar
-            [(ngModel)]="searchTerm"
-            (ionInput)="onSearchChange($event)"
-            placeholder="Buscar facturas..."
-            debounce="300"
-            show-clear-button="focus">
-          </ion-searchbar>
+          <div class="mb-4">
+            <ion-searchbar
+              [(ngModel)]="searchTerm"
+              (ionInput)="onSearchChange($event)"
+              placeholder="Buscar facturas..."
+              debounce="300"
+              show-clear-button="focus"
+              class="custom-searchbar">
+            </ion-searchbar>
+          </div>
           
           <!-- Filtros -->
-          <div class="filters-row">
+          <div class="filters-row grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             <ion-select
               [(ngModel)]="filtroEstado"
               (ionChange)="aplicarFiltros()"
               placeholder="Estado"
               interface="popover"
-              class="filter-select">
+              class="filter-select bg-gray-50 rounded-lg">
               <ion-select-option value="">Todos los estados</ion-select-option>
               <ion-select-option value="PENDIENTE">Pendiente</ion-select-option>
               <ion-select-option value="PAGADA">Pagada</ion-select-option>
@@ -215,7 +352,7 @@
               (ionChange)="aplicarFiltros()"
               placeholder="Mes"
               interface="popover"
-              class="filter-select">
+              class="filter-select bg-gray-50 rounded-lg">
               <ion-select-option value="">Todos los meses</ion-select-option>
               <ion-select-option value="1">Enero</ion-select-option>
               <ion-select-option value="2">Febrero</ion-select-option>
@@ -236,15 +373,18 @@
               (ionChange)="aplicarFiltros()"
               placeholder="Año"
               interface="popover"
-              class="filter-select">
+              class="filter-select bg-gray-50 rounded-lg">
               <ion-select-option value="">Todos los años</ion-select-option>
               <ion-select-option value="2024">2024</ion-select-option>
               <ion-select-option value="2023">2023</ion-select-option>
               <ion-select-option value="2022">2022</ion-select-option>
             </ion-select>
             
-            <ion-button fill="clear" (click)="limpiarFiltros()">
-              <ion-icon name="filter-outline"></ion-icon>
+            <ion-button 
+              fill="outline" 
+              (click)="limpiarFiltros()"
+              class="h-full rounded-lg border-gray-300">
+              <ion-icon name="filter-outline" slot="start"></ion-icon>
               Limpiar
             </ion-button>
           </div>
@@ -253,54 +393,179 @@
         <!-- Lista de Facturas -->
         <div class="facturas-list">
           <!-- Loading de facturas -->
-          <div *ngIf="isLoadingFacturas()" class="facturas-loading">
-            <ion-spinner name="lines-small" color="primary"></ion-spinner>
-            <p>Cargando facturas...</p>
+          <div *ngIf="isLoadingFacturas()" class="facturas-loading flex flex-col items-center justify-center py-12">
+            <ion-spinner name="lines-small" color="primary" class="mb-3"></ion-spinner>
+            <p class="text-gray-500 text-sm">Cargando facturas...</p>
           </div>
 
           <!-- No hay facturas -->
-          <div *ngIf="!isLoadingFacturas() && facturas().length === 0" class="no-facturas">
-            <ion-icon name="document-outline" color="medium"></ion-icon>
-            <h3>No hay facturas</h3>
-            <p>Este local aún no tiene facturas registradas.</p>            <ion-button *ngIf="canCreateFactura()" fill="outline" (click)="openInvoiceModal()">
+          <div *ngIf="!isLoadingFacturas() && facturas().length === 0" class="no-facturas flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <ion-icon name="document-outline" class="text-gray-400 text-2xl"></ion-icon>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">No hay facturas</h3>
+            <p class="text-gray-500 mb-6 max-w-sm">Este local aún no tiene facturas registradas. Crea la primera factura para comenzar.</p>
+            <ion-button 
+              *ngIf="canCreateFactura()" 
+              fill="solid" 
+              (click)="openInvoiceModal()"
+              color="primary"
+              class="px-6">
               <ion-icon name="add-outline" slot="start"></ion-icon>
               Crear Primera Factura
             </ion-button>
           </div>
 
-          <!-- Lista de facturas -->
-          <div *ngIf="!isLoadingFacturas() && facturas().length > 0">
-            <ion-item-sliding *ngFor="let factura of facturas(); trackBy: trackByFacturaId" class="factura-item">
-              <ion-item button (click)="verDetalleFactura(factura)">
-                <div class="factura-content">
-                  <div class="factura-main">                    <div class="factura-info">
-                      <h3>Factura #{{ factura.numero_factura }}</h3>
-                      <p class="periodo">{{ factura.mes }}/{{ factura.anio }}</p>
-                      <p class="fecha">{{ factura.createdAt | date:'dd/MM/yyyy' }}</p>
+          <!-- Lista de facturas modernizada -->
+          <div *ngIf="!isLoadingFacturas() && facturas().length > 0" class="space-y-4">
+            <ion-item-sliding *ngFor="let factura of facturas(); trackBy: trackByFacturaId" class="factura-item-modern">
+              <div class="modern-invoice-card bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300" 
+                   (click)="verDetalleFactura(factura)">
+                
+                <!-- Header con correlativo y estado -->
+                <div class="bg-gradient-to-r from-cyan-500 to-blue-500 p-4 text-white">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h3 class="text-lg font-bold tracking-wide">{{ factura.correlativo }}</h3>
+                      <p class="text-xs opacity-90">{{ factura.concepto }}</p>
                     </div>
-                    
-                    <div class="factura-amounts">
-                      <p class="monto-principal">L. {{ factura.monto | currency:'':'':'1.2-2' }}</p>
-                      <ion-badge [color]="getEstadoFacturaColor(factura.estado)" class="estado-badge">
-                        {{ factura.estado }}
-                      </ion-badge>
-                    </div>
-                  </div>
-                    <div class="factura-details" *ngIf="factura.fecha_vencimiento">
-                    <div class="vencimiento">
-                      <ion-icon name="calendar-outline" color="medium"></ion-icon>
-                      <span>Vence: {{ factura.fecha_vencimiento | date:'dd/MM/yyyy' }}</span>
-                    </div>
-                    
-                    <div *ngIf="factura.fecha_pago" class="pago">
-                      <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-                      <span>Pagado: {{ factura.fecha_pago | date:'dd/MM/yyyy' }}</span>
-                    </div>
+                    <ion-badge 
+                      [color]="getEstadoFacturaColor(factura.estado)"
+                      class="px-3 py-1 text-xs font-bold uppercase tracking-wide">
+                      {{ factura.estado }}
+                    </ion-badge>
                   </div>
                 </div>
-              </ion-item>
+
+                <!-- Contenido principal -->
+                <div class="p-4">
+                  <!-- Monto prominente -->
+                  <div class="text-center mb-4 py-3 bg-gray-50 rounded-xl">
+                    <div class="text-3xl font-bold text-gray-800 mb-1">
+                      L. {{ factura.monto | currency:'':'':'1.2-2' }}
+                    </div>
+                    <div class="text-sm text-gray-600">Monto Total</div>
+                  </div>
+
+                  <!-- Información del propietario -->
+                  <div class="flex items-center gap-3 mb-3 p-3 bg-blue-50 rounded-xl">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <ion-icon name="person" class="text-white text-lg"></ion-icon>
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-semibold text-gray-800 text-sm">{{ factura.propietario_nombre || 'Sin propietario' }}</div>
+                      <div class="text-xs text-gray-600">Local #{{ factura.local_numero || 'N/A' }}</div>
+                    </div>
+                  </div>
+
+                  <!-- Información del local y mercado -->
+                  <div class="flex items-center gap-3 mb-3 p-3 bg-green-50 rounded-xl">
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                      <ion-icon name="storefront" class="text-white text-lg"></ion-icon>
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-semibold text-gray-800 text-sm">{{ factura.mercado_nombre || 'Mercado' }}</div>
+                      <div class="text-xs text-gray-600">Local #{{ factura.local_numero || 'N/A' }}</div>
+                    </div>
+                  </div>
+
+                  <!-- Información de fechas -->
+                  <div class="grid grid-cols-2 gap-3 text-xs text-gray-600">
+                    <div class="flex items-center gap-2">
+                      <ion-icon name="calendar-outline" class="text-cyan-500"></ion-icon>
+                      <div>
+                        <div class="font-medium text-gray-800">{{ formatMesFromEndpoint(factura.mes) }}</div>
+                        <div class="text-gray-500">Período de facturación</div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <ion-icon name="time-outline" class="text-purple-500"></ion-icon>
+                      <div>
+                        <div class="font-medium text-gray-800">{{ factura.createdAt | date:'dd/MM/yyyy' }}</div>
+                        <div class="text-gray-500">Fecha de creación</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fecha de vencimiento o pago -->
+                  <div class="mt-3 pt-3 border-t border-gray-100" *ngIf="factura.fecha_vencimiento || factura.fecha_pago">
+                    <div *ngIf="factura.fecha_pago && factura.estado === 'PAGADA'" 
+                         class="flex items-center gap-2 text-green-600 text-sm">
+                      <ion-icon name="checkmark-circle" class="text-lg"></ion-icon>
+                      <span class="font-medium">Pagado: {{ factura.fecha_pago | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div *ngIf="!factura.fecha_pago && factura.fecha_vencimiento" 
+                         class="flex items-center gap-2 text-orange-600 text-sm">
+                      <ion-icon name="alert-circle" class="text-lg"></ion-icon>
+                      <span class="font-medium">Vence: {{ factura.fecha_vencimiento | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Botones de acción -->
+                  <div class="action-buttons">
+                    <!-- Botón Ver Detalles -->
+                    <ion-button 
+                      fill="outline" 
+                      size="small" 
+                      color="primary"
+                      (click)="verDetalleFactura(factura)"
+                      class="text-xs">
+                      <ion-icon name="eye-outline" slot="start"></ion-icon>
+                      Ver
+                    </ion-button>
+
+                    <!-- Botón Marcar como Pagada -->
+                    <ion-button 
+                      *ngIf="factura.estado === 'PENDIENTE' && canEditFactura()"
+                      fill="solid" 
+                      size="small" 
+                      color="success"
+                      (click)="marcarComoPagada(factura)"
+                      class="text-xs">
+                      <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                      Pagar
+                    </ion-button>
+
+                    <!-- Botón Imprimir -->
+                    <ion-button 
+                      *ngIf="factura.estado !== 'ANULADA'"
+                      fill="outline" 
+                      size="small" 
+                      color="secondary"
+                      (click)="reimprimirFactura(factura)"
+                      class="text-xs">
+                      <ion-icon name="print-outline" slot="start"></ion-icon>
+                      Imprimir
+                    </ion-button>
+
+                    <!-- Botón Editar -->
+                    <ion-button 
+                      *ngIf="factura.estado !== 'ANULADA' && canEditFactura()"
+                      fill="outline" 
+                      size="small" 
+                      color="warning"
+                      (click)="editarFactura(factura)"
+                      class="text-xs">
+                      <ion-icon name="create-outline" slot="start"></ion-icon>
+                      Editar
+                    </ion-button>
+
+                    <!-- Botón Anular -->
+                    <ion-button 
+                      *ngIf="factura.estado !== 'ANULADA' && canDelete()"
+                      fill="outline" 
+                      size="small" 
+                      color="danger"
+                      (click)="anularFactura(factura)"
+                      class="text-xs">
+                      <ion-icon name="trash-outline" slot="start"></ion-icon>
+                      Anular
+                    </ion-button>
+                  </div>
+                </div>
+              </div>
               
-              <!-- Opciones de deslizar -->
+              <!-- Mantenemos las opciones de deslizar como respaldo -->
               <ion-item-options side="end" *ngIf="canEditFactura()">
                 <ion-item-option 
                   *ngIf="factura.estado === 'PENDIENTE'" 
@@ -308,6 +573,14 @@
                   (click)="marcarComoPagada(factura)">
                   <ion-icon name="checkmark-outline"></ion-icon>
                   Pagar
+                </ion-item-option>
+                
+                <ion-item-option 
+                  *ngIf="factura.estado !== 'ANULADA'" 
+                  color="secondary" 
+                  (click)="reimprimirFactura(factura)">
+                  <ion-icon name="print-outline"></ion-icon>
+                  Imprimir
                 </ion-item-option>
                 
                 <ion-item-option 
@@ -322,7 +595,7 @@
                   *ngIf="factura.estado !== 'ANULADA'" 
                   color="danger" 
                   (click)="anularFactura(factura)">
-                  <ion-icon name="close-outline"></ion-icon>
+                  <ion-icon name="trash-outline"></ion-icon>
                   Anular
                 </ion-item-option>
               </ion-item-options>
@@ -348,130 +621,270 @@
     <ion-fab-button color="primary" (click)="openInvoiceModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab>  <!-- Compact Invoice Creation Modal -->  <ion-modal [isOpen]="showInvoiceModal()" (didDismiss)="closeInvoiceModal()" class="invoice-modal">
+  </ion-fab>
+
+  <!-- Compact Invoice Creation Modal -->
+  <ion-modal [isOpen]="showInvoiceModal()" (didDismiss)="closeInvoiceModal()" class="invoice-modal">
     <ng-template>
-      <div class="fixed inset-0 bg-gray-100 bg-opacity-70 flex items-center justify-center p-3 z-50">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-[320px] mx-auto modal-slide-in transform transition-all duration-300 overflow-hidden">          <!-- Ultra Compact Header -->
-          <div class="relative bg-gradient-to-r from-[#5ccedf] to-[#4ab8c7] p-3">            <!-- Close Button -->
-            <button 
-              (click)="closeInvoiceModal()" 
-              class="absolute top-2 right-2 w-6 h-6 bg-dark bg-opacity-20 hover:bg-opacity-30 rounded-full flex items-center justify-center transition-all duration-200 z-10">
-              <span class="text-white text-lg font-bold leading-none" style="margin-top: -2px;">×</span>
-            </button>
-            
-            <!-- Minimal Amount Display -->
+      <div class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-3 z-50">
+        <div class="bg-white rounded-2xl shadow-lg w-full max-w-md mx-auto overflow-hidden">
+          <!-- Encabezado con logo, nombre del mercado y monto mensual -->
+          <div class="relative bg-gradient-to-r from-cyan-500 to-blue-400 p-6 pb-4 flex flex-col items-center">
+            <img src="assets/logos/logo4.png" alt="Logo" class="w-16 h-16 rounded-full bg-white shadow mb-2" style="object-fit:contain;" />
             <div class="text-center text-white">
-              <div class="inline-flex items-center justify-center w-12 h-12 bg-white bg-opacity-20 rounded-full mb-1">
-                <img src="assets/logos/logoAmdc.png" alt="AMDC Logo" class="w-8 h-8 object-contain">
-              </div>
-              <div>
-                <p class="text-xs font-medium opacity-90">Monto Mensual</p>
-                <p class="text-base font-bold">LPS. {{ local()?.monto_mensual | currency:'':'':'1.0-0' }}</p>
-              </div>
+              <div class="text-lg font-bold mb-1">{{ mercadoNombre || 'Mercado' }}</div>
+              <div class="text-xs font-semibold tracking-wide">Monto Mensual</div>
+              <div class="text-2xl font-bold tracking-tight">LPS. {{ local()?.monto_mensual || '---' }}</div>
             </div>
-          </div><!-- Ultra Compact Content -->
-          <div class="p-3 space-y-3">
-              <!-- Minimalist Month Selector -->
-            <div class="space-y-1">
-              <label class="block text-xs font-medium text-gray-600 flex items-center">
-                <ion-icon name="calendar-outline" class="mr-1 text-[#5ccedf] text-xs"></ion-icon>
+            <button (click)="closeInvoiceModal()" 
+              class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center transition-all duration-200 z-10"
+              style="background: transparent; border: none; box-shadow: none;"
+              (mouseenter)="isCloseHovered = true" (mouseleave)="isCloseHovered = false">
+              <span class="text-2xl font-bold leading-none transition-colors duration-200"
+                [ngStyle]="{'color': isCloseHovered ? '#ef4444' : '#fff'}">×</span>
+            </button>
+          </div>
+          <div class="p-5 pt-3 space-y-4">
+            <!-- Selección de mes -->
+            <div>
+              <label class="block text-cyan-700 font-semibold mb-1 text-sm flex items-center">
+                <ion-icon name="calendar-outline" class="mr-1 text-cyan-500"></ion-icon>
                 Mes a Facturar
               </label>
-              <div class="relative">
-                <ion-select 
-                  [(ngModel)]="selectedMonth"
-                  placeholder="Seleccionar mes"
-                  interface="popover"
-                  aria-label="Seleccionar mes para la factura"
-                  class="w-full bg-gray-50 border border-gray-200 hover:border-[#5ccedf] focus:border-[#5ccedf] rounded-lg px-3 py-2 transition-all duration-200 text-sm text-gray-800">
-                  <ion-select-option value="1">Enero</ion-select-option>
-                  <ion-select-option value="2">Febrero</ion-select-option>
-                  <ion-select-option value="3">Marzo</ion-select-option>
-                  <ion-select-option value="4">Abril</ion-select-option>
-                  <ion-select-option value="5">Mayo</ion-select-option>
-                  <ion-select-option value="6">Junio</ion-select-option>
-                  <ion-select-option value="7">Julio</ion-select-option>
-                  <ion-select-option value="8">Agosto</ion-select-option>
-                  <ion-select-option value="9">Septiembre</ion-select-option>
-                  <ion-select-option value="10">Octubre</ion-select-option>
-                  <ion-select-option value="11">Noviembre</ion-select-option>
-                  <ion-select-option value="12">Diciembre</ion-select-option>
-                </ion-select>
-                <div class="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                  <ion-icon name="chevron-down-outline" class="text-gray-400 text-sm"></ion-icon>
-                </div>
+              <ion-select [(ngModel)]="selectedMonth" placeholder="Seleccionar mes" interface="popover" class="w-full rounded-lg border border-cyan-200 bg-gray-50">
+                <ion-select-option value="1">Enero</ion-select-option>
+                <ion-select-option value="2">Febrero</ion-select-option>
+                <ion-select-option value="3">Marzo</ion-select-option>
+                <ion-select-option value="4">Abril</ion-select-option>
+                <ion-select-option value="5">Mayo</ion-select-option>
+                <ion-select-option value="6">Junio</ion-select-option>
+                <ion-select-option value="7">Julio</ion-select-option>
+                <ion-select-option value="8">Agosto</ion-select-option>
+                <ion-select-option value="9">Septiembre</ion-select-option>
+                <ion-select-option value="10">Octubre</ion-select-option>
+                <ion-select-option value="11">Noviembre</ion-select-option>
+                <ion-select-option value="12">Diciembre</ion-select-option>
+              </ion-select>
+            </div>
+            <!-- Resumen de Factura -->
+            <div *ngIf="selectedMonth() > 0" class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <div class="flex items-center mb-2">
+                <ion-icon name="document-outline" class="mr-2 text-cyan-600 text-lg"></ion-icon>
+                <span class="text-lg font-bold text-cyan-800">Resumen de Factura</span>
               </div>
-            </div>            <!-- Compact Invoice Summary -->
-            <div *ngIf="selectedMonth() > 0" class="bg-gray-50 rounded-lg p-3 border border-gray-200">
-              <div class="flex items-center justify-center mb-2">
-                <ion-icon name="document-text-outline" class="text-[#5ccedf] text-base mr-1"></ion-icon>
-                <h3 class="text-xs font-semibold text-gray-700">Resumen de Factura</h3>
+              <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-sm">
+                <div class="font-medium text-gray-600">Mes:</div>
+                <div class="text-gray-900">{{ getMonthName(selectedMonth()) }}</div>
+                <div class="font-medium text-gray-600">Concepto:</div>
+                <div class="text-gray-900">Cuota {{ getMonthName(selectedMonth()) }} {{ getCurrentYear() }}</div>
+                <div class="font-medium text-gray-600">Vence:</div>
+                <div class="text-gray-900">{{ getNextDueDate(selectedMonth()) }}</div>
+                <div class="font-medium text-gray-600 col-span-2">Observaciones:</div>
+                <div class="col-span-2 text-gray-900">Factura generada automáticamente</div>
               </div>
-              
-              <div class="space-y-2 text-xs">
-                <!-- Mes -->
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-600">Mes:</span>
-                  <span class="font-medium text-gray-900">{{ getMonthName(selectedMonth()) }}</span>
-                </div>
-                
-                <!-- Concepto -->
-                <div class="flex justify-between items-start">
-                  <span class="text-gray-600">Concepto:</span>
-                  <span class="font-medium text-gray-900 text-right max-w-32 leading-tight">
-                    Cuota {{ getMonthName(selectedMonth()) }} {{ getCurrentYear() }}
-                  </span>
-                </div>
-                
-                <!-- Vencimiento -->
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-600">Vence:</span>
-                  <span class="font-medium text-gray-900">{{ getCurrentYear() }}-{{ getFormattedSelectedMonth() }}-15</span>
-                </div>
-                
-                <!-- Estado -->
-                <div class="flex justify-between items-center">
-                  <span class="text-gray-600">Estado:</span>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                    PENDIENTE
-                  </span>
-                </div>
-
-                <!-- Observaciones -->
-                <div class="flex justify-between items-start">
-                  <span class="text-gray-600">Observaciones:</span>
-                  <span class="font-medium text-gray-900 text-right max-w-32 leading-tight">
-                    Factura generada automáticamente
-                  </span>
-                </div>
-              </div>
-            </div>            <!-- Compact Action Buttons - Side by Side -->
-
-             <div class="flex space-x-2 pt-1">
-              <!-- Cancel Button -->
-              <button 
+            </div>
+            <!-- Botones -->
+            <div class="flex gap-3 pt-2">
+              <button type="button"
                 (click)="closeInvoiceModal()"
-                class=" btn-cancelar flex-1 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-medium py-2.5 px-4 rounded-[1rem] transition-all duration-200 flex items-center justify-center space-x-2 border border-gray-200 hover:border-gray-300 text-sm">
-                <ion-icon name="close-circle-outline" class="text-base"></ion-icon>
-                <span>Cancelar</span>
+                style="border-radius: 1rem; padding: 5px;"
+                class="flex-1 py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold text-base flex items-center justify-center gap-2 shadow">
+                <ion-icon name="close-outline" class="text-lg"></ion-icon>
+                Cancelar
               </button>
-              
-              <!-- Create Button -->
-              <button 
+              <button type="button"
                 [disabled]="!selectedMonth() || selectedMonth() === 0 || isCreatingInvoice()"
                 (click)="createInvoice()"
-                class="btn-crear flex-1 bg-gradient-to-r from-[#5ccedf] to-[#4ab8c7] hover:from-[#4ab8c7] hover:to-[#3aa3b0] disabled:from-gray-300 disabled:to-gray-400 text-white font-semibold py-2.5 px-4 rounded-[1rem] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed shadow-md hover:shadow-lg disabled:shadow-none flex items-center justify-center space-x-2 text-sm">
-                <div *ngIf="isCreatingInvoice()" class="flex items-center space-x-2">
-                  <ion-spinner name="circular" class="w-4 h-4 text-white"></ion-spinner>
+                style="background: #5ccedf; border-radius: 1rem; padding: 5px;"
+                class="flex-1 text-white font-bold text-base flex items-center justify-center gap-2 shadow disabled:opacity-60 border-0">
+                <ng-container *ngIf="isCreatingInvoice(); else crearText">
+                  <ion-spinner name="circular" class="w-5 h-5 text-white"></ion-spinner>
                   <span>Creando...</span>
-                </div>
-                <div *ngIf="!isCreatingInvoice()" class="flex items-center space-x-2">
-                  <ion-icon name="add-circle-outline" class="text-base"></ion-icon>
-                  <span>Crear</span>
-                </div>
+                </ng-container>
+                <ng-template #crearText>
+                  <ion-icon name="add-circle-outline" class="text-lg"></ion-icon>
+                  Crear
+                </ng-template>
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal Detalle Factura Moderno Responsive -->
+  <ion-modal 
+    [isOpen]="showFacturaDetailModal()" 
+    (didDismiss)="cerrarFacturaDetailModal()" 
+    class="factura-detail-modal-responsive"
+    [breakpoints]="[0.25, 0.5, 0.75, 1]"
+    [initialBreakpoint]="0.75">
+    <ng-template>
+      <div class="modal-container">
+        
+        <!-- Header con diseño mejorado -->
+        <div class="modal-header">
+          
+          <!-- Botón cerrar mejorado -->
+          <button 
+            (click)="cerrarFacturaDetailModal()" 
+            class="close-button"
+            [class.close-hovered]="isCloseHovered"
+            (mouseenter)="isCloseHovered = true"
+            (mouseleave)="isCloseHovered = false"
+            aria-label="Cerrar modal">
+            <ion-icon name="close" class="close-icon"></ion-icon>
+          </button>
+
+          <!-- Información principal del header -->
+          <div class="header-content">
+            <div class="invoice-icon">
+              <ion-icon name="receipt-outline" class="icon"></ion-icon>
+            </div>
             
+            <div class="invoice-info">
+              <h2 class="invoice-number">{{ facturaSeleccionada()?.correlativo || facturaSeleccionada()?.numero_factura }}</h2>
+              <p class="invoice-concept">{{ facturaSeleccionada()?.concepto }}</p>
+            </div>
+            
+            <!-- Monto total destacado con mejor visibilidad -->
+            <div class="amount-display">
+              <div class="amount-value">L. {{ (facturaSeleccionada()?.monto || 0) | number:'1.2-2' }}</div>
+              <div class="amount-label">Monto Total</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido scrollable -->
+        <div class="modal-content" *ngIf="facturaSeleccionada()">
+          
+          <!-- Estado de la factura con mejor visibilidad -->
+          <div class="status-section">
+            <ion-badge 
+              [color]="getEstadoFacturaColor(facturaSeleccionada()?.estado || 'medium')"
+              class="status-badge">
+              {{ facturaSeleccionada()?.estado }}
+            </ion-badge>
+          </div>
+
+          <!-- Información detallada con mejor estructura -->
+          <div class="details-grid">
+            
+            <!-- Período de facturación -->
+            <div class="detail-card period-card">
+              <div class="card-header">
+                <div class="card-icon period-icon">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                </div>
+                <div class="card-title">
+                  <h4>Período de Facturación</h4>
+                  <p>Mes que se está cobrando</p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="period-display">
+                  {{ formatMesFromEndpoint(facturaSeleccionada()?.mes || '') }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Fechas importantes -->
+            <div class="detail-card dates-card">
+              <div class="card-header">
+                <div class="card-icon dates-icon">
+                  <ion-icon name="time-outline"></ion-icon>
+                </div>
+                <div class="card-title">
+                  <h4>Fechas Importantes</h4>
+                  <p>Registro y vencimientos</p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="date-row">
+                  <span class="date-label">Fecha de Creación:</span>
+                  <span class="date-value">{{ facturaSeleccionada()?.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="date-row">
+                  <span class="date-label">Fecha de Vencimiento:</span>
+                  <span class="date-value">{{ facturaSeleccionada()?.fecha_vencimiento | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="date-row" *ngIf="facturaSeleccionada()?.fecha_pago">
+                  <span class="date-label">Fecha de Pago:</span>
+                  <span class="date-value paid">{{ facturaSeleccionada()?.fecha_pago | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Observaciones si existen -->
+            <div class="detail-card observations-card" *ngIf="facturaSeleccionada()?.observaciones">
+              <div class="card-header">
+                <div class="card-icon observations-icon">
+                  <ion-icon name="chatbubble-outline"></ion-icon>
+                </div>
+                <div class="card-title">
+                  <h4>Observaciones</h4>
+                  <p>Notas adicionales</p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="observations-text">{{ facturaSeleccionada()?.observaciones }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción responsivos -->
+          <div class="actions-section">
+            
+            <!-- Botón principal según estado -->
+            <div class="primary-action" *ngIf="facturaSeleccionada()?.estado === 'PENDIENTE' && canEditFactura()">
+              <ion-button 
+                expand="block" 
+                color="success" 
+                size="large"
+                (click)="marcarComoPagada(facturaSeleccionada()!)"
+                class="primary-button">
+                <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                Marcar como Pagada
+              </ion-button>
+            </div>
+
+            <!-- Botones secundarios en línea -->
+            <div class="secondary-actions" 
+                 [class.has-many-actions]="(facturaSeleccionada()?.estado !== 'ANULADA' && canEditFactura() && canAnularFactura())">
+              
+              <ion-button 
+                fill="outline" 
+                color="primary" 
+                size="default"
+                (click)="reimprimirFactura(facturaSeleccionada()!)"
+                class="action-button">
+                <ion-icon name="print-outline" slot="start"></ion-icon>
+                <span class="button-text">Reimprimir</span>
+              </ion-button>
+              
+              <ion-button 
+                fill="outline" 
+                color="warning" 
+                size="default"
+                *ngIf="facturaSeleccionada()?.estado !== 'ANULADA' && canEditFactura()"
+                (click)="editarFactura(facturaSeleccionada()!)"
+                class="action-button">
+                <ion-icon name="create-outline" slot="start"></ion-icon>
+                <span class="button-text">Editar</span>
+              </ion-button>
+
+              <ion-button 
+                fill="outline" 
+                color="danger" 
+                size="default"
+                *ngIf="facturaSeleccionada()?.estado !== 'ANULADA' && canAnularFactura()"
+                (click)="anularFactura(facturaSeleccionada()!)"
+                class="action-button danger-button">
+                <ion-icon name="trash-outline" slot="start"></ion-icon>
+                <span class="button-text">Anular</span>
+              </ion-button>
+            </div>
           </div>
         </div>
       </div>

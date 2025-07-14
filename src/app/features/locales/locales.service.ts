@@ -9,7 +9,8 @@ import {
   ApiResponse, 
   CreateLocalRequest, 
   UpdateLocalRequest,
-  LocalStats
+  LocalStats,
+  Mercado
 } from '../../shared/interfaces';
 
 export interface LocalFilters {
@@ -52,6 +53,13 @@ export class LocalesService {
    */
   getLocalById(id: string): Observable<Local> {
     return this.http.get<Local>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Obtener el mercado de un local específico
+   */
+  getMercadoByLocal(id: string): Observable<Mercado> {
+    return this.http.get<Mercado>(`${this.apiUrl}/${id}/mercado`);
   }
 
   /**

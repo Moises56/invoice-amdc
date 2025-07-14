@@ -3,6 +3,22 @@
 .local-detail-content {
   --background: #f8f9fa;
   
+  // Mejorar legibilidad del texto
+  .text-readable {
+    color: #2d3748 !important;
+    font-weight: 500;
+  }
+  
+  .text-secondary-readable {
+    color: #4a5568 !important;
+    font-weight: 400;
+  }
+  
+  .text-muted-readable {
+    color: #718096 !important;
+    font-weight: 400;
+  }
+  
   .loading-container {
     display: flex;
     flex-direction: column;
@@ -192,110 +208,203 @@
 }
 
 .stats-card {
-  margin-bottom: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   
-  ion-card-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--ion-color-primary);
+  ion-card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e2e8f0;
+    
+    ion-card-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+    
+    p {
+      margin: 0;
+      color: #64748b;
+      font-size: 14px;
+    }
   }
   
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
-    margin-top: 16px;
+  ion-card-content {
+    background: #ffffff;
     
-    .stat-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
-      background: var(--ion-color-light);
-      border-radius: 8px;
-      transition: all 0.3s ease;
-      
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #334155;
+      margin: 0 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
       
       ion-icon {
-        font-size: 24px;
-        flex-shrink: 0;
+        margin-right: 8px;
+        font-size: 20px;
+      }
+    }
+    
+    .grid {
+      &.grid-cols-2 {
+        @media (min-width: 768px) {
+          grid-template-columns: repeat(4, 1fr);
+        }
       }
       
-      .stat-content {
-        flex: 1;
+      &.grid-cols-1 {
+        @media (min-width: 768px) {
+          grid-template-columns: repeat(2, 1fr);
+        }
         
-        h4 {
-          margin: 0 0 4px 0;
+        @media (min-width: 1024px) {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      
+      & {
+        gap: 16px;
+      }
+      
+      > div {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .flex {
+          &.items-center {
+            align-items: center;
+            
+            &.justify-between {
+              justify-content: space-between;
+            }
+          }
+        }
+        
+        ion-icon {
           font-size: 24px;
+          flex-shrink: 0;
+        }
+        
+        span {
           font-weight: 700;
-          color: var(--ion-text-color);
+          font-size: 20px;
+          line-height: 1.2;
+          
+          @media (min-width: 768px) {
+            font-size: 22px;
+          }
         }
         
         p {
           margin: 0;
-          font-size: 12px;
-          color: var(--ion-color-medium);
+          font-size: 13px;
+          font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.5px;
+          line-height: 1.3;
         }
       }
+    }
+  }
+  
+  // Loading state
+  .loading-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--ion-color-medium);
+    
+    ion-spinner {
+      margin-right: 12px;
     }
   }
 }
 
 .facturas-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
   
-  .facturas-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+  ion-card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e2e8f0;
     
     ion-card-title {
-      font-size: 20px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+    
+    p {
+      margin: 0;
+      color: #64748b;
+      font-size: 14px;
+    }
+    
+    ion-button {
+      --border-radius: 10px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --padding-top: 8px;
+      --padding-bottom: 8px;
       font-weight: 600;
-      color: var(--ion-color-primary);
+      text-transform: none;
+      
+      ion-icon {
+        font-size: 18px;
+      }
     }
   }
   
-  .filters-section {
-    margin-bottom: 24px;
+  ion-card-content {
+    background: #ffffff;
     
-    ion-searchbar {
-      --background: var(--ion-color-light);
-      --border-radius: 8px;
-      margin-bottom: 16px;
-    }
-    
-    .filters-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
+    .filters-section {
+      margin-bottom: 24px;
+      
+      .custom-searchbar {
+        --background: #f8fafc;
+        --border-radius: 12px;
+        --box-shadow: none;
+        --border: 1px solid #e2e8f0;
+        
+        &.searchbar-has-focus {
+          --border: 1px solid var(--ion-color-primary);
+        }
+      }
       
       .filter-select {
-        flex: 1;
-        min-width: 120px;
-        max-width: 200px;
+        --background: #f8fafc;
+        --border-radius: 8px;
+        --padding-start: 12px;
+        --padding-end: 12px;
+        border: 1px solid #e2e8f0;
         
-        &::part(native) {
-          background: var(--ion-color-light);
-          border-radius: 8px;
-          padding: 8px 12px;
+        &:focus-within {
+          border-color: var(--ion-color-primary);
         }
       }
       
       ion-button {
         --border-radius: 8px;
-        height: 40px;
+        --border-width: 1px;
+        --border-style: solid;
+        --border-color: #d1d5db;
+        --color: #374151;
+        
+        &:hover {
+          --background: #f3f4f6;
+        }
       }
     }
   }
@@ -303,250 +412,1015 @@
   .facturas-list {
     .facturas-loading {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      padding: 40px;
-      color: var(--ion-color-medium);
+      padding: 48px 24px;
+      
+      ion-spinner {
+        --color: var(--ion-color-primary);
+        margin-bottom: 12px;
+      }
       
       p {
         margin: 0;
         font-size: 14px;
+        color: #64748b;
       }
     }
     
     .no-facturas {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 24px;
+      padding: 64px 24px;
       text-align: center;
-      color: var(--ion-color-medium);
       
-      ion-icon {
-        font-size: 64px;
-        margin-bottom: 16px;
-        opacity: 0.5;
+      .w-16 {
+        width: 64px;
+        height: 64px;
+        background: #f1f5f9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        
+        ion-icon {
+          font-size: 32px;
+          color: #9ca3af;
+        }
       }
       
       h3 {
-        margin: 8px 0;
-        font-size: 18px;
-        color: var(--ion-text-color);
+        margin: 0 0 8px 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #374151;
       }
       
       p {
-        margin: 8px 0 24px 0;
+        margin: 0 0 24px 0;
         font-size: 14px;
+        line-height: 1.5;
+        color: #6b7280;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
       }
+      
+      ion-button {
+        --border-radius: 12px;
+        --padding-start: 24px;
+        --padding-end: 24px;
+        --padding-top: 12px;
+        --padding-bottom: 12px;
+        font-weight: 600;
+        text-transform: none;
+        
+        ion-icon {
+          font-size: 18px;
+        }
+      }
+    }
+    
+    .space-y-3 > * + * {
+      margin-top: 12px;
     }
     
     .factura-item {
-      margin-bottom: 8px;
-      border-radius: 8px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+      }
       
       ion-item {
-        --background: white;
-        --border-radius: 8px;
+        --background: #ffffff;
+        --border-radius: 12px;
         --padding-start: 16px;
         --padding-end: 16px;
+        --padding-top: 16px;
+        --padding-bottom: 16px;
+        --inner-padding-end: 0;
         --min-height: auto;
-        padding: 16px 0;
         
         &:hover {
-          --background: var(--ion-color-light);
-        }
-      }
-      
-      .factura-content {
-        width: 100%;
-        
-        .factura-main {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 12px;
-          
-          .factura-info {
-            flex: 1;
-            
-            h3 {
-              margin: 0 0 4px 0;
-              font-size: 16px;
-              font-weight: 600;
-              color: var(--ion-text-color);
-            }
-            
-            .periodo {
-              margin: 0 0 2px 0;
-              font-size: 14px;
-              color: var(--ion-color-primary);
-              font-weight: 500;
-            }
-            
-            .fecha {
-              margin: 0;
-              font-size: 12px;
-              color: var(--ion-color-medium);
-            }
-          }
-          
-          .factura-amounts {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-            
-            .monto-principal {
-              margin: 0;
-              font-size: 18px;
-              font-weight: 700;
-              color: var(--ion-color-success);
-            }
-            
-            .estado-badge {
-              border-radius: 12px;
-              padding: 4px 8px;
-              font-size: 10px;
-              font-weight: 600;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            }
-          }
+          --background: #f8fafc;
         }
         
-        .factura-details {
-          display: flex;
-          gap: 16px;
-          padding-top: 12px;
-          border-top: 1px solid var(--ion-color-light);
-          
-          .vencimiento,
-          .pago {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            
-            ion-icon {
-              font-size: 14px;
-            }
-          }
-          
-          .vencimiento {
-            color: var(--ion-color-warning);
-          }
-          
-          .pago {
-            color: var(--ion-color-success);
-          }
-        }
-      }
-    }
-  }
-}
-
-// Item sliding options
-ion-item-options {
-  ion-item-option {
-    --border-radius: 8px;
-    margin: 2px;
-    
-    ion-icon {
-      font-size: 18px;
-    }
-  }
-}
-
-// FAB styles
-ion-fab {
-  ion-fab-button {
-    --background: var(--ion-color-primary);
-    --color: white;
-    --border-radius: 16px;
-    --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
-    
-    &:hover {
-      --box-shadow: 0 6px 16px rgba(var(--ion-color-primary-rgb), 0.4);
-      transform: translateY(-2px);
-    }
-  }
-}
-
-// Responsive design
-@media (max-width: 768px) {
-  .local-detail-content {
-    .content-container {
-      padding: 12px;
-    }
-  }
-  
-  .local-info-card {
-    .card-header-flex {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-      
-      .local-actions {
-        align-self: flex-end;
-      }
-    }
-    
-    .local-details-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-  }
-  
-  .stats-card {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      
-      .stat-item {
-        padding: 12px;
-        
-        .stat-content h4 {
-          font-size: 20px;
-        }
-      }
-    }
-  }
-  
-  .facturas-card {
-    .filters-section {
-      .filters-row {
-        flex-direction: column;
-        align-items: stretch;
-        
-        .filter-select {
-          max-width: none;
-        }
-      }
-    }
-    
-    .facturas-list {
-      .factura-item {
         .factura-content {
+          width: 100%;
+          
           .factura-main {
-            flex-direction: column;
-            gap: 12px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            
+            .factura-info {
+              flex: 1;
+              
+              h3 {
+                margin: 0 0 8px 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #1f2937;
+                line-height: 1.3;
+              }
+              
+              .flex {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                
+                span {
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                  font-size: 13px;
+                  color: #6b7280;
+                  
+                  ion-icon {
+                    font-size: 14px;
+                    color: #9ca3af;
+                  }
+                }
+              }
+            }
             
             .factura-amounts {
-              align-items: flex-start;
-              text-align: left;
+              text-align: right;
+              flex-shrink: 0;
+              
+              p {
+                margin: 0 0 8px 0;
+                font-size: 20px;
+                font-weight: 700;
+                color: #059669;
+                line-height: 1.2;
+              }
+              
+              ion-badge {
+                --padding-start: 12px;
+                --padding-end: 12px;
+                --padding-top: 4px;
+                --padding-bottom: 4px;
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                border-radius: 6px;
+              }
             }
           }
           
           .factura-details {
-            flex-direction: column;
-            gap: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid #f3f4f6;
+            
+            .vencimiento,
+            .pago {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              font-size: 13px;
+              
+              ion-icon {
+                font-size: 14px;
+              }
+            }
+            
+            .vencimiento {
+              color: #6b7280;
+              
+              ion-icon {
+                color: #9ca3af;
+              }
+            }
+            
+            .pago {
+              color: #059669;
+              
+              ion-icon {
+                color: #10b981;
+              }
+            }
           }
         }
+      }
+    }
+  }
+}
+
+// Estilos para las tarjetas modernas de facturas
+.factura-item-modern {
+  margin-bottom: 0;
+  background: transparent;
+  
+  .modern-invoice-card {
+    position: relative;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f3f4f6;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    overflow: hidden;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border-color: #5ccedf;
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Modal moderno responsive para detalle de factura
+.factura-detail-modal-responsive {
+  // Configuración del modal Ionic
+  --backdrop-opacity: 0.4;
+  --background: transparent;
+  --border-radius: 1.5rem 1.5rem 0 0;
+  --box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  --height: auto;
+  --max-height: 95vh;
+  --min-height: 400px;
+  --width: 100%;
+  --max-width: 100%;
+
+  // Contenedor principal del modal
+  .modal-container {
+    background: #ffffff;
+    border-radius: 1.5rem 1.5rem 0 0;
+    overflow: hidden;
+    height: 100%;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  // Header del modal con gradiente mejorado
+  .modal-header {
+    background: linear-gradient(135deg, #5ccedf 0%, #4fb3c7 50%, #3b9bb0 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    position: relative;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+
+    @media (min-width: 768px) {
+      padding: 1.5rem 2rem;
+      min-height: 180px;
+    }
+
+    @media (min-width: 1024px) {
+      padding: 2rem;
+      min-height: 200px;
+    }
+  }
+
+  // Botón cerrar mejorado
+  .close-button {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+    backdrop-filter: blur(10px);
+
+    &:hover, &.close-hovered {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    .close-icon {
+      font-size: 1rem;
+      color: white;
+      font-weight: bold;
+    }
+
+    @media (min-width: 768px) {
+      width: 2.5rem;
+      height: 2.5rem;
+      top: 1rem;
+      right: 1rem;
+
+      .close-icon {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      width: 3rem;
+      height: 3rem;
+      top: 1.5rem;
+      right: 1.5rem;
+
+      .close-icon {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  // Contenido del header
+  .header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+
+  // Icono de factura
+  .invoice-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+
+    .icon {
+      font-size: 1.25rem;
+      color: white;
+    }
+
+    @media (min-width: 768px) {
+      width: 3rem;
+      height: 3rem;
+
+      .icon {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      width: 3.5rem;
+      height: 3.5rem;
+
+      .icon {
+        font-size: 1.75rem;
+      }
+    }
+  }
+
+  // Información de la factura en el header
+  .invoice-info {
+    .invoice-number {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 0 0.25rem 0;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+      @media (min-width: 768px) {
+        font-size: 1.5rem;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 1.75rem;
+      }
+    }
+
+    .invoice-concept {
+      font-size: 0.75rem;
+      margin: 0;
+      opacity: 0.9;
+      color: white;
+      font-weight: 400;
+
+      @media (min-width: 768px) {
+        font-size: 0.875rem;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  // Display del monto con máxima visibilidad
+  .amount-display {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 150px;
+
+    @media (min-width: 768px) {
+      padding: 1rem 1.25rem;
+      border-radius: 1rem;
+      min-width: 180px;
+    }
+
+    @media (min-width: 1024px) {
+      padding: 1rem 1.5rem;
+      min-width: 200px;
+    }
+
+    .amount-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      letter-spacing: -0.025em;
+
+      @media (min-width: 768px) {
+        font-size: 1.75rem;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 2rem;
+      }
+    }
+
+    .amount-label {
+      font-size: 0.625rem;
+      opacity: 0.9;
+      color: white;
+      margin-top: 0.25rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      @media (min-width: 768px) {
+        font-size: 0.75rem;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  // Contenido scrollable
+  .modal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+    background: #ffffff;
+    max-height: calc(95vh - 160px);
+
+    @media (min-width: 768px) {
+      padding: 1.5rem 2rem;
+      max-height: calc(95vh - 180px);
+    }
+
+    @media (min-width: 1024px) {
+      padding: 2rem;
+      max-height: calc(95vh - 200px);
+    }
+
+    // Scrollbar personalizada
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #5ccedf;
+      border-radius: 3px;
+
+      &:hover {
+        background: #4fb3c7;
+      }
+    }
+  }
+
+  // Sección del estado
+  .status-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      margin-bottom: 1.5rem;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      @media (min-width: 768px) {
+        font-size: 0.875rem;
+        padding: 0.75rem 1.25rem;
+      }
+
+      @media (min-width: 1024px) {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+      }
+    }
+  }
+
+  // Grid de detalles
+  .details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    @media (min-width: 768px) {
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+      gap: 1.5rem;
+    }
+  }
+
+  // Tarjetas de detalle
+  .detail-card {
+    background: #f8fafc;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #5ccedf;
+      box-shadow: 0 4px 12px rgba(92, 206, 223, 0.1);
+    }
+
+    @media (min-width: 768px) {
+      padding: 1.25rem;
+      border-radius: 1rem;
+    }
+
+    @media (min-width: 1024px) {
+      padding: 1.5rem;
+    }
+
+    // Header de la tarjeta
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+
+      @media (min-width: 768px) {
+        margin-bottom: 1rem;
+      }
+
+      .card-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: white;
+
+        &.period-icon {
+          background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        &.dates-icon {
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        &.observations-icon {
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        @media (min-width: 768px) {
+          width: 2.5rem;
+          height: 2.5rem;
+          border-radius: 0.75rem;
+          font-size: 1.25rem;
+        }
+
+        @media (min-width: 1024px) {
+          width: 3rem;
+          height: 3rem;
+          font-size: 1.5rem;
+        }
+      }
+
+      .card-title {
+        h4 {
+          margin: 0 0 0.25rem 0;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #1f2937;
+
+          @media (min-width: 768px) {
+            font-size: 1rem;
+          }
+
+          @media (min-width: 1024px) {
+            font-size: 1.125rem;
+          }
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.625rem;
+          color: #6b7280;
+
+          @media (min-width: 768px) {
+            font-size: 0.75rem;
+          }
+
+          @media (min-width: 1024px) {
+            font-size: 0.875rem;
+          }
+        }
+      }
+    }
+
+    // Contenido de la tarjeta
+    .card-content {
+      .period-display {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1f2937;
+
+        @media (min-width: 768px) {
+          font-size: 1.25rem;
+        }
+
+        @media (min-width: 1024px) {
+          font-size: 1.5rem;
+        }
+      }
+
+      .date-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.375rem 0;
+        border-bottom: 1px solid #e5e7eb;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        @media (min-width: 768px) {
+          padding: 0.5rem 0;
+        }
+
+        .date-label {
+          font-size: 0.75rem;
+          color: #6b7280;
+          font-weight: 500;
+
+          @media (min-width: 768px) {
+            font-size: 0.875rem;
+          }
+
+          @media (min-width: 1024px) {
+            font-size: 1rem;
+          }
+        }
+
+        .date-value {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #1f2937;
+          text-align: right;
+
+          &.paid {
+            color: #059669;
+          }
+
+          @media (min-width: 768px) {
+            font-size: 0.875rem;
+          }
+
+          @media (min-width: 1024px) {
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .observations-text {
+        font-size: 0.75rem;
+        color: #374151;
+        line-height: 1.5;
+        font-weight: 500;
+
+        @media (min-width: 768px) {
+          font-size: 0.875rem;
+        }
+
+        @media (min-width: 1024px) {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  // Sección de acciones
+  .actions-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+
+    @media (min-width: 768px) {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+      margin-top: 2rem;
+      padding-top: 2rem;
+    }
+
+    .primary-action {
+      margin-bottom: 0.75rem;
+
+      @media (min-width: 768px) {
+        margin-bottom: 1rem;
+      }
+
+      .primary-button {
+        font-weight: 700;
+        height: 2.5rem;
+        --border-radius: 0.75rem;
+        font-size: 0.875rem;
+
+        @media (min-width: 768px) {
+          height: 3rem;
+          font-size: 1rem;
+        }
+
+        @media (min-width: 1024px) {
+          height: 3.5rem;
+          font-size: 1.125rem;
+        }
+      }
+    }
+
+    .secondary-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+
+      @media (min-width: 768px) {
+        gap: 0.75rem;
+      }
+
+      @media (min-width: 1024px) {
+        gap: 1rem;
+      }
+
+      .action-button {
+        flex: 1;
+        min-width: 90px;
+        max-width: 130px;
+        height: 2.25rem;
+        --border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 0.7rem;
+
+        @media (min-width: 480px) {
+          font-size: 0.75rem;
+          min-width: 100px;
+          max-width: 140px;
+        }
+
+        @media (min-width: 768px) {
+          height: 2.75rem;
+          font-size: 0.875rem;
+          min-width: 110px;
+          max-width: 150px;
+        }
+
+        @media (min-width: 1024px) {
+          height: 3rem;
+          font-size: 1rem;
+          min-width: 120px;
+          max-width: 160px;
+        }
+
+        .button-text {
+          @media (max-width: 380px) {
+            display: none;
+          }
+        }
+
+        // Botón de eliminar se mantiene en línea pero puede tomar más espacio
+        &.danger-button {
+          flex: 1.2;
+          min-width: 100px;
+
+          @media (min-width: 480px) {
+            min-width: 110px;
+          }
+
+          @media (min-width: 768px) {
+            min-width: 120px;
+          }
+        }
+      }
+
+      // Si hay muchos botones, permitir que se envuelvan en una segunda línea
+      &.has-many-actions {
+        .action-button {
+          flex: 0 1 calc(50% - 0.25rem);
+          
+          @media (min-width: 768px) {
+            flex: 0 1 calc(33.33% - 0.5rem);
+          }
+
+          @media (min-width: 1024px) {
+            flex: 0 1 calc(25% - 0.75rem);
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive para tablet y desktop
+  @media (min-width: 768px) {
+    --border-radius: 1rem;
+    --max-width: 500px;
+    --width: 90%;
+    --max-height: 85vh;
+
+    .modal-container {
+      border-radius: 1rem;
+      max-height: 85vh;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    --max-width: 600px;
+    --width: 80%;
+    --max-height: 80vh;
+
+    .modal-container {
+      max-height: 80vh;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    --max-width: 650px;
+    --width: 70%;
+  }
+}
+
+// Animaciones para el modal
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.factura-detail-modal-responsive .modal-container {
+  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Personalización de badges
+ion-badge {
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  
+  &[color="success"] {
+    --background: #10b981;
+    --background-hover: #059669;
+    --background-activated: #047857;
+  }
+  
+  &[color="primary"] {
+    --background: #5ccedf;
+    --background-hover: #4fb3c7;
+    --background-activated: #3b9bb0;
+  }
+}
+
+// Personalización de botones
+ion-button {
+  --border-radius: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+// Animaciones para hover en elementos interactivos
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+// Gradientes personalizados
+.gradient-cyan {
+  background: linear-gradient(135deg, #5ccedf 0%, #4fb3c7 50%, #3b9bb0 100%);
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+}
+
+.gradient-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+}
+
+// Efectos de glass morphism
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// Mejoras para el contenedor de facturas
+.facturas-list {
+  .space-y-4 > * + * {
+    margin-top: 1rem;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .modern-invoice-card {
+    margin: 0 0.5rem;
+  }
+  
+  .factura-detail-modal-modern {
+    .modal-slide-in {
+      margin: 0.5rem;
+      max-height: calc(100vh - 1rem);
+      overflow-y: auto;
+    }
+  }
+}
+
+// Custom scrollbar para el modal
+.factura-detail-modal-modern {
+  .modal-slide-in {
+    scrollbar-width: thin;
+    scrollbar-color: #5ccedf #f1f5f9;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #5ccedf;
+      border-radius: 3px;
+      
+      &:hover {
+        background: #4fb3c7;
       }
     }
   }
@@ -843,3 +1717,192 @@ ion-alert.error-alert {
   margin-left: 20px;
   margin-top: 10px;
 }
+
+// Mejoras para la legibilidad y botones de acción
+.modern-invoice-card {
+  // Mejorar contraste del texto
+  .font-medium, .font-semibold {
+    color: #1f2937 !important;
+    font-weight: 600 !important;
+  }
+  
+  .text-gray-800 {
+    color: #1f2937 !important;
+  }
+  
+  .text-gray-600 {
+    color: #4b5563 !important;
+  }
+  
+  .text-gray-500 {
+    color: #6b7280 !important;
+  }
+  
+  // Estilos para los botones de acción
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+    
+    ion-button {
+      --border-radius: 0.5rem;
+      --padding-start: 0.75rem;
+      --padding-end: 0.75rem;
+      --padding-top: 0.5rem;
+      --padding-bottom: 0.5rem;
+      height: auto;
+      min-height: 2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.025em;
+      text-transform: none;
+      
+      ion-icon {
+        font-size: 0.875rem;
+      }
+      
+      // Botón Ver
+      &[color="primary"] {
+        --color: #3b82f6;
+        --border-color: #3b82f6;
+        
+        &:hover {
+          --background: #eff6ff;
+        }
+      }
+      
+      // Botón Pagar
+      &[color="success"] {
+        --background: #10b981;
+        --color: white;
+        --border-color: #10b981;
+        
+        &:hover {
+          --background: #059669;
+        }
+      }
+      
+      // Botón Imprimir
+      &[color="secondary"] {
+        --color: #6b7280;
+        --border-color: #6b7280;
+        
+        &:hover {
+          --background: #f9fafb;
+        }
+      }
+      
+      // Botón Editar
+      &[color="warning"] {
+        --color: #f59e0b;
+        --border-color: #f59e0b;
+        
+        &:hover {
+          --background: #fffbeb;
+        }
+      }
+      
+      // Botón Anular
+      &[color="danger"] {
+        --color: #ef4444;
+        --border-color: #ef4444;
+        
+        &:hover {
+          --background: #fef2f2;
+        }
+      }
+    }
+  }
+}
+
+// Utility classes for improved spacing and layout
+.mt-4 { margin-top: 1rem !important; }
+.mx-2 { margin-left: 0.5rem !important; margin-right: 0.5rem !important; }
+.mb-6 { margin-bottom: 1.5rem !important; }
+.mb-4 { margin-bottom: 1rem !important; }
+.mb-3 { margin-bottom: 0.75rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+
+.px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+.pb-6 { padding-bottom: 1.5rem !important; }
+.pb-3 { padding-bottom: 0.75rem !important; }
+.py-12 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+.py-16 { padding-top: 4rem !important; padding-bottom: 4rem !important; }
+.py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+.px-6 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+
+.flex { display: flex !important; }
+.flex-col { flex-direction: column !important; }
+.items-center { align-items: center !important; }
+.justify-between { justify-content: space-between !important; }
+.justify-center { justify-content: center !important; }
+.gap-3 { gap: 0.75rem !important; }
+.gap-4 { gap: 1rem !important; }
+
+.w-10 { width: 2.5rem !important; }
+.h-10 { height: 2.5rem !important; }
+.w-16 { width: 4rem !important; }
+.h-16 { height: 4rem !important; }
+.w-full { width: 100% !important; }
+.h-full { height: 100% !important; }
+
+.bg-white { background-color: #ffffff !important; }
+.bg-gray-50 { background-color: #f9fafb !important; }
+
+.rounded-lg { border-radius: 0.5rem !important; }
+.rounded-xl { border-radius: 0.75rem !important; }
+
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important; }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
+
+.border-0 { border: none !important; }
+.border { border: 1px solid #e5e7eb !important; }
+.border-gray-200 { border-color: #e5e7eb !important; }
+.border-gray-300 { border-color: #d1d5db !important; }
+
+.text-xl { font-size: 1.25rem !important; }
+.text-lg { font-size: 1.125rem !important; }
+.text-sm { font-size: 0.875rem !important; }
+.text-xs { font-size: 0.75rem !important; }
+.text-2xl { font-size: 1.5rem !important; }
+
+.font-bold { font-weight: 700 !important; }
+.font-semibold { font-weight: 600 !important; }
+
+.text-gray-800 { color: #1f2937 !important; }
+.text-gray-700 { color: #374151 !important; }
+.text-gray-600 { color: #4b5563 !important; }
+.text-gray-500 { color: #6b7280 !important; }
+.text-gray-400 { color: #9ca3af !important; }
+.text-white { color: #ffffff !important; }
+.text-green-600 { color: #dc2626 !important; }
+
+.leading-tight { line-height: 1.25 !important; }
+
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+
+.max-w-sm { max-width: 24rem !important; }
+
+.space-y-3 > * + * { margin-top: 0.75rem !important; }
+
+.overflow-hidden { overflow: hidden !important; }
+
+.transition-colors { transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out !important; }
+
+.hover\:bg-gray-50:hover { background-color: #f9fafb !important; }
+
+.grid { display: grid !important; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
+@media (min-width: 768px) {
+  .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+
+.flex-shrink-0 { flex-shrink: 0 !important; }

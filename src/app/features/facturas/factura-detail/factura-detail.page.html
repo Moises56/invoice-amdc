@@ -1,15 +1,61 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-back-button defaultHref="/facturas"></ion-back-button>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/facturas"></ion-back-button>
+    </ion-buttons>
     <ion-title>Detalle Factura</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="printInvoice()">
+        <ion-icon slot="icon-only" name="print"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="p-4">
-    <ion-text>
-      <h2>Detalle de Factura</h2>
-      <p>Módulo en desarrollo...</p>
-    </ion-text>
+<ion-content class="ion-padding">
+  <div *ngIf="factura">
+    <ion-list>
+      <ion-item>
+        <ion-label>Factura Nº:</ion-label>
+        <ion-text slot="end">{{ factura.id }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label>Cliente:</ion-label>
+        <ion-text slot="end">{{ factura.customerName }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label>Fecha:</ion-label>
+        <ion-text slot="end">{{ factura.date | date:'short' }}</ion-text>
+      </ion-item>
+    </ion-list>
+
+    <h3 class="ion-padding-start">Items</h3>
+    <ion-list>
+      <ion-item *ngFor="let item of factura.items">
+        <ion-label>
+          <p>{{ item.quantity }}x {{ item.description }}</p>
+        </ion-label>
+        <ion-text slot="end">{{ item.price * item.quantity | currency:'USD' }}</ion-text>
+      </ion-item>
+    </ion-list>
+
+    <ion-list class="ion-margin-top">
+      <ion-item>
+        <ion-label>Subtotal</ion-label>
+        <ion-text slot="end">{{ factura.subtotal | currency:'USD' }}</ion-text>
+      </ion-item>
+      <ion-item>
+        <ion-label>ISV</ion-label>
+        <ion-text slot="end">{{ factura.tax | currency:'USD' }}</ion-text>
+      </ion-item>
+      <ion-item lines="full">
+        <ion-label><b>Total</b></ion-label>
+        <ion-text slot="end"><b>{{ factura.total | currency:'USD' }}</b></ion-text>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <div *ngIf="!factura" class="ion-text-center ion-padding">
+    <p>Cargando datos de la factura...</p>
   </div>
 </ion-content>

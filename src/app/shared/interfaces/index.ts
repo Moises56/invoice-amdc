@@ -280,11 +280,29 @@ export interface MercadoStats {
 }
 
 export interface LocalStats {
-  total_locales: number;
-  locales_activos: number;
-  locales_ocupados: number;
-  locales_libres: number;
-  ingresos_mensuales: number;
+  local_id: string;
+  local_nombre: string;
+  local_numero: string;
+  local_estado: string;
+  mercado: {
+    id: string;
+    nombre: string;
+  };
+  estadisticas_facturas: {
+    total_facturas: number;
+    facturas_pendientes: number;
+    facturas_pagadas: number;
+    facturas_vencidas: number;
+    facturas_anuladas: number;
+  };
+  estadisticas_financieras: {
+    total_recaudado: number;
+    monto_total_facturas: number;
+    monto_pendiente: number;
+    recaudo_esperado_mensual: number;
+    recaudo_esperado_anual: number;
+    porcentaje_recaudacion: number;
+  };
 }
 
 export interface FacturaStats {

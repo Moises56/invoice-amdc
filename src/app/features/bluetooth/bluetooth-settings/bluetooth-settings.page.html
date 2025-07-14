@@ -1,15 +1,51 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-back-button defaultHref="/dashboard"></ion-back-button>
-    <ion-title>Configuración Bluetooth</ion-title>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab3"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Configurar Impresora</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="p-4">
-    <ion-text>
-      <h2>Configuración Bluetooth</h2>
-      <p>Módulo en desarrollo...</p>
-    </ion-text>
-  </div>
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label>Estado</ion-label>
+      <ion-text
+        slot="end"
+        [color]="(connectionStatus$ | async) ? 'success' : 'danger'"
+      >
+        {{ (connectionStatus$ | async) ? 'Conectado' : 'Desconectado' }}
+      </ion-text>
+    </ion-item>
+    <ion-item>
+      <ion-label>Impresora Guardada</ion-label>
+      <ion-text slot="end">{{ defaultPrinter?.name || 'Ninguna' }}</ion-text>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" (click)="openDeviceList()" class="ion-margin-top">
+    <ion-icon slot="start" name="search"></ion-icon>
+    Buscar y Seleccionar Impresora
+  </ion-button>
+
+  <ion-button
+    expand="block"
+    (click)="printTestPage()"
+    color="secondary"
+    [disabled]="!(connectionStatus$ | async)"
+  >
+    <ion-icon slot="start" name="print"></ion-icon>
+    Imprimir Página de Prueba
+  </ion-button>
+
+  <ion-button
+    expand="block"
+    (click)="disconnect()"
+    color="danger"
+    [disabled]="!(connectionStatus$ | async)"
+  >
+    <ion-icon slot="start" name="close-circle"></ion-icon>
+    Desconectar
+  </ion-button>
 </ion-content>
