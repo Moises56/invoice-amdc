@@ -272,11 +272,18 @@ export interface MassiveFacturaRequest {
 
 // Interfaces para estadísticas
 export interface MercadoStats {
-  total_mercados: number;
+  mercado_id: string;
+  mercado_nombre: string;
+  mercado_activo: boolean;
   total_locales: number;
+  total_recaudado: number;
+  total_esperado_mensual: number;
+  total_esperado_anual: number;
   locales_ocupados: number;
   locales_libres: number;
   ocupacion_percentage: number;
+  cumplimiento_mensual_percentage: number;
+  cumplimiento_anual_percentage: number;
 }
 
 export interface LocalStats {

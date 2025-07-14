@@ -12,21 +12,23 @@ import {
   checkmarkCircleOutline, closeCircleOutline, timeOutline, helpCircleOutline,
   refreshOutline, cardOutline, personOutline, callOutline, chevronForwardOutline,
   chevronBackOutline, trendingUpOutline, walletOutline, homeOutline, keyOutline, 
-  searchOutline, closeOutline, ellipsisHorizontalOutline
+  searchOutline, closeOutline, ellipsisHorizontalOutline, calendarOutline,
+  cashOutline, barChartOutline, pieChartOutline, analyticsOutline
 } from 'ionicons/icons';
 
 import { MercadosService } from '../mercados.service';
-import { Mercado, Local } from '../../../shared/interfaces';
+import { Mercado, Local, MercadoStats } from '../../../shared/interfaces';
 import { EstadoLocal } from '../../../shared/enums';
 
-// Interface para las estadísticas del mercado
-interface MercadoStats {
-  total_mercados: number;
+// Interface para las estadísticas del mercado desde el backend
+interface MercadoStatsBackend {
+  mercado_id: string;
+  mercado_nombre: string;
+  mercado_activo: boolean;
   total_locales: number;
-  locales_ocupados: number;
-  locales_libres: number;
-  ocupacion_percentage: number;
   total_recaudado: number;
+  total_esperado_mensual: number;
+  total_esperado_anual: number;
 }
 
 @Component({
@@ -204,7 +206,8 @@ export class MercadoDetailPage implements OnInit {
       refreshOutline, cardOutline, personOutline, callOutline, chevronForwardOutline,
       chevronBackOutline, checkmarkCircleOutline, closeCircleOutline, timeOutline, 
       helpCircleOutline, trendingUpOutline, walletOutline, homeOutline, keyOutline,
-      searchOutline, closeOutline, ellipsisHorizontalOutline
+      searchOutline, closeOutline, ellipsisHorizontalOutline, calendarOutline,
+      cashOutline, barChartOutline, pieChartOutline, analyticsOutline
     });
   }
 
@@ -235,29 +238,65 @@ export class MercadoDetailPage implements OnInit {
     }
   }
 
-  private async loadStats(id: string) {
+  public async loadStats(id: string) {
     try {
       this.isLoadingStats.set(true);
       
-      // Llamada real a la API
-      const response = await this.mercadosService.getMarketStats(id).toPromise();
-      this.stats.set(response);
+      // Llamada real a la API para obtener estadísticas del backend
+      const backendStats: MercadoStatsBackend = await this.mercadosService.getMarketStats(id).toPromise();
+      
+      if (backendStats && backendStats.mercado_id) {
+        // Procesar y calcular estadísticas adicionales
+        const processedStats = this.processStats(backendStats);
+        this.stats.set(processedStats);
+        console.log('✅ Estadísticas del mercado cargadas:', processedStats);
+      } else {
+        console.error('❌ Respuesta inválida del endpoint de estadísticas');
+        this.stats.set(null);
+      }
       
     } catch (error) {
-      console.error('Error loading stats:', error);
-      // En caso de error, usar datos simulados
-      const defaultStats: MercadoStats = {
-        total_mercados: 1,
-        total_locales: this.mercado()?.locales?.length || 0,
-        locales_ocupados: 0,
-        locales_libres: this.mercado()?.locales?.length || 0,
-        ocupacion_percentage: 0,
-        total_recaudado: 0
-      };
-      this.stats.set(defaultStats);
+      console.error('❌ Error loading stats:', error);
+      this.stats.set(null);
+      // No usar datos simulados - mejor mostrar error al usuario
     } finally {
       this.isLoadingStats.set(false);
     }
+  }
+
+  /**
+   * Procesar estadísticas del backend y calcular métricas adicionales
+   */
+  private processStats(backendStats: MercadoStatsBackend): MercadoStats {
+    const mercado = this.mercado();
+    
+    // Calcular locales ocupados basado en el estado actual de los locales
+    const localesOcupados = mercado?.locales?.filter(local => 
+      local.estado_local === EstadoLocal.OCUPADO
+    ).length || 0;
+    
+    const localesLibres = backendStats.total_locales - localesOcupados;
+    const ocupacionPercentage = backendStats.total_locales > 0 
+      ? (localesOcupados / backendStats.total_locales) * 100 
+      : 0;
+    
+    // Calcular cumplimiento financiero
+    const cumplimientoMensual = backendStats.total_esperado_mensual > 0 
+      ? (backendStats.total_recaudado / backendStats.total_esperado_mensual) * 100 
+      : 0;
+      
+    const cumplimientoAnual = backendStats.total_esperado_anual > 0 
+      ? (backendStats.total_recaudado / backendStats.total_esperado_anual) * 100 
+      : 0;
+
+    return {
+      ...backendStats,
+      locales_ocupados: localesOcupados,
+      locales_libres: localesLibres,
+      ocupacion_percentage: ocupacionPercentage,
+      cumplimiento_mensual_percentage: cumplimientoMensual,
+      cumplimiento_anual_percentage: cumplimientoAnual
+    };
   }
 
   getStatusColor(isActive: boolean): string {
@@ -390,6 +429,47 @@ export class MercadoDetailPage implements OnInit {
       default:
         return 'Sin estado';
     }
+  }
+
+  /**
+   * Obtener color basado en porcentaje de performance
+   */
+  getPerformanceColor(percentage: number): string {
+    if (percentage >= 80) return 'success'; // Verde
+    if (percentage >= 60) return 'warning'; // Amarillo
+    return 'danger'; // Rojo
+  }
+
+  /**
+   * Obtener color para ocupación
+   */
+  getOccupancyColor(percentage: number): string {
+    if (percentage >= 80) return 'success'; // Verde - alta ocupación
+    if (percentage >= 50) return 'warning'; // Amarillo - ocupación media
+    return 'medium'; // Gris - baja ocupación
+  }
+
+  /**
+   * Formatear números grandes con sufijos (K, M)
+   */
+  formatLargeNumber(num: number): string {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toFixed(0);
+  }
+
+  /**
+   * Formatear moneda con separadores de miles completos
+   */
+  formatCurrencyCompact(amount: number): string {
+    return `L ${amount.toLocaleString('es-HN', { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    })}`;
   }
 
   // Exponer Math para usar en el template

@@ -56,7 +56,10 @@
         <ion-spinner name="crescent" color="primary"></ion-spinner>
       </div>
       
-      <div *ngIf="!isLoadingStats() && stats()" class="stats-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">        <!-- Total Locales -->
+      <div *ngIf="!isLoadingStats() && stats()" class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Estadísticas del Mercado -->
+        <!-- Total Locales -->
         <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200 hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center justify-between">
             <div class="flex-1">
@@ -69,45 +72,61 @@
             </div>
           </div>
         </div>
-          <!-- Locales Ocupados -->
-        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200 hover:shadow-md transition-shadow duration-200">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <p class="text-sm text-green-600 font-semibold mb-2">Locales Ocupados</p>
-              <p class="text-3xl font-bold text-green-700 mb-1">{{ stats()?.locales_ocupados | number }}</p>
-              <p class="text-xs text-green-500">Actualmente en uso</p>
-            </div>
-            <div class="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center shadow-lg">
-              <ion-icon name="key-outline" class="text-white text-xl"></ion-icon>
-            </div>
-          </div>
-        </div>
-          <!-- Porcentaje de Ocupación -->
-        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200 hover:shadow-md transition-shadow duration-200">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <p class="text-sm text-purple-600 font-semibold mb-2">% Ocupación</p>
-              <p class="text-3xl font-bold text-purple-700 mb-1">{{ stats()?.ocupacion_percentage | number:'1.1-1' }}%</p>
-              <p class="text-xs text-purple-500">Tasa de ocupación</p>
-            </div>
-            <div class="w-14 h-14 bg-purple-500 rounded-xl flex items-center justify-center shadow-lg">
-              <ion-icon name="trending-up-outline" class="text-white text-xl"></ion-icon>
-            </div>
-          </div>
-        </div>
-          <!-- Total Recaudado -->
+
+        <!-- Total Recaudado -->
         <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200 hover:shadow-md transition-shadow duration-200">
           <div class="flex items-center justify-between">
             <div class="flex-1">
               <p class="text-sm text-orange-600 font-semibold mb-2">Total Recaudado</p>
-              <p class="text-3xl font-bold text-orange-700 mb-1">L {{ stats()?.total_recaudado | number:'1.2-2' }}</p>
-              <p class="text-xs text-orange-500">Ingresos totales</p>
+              <p class="text-3xl font-bold text-orange-700 mb-1">{{ formatCurrencyCompact(stats()?.total_recaudado || 0) }}</p>
+              <p class="text-xs text-orange-500">Ingresos hasta la fecha</p>
             </div>
             <div class="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg">
               <ion-icon name="wallet-outline" class="text-white text-xl"></ion-icon>
             </div>
           </div>
         </div>
+
+        <!-- Esperado Mensual -->
+        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 border border-indigo-200 hover:shadow-md transition-shadow duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm text-indigo-600 font-semibold mb-2">Esperado Mensual</p>
+              <p class="text-3xl font-bold text-indigo-700 mb-1">{{ formatCurrencyCompact(stats()?.total_esperado_mensual || 0) }}</p>
+              <p class="text-xs text-indigo-500">Meta mensual de ingresos</p>
+            </div>
+            <div class="w-14 h-14 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+              <ion-icon name="calendar-outline" class="text-white text-xl"></ion-icon>
+            </div>
+          </div>
+        </div>
+
+        <!-- Esperado Anual -->
+        <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 border border-cyan-200 hover:shadow-md transition-shadow duration-200">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm text-cyan-600 font-semibold mb-2">Esperado Anual</p>
+              <p class="text-3xl font-bold text-cyan-700 mb-1">{{ formatCurrencyCompact(stats()?.total_esperado_anual || 0) }}</p>
+              <p class="text-xs text-cyan-500">Meta anual de ingresos</p>
+            </div>
+            <div class="w-14 h-14 bg-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+              <ion-icon name="bar-chart-outline" class="text-white text-xl"></ion-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje de error si no hay estadísticas -->
+      <div *ngIf="!isLoadingStats() && !stats()" class="text-center py-8">
+        <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+          <ion-icon name="analytics-outline" class="text-gray-400 text-2xl"></ion-icon>
+        </div>
+        <p class="text-gray-500 text-lg mb-2">No se pudieron cargar las estadísticas</p>
+        <p class="text-gray-400 text-sm mb-4">Verifica la conexión e intenta nuevamente</p>
+        <ion-button fill="outline" size="small" (click)="loadStats(mercadoId())">
+          <ion-icon name="refresh-outline" slot="start"></ion-icon>
+          Reintentar
+        </ion-button>
       </div>
     </div>    <!-- Locales del Mercado -->
     <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" *ngIf="mercado()?.locales && mercado()!.locales!.length > 0">

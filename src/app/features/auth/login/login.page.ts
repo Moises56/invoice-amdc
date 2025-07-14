@@ -66,9 +66,51 @@ export class LoginPage {
       contrasena: ['', [Validators.required, Validators.minLength(VALIDATION_CONFIG.PASSWORD.MIN_LENGTH)]]
     });
 
-    // Redirigir si ya está autenticado
-    if (this.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+    // Verificar autenticación cuando se complete la verificación inicial
+    this.checkAuthenticationStatus();
+  }
+
+  /**
+   * Verificar estado de autenticación de manera robusta
+   */
+  private async checkAuthenticationStatus(): Promise<void> {
+    console.log('🔍 LoginPage: Verificando estado de autenticación...');
+    
+    // Esperar a que se complete la verificación de autenticación con timeout
+    let attempts = 0;
+    const maxAttempts = 30; // 3 segundos máximo (más rápido para UX)
+
+    while (!this.authService.authCheckComplete() && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    // Verificar de manera robusta si ya está autenticado
+    if (this.authService.isAuthenticated()) {
+      console.log('✅ Usuario ya autenticado, redirigiendo al dashboard');
+      this.router.navigate(['/dashboard'], { replaceUrl: true });
+      return;
+    }
+
+    // Si no está autenticado y completó la verificación, mostrar form
+    if (this.authService.authCheckComplete()) {
+      console.log('ℹ️ Usuario no autenticado, mostrando formulario de login');
+      return;
+    }
+
+    // Si hay timeout, intentar verificación manual una vez
+    if (attempts >= maxAttempts) {
+      console.log('⚠️ Timeout en verificación, intentando verificación manual...');
+      try {
+        const isAuth = await this.authService.checkAuthStatus();
+        if (isAuth) {
+          console.log('✅ Usuario autenticado en verificación manual');
+          this.router.navigate(['/dashboard'], { replaceUrl: true });
+        }
+      } catch (error) {
+        console.log('❌ Error en verificación manual:', error);
+        // Continuar mostrando el formulario de login
+      }
     }
   }
 
@@ -87,10 +129,12 @@ export class LoginPage {
   }
 
   /**
-   * Enviar formulario de login
+   * Enviar formulario de login con manejo robusto
    */
   onSubmit(): void {
     if (this.loginForm.valid && !this.isLoading()) {
+      console.log('🔐 Enviando formulario de login...');
+      
       const formValue = this.loginForm.value;
       const credentials = {
         contrasena: formValue.contrasena,
@@ -102,14 +146,18 @@ export class LoginPage {
       };
 
       this.authService.login(credentials).subscribe({
-        next: () => {
-          this.router.navigate(['/dashboard']);
+        next: (response) => {
+          console.log('✅ Login exitoso en component:', response);
+          // Navegar al dashboard con replaceUrl para limpiar historial
+          this.router.navigate(['/dashboard'], { replaceUrl: true });
         },
         error: (error) => {
-          console.error('Error en login:', error);
+          console.error('❌ Error en login component:', error);
+          // El AuthService ya maneja el toast de error
         }
       });
     } else {
+      console.log('⚠️ Formulario inválido o cargando');
       this.markFormGroupTouched();
     }
   }
