@@ -1,11 +1,11 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar style="--background: #5ccedf">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Locales</ion-title>
+    <ion-title style="color: white; font-weight: 600;">Gestión de Locales</ion-title>
     <ion-buttons slot="end">
-      <ion-button routerLink="/locales/nuevo">
+      <ion-button (click)="createLocal()" style="color: white;">
         <ion-icon name="add-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -13,10 +13,141 @@
 </ion-header>
 
 <ion-content>
-  <div class="p-4">
-    <ion-text>
-      <h2>Gestión de Locales</h2>
-      <p>Módulo en desarrollo...</p>
-    </ion-text>
+  <!-- Barra de búsqueda -->
+  <div class="search-container">
+    <ion-searchbar 
+      (ionInput)="onSearch($event)"
+      placeholder="Buscar por mercado, número, DNI o propietario..."
+      [debounce]="500"
+      show-clear-button="focus"
+      style="--background: #f8f9fa; --color: #333;">
+    </ion-searchbar>
+  </div>
+
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content pulling-icon="refresh-outline" refreshing-spinner="circular">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading state -->
+  <div *ngIf="loading() && locales().length === 0" class="loading-container">
+    <ion-spinner name="circular" style="color: #5ccedf;"></ion-spinner>
+    <p>Cargando locales...</p>
+  </div>
+
+  <!-- Content Grid -->
+  <ion-grid *ngIf="!loading() || locales().length > 0">
+    <ion-row>
+      <ion-col 
+        *ngFor="let local of locales()" 
+        [size]="12" 
+        [sizeMd]="6" 
+        [sizeLg]="3">
+        
+        <ion-card class="local-card" (click)="viewLocal(local)">
+          <ion-card-header>
+            <div class="card-header-content">
+              <ion-icon 
+                [name]="getTipoIcon(local.tipo_local || '')" 
+                class="tipo-icon"
+                style="color: #5ccedf;">
+              </ion-icon>
+              <div class="local-info">
+                <ion-card-title class="local-title">
+                  {{ local.nombre_local === 'NO DISPONIBLE' ? 'Local ' + local.numero_local : local.nombre_local }}
+                </ion-card-title>
+                <ion-badge 
+                  [color]="getEstadoColor(local.estado_local)" 
+                  class="estado-badge">
+                  {{ local.estado_local }}
+                </ion-badge>
+              </div>
+            </div>
+          </ion-card-header>
+
+          <ion-card-content>
+            <div class="local-details">
+              <!-- Número y tipo -->
+              <div class="detail-row">
+                <ion-icon name="business-outline" class="detail-icon"></ion-icon>
+                <span class="detail-text">
+                  <strong>No. {{ local.numero_local }}</strong> - {{ local.tipo_local }}
+                </span>
+              </div>
+
+              <!-- Mercado -->
+              <div class="detail-row">
+                <ion-icon name="location-outline" class="detail-icon"></ion-icon>
+                <span class="detail-text">{{ getMercadoNombre(local) }}</span>
+              </div>
+
+              <!-- Propietario -->
+              <div class="detail-row">
+                <ion-icon name="person-outline" class="detail-icon"></ion-icon>
+                <span class="detail-text">{{ local.propietario }}</span>
+              </div>
+
+              <!-- DNI -->
+              <div class="detail-row" *ngIf="formatDNI(local.dni_propietario || '') !== 'N/A'">
+                <ion-icon name="card-outline" class="detail-icon"></ion-icon>
+                <span class="detail-text">{{ formatDNI(local.dni_propietario || '') }}</span>
+              </div>
+
+              <!-- Monto mensual -->
+              <div class="detail-row monto-row">
+                <ion-icon name="card-outline" class="detail-icon"></ion-icon>
+                <span class="monto-text">{{ formatMonto(local.monto_mensual?.toString() || '0') }}</span>
+              </div>
+
+              <!-- Facturas -->
+              <div class="detail-row">
+                <ion-chip color="primary" class="facturas-chip">
+                  <ion-label>{{ getNumeroFacturas(local) }} facturas</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading() && locales().length === 0" class="empty-state">
+    <ion-icon name="storefront-outline" class="empty-icon"></ion-icon>
+    <h3>No se encontraron locales</h3>
+    <p>{{ searchTerm() ? 'Intenta con otros términos de búsqueda' : 'No hay locales registrados' }}</p>
+    <ion-button 
+      (click)="createLocal()" 
+      fill="solid" 
+      style="--background: #5ccedf;">
+      <ion-icon name="add-outline" slot="start"></ion-icon>
+      Agregar Local
+    </ion-button>
+  </div>
+
+  <!-- Infinite scroll -->
+  <ion-infinite-scroll 
+    *ngIf="currentPage() < totalPages()" 
+    (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content 
+      loading-spinner="circular" 
+      loading-text="Cargando más locales...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- Floating action button -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button 
+      (click)="createLocal()" 
+      style="--background: #5ccedf;">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- Stats footer -->
+  <div *ngIf="locales().length > 0" class="stats-footer">
+    <p>Mostrando {{ locales().length }} de {{ totalItems() }} locales</p>
   </div>
 </ion-content>

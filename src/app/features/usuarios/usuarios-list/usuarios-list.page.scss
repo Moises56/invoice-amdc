@@ -1,128 +1,601 @@
-// Toolbar personalizado
-.municipal-toolbar {
-  --background: var(--ion-color-primary);
-  --color: white;
-}
-
-// Searchbar personalizada
-.custom-searchbar {
-  --background: #f8f9fa;
-  --border-radius: 12px;
-  --box-shadow: none;
-  --color: var(--ion-color-dark);
-  --placeholder-color: var(--ion-color-medium);
-  --icon-color: var(--ion-color-medium);
+// Usuarios Page - Modern Glass Design para estructura Ionic
+.users-page {
+  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   
-  .searchbar-input-container {
-    height: 44px;
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(92, 206, 223, 0.2) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
   }
 }
 
-// Items de usuario
-.user-item {
-  --padding-start: 16px;
-  --padding-end: 16px;
-  --inner-padding-end: 0;
-  --min-height: 80px;
-  
-  ion-avatar {
-    margin-right: 16px;
-  }
-  
-  ion-label {
-    margin: 0;
-  }
-  
-  &:hover {
-    --background: #f8f9fa;
-  }
-  
-  &.opacity-50 {
-    opacity: 0.6;
-  }
-}
+// Header con efecto glass
+.sticky-header {
+  background: linear-gradient(135deg, rgba(92, 206, 223, 0.95) 0%, rgba(44, 160, 184, 0.95) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  padding: 2rem 1rem 3rem !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin-bottom: 1rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  border-radius: 0 0 20px 20px !important;
 
-// Chips personalizados
-ion-chip {
-  --border-radius: 16px;
-  height: 24px;
-  font-size: 12px;
-  font-weight: 500;
-}
+  .header-stats {
+    position: relative;
+    z-index: 2;
 
-// Badges personalizados
-ion-badge {
-  --border-radius: 12px;
-  font-size: 10px;
-  font-weight: 500;
-  padding: 4px 8px;
-}
+    h1 {
+      margin: 0 0 2rem 0 !important;
+      font-size: 2.5rem !important;
+      font-weight: 800 !important;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    }
 
-// FAB personalizado
-ion-fab-button {
-  --background: var(--ion-color-primary);
-  --background-hover: var(--ion-color-primary-shade);
-  --background-activated: var(--ion-color-primary-shade);
-  --color: white;
-  --border-radius: 16px;
-  --box-shadow: 0 8px 16px rgba(92, 206, 223, 0.3);
-  
-  &:hover {
-    --box-shadow: 0 12px 20px rgba(92, 206, 223, 0.4);
-  }
-}
+    .stats-cards {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+      gap: 1rem !important;
 
-// Skeleton loading
-ion-skeleton-text {
-  --border-radius: 4px;
-  margin-bottom: 8px;
-  
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
+      .stat-item {
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 1rem !important;
 
-// Infinite scroll
-ion-infinite-scroll-content {
-  .infinite-loading-text {
-    color: var(--ion-color-medium);
-    font-size: 14px;
-  }
-}
+        &:hover {
+          transform: translateY(-4px) scale(1.02) !important;
+          background: rgba(255, 255, 255, 0.25) !important;
+          box-shadow: 0 16px 32px 0 rgba(31, 38, 135, 0.5) !important;
+        }
 
-// Mensajes vacíos
-.text-center {
-  ion-icon {
-    display: block;
-    margin: 0 auto;
-  }
-}
+        ion-icon {
+          font-size: 2.5rem !important;
+          opacity: 0.9 !important;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) !important;
+        }
 
-// Responsive adjustments
-@media (max-width: 768px) {
-  .user-item {
-    --min-height: 72px;
-    
-    ion-label {
-      font-size: 14px;
-      
-      h3 {
-        font-size: 15px;
-      }
-      
-      p {
-        font-size: 13px;
+        div {
+          display: flex !important;
+          flex-direction: column !important;
+
+          .stat-number {
+            font-size: 2.2rem !important;
+            font-weight: 800 !important;
+            line-height: 1.2 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+          }
+
+          .stat-label {
+            font-size: 0.875rem !important;
+            opacity: 0.9 !important;
+            font-weight: 500 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+          }
+        }
+
+        &.success ion-icon {
+          color: #10b981 !important;
+          filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5)) !important;
+        }
+
+        &.pending ion-icon {
+          color: #ef4444 !important;
+          filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5)) !important;
+        }
+
+        &.admin ion-icon {
+          color: #f59e0b !important;
+          filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)) !important;
+        }
       }
     }
   }
-  
-  ion-chip {
-    font-size: 11px;
-    height: 22px;
+}
+
+// Filtros con efecto glass
+.search-filters {
+  padding: 2rem !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  margin: 0 1rem 1rem !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  z-index: 3 !important;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    border-radius: 20px 20px 0 0;
   }
-  
-  ion-badge {
-    font-size: 9px;
-    padding: 3px 6px;
+
+  ion-searchbar {
+    --background: rgba(248, 250, 252, 0.8) !important;
+    --border-radius: 16px !important;
+    --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    --padding-start: 1.5rem !important;
+    --padding-end: 1.5rem !important;
+    margin: 0 0 1.5rem 0 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+
+    &.searchbar-has-value {
+      --background: rgba(255, 255, 255, 0.95) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+      transform: scale(1.02) !important;
+    }
+  }
+
+  .filters-row {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 1rem !important;
+    align-items: center !important;
+
+    .filter-item {
+      --background: transparent !important;
+      --inner-padding-end: 0 !important;
+      --padding-start: 0 !important;
+
+      ion-select {
+        --padding-start: 1.5rem !important;
+        --padding-end: 1.5rem !important;
+        background: rgba(248, 250, 252, 0.8) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+        &:hover {
+          border-color: var(--primary-color) !important;
+          background: rgba(255, 255, 255, 0.95) !important;
+          transform: translateY(-2px) !important;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+        }
+      }
+    }
+
+    .clear-filters-btn {
+      --color: var(--primary-color) !important;
+      --background: rgba(248, 250, 252, 0.8) !important;
+      --border-radius: 12px !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      border: 1px solid rgba(226, 232, 240, 0.8) !important;
+      transition: all 0.3s ease !important;
+
+      &:hover {
+        --background: rgba(255, 255, 255, 0.95) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+      }
+    }
+  }
+}
+
+// Grid de usuarios con efectos modernos
+.users-content {
+  padding: 0 1rem 2rem !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.users-grid {
+  ion-row {
+    gap: 1.5rem !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+  }
+
+  ion-col {
+    padding: 0.75rem !important;
+    
+    // Móvil: 1 card por fila
+    @media (max-width: 767px) {
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+    }
+    
+    // Tablet pequeña: 2 cards por fila
+    @media (min-width: 768px) and (max-width: 991px) {
+      flex: 0 0 calc(50% - 0.75rem) !important;
+      max-width: calc(50% - 0.75rem) !important;
+    }
+    
+    // Tablet grande: 3 cards por fila
+    @media (min-width: 992px) and (max-width: 1199px) {
+      flex: 0 0 calc(33.333% - 1rem) !important;
+      max-width: calc(33.333% - 1rem) !important;
+    }
+    
+    // Escritorio: 4 cards por fila
+    @media (min-width: 1200px) {
+      flex: 0 0 calc(25% - 1.125rem) !important;
+      max-width: calc(25% - 1.125rem) !important;
+    }
+  }
+}
+
+// Cards de usuarios con glassmorphism
+ion-card.user-card,
+.user-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  position: relative !important;
+  margin: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 480px !important;
+
+  // Responsive adjustments
+  @media (max-width: 767px) {
+    min-height: 420px !important;
+  }
+
+  @media (min-width: 1200px) {
+    min-height: 520px !important;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+  }
+
+  &:hover {
+    transform: translateY(-12px) scale(1.02) !important;
+    box-shadow: 0 20px 64px 0 rgba(0, 0, 0, 0.2) !important;
+    border-color: var(--primary-color) !important;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  // Estados de los usuarios por rol
+  &.admin {
+    border-left: 4px solid #ef4444 !important;
+  }
+
+  &.market {
+    border-left: 4px solid #f59e0b !important;
+  }
+
+  &.user {
+    border-left: 4px solid #10b981 !important;
+  }
+
+  &.inactive {
+    opacity: 0.7 !important;
+    background: rgba(248, 250, 252, 0.8) !important;
+  }
+}
+
+// Header de las cards de usuario
+ion-card-header {
+  padding: 2rem 2rem 1.5rem !important;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
+  position: relative !important;
+  z-index: 1 !important;
+
+  .user-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    margin-bottom: 1rem !important;
+
+    .user-avatar {
+      width: 56px !important;
+      height: 56px !important;
+      border-radius: 50% !important;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: white !important;
+      font-weight: 800 !important;
+      font-size: 1.5rem !important;
+      text-transform: uppercase !important;
+      box-shadow: 0 8px 24px rgba(92, 206, 223, 0.4) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .user-info {
+      flex: 1 !important;
+
+      ion-card-title {
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: var(--ion-color-dark) !important;
+        margin: 0 0 0.25rem 0 !important;
+        line-height: 1.3 !important;
+      }
+
+      ion-card-subtitle {
+        font-size: 0.875rem !important;
+        color: var(--ion-color-medium) !important;
+        margin: 0 !important;
+        font-weight: 500 !important;
+      }
+    }
+  }
+
+  .user-badges {
+    display: flex !important;
+    gap: 0.75rem !important;
+    flex-wrap: wrap !important;
+
+    .role-badge {
+      padding: 0.5rem 1rem !important;
+      border-radius: 20px !important;
+      font-size: 0.75rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+
+      &.admin {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9)) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4) !important;
+      }
+
+      &.market {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9)) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4) !important;
+      }
+
+      &.user {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9)) !important;
+        color: white !important;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4) !important;
+      }
+    }
+  }
+}
+
+// Contenido de las cards
+ion-card-content {
+  padding: 2rem !important;
+  position: relative !important;
+  z-index: 1 !important;
+
+  .user-details {
+    display: grid !important;
+    gap: 1rem !important;
+
+    .detail-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1rem !important;
+      padding: 1rem !important;
+      background: rgba(248, 250, 252, 0.6) !important;
+      backdrop-filter: blur(5px) !important;
+      -webkit-backdrop-filter: blur(5px) !important;
+      border-radius: 12px !important;
+      border: 1px solid rgba(226, 232, 240, 0.5) !important;
+      transition: all 0.3s ease !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.8) !important;
+        transform: translateX(4px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+      }
+
+      ion-icon {
+        color: var(--primary-color) !important;
+        font-size: 1.25rem !important;
+        filter: drop-shadow(0 2px 4px rgba(92, 206, 223, 0.3)) !important;
+      }
+
+      .detail-content {
+        flex: 1 !important;
+
+        .detail-label {
+          font-size: 0.75rem !important;
+          color: var(--ion-color-medium) !important;
+          margin-bottom: 0.25rem !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px !important;
+          font-weight: 600 !important;
+          display: block !important;
+        }
+
+        .detail-value {
+          font-size: 0.875rem !important;
+          color: var(--ion-color-dark) !important;
+          font-weight: 600 !important;
+
+          &.status {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+
+            .status-indicator {
+              width: 8px !important;
+              height: 8px !important;
+              border-radius: 50% !important;
+              background: #10b981 !important;
+              box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3) !important;
+
+              &.inactive {
+                background: #ef4444 !important;
+                box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3) !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .user-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    margin-top: 2rem !important;
+    padding-top: 2rem !important;
+    border-top: 1px solid rgba(226, 232, 240, 0.5) !important;
+
+    ion-button {
+      --border-radius: 12px !important;
+      --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      font-size: 0.7rem !important;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+      min-height: 36px !important;
+
+      &:hover {
+        transform: translateY(-2px) !important;
+        --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+      }
+
+      &.view-button {
+        --background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+        --color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      }
+
+      &.edit-button {
+        --background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+        --color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      }
+
+      &.password-button {
+        &[color="warning"] {
+          --background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+          --color: white !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+      }
+
+      &.toggle-button {
+        &[color="success"] {
+          --background: linear-gradient(135deg, #10b981, #059669) !important;
+          --color: white !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        &[color="danger"] {
+          --background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+          --color: white !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+      }
+
+      &.delete-button {
+        --background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        --color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      }
+    }
+  }
+}
+
+// Loading state
+.loading-container {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 4rem 0 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+  margin: 1rem !important;
+
+  ion-spinner {
+    --color: var(--primary-color) !important;
+    transform: scale(1.8) !important;
+    filter: drop-shadow(0 0 8px rgba(92, 206, 223, 0.5)) !important;
+    margin-bottom: 1rem !important;
+  }
+
+  p {
+    color: var(--ion-color-medium) !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+  }
+}
+
+// FAB Button
+ion-fab {
+  ion-fab-button {
+    --background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
+    --color: white !important;
+    --box-shadow: 0 12px 40px rgba(92, 206, 223, 0.4) !important;
+    --border-radius: 50% !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+
+    &:hover {
+      --background: linear-gradient(135deg, var(--primary-light), var(--primary-color)) !important;
+      transform: scale(1.15) rotate(180deg) !important;
+      --box-shadow: 0 16px 48px rgba(92, 206, 223, 0.6) !important;
+    }
+
+    ion-icon {
+      font-size: 1.75rem !important;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) !important;
+    }
   }
 }

@@ -2,8 +2,7 @@
 export enum Role {
   ADMIN = 'ADMIN',
   MARKET = 'MARKET',
-  USER = 'USER',
-  AUDITOR = 'AUDITOR'
+  USER = 'USER'
 }
 
 export enum EstadoFactura {

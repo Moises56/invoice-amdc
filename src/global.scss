@@ -48,6 +48,32 @@
   --error: #dc2626;
   --success: #059669;
   --neutral-50: #f9fafb;
+  
+  /* Facturas & Usuarios Variables */
+  --primary-color: #5ccedf;
+  --primary-light: #8fe0ed;
+  --primary-dark: #2ca0b8;
+  --secondary-color: #f8f9fa;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --info-color: #17a2b8;
+  --neutral-100: #f8f9fa;
+  --neutral-200: #e9ecef;
+  --neutral-300: #dee2e6;
+  --neutral-400: #ced4da;
+  --neutral-500: #adb5bd;
+  --neutral-600: #6c757d;
+  --neutral-700: #495057;
+  --neutral-800: #343a40;
+  --neutral-900: #212529;
+  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  --border-radius: 0.375rem;
+  --border-radius-lg: 0.5rem;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
   --neutral-100: #f3f4f6;
   --neutral-200: #e5e7eb;
   --neutral-500: #6b7280;
@@ -67,11 +93,140 @@
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
   --ion-color-secondary-shade: #90b1d8;
   --ion-color-secondary-tint: #addaf6;
+  
+  /* Glass Effect Variables */
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg-dark: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --glass-backdrop: blur(20px);
+  
+  /* Modern Card Variables */
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(255, 255, 255, 0.2);
+  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  --card-hover-shadow: 0 16px 64px 0 rgba(0, 0, 0, 0.15);
+  --card-backdrop: blur(20px);
 }
 
 /* Clases base para componentes municipales */
 .municipal-card {
   background: white;
+}
+
+/* GLASS EFFECT STYLES - Modern Glassmorphism */
+.glass-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  -webkit-backdrop-filter: var(--glass-backdrop) !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+  background: rgba(255, 255, 255, 0.35) !important;
+}
+
+.glass-card-dark {
+  background: var(--glass-bg-dark) !important;
+  backdrop-filter: var(--glass-backdrop) !important;
+  -webkit-backdrop-filter: var(--glass-backdrop) !important;
+}
+
+.glass-header {
+  background: linear-gradient(135deg, rgba(92, 206, 223, 0.8) 0%, rgba(44, 160, 184, 0.9) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* MODERN CARD STYLES */
+.modern-card {
+  background: var(--card-bg) !important;
+  backdrop-filter: var(--card-backdrop) !important;
+  -webkit-backdrop-filter: var(--card-backdrop) !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.modern-card:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+}
+
+.modern-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modern-card:hover::after {
+  opacity: 1;
+}
+
+/* Facturas Page Override Styles */
+ion-content.facturas-page,
+.facturas-page {
+  --background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+ion-content.facturas-page .sticky-header,
+.facturas-page .sticky-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+  padding: 2rem 1rem 3rem !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Usuarios Page Override Styles */
+ion-content.users-page,
+.users-page {
+  --background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+ion-content.users-page .sticky-header,
+.users-page .sticky-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+  padding: 2rem 1rem 3rem !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin-bottom: 1rem !important;
+}
+
+.municipal-card {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   border-radius: 0.5rem;
   border: 1px solid #e5e7eb;

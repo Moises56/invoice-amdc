@@ -105,7 +105,7 @@ export class AppComponent implements OnInit {
       title: 'Auditoría',
       url: '/audit',
       icon: 'analytics-outline',
-      roles: [Role.ADMIN, Role.AUDITOR]
+      roles: [Role.ADMIN]
     },
     {
       title: 'Bluetooth',

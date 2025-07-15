@@ -1,20 +1,113 @@
-<ion-header>
-  <ion-toolbar class="municipal-toolbar">
+<ion-header [translucent]="true">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title class="text-white font-semibold">Usuarios</ion-title>
+    <ion-title>Usuarios</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="loadUsuarios(true)">
-        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      <ion-button (click)="createUser()" fill="clear">
+        <ion-icon name="add-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg-gray-50">
-  <!-- Refresh -->
-  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+<ion-content [fullscreen]="true" class="users-page">    <!-- Header fijo con controles -->
+    <div class="sticky-header">
+      <!-- Título y estadísticas -->
+      <div class="header-stats">
+        <h1>Gestión de Usuarios</h1>
+        <div class="stats-cards">
+          <div class="stat-item">
+            <ion-icon name="people-outline"></ion-icon>
+            <div>
+              <span class="stat-number">{{ userStats()?.total || totalItems() }}</span>
+              <span class="stat-label">Total</span>
+            </div>
+          </div>
+          <div class="stat-item success">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <div>
+              <span class="stat-number">{{ userStats()?.active || filteredByStatus()(true).length }}</span>
+              <span class="stat-label">Activos</span>
+            </div>
+          </div>
+          <div class="stat-item pending">
+            <ion-icon name="close-circle-outline"></ion-icon>
+            <div>
+              <span class="stat-number">{{ userStats()?.inactive || filteredByStatus()(false).length }}</span>
+              <span class="stat-label">Inactivos</span>
+            </div>
+          </div>
+          <div class="stat-item admin">
+            <ion-icon name="shield-outline"></ion-icon>
+            <div>
+              <span class="stat-number">{{ userStats()?.byRole?.ADMIN || filteredByRole()(Role.ADMIN).length }}</span>
+              <span class="stat-label">Admins</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Buscador y filtros -->
+    <div class="search-filters">
+      <ion-searchbar 
+        [(ngModel)]="searchTerm"
+        (ionInput)="onSearch($event)"
+        placeholder="Buscar por nombre, email, usuario..."
+        debounce="500"
+        show-clear-button="focus">
+      </ion-searchbar>
+      
+      <div class="filters-row">
+        <ion-item class="filter-item">
+          <ion-select 
+            [(ngModel)]="selectedRole"
+            (ionChange)="onRoleChange($event)"
+            placeholder="Rol"
+            interface="popover">
+            <ion-select-option value="">Todos los roles</ion-select-option>
+            <ion-select-option [value]="Role.ADMIN">Administrador</ion-select-option>
+            <ion-select-option [value]="Role.MARKET">Gerente de Mercado</ion-select-option>
+            <ion-select-option [value]="Role.USER">Usuario</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="filter-item">
+          <ion-select 
+            [(ngModel)]="selectedStatus"
+            (ionChange)="onStatusChange($event)"
+            placeholder="Estado"
+            interface="popover">
+            <ion-select-option value="">Todos los estados</ion-select-option>
+            <ion-select-option [value]="true">Activos</ion-select-option>
+            <ion-select-option [value]="false">Inactivos</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="filter-item" *ngIf="availableGerencias().length > 0">
+          <ion-select 
+            [(ngModel)]="selectedGerencia"
+            (ionChange)="onGerenciaChange($event)"
+            placeholder="Gerencia"
+            interface="popover">
+            <ion-select-option value="">Todas las gerencias</ion-select-option>
+            <ion-select-option [value]="gerencia" *ngFor="let gerencia of availableGerencias()">{{ gerencia }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button 
+          fill="clear" 
+          (click)="clearFilters()"
+          class="clear-filters-btn">
+          <ion-icon name="refresh-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresher -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content
       pulling-icon="chevron-down-circle-outline"
       pulling-text="Desliza para actualizar"
@@ -23,114 +116,177 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <!-- Buscador -->
-  <div class="p-4 bg-white border-b border-gray-200">
-    <ion-searchbar
-      placeholder="Buscar usuarios..."
-      [debounce]="300"
-      (ionInput)="onSearchChange($event)"
-      class="custom-searchbar">
-    </ion-searchbar>
+  <!-- Loading spinner -->
+  <div *ngIf="loading()" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando usuarios...</p>
   </div>
 
   <!-- Lista de usuarios -->
-  <div class="p-4" *ngIf="!loading(); else loadingTemplate">
-    <ion-list class="rounded-lg shadow-sm bg-white">
-      <ion-item 
-        *ngFor="let user of filteredUsuarios(); trackBy: trackByUserId"
-        class="user-item border-b border-gray-100 last:border-0"
-        [class.opacity-50]="!user.isActive">
-        
-        <!-- Avatar -->
-        <ion-avatar slot="start" class="w-12 h-12">
-          <div class="w-full h-full bg-primary rounded-full flex items-center justify-center">
-            <ion-icon name="person-outline" class="text-white text-xl"></ion-icon>
-          </div>
-        </ion-avatar>
-
-        <!-- Información del usuario -->
-        <ion-label class="py-3">
-          <div class="flex justify-between items-start">
-            <div class="flex-1">
-              <h3 class="font-semibold text-gray-800 text-base">{{ user.name }}</h3>
-              <p class="text-sm text-gray-500 mt-1">{{ user.email }}</p>
+  <div *ngIf="!loading()" class="users-content">
+    <!-- Grid de usuarios -->
+    <div class="users-grid">
+      <ion-grid>
+        <ion-row>
+          <ion-col 
+            *ngFor="let user of usuarios(); trackBy: trackByUser"
+            size="12" 
+            size-sm="6" 
+            size-md="4" 
+            size-lg="3">
+            <ion-card 
+              class="user-card"
+              [class.admin]="user.role === Role.ADMIN"
+              [class.market]="user.role === Role.MARKET"
+              [class.user]="user.role === Role.USER"
+              [class.inactive]="!user.isActive">
+              <!-- Removido el (click)="viewUser(user)" para evitar navegación no deseada -->
               
-              <!-- Chips de rol y estado -->
-              <div class="flex gap-2 mt-2">
-                <ion-chip [color]="getRoleColor(user.role)" class="text-xs">
-                  <ion-label>{{ getRoleText(user.role) }}</ion-label>
-                </ion-chip>
-                
-                <ion-badge 
-                  [color]="user.isActive ? 'success' : 'danger'"
-                  class="text-xs">
-                  {{ user.isActive ? 'Activo' : 'Inactivo' }}
-                </ion-badge>
-              </div>
-            </div>
+              <ion-card-header>
+                <div class="user-header">
+                  <div class="user-avatar">
+                    {{ getAvatarInitials(user) }}
+                  </div>
+                  <div class="user-info">
+                    <ion-card-title>{{ getFullName(user) }}</ion-card-title>
+                    <ion-card-subtitle>{{ user.correo || user.email || user.username }}</ion-card-subtitle>
+                  </div>
+                </div>
+                <div class="user-badges">
+                  <div 
+                    class="role-badge"
+                    [class.admin]="user.role === Role.ADMIN"
+                    [class.market]="user.role === Role.MARKET"
+                    [class.user]="user.role === Role.USER">
+                    {{ getRoleText(user.role) }}
+                  </div>
+                </div>
+              </ion-card-header>
 
-            <!-- Botón de opciones -->
-            <ion-button 
-              fill="clear" 
-              size="small"
-              (click)="showUserOptions(user)"
-              class="ml-2">
-              <ion-icon name="ellipsis-vertical-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-          </div>
+              <ion-card-content>
+                <div class="user-details">
+                  <!-- Estado -->
+                  <div class="detail-row">
+                    <ion-icon name="radio-button-on-outline"></ion-icon>
+                    <div class="detail-content">
+                      <span class="detail-label">Estado</span>
+                      <span class="detail-value status">
+                        <span class="status-indicator" [class.inactive]="!user.isActive"></span>
+                        {{ getUserStatus(user).text }}
+                      </span>
+                    </div>
+                  </div>
 
-          <!-- Información adicional -->          <div class="mt-2 text-xs text-gray-400">
-            <span *ngIf="user.market">Mercado: {{ user.market.nombre_mercado }}</span>
-            <span *ngIf="user.lastLogin" class="ml-2">
-              Último acceso: {{ user.lastLogin | date:'short' }}
-            </span>
-          </div>
-        </ion-label>
-      </ion-item>
+                  <!-- Email -->
+                  <div class="detail-row" *ngIf="user.correo || user.email">
+                    <ion-icon name="mail-outline"></ion-icon>
+                    <div class="detail-content">
+                      <span class="detail-label">Email</span>
+                      <span class="detail-value">{{ user.correo || user.email }}</span>
+                    </div>
+                  </div>
 
-      <!-- Mensaje si no hay usuarios -->
-      <div *ngIf="filteredUsuarios().length === 0" class="text-center py-12">
-        <ion-icon name="people-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
-        <h3 class="text-lg font-medium text-gray-500 mb-2">No hay usuarios</h3>
-        <p class="text-sm text-gray-400">
-          {{ searchText() ? 'No se encontraron usuarios con ese criterio' : 'Comienza agregando el primer usuario' }}
-        </p>
-      </div>
-    </ion-list>
-  </div>
+                  <!-- Teléfono -->
+                  <div class="detail-row" *ngIf="user.telefono || user.phone">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <div class="detail-content">
+                      <span class="detail-label">Teléfono</span>
+                      <span class="detail-value">{{ user.telefono || user.phone }}</span>
+                    </div>
+                  </div>
 
-  <!-- Loading template -->
-  <ng-template #loadingTemplate>
-    <div class="p-4">
-      <ion-list class="rounded-lg shadow-sm bg-white">
-        <ion-item *ngFor="let item of [1,2,3,4,5]" class="border-b border-gray-100">
-          <ion-avatar slot="start">
-            <ion-skeleton-text animated style="width: 100%; height: 100%"></ion-skeleton-text>
-          </ion-avatar>
-          <ion-label>
-            <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+                  <!-- Username -->
+                  <div class="detail-row" *ngIf="user.username">
+                    <ion-icon name="at-outline"></ion-icon>
+                    <div class="detail-content">
+                      <span class="detail-label">Usuario</span>
+                      <span class="detail-value">{{ user.username }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Último acceso -->
+                  <div class="detail-row" *ngIf="user.lastLogin">
+                    <ion-icon name="time-outline"></ion-icon>
+                    <div class="detail-content">
+                      <span class="detail-label">Último acceso</span>
+                      <span class="detail-value">{{ formatLastLogin(user.lastLogin) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="user-actions">
+                  <ion-button 
+                    class="view-button"
+                    size="small" 
+                    fill="outline"
+                    (click)="viewUser(user)">
+                    <ion-icon name="eye-outline" slot="start"></ion-icon>
+                    Ver
+                  </ion-button>
+                  <ion-button 
+                    class="edit-button"
+                    size="small" 
+                    (click)="editUser(user)">
+                    <ion-icon name="create-outline" slot="start"></ion-icon>
+                    Editar
+                  </ion-button>
+                  <ion-button 
+                    class="password-button"
+                    size="small" 
+                    fill="outline"
+                    color="warning"
+                    (click)="resetPassword(user)">
+                    <ion-icon name="key-outline" slot="start"></ion-icon>
+                    Contraseña
+                  </ion-button>
+                  <ion-button 
+                    class="toggle-button"
+                    size="small" 
+                    fill="outline"
+                    [color]="user.isActive ? 'danger' : 'success'"
+                    (click)="toggleUserStatus(user)">
+                    <ion-icon 
+                      [name]="user.isActive ? 'close-circle-outline' : 'checkmark-circle-outline'"
+                      slot="start">
+                    </ion-icon>
+                    {{ user.isActive ? 'Desactivar' : 'Activar' }}
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </div>
-  </ng-template>
+
+    <!-- Estado vacío -->
+    <div *ngIf="usuarios().length === 0" class="empty-state">
+      <ion-icon name="people-outline" size="large"></ion-icon>
+      <h3>No se encontraron usuarios</h3>
+      <p>No hay usuarios que coincidan con los filtros seleccionados.</p>
+      <ion-button 
+        (click)="clearFilters()" 
+        fill="outline">
+        Limpiar filtros
+      </ion-button>
+    </div>
+  </div>
 
   <!-- Infinite scroll -->
   <ion-infinite-scroll 
     threshold="100px" 
-    [disabled]="isInfiniteDisabled()"
-    (ionInfinite)="onLoadMore($event)">
+    (ionInfinite)="loadMore($event)"
+    [disabled]="currentPage() >= totalPages()">
     <ion-infinite-scroll-content
       loading-spinner="bubbles"
       loading-text="Cargando más usuarios...">
     </ion-infinite-scroll-content>
   </ion-infinite-scroll>
 
-  <!-- FAB para agregar usuario -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="goToCreate()" class="shadow-lg">
+  <!-- FAB para crear nuevo usuario -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="createUser()" color="primary">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>

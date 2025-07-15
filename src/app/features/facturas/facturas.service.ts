@@ -254,4 +254,78 @@ export class FacturasService {
 
     return this.http.get<{ canCreate: boolean; message?: string }>(`${this.apiUrl}/validate`, { params });
   }
+
+  /**
+   * Formatear monto de factura
+   */
+  formatMonto(monto: string | number): string {
+    if (!monto) return 'L. 0.00';
+    const amount = parseFloat(monto.toString());
+    return new Intl.NumberFormat('es-HN', {
+      style: 'currency',
+      currency: 'HNL',
+      minimumFractionDigits: 2
+    }).format(amount);
+  }
+
+  /**
+   * Obtener color según estado de la factura
+   */
+  getEstadoColor(estado: string): string {
+    switch (estado?.toUpperCase()) {
+      case 'PAGADA':
+        return 'success';
+      case 'PENDIENTE':
+        return 'warning';
+      case 'VENCIDA':
+        return 'danger';
+      case 'ANULADA':
+        return 'medium';
+      default:
+        return 'primary';
+    }
+  }
+
+  /**
+   * Obtener ícono según estado de la factura
+   */
+  getEstadoIcon(estado: string): string {
+    switch (estado?.toUpperCase()) {
+      case 'PAGADA':
+        return 'checkmark-circle-outline';
+      case 'PENDIENTE':
+        return 'time-outline';
+      case 'VENCIDA':
+        return 'alert-circle-outline';
+      case 'ANULADA':
+        return 'close-circle-outline';
+      default:
+        return 'document-text-outline';
+    }
+  }
+
+  /**
+   * Formatear fecha
+   */
+  formatFecha(fecha: string | Date): string {
+    if (!fecha) return 'N/A';
+    const date = new Date(fecha);
+    return new Intl.DateTimeFormat('es-HN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
+  }
+
+  /**
+   * Obtener nombre del mes en español
+   */
+  getMesNombre(mes: string): string {
+    const meses = {
+      '01': 'Enero', '02': 'Febrero', '03': 'Marzo', '04': 'Abril',
+      '05': 'Mayo', '06': 'Junio', '07': 'Julio', '08': 'Agosto',
+      '09': 'Septiembre', '10': 'Octubre', '11': 'Noviembre', '12': 'Diciembre'
+    };
+    return meses[mes as keyof typeof meses] || mes;
+  }
 }

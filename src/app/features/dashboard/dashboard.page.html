@@ -55,10 +55,11 @@
           <ion-card-content>
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-sm font-medium text-gray-500">Mercados</h3>                <div class="text-2xl font-bold mt-1 text-gray-800">{{ mercadosStats()?.total_mercados || 0 }}</div>
+                <h3 class="text-sm font-medium text-gray-500">Total Mercados</h3>
+                <div class="text-2xl font-bold mt-1 text-gray-800">{{ formatNumber(mercadosStats().total_mercados) }}</div>
                 <div class="mt-2 flex items-center text-xs">
                   <ion-icon name="business-outline" color="primary" class="mr-1"></ion-icon>
-                  <span class="text-gray-500">{{ mercadosStats()?.ocupacion_percentage || 0 | number:'1.0-1' }}% ocupación</span>
+                  <span class="text-gray-500">{{ formatNumber(additionalStats()?.promedioLocalesPorMercado) }} locales promedio</span>
                 </div>
               </div>
               <div class="bg-blue-50 p-3 rounded-full">
@@ -73,10 +74,11 @@
           <ion-card-content>
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-sm font-medium text-gray-500">Locales</h3>                <div class="text-2xl font-bold mt-1 text-gray-800">{{ localesStats()?.total_locales || 0 }}</div>
+                <h3 class="text-sm font-medium text-gray-500">Total Locales</h3>
+                <div class="text-2xl font-bold mt-1 text-gray-800">{{ formatNumber(localesStats().total_locales) }}</div>
                 <div class="mt-2 flex items-center text-xs">
                   <ion-icon name="storefront-outline" color="secondary" class="mr-1"></ion-icon>
-                  <span class="text-gray-500">{{ localesStats()?.locales_activos || 0 }} activos</span>
+                  <span class="text-gray-500">{{ formatNumber(additionalStats()?.localesConPagos) }} con pagos este mes</span>
                 </div>
               </div>
               <div class="bg-indigo-50 p-3 rounded-full">
@@ -91,14 +93,126 @@
           <ion-card-content>
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-sm font-medium text-gray-500">Facturas</h3>                <div class="text-2xl font-bold mt-1 text-gray-800">{{ facturasStats()?.total_facturas || 0 }}</div>
+                <h3 class="text-sm font-medium text-gray-500">Total Facturas</h3>
+                <div class="text-2xl font-bold mt-1 text-gray-800">{{ formatNumber(facturasStats().total_facturas) }}</div>
                 <div class="mt-2 flex items-center text-xs">
                   <ion-icon name="cash-outline" color="warning" class="mr-1"></ion-icon>
-                  <span class="text-gray-500">L. {{ facturasStats()?.monto_total || 0 | number:'1.2-2' }} total</span>
+                  <span class="text-gray-500">{{ formatCurrency(facturasStats().monto_total) }} total</span>
                 </div>
               </div>
               <div class="bg-yellow-50 p-3 rounded-full">
                 <ion-icon name="receipt-outline" color="warning" size="large"></ion-icon>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Ingresos Mensuales -->
+        <ion-card *ngIf="additionalStats()" class="stats-card">
+          <ion-card-content>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Ingresos Mensuales</h3>
+                <div class="text-2xl font-bold mt-1 text-green-600">{{ formatCurrency(additionalStats()?.ingresoMensual) }}</div>
+                <div class="mt-2 flex flex-col text-xs">
+                  <div class="flex items-center">
+                    <ion-icon name="wallet-outline" color="success" class="mr-1"></ion-icon>
+                    <span class="text-gray-500">Esperado: {{ formatCurrency(additionalStats()?.ingresoMensualEsperado) }}</span>
+                  </div>
+                  <div class="flex items-center mt-1" 
+                       [ngClass]="(additionalStats()?.cumplimientoMensual || 0) >= 100 ? 'text-green-600' : 'text-red-600'">
+                    <ion-icon [name]="(additionalStats()?.cumplimientoMensual || 0) >= 100 ? 'trending-up-outline' : 'trending-down-outline'" 
+                              class="mr-1"></ion-icon>
+                    <span>{{ formatPercentage((additionalStats()?.cumplimientoMensual || 0) / 100) }} cumplimiento</span>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-green-50 p-3 rounded-full">
+                <ion-icon name="wallet-outline" color="success" size="large"></ion-icon>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Facturas Vencidas -->
+        <ion-card *ngIf="facturasStats()" class="stats-card">
+          <ion-card-content>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Facturas Vencidas</h3>
+                <div class="text-2xl font-bold mt-1 text-red-600">{{ formatNumber(facturasStats().facturas_vencidas) }}</div>
+                <div class="mt-2 flex items-center text-xs">
+                  <ion-icon name="alert-circle-outline" color="danger" class="mr-1"></ion-icon>
+                  <span class="text-gray-500">{{ formatCurrency(facturasStats().monto_vencido) }}</span>
+                </div>
+              </div>
+              <div class="bg-red-50 p-3 rounded-full">
+                <ion-icon name="alert-circle-outline" color="danger" size="large"></ion-icon>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Facturas Pendientes -->
+        <ion-card *ngIf="facturasStats()" class="stats-card">
+          <ion-card-content>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Facturas Pendientes</h3>
+                <div class="text-2xl font-bold mt-1 text-orange-600">{{ formatNumber(facturasStats().facturas_pendientes) }}</div>
+                <div class="mt-2 flex items-center text-xs">
+                  <ion-icon name="time-outline" color="warning" class="mr-1"></ion-icon>
+                  <span class="text-gray-500">{{ formatCurrency(facturasStats().monto_pendiente) }}</span>
+                </div>
+              </div>
+              <div class="bg-orange-50 p-3 rounded-full">
+                <ion-icon name="time-outline" color="warning" size="large"></ion-icon>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Ingresos Anuales -->
+        <ion-card *ngIf="additionalStats()" class="stats-card">
+          <ion-card-content>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Ingresos Anuales</h3>
+                <div class="text-2xl font-bold mt-1 text-blue-600">{{ formatCurrency(additionalStats()?.ingresoAnual) }}</div>
+                <div class="mt-2 flex flex-col text-xs">
+                  <div class="flex items-center">
+                    <ion-icon name="trending-up-outline" color="primary" class="mr-1"></ion-icon>
+                    <span class="text-gray-500">Esperado: {{ formatCurrency(additionalStats()?.ingresoAnualEsperado) }}</span>
+                  </div>
+                  <div class="flex items-center mt-1" 
+                       [ngClass]="(additionalStats()?.cumplimientoAnual || 0) >= 100 ? 'text-green-600' : 'text-red-600'">
+                    <ion-icon [name]="(additionalStats()?.cumplimientoAnual || 0) >= 100 ? 'trending-up-outline' : 'trending-down-outline'" 
+                              class="mr-1"></ion-icon>
+                    <span>{{ formatPercentage((additionalStats()?.cumplimientoAnual || 0) / 100) }} cumplimiento</span>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-blue-50 p-3 rounded-full">
+                <ion-icon name="trending-up-outline" color="primary" size="large"></ion-icon>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Facturas Pagadas -->
+        <ion-card *ngIf="facturasStats()" class="stats-card">
+          <ion-card-content>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Facturas Pagadas</h3>
+                <div class="text-2xl font-bold mt-1 text-green-600">{{ formatNumber(facturasStats().facturas_pagadas) }}</div>
+                <div class="mt-2 flex items-center text-xs">
+                  <ion-icon name="checkmark-circle-outline" color="success" class="mr-1"></ion-icon>
+                  <span class="text-gray-500">{{ formatPercentage(facturasStats().facturas_pagadas / facturasStats().total_facturas) }} del total</span>
+                </div>
+              </div>
+              <div class="bg-green-50 p-3 rounded-full">
+                <ion-icon name="checkmark-circle-outline" color="success" size="large"></ion-icon>
               </div>
             </div>
           </ion-card-content>
@@ -119,7 +233,64 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+
+    <!-- Top Mercados por Recaudación -->
+    <div *ngIf="!statsLoading() && topMarketsByRevenue().length > 0" class="mb-6">
+      <h2 class="text-xl font-bold text-gray-700 mb-4">Mejores Mercados por Recaudación</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <ion-card *ngFor="let market of topMarketsByRevenue(); let i = index" 
+                  class="market-ranking-card"
+                  [class.border-l-4]="true"
+                  [class.border-yellow-400]="i === 0"
+                  [class.border-gray-400]="i === 1"
+                  [class.border-orange-400]="i === 2">
+          <ion-card-content class="p-4">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center mb-2">
+                  <span class="text-2xl font-bold mr-2"
+                        [class.text-yellow-600]="i === 0"
+                        [class.text-gray-600]="i === 1"
+                        [class.text-orange-600]="i === 2">
+                    #{{ i + 1 }}
+                  </span>
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-800">{{ market.name }}</h3>
+                    <p class="text-xs text-gray-500">{{ formatNumber(market.totalLocals) }} locales</p>
+                  </div>
+                </div>
+                
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Recaudación:</span>
+                    <span class="text-sm font-bold text-green-600">{{ formatCurrency(market.total) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Promedio x Local:</span>
+                    <span class="text-sm font-medium text-blue-600">{{ formatCurrency(market.averagePerLocal) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">% del Total:</span>
+                    <span class="text-sm font-medium text-purple-600">{{ formatPercentage(market.percentage) }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="ml-3">
+                <ion-icon name="trophy-outline" 
+                          [color]="i === 0 ? 'warning' : i === 1 ? 'medium' : 'tertiary'"
+                          size="large">
+                </ion-icon>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Estadísticas detalladas en números pequeños -->
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
       <div *ngFor="let stat of quickStats()" 
            class="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
         <div class="text-xs text-gray-500 mb-1">{{ stat.label }}</div>

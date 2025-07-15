@@ -4,10 +4,10 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { 
-  Local, 
-  PaginationResponse, 
-  ApiResponse, 
-  CreateLocalRequest, 
+  Local,
+  PaginationResponse,
+  ApiResponse,
+  CreateLocalRequest,
   UpdateLocalRequest,
   LocalStats,
   Mercado
@@ -28,7 +28,7 @@ export interface LocalFilters {
 export class LocalesService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/locales`;
-  
+
   // Estado local
   private localesSubject = new BehaviorSubject<Local[]>([]);
   locales$ = this.localesSubject.asObservable();
@@ -48,6 +48,7 @@ export class LocalesService {
 
     return this.http.get<PaginationResponse<Local>>(this.apiUrl, { params });
   }
+
   /**
    * Obtener local por ID
    */
@@ -174,6 +175,7 @@ export class LocalesService {
     
     return this.http.get<{ available: boolean }>(`${this.apiUrl}/check-number`, { params });
   }
+
   /**
    * Obtener facturas de un local específico
    * Nota: Este método usa el endpoint de facturas con filtro de localId
@@ -203,5 +205,61 @@ export class LocalesService {
       params,
       responseType: 'blob'
     });
+  }
+
+  /**
+   * Formatear monto mensual
+   */
+  formatMontoMensual(monto: string): string {
+    if (!monto) return 'L. 0.00';
+    const amount = parseFloat(monto);
+    return new Intl.NumberFormat('es-HN', {
+      style: 'currency',
+      currency: 'HNL',
+      minimumFractionDigits: 2
+    }).format(amount);
+  }
+
+  /**
+   * Obtener color según estado del local
+   */
+  getEstadoColor(estado: string): string {
+    switch (estado?.toUpperCase()) {
+      case 'ACTIVO':
+        return 'success';
+      case 'INACTIVO':
+        return 'danger';
+      default:
+        return 'medium';
+    }
+  }
+
+  /**
+   * Obtener ícono según tipo de local
+   */
+  getTipoLocalIcon(tipo: string): string {
+    const tipoUpper = tipo?.toUpperCase();
+    switch (tipoUpper) {
+      case 'FRUTAS':
+      case 'VERDURAS':
+        return 'leaf-outline';
+      case 'ABARROTERIA':
+      case 'ABBARROTERIA':
+        return 'storefront-outline';
+      case 'COCINA':
+      case 'COMEDOR':
+        return 'restaurant-outline';
+      case 'DULCERIA':
+        return 'ice-cream-outline';
+      case 'REFRESQUERIA':
+        return 'cafe-outline';
+      case 'MISCELANEOS':
+        return 'basket-outline';
+      case 'LÁCTEOS':
+      case 'LACTEOS':
+        return 'nutrition-outline';
+      default:
+        return 'business-outline';
+    }
   }
 }

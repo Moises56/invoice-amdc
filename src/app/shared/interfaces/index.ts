@@ -3,6 +3,9 @@ import { Role, EstadoFactura, EstadoLocal, TipoLocal, BluetoothConnectionState, 
 // Export Role and other enums
 export { Role, EstadoFactura, EstadoLocal, TipoLocal, BluetoothConnectionState, BluetoothError };
 
+// Export dashboard interfaces
+export * from './dashboard.interface';
+
 // Interfaces base
 export interface User {
   id: string;
@@ -143,12 +146,14 @@ export interface UpdateUserDto {
   correo?: string;
   nombre?: string;
   apellido?: string;
+  contrasena?: string;
   telefono?: string;
   dni?: string;
   gerencia?: string;
   numero_empleado?: number;
   role?: Role;
   username?: string;
+  isActive?: boolean;
 }
 
 export interface CreateUserDto {
@@ -163,20 +168,6 @@ export interface CreateUserDto {
   role?: Role;
   username: string;
   name?: string; // For UI compatibility
-}
-
-export interface UpdateUserDto {
-  correo?: string;
-  nombre?: string;
-  apellido?: string;
-  telefono?: string;
-  dni?: string;
-  gerencia?: string;
-  numero_empleado?: number;
-  role?: Role;
-  username?: string;
-  name?: string; // For UI compatibility
-  password?: string; // For password updates
 }
 
 // Alias for compatibility

@@ -84,10 +84,27 @@ export class UsuariosService {
   }
 
   /**
+   * Activar usuario
+   */
+  activateUser(id: string): Observable<User> {
+    return this.http.patch<User>(`${this.baseUrl}/${id}/activate`, {}).pipe(
+      tap(updatedUser => {
+        const currentUsers = this.usuariosSubject.value;
+        const index = currentUsers.findIndex(u => u.id === id);
+        if (index !== -1) {
+          currentUsers[index] = updatedUser;
+          this.usuariosSubject.next([...currentUsers]);
+        }
+      })
+    );
+  }
+
+  /**
    * Cambiar estado de usuario (activar/desactivar)
    */
   toggleUserStatus(id: string, isActive: boolean): Observable<User> {
-    return this.http.patch<User>(`${this.baseUrl}/${id}/status`, { isActive }).pipe(
+    const endpoint = isActive ? 'activate' : 'deactivate';
+    return this.http.patch<User>(`${this.baseUrl}/${id}/${endpoint}`, {}).pipe(
       tap(updatedUser => {
         const currentUsers = this.usuariosSubject.value;
         const index = currentUsers.findIndex(u => u.id === id);
@@ -102,8 +119,20 @@ export class UsuariosService {
   /**
    * Cambiar contraseña de usuario
    */
-  changePassword(id: string, newPassword: string): Observable<void> {
-    return this.http.patch<void>(`${this.baseUrl}/${id}/password`, { password: newPassword });
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${API_CONFIG.BASE_URL}/auth/change-password`, {
+      currentPassword,
+      newPassword
+    });
+  }
+
+  /**
+   * Cambiar contraseña de usuario (admin) - CORREGIDO
+   */
+  changeUserPassword(id: string, newPassword: string): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/reset-password`, { 
+      newPassword 
+    });
   }
 
   /**
@@ -132,5 +161,87 @@ export class UsuariosService {
    */
   getUserStats(): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/stats`);
+  }
+
+  // Helper methods para UI
+  /**
+   * Obtener avatar inicial del usuario
+   */
+  getAvatarInitials(user: User): string {
+    const firstName = user.nombre?.charAt(0) || '';
+    const lastName = user.apellido?.charAt(0) || '';
+    return (firstName + lastName).toUpperCase() || user.username?.charAt(0).toUpperCase() || 'U';
+  }
+
+  /**
+   * Obtener color del rol
+   */
+  getRoleColor(role: Role): string {
+    switch (role) {
+      case Role.ADMIN:
+        return 'danger';
+      case Role.MARKET:
+        return 'warning';
+      case Role.USER:
+        return 'primary';
+      default:
+        return 'medium';
+    }
+  }
+
+  /**
+   * Obtener texto del rol
+   */
+  getRoleText(role: Role): string {
+    switch (role) {
+      case Role.ADMIN:
+        return 'Administrador';
+      case Role.MARKET:
+        return 'Gerente de Mercado';
+      case Role.USER:
+        return 'Usuario';
+      default:
+        return role;
+    }
+  }
+
+  /**
+   * Formatear nombre completo
+   */
+  getFullName(user: User): string {
+    return `${user.nombre || ''} ${user.apellido || ''}`.trim() || user.username;
+  }
+
+  /**
+   * Formatear fecha de último login
+   */
+  formatLastLogin(date: Date | null | undefined): string {
+    if (!date) return 'Nunca';
+    
+    const now = new Date();
+    const loginDate = new Date(date);
+    const diffMs = now.getTime() - loginDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return 'Hoy';
+    } else if (diffDays === 1) {
+      return 'Ayer';
+    } else if (diffDays < 7) {
+      return `Hace ${diffDays} días`;
+    } else {
+      return loginDate.toLocaleDateString('es-ES');
+    }
+  }
+
+  /**
+   * Obtener estado del usuario
+   */
+  getUserStatus(user: User): { text: string; color: string } {
+    if (user.isActive) {
+      return { text: 'Activo', color: 'success' };
+    } else {
+      return { text: 'Inactivo', color: 'danger' };
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { 
@@ -37,12 +37,22 @@ import {
   alertCircleOutline,
   checkmarkCircleOutline,
   cashOutline,
-  walletOutline
+  walletOutline, 
+  timeOutline, 
+  trophyOutline 
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../shared/enums';
 import { MercadosService } from '../mercados/mercados.service';
-import { StatsService, LocalesStats, FacturasStats } from '../../shared/services/stats.service';
+import { DashboardService } from './dashboard.service';
+import { 
+  DashboardStatistics, 
+  DashboardKPI, 
+  TopItem, 
+  FinancialMetrics,
+  InvoiceMetrics,
+  EntityMetrics
+} from '../../shared/interfaces';
 
 interface DashboardCard {
   title: string;
@@ -65,7 +75,9 @@ interface QuickStat {
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
-  standalone: true,  imports: [    CommonModule,
+  standalone: true,
+  imports: [
+    CommonModule,
     IonContent,
     IonHeader,
     IonTitle,
@@ -88,38 +100,155 @@ export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private mercadosService = inject(MercadosService);
-  private statsService = inject(StatsService);
+  private dashboardService = inject(DashboardService);
 
-  // Signals
+  // Signals principales
   isLoading = signal<boolean>(true);
   dashboardCards = signal<DashboardCard[]>([]);
   quickStats = signal<QuickStat[]>([]);
   
-  // Statistics Signals
-  mercadosStats = signal<any>(null);
-  localesStats = signal<LocalesStats | null>(null);
-  facturasStats = signal<FacturasStats | null>(null);
+  // Nuevas statistics signals para el endpoint mejorado
+  dashboardStats = signal<DashboardStatistics | null>(null);
   statsLoading = signal(true);
   statsError = signal<string | null>(null);
+  lastUpdated = signal<Date | null>(null);
 
-  // Computed signals
+  // Computed signals para métricas específicas
+  financialStats = computed(() => this.dashboardStats()?.financial);
+  invoiceStats = computed(() => this.dashboardStats()?.invoices);
+  entityStats = computed(() => this.dashboardStats()?.entities);
+
+  // Legacy computed para compatibilidad
+  mercadosStats = computed(() => ({
+    total_mercados: this.entityStats()?.totalMarkets || 0,
+    locales_ocupados: Math.round((this.entityStats()?.totalLocals || 0) * (this.entityStats()?.occupancyRate || 0) / 100),
+    ocupacion_percentage: this.entityStats()?.occupancyRate || 0
+  }));
+  
+  localesStats = computed(() => ({
+    total_locales: this.entityStats()?.totalLocals || 0,
+    locales_activos: this.entityStats()?.activeLocals || 0
+  }));
+
+  facturasStats = computed(() => ({
+    total_facturas: this.invoiceStats()?.generated || 0,
+    monto_total: this.financialStats()?.totalRevenue || 0,
+    facturas_vencidas: this.invoiceStats()?.overdue || 0,
+    facturas_pendientes: this.invoiceStats()?.pending || 0,
+    facturas_pagadas: this.invoiceStats()?.paid || 0,
+    monto_pendiente: this.invoiceStats()?.pendingAmount || 0,
+    monto_vencido: this.invoiceStats()?.overdueAmount || 0
+  }));
+
+  // Computed para top 3 mercados por recaudación
+  topMarketsByRevenue = computed(() => {
+    const markets = this.financialStats()?.revenueByMarket;
+    if (!markets) return [];
+    
+    return markets
+      .slice(0, 3)
+      .map(market => ({
+        id: market.marketId,
+        name: market.marketName,
+        total: market.total,
+        percentage: market.percentageOfTotalRevenue,
+        averagePerLocal: market.averageRevenuePerLocal,
+        totalLocals: market.totalLocals
+      }));
+  });
+
+  // Estadísticas adicionales importantes
+  additionalStats = computed(() => {
+    const stats = this.dashboardStats();
+    if (!stats) return null;
+    
+    return {
+      localesConPagos: stats.entities.localsWithPaymentsThisMonth,
+      promedioLocalesPorMercado: stats.entities.averageLocalsPerMarket,
+      eficienciaCobranza: stats.invoices.collectionEfficiency,
+      ingresoMensual: stats.financial.monthlyRevenue,
+      ingresoAnual: stats.financial.annualRevenue,
+      ingresoTotal: stats.financial.totalRevenue,
+      // Nuevos campos de ingresos esperados
+      ingresoMensualEsperado: stats.financial.expectedMonthlyRevenue,
+      ingresoAnualEsperado: stats.financial.expectedAnnualRevenue,
+      // Cálculos de cumplimiento
+      cumplimientoMensual: (stats.financial.monthlyRevenue / stats.financial.expectedMonthlyRevenue) * 100,
+      cumplimientoAnual: (stats.financial.annualRevenue / stats.financial.expectedAnnualRevenue) * 100
+    };
+  });
+
+  // KPIs principales computados
+  mainKPIs = computed(() => {
+    const stats = this.dashboardStats();
+    if (!stats) return [];
+    return this.dashboardService.createMainKPIs(stats);
+  });
+
+  // Top markets y locales computados
+  topMarkets = computed(() => {
+    const markets = this.financialStats()?.revenueByMarket;
+    if (!markets) return [];
+    return this.dashboardService.createTopMarkets(markets);
+  });
+
+  topLocals = computed(() => {
+    const locals = this.financialStats()?.revenueByLocal;
+    if (!locals) return [];
+    return this.dashboardService.createTopLocals(locals);
+  });
+
+  // Métricas de rendimiento computadas
+  paymentRateColor = computed(() => {
+    const rate = this.invoiceStats()?.paymentRate || 0;
+    return this.dashboardService.getPerformanceColor(rate);
+  });
+
+  overdueRateColor = computed(() => {
+    const rate = this.invoiceStats()?.overdueRate || 0;
+    return this.dashboardService.getOverdueRateColor(rate);
+  });
+
+  occupancyRateColor = computed(() => {
+    const rate = this.entityStats()?.occupancyRate || 0;
+    return this.dashboardService.getPerformanceColor(rate);
+  });
+
+  // Legacy computed signals
   user = this.authService.user;
   userRole = this.authService.userRole;
   userName = this.authService.userName;
+
   constructor() {
     addIcons({
-      refreshOutline, logOutOutline, chevronForwardOutline, addOutline,
-      statsChartOutline, settingsOutline, homeOutline, businessOutline,
-      storefrontOutline, receiptOutline, peopleOutline, trendingUpOutline, 
-      trendingDownOutline, alertCircleOutline, checkmarkCircleOutline,
-      cashOutline, walletOutline
+      refreshOutline,
+      logOutOutline,
+      businessOutline,
+      storefrontOutline,
+      cashOutline,
+      receiptOutline,
+      walletOutline,
+      alertCircleOutline,
+      timeOutline,
+      trophyOutline,
+      chevronForwardOutline,
+      addOutline,
+      statsChartOutline,
+      settingsOutline,
+      homeOutline,
+      peopleOutline,
+      trendingUpOutline,
+      trendingDownOutline,
+      checkmarkCircleOutline
     });
   }
 
   ngOnInit() {
     this.initializeDashboard();
-  }  /**
-   * Inicializar dashboard
+  }
+
+  /**
+   * Inicializar dashboard con el nuevo endpoint
    */
   private async initializeDashboard(): Promise<void> {
     this.isLoading.set(true);
@@ -129,10 +258,13 @@ export class DashboardPage implements OnInit {
       // Initialize dashboard cards
       this.setupDashboardCards();
       
-      // Load stats from API
-      await this.loadStats();
+      // Load stats from new endpoint
+      await this.loadDashboardStats();
       
-      // Initialize quick stats
+      // Update cards with real data
+      this.updateCardCounts();
+      
+      // Initialize quick stats based on new data
       this.setupQuickStats();
     } catch (error) {
       console.error('Error initializing dashboard:', error);
@@ -140,101 +272,134 @@ export class DashboardPage implements OnInit {
     } finally {
       this.isLoading.set(false);
       this.statsLoading.set(false);
-    }try {
-      // Inicializar tarjetas del dashboard
-      this.setupDashboardCards();
+    }
+  }
+
+  /**
+   * Cargar estadísticas desde el nuevo endpoint
+   */
+  async loadDashboardStats(): Promise<void> {
+    try {
+      this.statsLoading.set(true);
+      this.statsError.set(null);
       
-      // Cargar estadísticas
-      await this.loadStats();
+      const stats = await this.dashboardService.getDashboardStatistics().toPromise();
       
-      // Setupear quick stats
-      this.setupQuickStats();
-    } catch (error) {
-      console.error('Error initializing dashboard:', error);
-      this.statsError.set('Error al cargar estadísticas');
+      if (stats) {
+        this.dashboardStats.set(stats);
+        this.lastUpdated.set(new Date());
+        console.log('✅ Dashboard statistics loaded successfully:', stats);
+      } else {
+        throw new Error('No data received from dashboard endpoint');
+      }
+      
+    } catch (error: any) {
+      console.error('❌ Error loading dashboard statistics:', error);
+      this.statsError.set(error.message || 'Error al cargar estadísticas del dashboard');
+      
+      // Intentar cargar datos del cache como fallback
+      const cachedData = this.getCachedFallbackData();
+      if (cachedData) {
+        this.dashboardStats.set(cachedData);
+        this.statsError.set('Mostrando datos en caché - Sin conexión');
+      }
     } finally {
-      this.isLoading.set(false);
       this.statsLoading.set(false);
     }
   }
-  
+
   /**
-   * Cargar estadísticas
+   * Refresh de datos (pull-to-refresh)
    */
-  private async loadStats(): Promise<void> {
+  async refresh(): Promise<void> {
+    console.log('🔄 Refreshing dashboard data...');
+    
     try {
-      // Fetch all stats in parallel      // Only use for demo - replace with real API calls and proper error handling
-      try {
-        const mercadosStats = await this.mercadosService.getAllMarketStats().toPromise();
-        this.mercadosStats.set(mercadosStats);
-      } catch (error) {
-        console.error('Error fetching mercados stats:', error);
+      const stats = await this.dashboardService.refreshDashboardStatistics().toPromise();
+      
+      if (stats) {
+        this.dashboardStats.set(stats);
+        this.lastUpdated.set(new Date());
+        this.statsError.set(null);
+        console.log('✅ Dashboard refreshed successfully');
       }
       
-      try {
-        const localesStats = await this.statsService.getLocalesStats().toPromise();
-        this.localesStats.set(localesStats || null);
-      } catch (error) {
-        console.error('Error fetching locales stats:', error);
-      }
-      
-      try {
-        const facturasStats = await this.statsService.getFacturasStats().toPromise();
-        this.facturasStats.set(facturasStats || null);
-      } catch (error) {
-        console.error('Error fetching facturas stats:', error);
-      }
-      
-      // Update cards with real statistics
-      this.updateCardCounts();
-      
-      // Setup quick stats based on real data
-      this.setupQuickStats();
-    } catch (error) {
-      console.error('Error loading stats:', error);
-      this.statsError.set('Error al cargar estadísticas');
+    } catch (error: any) {
+      console.error('❌ Error refreshing dashboard:', error);
+      this.statsError.set('Error al actualizar datos');
     }
   }
+
+  /**
+   * Datos de fallback desde cache o valores por defecto
+   */
+  private getCachedFallbackData(): DashboardStatistics | null {
+    // Implementar lógica de fallback si es necesario
+    return null;
+  }
+
+  /**
+   * Métodos de formateo utilizando el service
+   */
+  formatCurrency = (amount: number | undefined): string => {
+    if (amount === undefined || amount === null) return 'L. 0.00';
+    return this.dashboardService.formatCurrency(amount);
+  };
+
+  formatCurrencyCompact = (amount: number | undefined): string => {
+    if (amount === undefined || amount === null) return 'L. 0';
+    return this.dashboardService.formatCurrencyCompact(amount);
+  };
+
+  formatPercentage = (value: number | undefined, decimals = 1): string => {
+    if (value === undefined || value === null) return '0%';
+    return this.dashboardService.formatPercentage(value, decimals);
+  };
+
+  formatNumber = (value: number | undefined): string => {
+    if (value === undefined || value === null) return '0';
+    return this.dashboardService.formatNumber(value);
+  };
   
   /**
-   * Update card counts with real statistics
+   * Actualizar contadores de las cards con datos reales
    */
   private updateCardCounts(): void {
-    const cards = [...this.dashboardCards()];
+    const dashStats = this.dashboardStats();
+    if (!dashStats) return;
+
+    const cards = this.dashboardCards();
     
-    // Update Mercados card
-    if (this.mercadosStats()) {
-      const mercadoCard = cards.find(card => card.title === 'Mercados');
-      if (mercadoCard) {
-        mercadoCard.count = this.mercadosStats().total_mercados || 0;
-        mercadoCard.subtitle = `${this.mercadosStats().locales_ocupados || 0} ocupados`;
-      }
+    // Actualizar card de Mercados
+    const mercadoCard = cards.find(card => card.title === 'Mercados');
+    if (mercadoCard) {
+      mercadoCard.count = dashStats.entities.totalMarkets;
+      mercadoCard.subtitle = `${dashStats.entities.activeMarkets} activos`;
     }
-      // Update Locales card
-    if (this.localesStats()) {
-      const localCard = cards.find(card => card.title === 'Locales');
-      if (localCard) {
-        localCard.count = this.localesStats()?.total_locales || 0;
-        localCard.subtitle = `${this.localesStats()?.locales_activos || 0} activos`;
-      }
+
+    // Actualizar card de Locales
+    const localCard = cards.find(card => card.title === 'Locales');
+    if (localCard) {
+      localCard.count = dashStats.entities.totalLocals;
+      const ocupados = Math.round(dashStats.entities.totalLocals * dashStats.entities.occupancyRate / 100);
+      localCard.subtitle = `${ocupados} ocupados`;
     }
-    
-    // Update Facturas card
-    if (this.facturasStats()) {
-      const facturaCard = cards.find(card => card.title === 'Facturas');
-      if (facturaCard) {
-        facturaCard.count = this.facturasStats()?.total_facturas || 0;
-        facturaCard.subtitle = `${this.facturasStats()?.facturas_pendientes || 0} pendientes`;
-      }
+
+    // Actualizar card de Facturas
+    const facturaCard = cards.find(card => card.title === 'Facturas');
+    if (facturaCard) {
+      facturaCard.count = dashStats.invoices.generated;
+      facturaCard.subtitle = `${dashStats.invoices.paid} pagadas, ${dashStats.invoices.pending} pendientes`;
     }
-      this.dashboardCards.set(cards);
-  }
-  /**
-   * Cargar datos del dashboard de forma simulada (para desarrollo)
-   */
-  private async loadDashboardData(): Promise<void> {
-    // Simular carga para propósitos de desarrollo
-    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Actualizar card de Usuarios
+    const usuarioCard = cards.find(card => card.title === 'Usuarios');
+    if (usuarioCard) {
+      usuarioCard.count = dashStats.entities.totalUsers;
+      usuarioCard.subtitle = `${dashStats.entities.activeUsers} activos`;
+    }
+
+    this.dashboardCards.set([...cards]); // Trigger change detection
   }
 
   /**
@@ -290,33 +455,57 @@ export class DashboardPage implements OnInit {
   }
 
   /**
-   * Configurar estadísticas rápidas
+   * Configurar estadísticas rápidas basadas en datos reales
    */
   private setupQuickStats(): void {
+    const dashStats = this.dashboardStats();
+    if (!dashStats) {
+      this.quickStats.set([]);
+      return;
+    }
+
     const stats: QuickStat[] = [
       {
         label: 'Recaudación Mensual',
-        value: 'S/. 45,280',
+        value: this.formatCurrency(dashStats.financial.monthlyRevenue),
         trend: 'up',
         color: 'success'
       },
       {
-        label: 'Ocupación',
-        value: '80.8%',
+        label: 'Recaudación Anual',
+        value: this.formatCurrency(dashStats.financial.annualRevenue),
         trend: 'up',
         color: 'primary'
       },
       {
         label: 'Facturas Vencidas',
-        value: '15',
-        trend: 'down',
-        color: 'danger'
+        value: dashStats.invoices.overdue.toString(),
+        trend: dashStats.invoices.overdue <= 10 ? 'up' : dashStats.invoices.overdue <= 25 ? 'neutral' : 'down',
+        color: dashStats.invoices.overdue <= 10 ? 'success' : dashStats.invoices.overdue <= 25 ? 'warning' : 'danger'
       },
       {
-        label: 'Nuevos Registros',
-        value: '+8',
+        label: 'Facturas Pagadas',
+        value: dashStats.invoices.paid.toString(),
+        trend: 'up',
+        color: 'success'
+      },
+      {
+        label: 'Facturas Pendientes',
+        value: dashStats.invoices.pending.toString(),
+        trend: dashStats.invoices.pending <= 15 ? 'up' : dashStats.invoices.pending <= 30 ? 'neutral' : 'down',
+        color: dashStats.invoices.pending <= 15 ? 'success' : dashStats.invoices.pending <= 30 ? 'warning' : 'danger'
+      },
+      {
+        label: 'Locales con Pagos',
+        value: dashStats.entities.localsWithPaymentsThisMonth.toString(),
+        trend: 'up',
+        color: 'secondary'
+      },
+      {
+        label: 'Monto Pendiente',
+        value: this.formatCurrency(dashStats.invoices.pendingAmount),
         trend: 'neutral',
-        color: 'medium'
+        color: 'warning'
       }
     ];
 
@@ -331,17 +520,52 @@ export class DashboardPage implements OnInit {
   }
 
   /**
-   * Cerrar sesión
+   * Navegar al detalle de un mercado específico
    */
-  logout(): void {
-    this.authService.logout().subscribe();
+  navigateToMarket(marketId: string): void {
+    this.router.navigate(['/mercados', marketId]);
   }
 
   /**
-   * Refrescar dashboard
+   * Navegar al detalle de un local específico
    */
-  async refresh(): Promise<void> {
-    await this.initializeDashboard();
+  navigateToLocal(localId: string): void {
+    this.router.navigate(['/locales', localId]);
+  }
+
+  /**
+   * Navegar a la gestión de facturas con filtros
+   */
+  navigateToInvoices(filter?: 'pending' | 'overdue' | 'paid'): void {
+    const route = ['/facturas'];
+    if (filter) {
+      route.push({ queryParams: { status: filter } } as any);
+    }
+    this.router.navigate(route);
+  }
+
+  /**
+   * Cerrar sesión
+   */
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  /**
+   * Obtener fecha formateada de última actualización
+   */
+  getLastUpdated(): string {
+    const date = this.lastUpdated();
+    if (!date) return 'Nunca';
+    
+    return date.toLocaleString('es-HN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   /**
@@ -363,11 +587,60 @@ export class DashboardPage implements OnInit {
     }
   }
 
+  /**
+   * Obtener fecha actual formateada
+   */
   getCurrentDate(): string {
-    return new Date().toLocaleDateString('es-ES', {
+    return new Date().toLocaleDateString('es-HN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  /**
+   * Obtener ícono según tendencia
+   */
+  getTrendIcon(trend?: string): string {
+    switch (trend) {
+      case 'up': return 'trending-up-outline';
+      case 'down': return 'trending-down-outline';
+      default: return 'remove-outline';
+    }
+  }
+
+  /**
+   * Manejar click en KPI card
+   */
+  onKPIClick(kpi: DashboardKPI): void {
+    // Navegar a la sección correspondiente según el tipo de KPI
+    switch (kpi.label) {
+      case 'Ingresos Totales':
+      case 'Ingresos Mensuales':
+        this.navigateTo('/facturas');
+        break;
+      case 'Tasa de Pago':
+        this.navigateToInvoices('paid');
+        break;
+      case 'Ocupación':
+        this.navigateTo('/locales');
+        break;
+      default:
+        console.log('KPI clicked:', kpi.label);
+    }
+  }
+
+  /**
+   * Manejar click en top market item
+   */
+  onTopMarketClick(market: TopItem): void {
+    this.navigateToMarket(market.id);
+  }
+
+  /**
+   * Manejar click en top local item
+   */
+  onTopLocalClick(local: TopItem): void {
+    this.navigateToLocal(local.id);
   }
 }

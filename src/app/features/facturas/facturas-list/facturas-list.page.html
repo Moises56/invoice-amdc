@@ -1,22 +1,282 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>Facturas</ion-title>
     <ion-buttons slot="end">
-      <ion-button routerLink="/facturas/nueva">
+      <ion-button (click)="createFactura()" fill="clear">
         <ion-icon name="add-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="p-4">
-    <ion-text>
-      <h2>Gestión de Facturas</h2>
-      <p>Módulo en desarrollo...</p>
-    </ion-text>
+<ion-content [fullscreen]="true" class="facturas-page">
+  <!-- Header fijo con controles -->
+  <div class="sticky-header">
+    <!-- Título y estadísticas -->
+    <div class="header-stats">
+      <h1>Gestión de Facturas</h1>
+      <div class="stats-cards">
+        <div class="stat-item">
+          <ion-icon name="receipt-outline"></ion-icon>
+          <div>
+            <span class="stat-number">{{ totalItems() }}</span>
+            <span class="stat-label">Total</span>
+          </div>
+        </div>
+        <div class="stat-item success">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <div>
+            <span class="stat-number">{{ filteredByEstado('pagada').length }}</span>
+            <span class="stat-label">Pagadas</span>
+          </div>
+        </div>
+        <div class="stat-item pending">
+          <ion-icon name="time-outline"></ion-icon>
+          <div>
+            <span class="stat-number">{{ filteredByEstado('pendiente').length }}</span>
+            <span class="stat-label">Pendientes</span>
+          </div>
+        </div>
+        <div class="stat-item cancelled">
+          <ion-icon name="close-circle-outline"></ion-icon>
+          <div>
+            <span class="stat-number">{{ filteredByEstado('anulada').length }}</span>
+            <span class="stat-label">Anuladas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buscador y filtros -->
+    <div class="search-filters">
+      <ion-searchbar 
+        [(ngModel)]="searchTerm"
+        (ionInput)="onSearch($event)"
+        placeholder="Buscar por número, local, propietario, DNI..."
+        debounce="500"
+        show-clear-button="focus">
+      </ion-searchbar>
+      
+      <div class="filters-row">
+        <ion-item class="filter-item">
+          <ion-select 
+            [(ngModel)]="selectedEstado"
+            (ionChange)="onEstadoChange($event)"
+            placeholder="Estado"
+            interface="popover">
+            <ion-select-option value="">Todos los estados</ion-select-option>
+            <ion-select-option value="pendiente">Pendiente</ion-select-option>
+            <ion-select-option value="pagada">Pagada</ion-select-option>
+            <ion-select-option value="anulada">Anulada</ion-select-option>
+            <ion-select-option value="vencida">Vencida</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="filter-item">
+          <ion-select 
+            [(ngModel)]="selectedMes"
+            (ionChange)="onMesChange($event)"
+            placeholder="Mes"
+            interface="popover">
+            <ion-select-option value="">Todos los meses</ion-select-option>
+            <ion-select-option value="01">Enero</ion-select-option>
+            <ion-select-option value="02">Febrero</ion-select-option>
+            <ion-select-option value="03">Marzo</ion-select-option>
+            <ion-select-option value="04">Abril</ion-select-option>
+            <ion-select-option value="05">Mayo</ion-select-option>
+            <ion-select-option value="06">Junio</ion-select-option>
+            <ion-select-option value="07">Julio</ion-select-option>
+            <ion-select-option value="08">Agosto</ion-select-option>
+            <ion-select-option value="09">Septiembre</ion-select-option>
+            <ion-select-option value="10">Octubre</ion-select-option>
+            <ion-select-option value="11">Noviembre</ion-select-option>
+            <ion-select-option value="12">Diciembre</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="filter-item">
+          <ion-select 
+            [(ngModel)]="selectedAnio"
+            (ionChange)="onAnioChange($event)"
+            placeholder="Año"
+            interface="popover">
+            <ion-select-option [value]="year" *ngFor="let year of availableYears()">{{ year }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button 
+          fill="clear" 
+          (click)="clearFilters()"
+          class="clear-filters-btn">
+          <ion-icon name="refresh-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
   </div>
+
+  <!-- Refresher -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pulling-icon="chevron-down-circle-outline"
+      pulling-text="Desliza para actualizar"
+      refreshing-spinner="circles"
+      refreshing-text="Actualizando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading()" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando facturas...</p>
+  </div>
+
+  <!-- Lista de facturas -->
+  <div *ngIf="!loading()" class="facturas-content">
+    <!-- Grid de facturas -->
+    <ion-grid class="facturas-grid">
+      <ion-row>
+        <ion-col 
+          *ngFor="let factura of facturas(); trackBy: trackByFactura"
+          size="12" 
+          size-md="6" 
+          size-lg="3">
+          <ion-card 
+            class="factura-card"
+            [class.pendiente]="factura.estado === 'PENDIENTE'"
+            [class.pagada]="factura.estado === 'PAGADA'"
+            [class.anulada]="factura.estado === 'ANULADA'"
+            [class.vencida]="factura.estado === 'VENCIDA'"
+            (click)="viewFactura(factura)">
+            
+            <ion-card-header>
+              <div class="card-header-row">
+                <div class="factura-number">
+                  <ion-icon name="receipt-outline"></ion-icon>
+                  <span>#{{ factura.numero_factura || factura.id }}</span>
+                </div>
+                <div 
+                  class="status-badge"
+                  [class.pendiente]="factura.estado === 'PENDIENTE'"
+                  [class.pagada]="factura.estado === 'PAGADA'"
+                  [class.anulada]="factura.estado === 'ANULADA'"
+                  [class.vencida]="factura.estado === 'VENCIDA'">
+                  <ion-icon [name]="getEstadoIcon(factura.estado)"></ion-icon>
+                  {{ factura.estado | titlecase }}
+                </div>
+              </div>
+              
+              <ion-card-title class="local-info">
+                <ion-icon name="business-outline"></ion-icon>
+                {{ factura.mercado_nombre }} - Local {{ factura.local_numero }}
+              </ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+              <div class="factura-details">
+                <!-- Propietario -->
+                <div class="detail-row">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Propietario</span>
+                    <span class="detail-value">{{ factura.propietario_nombre }}</span>
+                  </div>
+                </div>
+
+                <!-- Periodo -->
+                <div class="detail-row">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Periodo</span>
+                    <span class="detail-value">
+                      {{ getMesNombre(factura.mes) }} {{ factura.anio }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Monto -->
+                <div class="detail-row monto-row">
+                  <ion-icon name="card-outline"></ion-icon>
+                  <div class="detail-content">
+                    <span class="detail-label">Monto Total</span>
+                    <span class="detail-value monto">{{ formatMonto(factura.monto) }}</span>
+                  </div>
+                </div>
+
+                <!-- Fechas importantes -->
+                <div class="dates-section">
+                  <div class="date-item" *ngIf="factura.createdAt">
+                    <span class="date-label">Emitida:</span>
+                    <span class="date-value">{{ formatFecha(factura.createdAt) }}</span>
+                  </div>
+                  <div class="date-item" *ngIf="factura.fecha_vencimiento">
+                    <span class="date-label">Vence:</span>
+                    <span class="date-value">{{ formatFecha(factura.fecha_vencimiento) }}</span>
+                  </div>
+                  <div class="date-item" *ngIf="factura.fecha_pago && factura.estado === 'PAGADA'">
+                    <span class="date-label">Pagada:</span>
+                    <span class="date-value">{{ formatFecha(factura.fecha_pago) }}</span>
+                  </div>
+                </div>
+
+                <!-- Concepto -->
+                <div class="concepto-section">
+                  <div class="detail-row">
+                    <ion-icon name="document-text-outline"></ion-icon>
+                    <div class="detail-content">
+                      <span class="detail-label">Concepto</span>
+                      <span class="detail-value">{{ factura.concepto }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acciones rápidas -->
+              <div class="quick-actions">
+                <ion-button 
+                  size="small" 
+                  fill="clear" 
+                  (click)="viewFactura(factura); $event.stopPropagation()">
+                  <ion-icon name="eye-outline"></ion-icon>
+                  Ver
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Estado vacío -->
+    <div *ngIf="facturas().length === 0" class="empty-state">
+      <ion-icon name="receipt-outline" size="large"></ion-icon>
+      <h3>No se encontraron facturas</h3>
+      <p>No hay facturas que coincidan con los filtros seleccionados.</p>
+      <ion-button 
+        (click)="clearFilters()" 
+        fill="outline">
+        Limpiar filtros
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Infinite scroll -->
+  <ion-infinite-scroll 
+    threshold="100px" 
+    (ionInfinite)="loadMore($event)"
+    [disabled]="currentPage() >= totalPages()">
+    <ion-infinite-scroll-content
+      loading-spinner="bubbles"
+      loading-text="Cargando más facturas...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+  <!-- FAB para crear nueva factura -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="createFactura()" color="primary">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

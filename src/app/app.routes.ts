@@ -46,7 +46,7 @@ export const routes: Routes = [
     path: 'audit',
     loadChildren: () => import('./features/audit/audit.routes').then(m => m.routes),
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: [Role.ADMIN, Role.AUDITOR] }
+    data: { roles: [Role.ADMIN] }
   },
   {
     path: 'bluetooth',

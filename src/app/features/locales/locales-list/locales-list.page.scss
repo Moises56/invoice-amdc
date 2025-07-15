@@ -1,1 +1,259 @@
 // Locales list page styles
+@use 'sass:color';
+
+// Color principal
+$primary-color: #5ccedf;
+
+// Search container
+.search-container {
+  padding: 16px;
+  background: linear-gradient(135deg, $primary-color 0%, color.adjust($primary-color, $lightness: 10%) 100%);
+  
+  ion-searchbar {
+    --border-radius: 25px;
+    --box-shadow: 0 4px 12px rgba(92, 206, 223, 0.2);
+    margin: 0;
+  }
+}
+
+// Loading state
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  
+  ion-spinner {
+    margin-bottom: 16px;
+    transform: scale(1.5);
+  }
+  
+  p {
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// Local cards
+.local-card {
+  margin: 8px 0;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  ion-card-header {
+    padding: 16px 16px 8px 16px;
+  }
+  
+  ion-card-content {
+    padding: 8px 16px 16px 16px;
+  }
+}
+
+// Card header
+.card-header-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  
+  .tipo-icon {
+    font-size: 24px;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  
+  .local-info {
+    flex: 1;
+    min-width: 0;
+    
+    .local-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .estado-badge {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+  }
+}
+
+// Detail rows
+.local-details {
+  .detail-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .detail-icon {
+      font-size: 16px;
+      color: #666;
+      flex-shrink: 0;
+      width: 20px;
+    }
+    
+    .detail-text {
+      font-size: 14px;
+      color: #555;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  
+  .monto-row {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+    
+    .monto-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: $primary-color;
+    }
+  }
+  
+  .facturas-chip {
+    margin-top: 8px;
+    
+    ion-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+}
+
+// Empty state
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  padding: 32px;
+  text-align: center;
+  
+  .empty-icon {
+    font-size: 64px;
+    color: #ddd;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    color: #666;
+    margin-bottom: 8px;
+    font-size: 20px;
+  }
+  
+  p {
+    color: #999;
+    margin-bottom: 24px;
+    max-width: 300px;
+  }
+  
+  ion-button {
+    --border-radius: 25px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+  }
+}
+
+// Stats footer
+.stats-footer {
+  padding: 16px;
+  text-align: center;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .local-card {
+    margin: 4px 0;
+    
+    .card-header-content {
+      .local-title {
+        font-size: 15px;
+      }
+    }
+    
+    .local-details .detail-row {
+      .detail-text {
+        font-size: 13px;
+      }
+    }
+  }
+  
+  .search-container {
+    padding: 12px;
+  }
+}
+
+// FAB styling
+ion-fab-button {
+  --box-shadow: 0 4px 16px rgba(92, 206, 223, 0.4);
+  
+  &:hover {
+    --box-shadow: 0 6px 20px rgba(92, 206, 223, 0.5);
+  }
+}
+
+// Grid spacing
+ion-grid {
+  padding: 8px;
+  
+  ion-row {
+    ion-col {
+      padding: 4px;
+    }
+  }
+}
+
+// Infinite scroll styling
+ion-infinite-scroll-content {
+  .infinite-loading {
+    color: $primary-color;
+  }
+}
+
+// Badge colors
+ion-badge {
+  &[color="success"] {
+    --background: #28a745;
+  }
+  
+  &[color="danger"] {
+    --background: #dc3545;
+  }
+  
+  &[color="medium"] {
+    --background: #6c757d;
+  }
+}
