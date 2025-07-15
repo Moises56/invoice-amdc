@@ -43,8 +43,8 @@ export const routes: Routes = [
     data: { roles: [Role.ADMIN, Role.MARKET, Role.USER] }
   },
   {
-    path: 'audit',
-    loadChildren: () => import('./features/audit/audit.routes').then(m => m.routes),
+    path: 'auditoria',
+    loadChildren: () => import('./features/auditoria/auditoria.routes').then(m => m.routes),
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: [Role.ADMIN] }
   },

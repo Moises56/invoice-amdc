@@ -1,0 +1,506 @@
+<ion-header>
+  <ion-toolbar class="bg-gradient-to-r from-blue-600 to-blue-800">
+    <ion-buttons slot="start">
+      <ion-menu-button class="text-white"></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="text-white font-bold text-xl">
+      📊 Panel de Auditoría
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gradient-to-br from-gray-50 to-blue-50">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="p-4 max-w-7xl mx-auto">
+    
+    <!-- Loading State - Mejorado -->
+    <div *ngIf="isLoading()" class="space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <ion-card class="animate-pulse" *ngFor="let item of [1,2,3,4]">
+          <ion-card-content class="p-6">
+            <div class="flex flex-col items-center space-y-3">
+              <div class="w-12 h-12 bg-gray-300 rounded-full"></div>
+              <div class="w-16 h-6 bg-gray-300 rounded"></div>
+              <div class="w-20 h-4 bg-gray-200 rounded"></div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Error State - Mejorado -->
+    <div *ngIf="!isLoading() && error()" class="text-center py-12">
+      <div class="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md mx-auto">
+        <ion-icon name="alert-circle-outline" class="text-6xl text-red-500 mb-4"></ion-icon>
+        <h2 class="text-xl font-semibold text-red-700 mb-2">Error al cargar datos</h2>
+        <p class="text-red-600 mb-4">{{ error() }}</p>
+        <ion-button fill="solid" color="danger" (click)="loadDashboardData()">
+          <ion-icon name="refresh-outline" slot="start"></ion-icon>
+          Reintentar
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Dashboard Content - Completamente Rediseñado -->
+    <div *ngIf="!isLoading() && !error()" class="space-y-6">
+      
+      <!-- Statistics Cards - Layout en una línea mejorado con mejor contraste -->
+      <div class="grid grid-cols-4 gap-4">
+        <!-- Total Logs -->
+        <ion-card class="stats-card cursor-pointer hover:shadow-lg transition-all duration-300" 
+                  (click)="navigateToLogs()"
+                  style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #5ccedf; box-shadow: 0 4px 6px -1px rgba(92, 206, 223, 0.1);">
+          <ion-card-content class="p-4 text-center">
+            <div>
+              <ion-icon name="document-text-outline" class="text-3xl mb-3" style="color: #5ccedf;"></ion-icon>
+              <p class="text-sm font-semibold text-gray-600 mb-2">Logs</p>
+              <p class="text-3xl font-bold" style="color: #374151;">{{ stats()?.total_logs || recentActivity().length || 0 }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Today's Logs -->
+        <ion-card class="stats-card hover:shadow-lg transition-all duration-300"
+                  style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #5ccedf; box-shadow: 0 4px 6px -1px rgba(92, 206, 223, 0.1);">
+          <ion-card-content class="p-4 text-center">
+            <div>
+              <ion-icon name="calendar-outline" class="text-3xl mb-3" style="color: #5ccedf;"></ion-icon>
+              <p class="text-sm font-semibold text-gray-600 mb-2">Hoy</p>
+              <p class="text-3xl font-bold" style="color: #374151;">{{ stats()?.logs_today || getTodayLogsCount() || 0 }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- By Table: Auth -->
+        <ion-card class="stats-card hover:shadow-lg transition-all duration-300"
+                  style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #5ccedf; box-shadow: 0 4px 6px -1px rgba(92, 206, 223, 0.1);">
+          <ion-card-content class="p-4 text-center">
+            <div>
+              <ion-icon name="shield-checkmark-outline" class="text-3xl mb-3" style="color: #5ccedf;"></ion-icon>
+              <p class="text-sm font-semibold text-gray-600 mb-2">Auth</p>
+              <p class="text-3xl font-bold" style="color: #374151;">{{ getTableCount('auth') }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- By Table: Dashboard -->
+        <ion-card class="stats-card hover:shadow-lg transition-all duration-300"
+                  style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 2px solid #5ccedf; box-shadow: 0 4px 6px -1px rgba(92, 206, 223, 0.1);">
+          <ion-card-content class="p-4 text-center">
+            <div>
+              <ion-icon name="grid-outline" class="text-3xl mb-3" style="color: #5ccedf;"></ion-icon>
+              <p class="text-sm font-semibold text-gray-600 mb-2">Dash</p>
+              <p class="text-3xl font-bold" style="color: #374151;">{{ getTableCount('dashboard') }}</p>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+
+      <!-- Operations Summary - Diseño Estilo GitHub -->
+      <ion-card class="border-0 overflow-hidden">
+        <div class="section-header">
+          <h2>
+            <ion-icon name="stats-chart-outline" class="text-xl"></ion-icon>
+            Operaciones por Tipo
+          </h2>
+        </div>
+        
+        <div class="operations-grid">
+          <!-- LOGIN -->
+          <div class="operation-item">
+            <div class="icon-wrapper blue">
+              <ion-icon name="log-in-outline" class="text-xl"></ion-icon>
+            </div>
+            <div class="count">{{ getOperationCount('LOGIN') }}</div>
+            <div class="label">LOGIN</div>
+            <ion-chip>{{ getOperationPercentage('LOGIN') }}%</ion-chip>
+          </div>
+
+          <!-- VIEW_STATISTICS -->
+          <div class="operation-item">
+            <div class="icon-wrapper green">
+              <ion-icon name="eye-outline" class="text-xl"></ion-icon>
+            </div>
+            <div class="count">{{ getOperationCount('VIEW_STATISTICS') }}</div>
+            <div class="label">VIEW STATS</div>
+            <ion-chip>{{ getOperationPercentage('VIEW_STATISTICS') }}%</ion-chip>
+          </div>
+
+          <!-- RESET_PASSWORD -->
+          <div class="operation-item">
+            <div class="icon-wrapper yellow">
+              <ion-icon name="key-outline" class="text-xl"></ion-icon>
+            </div>
+            <div class="count">{{ getOperationCount('RESET_PASSWORD') }}</div>
+            <div class="label">RESET PWD</div>
+            <ion-chip>{{ getOperationPercentage('RESET_PASSWORD') }}%</ion-chip>
+          </div>
+
+          <!-- TEST_POSTMAN -->
+          <div class="operation-item">
+            <div class="icon-wrapper purple">
+              <ion-icon name="flask-outline" class="text-xl"></ion-icon>
+            </div>
+            <div class="count">{{ getOperationCount('TEST_POSTMAN') }}</div>
+            <div class="label">TEST API</div>
+            <ion-chip>{{ getOperationPercentage('TEST_POSTMAN') }}%</ion-chip>
+          </div>
+        </div>
+      </ion-card>
+
+      <!-- Registro de Actividades del Sistema - Estilo Tabla -->
+      <ion-card class="glass-card">
+        <div class="section-header">
+          <h2>
+            <ion-icon name="time-outline" class="text-lg"></ion-icon>
+            Registro de Actividades del Sistema
+            <ion-button fill="clear" size="small" class="ml-auto text-white" (click)="showAllLogsModal()">
+              Ver Todos ({{ recentActivity().length }})
+            </ion-button>
+          </h2>
+        </div>
+        
+        <ion-card-content class="p-0">
+          <!-- Filtros funcionales -->
+          <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+              <div>
+                <label class="block text-gray-600 mb-1">ID de Usuario</label>
+                <input 
+                  type="text" 
+                  placeholder="Filtrar por nombre" 
+                  class="w-full p-2 border rounded text-sm"
+                  [value]="filters().userId"
+                  (input)="onFilterChange('userId', $any($event.target).value)">
+              </div>
+              <div>
+                <label class="block text-gray-600 mb-1">Tipo de Acción</label>
+                <select 
+                  class="w-full p-2 border rounded text-sm"
+                  [value]="filters().action"
+                  (change)="onFilterChange('action', $any($event.target).value)">
+                  <option value="">Todas las acciones</option>
+                  <option *ngFor="let action of getUniqueActions()" [value]="action">{{ action }}</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button 
+                  class="px-4 py-2 bg-gray-500 text-white text-sm hover:bg-gray-600 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                  style="border-radius: 1rem; min-width: fit-content; white-space: nowrap;"
+                  (click)="resetFilters()">
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de Logs -->
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-100 border-b">
+                <tr class="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  <th class="px-4 py-3 text-left">FECHA Y HORA</th>
+                  <th class="px-4 py-3 text-left">USUARIO</th>
+                  <th class="px-4 py-3 text-left">ACCIÓN</th>
+                  <th class="px-4 py-3 text-left">DETALLES</th>
+                  <th class="px-4 py-3 text-left">DIRECCIÓN IP</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr 
+                  *ngFor="let log of getPaginatedLogs(); trackBy: trackByLogId"
+                  class="hover:bg-gray-50 cursor-pointer transition-colors"
+                  (click)="navigateToLogDetail(log.id)">
+                  
+                  <!-- Fecha y Hora -->
+                  <td class="px-4 py-3 text-sm text-gray-900">
+                    {{ formatDateTime(log.createdAt) }}
+                  </td>
+                  
+                  <!-- Usuario -->
+                  <td class="px-4 py-3">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium mr-3" 
+                           style="background: linear-gradient(135deg, #5ccedf, #4db8cc);">
+                        {{ getUserInitials(log.user?.nombre || 'Usuario') }}
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-gray-900">{{ log.user?.nombre || 'mougrind' }}</div>
+                        <div class="text-xs text-gray-500">{{ log.user?.correo || 'mougrind@amdc.hn' }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  
+                  <!-- Acción -->
+                  <td class="px-4 py-3">
+                    <span class="text-sm font-medium" style="color: #5ccedf;">
+                      {{ log.accion }}
+                    </span>
+                  </td>
+                  
+                  <!-- Detalles -->
+                  <td class="px-4 py-3">
+                    <div class="text-sm text-gray-900">
+                      {{ getActionDescription(log.accion, log.tabla) }}
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      {{ log.tabla }} • {{ log.registroId ? 'ID: ' + log.registroId : 'Sistema' }}
+                    </div>
+                  </td>
+                  
+                  <!-- IP -->
+                  <td class="px-4 py-3 text-sm text-gray-600">
+                    {{ log.ip || '-' }}
+                  </td>
+                </tr>
+                
+                <!-- Empty state -->
+                <tr *ngIf="getPaginatedLogs().length === 0">
+                  <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                    <ion-icon name="document-text-outline" class="text-3xl mb-2"></ion-icon>
+                    <p>No hay registros que coincidan con los filtros</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls - Diseño mejorado -->
+          <div class="px-6 py-4 border-t border-gray-200 bg-white" style="background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95)); backdrop-filter: blur(10px);">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <!-- Información de resultados -->
+              <div class="flex items-center text-sm text-gray-600">
+                <ion-icon name="document-text-outline" class="mr-2 text-gray-400"></ion-icon>
+                <span class="font-medium">
+                  Mostrando <span class="text-blue-600 font-semibold">{{ pagination().startIndex + 1 }}</span> 
+                  a <span class="text-blue-600 font-semibold">{{ pagination().endIndex }}</span> 
+                  de <span class="text-blue-600 font-semibold">{{ pagination().totalItems }}</span> resultados
+                </span>
+              </div>
+              
+              <!-- Controles de navegación -->
+              <div class="flex items-center space-x-1">
+                <!-- Previous button -->
+                <button 
+                  type="button"
+                  (click)="goToPage(pagination().currentPage - 1)"
+                  [disabled]="pagination().currentPage <= 1"
+                  class="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
+                  style="border-radius: 2rem;">
+                  <ion-icon name="chevron-back-outline"></ion-icon>
+                </button>
+                
+                <!-- Page numbers -->
+                <div class="flex space-x-1 mx-2">
+                  <button 
+                    *ngFor="let page of getPageNumbers()"
+                    type="button"
+                    (click)="goToPage(page)"
+                    [class]="page === pagination().currentPage 
+                      ? 'text-white border-transparent shadow-md transform scale-105' 
+                      : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400'"
+                    [style]="page === pagination().currentPage 
+                      ? 'background: linear-gradient(135deg, #5ccedf, #4db8cc); box-shadow: 0 4px 6px -1px rgba(92, 206, 223, 0.3); border-radius: 2rem;' 
+                      : 'border-radius: 2rem;'"
+                    class="min-w-[40px] h-10 px-3 py-2 text-sm font-medium border transition-all duration-200 hover:shadow-sm">
+                    {{ page }}
+                  </button>
+                </div>
+                
+                <!-- Next button -->
+                <button 
+                  type="button"
+                  (click)="goToPage(pagination().currentPage + 1)"
+                  [disabled]="pagination().currentPage >= pagination().totalPages"
+                  class="flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
+                  style="border-radius: 2rem;">
+                  <ion-icon name="chevron-forward-outline"></ion-icon>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Información adicional de página -->
+            <div class="flex items-center justify-center mt-3 pt-3 border-t border-gray-100">
+              <span class="text-xs text-gray-500">
+                Página {{ pagination().currentPage }} de {{ pagination().totalPages }}
+                <span class="mx-2">•</span>
+                {{ pagination().itemsPerPage }} elementos por página
+              </span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Quick Actions - Diseño Compacto con Glass Effect -->
+      <ion-card class="glass-card operations-card">
+        <div class="section-header">
+          <h2>
+            <ion-icon name="flash-outline" class="text-lg"></ion-icon>
+            Operaciones Rápidas
+          </h2>
+        </div>
+        
+        <ion-card-content class="p-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Ver Todos los Logs -->
+            <button 
+              class="operation-btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" 
+              (click)="showAllLogsModal()">
+              <ion-icon name="list-outline" class="text-xl mb-2"></ion-icon>
+              <span class="text-sm font-medium">Ver Todos los Logs</span>
+              <span class="text-xs opacity-80 mt-1">{{ recentActivity().length }} registros</span>
+            </button>
+            
+            <!-- Estadísticas Detalladas -->
+            <button 
+              class="operation-btn bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" 
+              (click)="showStatsModal()">
+              <ion-icon name="analytics-outline" class="text-xl mb-2"></ion-icon>
+              <span class="text-sm font-medium">Estadísticas Detalladas</span>
+              <span class="text-xs opacity-80 mt-1">Ver métricas completas</span>
+            </button>
+            
+            <!-- Usuarios Activos -->
+            <button 
+              class="operation-btn bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              (click)="showActiveUsersModal()">
+              <ion-icon name="people-outline" class="text-xl mb-2"></ion-icon>
+              <span class="text-sm font-medium">Usuarios Activos</span>
+              <span class="text-xs opacity-80 mt-1">Ver actividad de usuarios</span>
+            </button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- Modal para detalles de log -->
+<ion-modal [isOpen]="isModalOpen()" (ionDidDismiss)="closeModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar style="background: linear-gradient(135deg, #5ccedf 0%, #4db8cc 100%); color: white; --padding-top: 0.75rem; --padding-bottom: 0.75rem; --min-height: 60px;">
+        <ion-title style="color: white; font-size: 1.2rem; font-weight: 600; padding: 0.5rem 0; display: flex; align-items: center; justify-content: center;">
+          <ion-icon name="document-text-outline" style="margin-right: 0.5rem; font-size: 1.3rem;"></ion-icon>
+          Detalles del Log
+        </ion-title>
+        <ion-buttons slot="end" style="margin-right: 0.5rem;">
+          <ion-button (click)="closeModal()" style="color: white; --padding-start: 8px; --padding-end: 8px;">
+            <ion-icon name="close" slot="icon-only" style="font-size: 1.4rem;"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    
+    <ion-content style="--padding-top: 1.5rem; --padding-bottom: 2rem; --padding-start: 1.5rem; --padding-end: 1.5rem;">
+      <div *ngIf="isLoadingLogDetail()" class="text-center py-16">
+        <ion-spinner></ion-spinner>
+        <p class="mt-8 text-gray-600 text-base">Cargando detalles...</p>
+      </div>
+      
+      <div *ngIf="!isLoadingLogDetail() && selectedLog()" class="space-y-8">
+        <ion-card style="margin: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+          <ion-card-header style="background: linear-gradient(135deg, #5ccedf 0%, #4db8cc 100%); color: white; padding: 1.5rem 2rem 2rem 2rem;">
+            <ion-card-title class="flex items-center text-lg mb-3">
+              <ion-icon [name]="getActionIcon(selectedLog()?.accion)" style="margin-right: 0.75rem; font-size: 1.5rem;"></ion-icon>
+              <span style="font-weight: 600;">{{ selectedLog()?.accion }}</span>
+            </ion-card-title>
+            <ion-card-subtitle style="color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-top: 0.5rem;">
+              📅 {{ formatDateTime(selectedLog()?.createdAt) }}
+            </ion-card-subtitle>
+          </ion-card-header>
+          
+          <ion-card-content style="padding: 2rem;">
+            <!-- Información básica -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <div class="space-y-6">
+                <div style="padding: 1.25rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">🆔 ID del Log</label>
+                  <p style="font-family: 'Courier New', monospace; font-size: 0.9rem; color: #1e293b; word-break: break-all;">{{ selectedLog()?.id }}</p>
+                </div>
+                
+                <div style="padding: 1.25rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">🗂️ Tabla</label>
+                  <p style="font-size: 0.9rem; color: #1e293b; font-weight: 500;">{{ selectedLog()?.tabla }}</p>
+                </div>
+                
+                <div style="padding: 1.25rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;" *ngIf="selectedLog()?.registroId || selectedLog()?.registro_id">
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">🔢 ID del Registro</label>
+                  <p style="font-family: 'Courier New', monospace; font-size: 0.9rem; color: #1e293b;">{{ selectedLog()?.registroId || selectedLog()?.registro_id }}</p>
+                </div>
+              </div>
+              
+              <div class="space-y-6">
+                <div style="padding: 1.25rem; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 10px; border: 1px solid #93c5fd;">
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #1e40af; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.025em;">👤 Usuario</label>
+                  <div class="flex items-center">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; font-weight: 600; margin-right: 1rem; background: linear-gradient(135deg, #5ccedf, #4db8cc); box-shadow: 0 2px 8px rgba(92, 206, 223, 0.3);">
+                      {{ getUserInitials(selectedLog()?.user?.nombre || 'Usuario') }}
+                    </div>
+                    <div style="flex: 1;">
+                      <p style="font-size: 0.95rem; font-weight: 600; color: #1e293b; margin-bottom: 0.25rem;">{{ selectedLog()?.user?.nombre }} {{ selectedLog()?.user?.apellido }}</p>
+                      <p style="font-size: 0.8rem; color: #64748b;">{{ selectedLog()?.user?.correo }}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="padding: 1.25rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">🌐 Dirección IP</label>
+                  <p style="font-family: 'Courier New', monospace; font-size: 0.9rem; color: #1e293b;">{{ selectedLog()?.ip || selectedLog()?.ip_address || 'No disponible' }}</p>
+                </div>
+                
+                <div style="padding: 1.25rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em;">🔑 ID de Usuario</label>
+                  <p style="font-family: 'Courier New', monospace; font-size: 0.9rem; color: #1e293b;">{{ selectedLog()?.userId }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- User Agent -->
+            <div style="padding: 1.25rem; background: #fefce8; border-radius: 10px; border: 1px solid #facc15; margin-bottom: 2rem;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #a16207; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.025em;">🔍 User Agent</label>
+              <p style="font-size: 0.8rem; color: #374151; line-height: 1.6; word-break: break-all; font-family: 'Courier New', monospace; background: white; padding: 0.75rem; border-radius: 6px; border: 1px solid #e5e7eb;">{{ selectedLog()?.userAgent || selectedLog()?.user_agent || 'No disponible' }}</p>
+            </div>
+            
+            <!-- Datos Anteriores -->
+            <div style="padding: 1.25rem; background: #fef2f2; border-radius: 10px; border: 1px solid #fca5a5; margin-bottom: 2rem;" *ngIf="selectedLog()?.datosAntes || selectedLog()?.datos_anteriores">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #dc2626; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.025em;">📝 Datos Anteriores</label>
+              <pre style="font-size: 0.8rem; background: white; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb; color: #374151; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;">{{ formatJsonData(selectedLog()?.datosAntes || selectedLog()?.datos_anteriores) }}</pre>
+            </div>
+            
+            <!-- Datos Nuevos/Después -->
+            <div style="padding: 1.25rem; background: #f0fdf4; border-radius: 10px; border: 1px solid #86efac; margin-bottom: 2rem;" *ngIf="selectedLog()?.datosDespues || selectedLog()?.datos_nuevos">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #16a34a; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.025em;">✨ Datos Nuevos</label>
+              <pre style="font-size: 0.8rem; background: white; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb; color: #374151; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;">{{ formatJsonData(selectedLog()?.datosDespues || selectedLog()?.datos_nuevos) }}</pre>
+            </div>
+            
+            <!-- Información adicional si existe -->
+            <div style="padding: 1.25rem; background: #fffbeb; border-radius: 10px; border: 1px solid #fbbf24; margin-bottom: 2rem;" *ngIf="selectedLog()?.detalles">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #d97706; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.025em;">📋 Detalles Adicionales</label>
+              <pre style="font-size: 0.8rem; background: white; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb; color: #374151; line-height: 1.5; overflow-x: auto; white-space: pre-wrap;">{{ formatJsonData(selectedLog()?.detalles) }}</pre>
+            </div>
+            
+            <!-- Timestamp detallado -->
+            <div style="padding: 1.25rem; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 10px; border: 1px solid #93c5fd;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #1e40af; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.025em;">⏰ Información de Tiempo</label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                  <span style="font-weight: 600; color: #475569; font-size: 0.8rem;">🕐 Creado:</span><br>
+                  <span style="color: #64748b; font-size: 0.8rem; font-family: 'Courier New', monospace; margin-top: 0.25rem; display: block;">{{ formatDetailedDateTime(selectedLog()?.createdAt) }}</span>
+                </div>
+                <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #e5e7eb;">
+                  <span style="font-weight: 600; color: #475569; font-size: 0.8rem;">⚡ Timestamp:</span><br>
+                  <span style="color: #64748b; font-size: 0.8rem; font-family: 'Courier New', monospace; margin-top: 0.25rem; display: block;">{{ getTimestamp(selectedLog()?.createdAt) }}</span>
+                </div>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </ion-content>
+  </ng-template>
+</ion-modal>

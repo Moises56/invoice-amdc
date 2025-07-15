@@ -100,14 +100,20 @@ export interface AuditLog {
   id: string;
   accion: string;
   tabla: string;
+  registroId?: string | null;
+  datosAntes?: object | null;
+  datosDespues?: object | null;
+  ip?: string;
+  userAgent?: string;
+  userId: string;
+  user?: User;
+  createdAt: Date;
+  // Mantener compatibilidad con nombres anteriores
   registro_id?: string;
   datos_anteriores?: object;
   datos_nuevos?: object;
   ip_address?: string;
   user_agent?: string;
-  userId: string;
-  user?: User;
-  createdAt: Date;
 }
 
 // Interfaces para paginación
@@ -386,4 +392,56 @@ export interface BluetoothErrorHandler {
   handleError(error: BluetoothError, context?: any): void;
   showErrorMessage(error: BluetoothError): string;
   suggestSolution(error: BluetoothError): string;
+}
+
+// Interfaces para el módulo de auditoría
+export interface AuditStats {
+  totalLogs: number;
+  todayLogs: number;
+  thisWeekLogs: number;
+  thisMonthLogs: number;
+  operationCounts: {
+    CREATE: number;
+    UPDATE: number;
+    DELETE: number;
+    READ: number;
+  };
+  tableCounts: {
+    [tableName: string]: number;
+  };
+  userActivity: {
+    userId: string;
+    userName: string;
+    logCount: number;
+  }[];
+  recentActivity: AuditLog[];
+}
+
+export interface AuditFilters {
+  page?: number;
+  limit?: number;
+  action?: string;
+  userId?: string;
+  startDate?: string;
+  endDate?: string;
+  table?: string;
+  operation?: 'CREATE' | 'UPDATE' | 'DELETE' | 'READ';
+}
+
+export interface AuditOperationCount {
+  operation: string;
+  count: number;
+  percentage: number;
+}
+
+export interface AuditUserActivity {
+  userId: string;
+  userName: string;
+  email: string;
+  logCount: number;
+  lastActivity: Date;
+  actions: {
+    action: string;
+    count: number;
+  }[];
 }

@@ -1,0 +1,461 @@
+// 🎨 ESTILOS PARA HEADER Y MENÚ
+ion-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #5ccedf, #4db8cc);
+    --color: white;
+    
+    ion-title {
+      color: white !important;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    
+    ion-menu-button {
+      color: white !important;
+      --color: white;
+      
+      ion-icon {
+        color: white !important;
+      }
+    }
+    
+    ion-buttons {
+      ion-menu-button {
+        color: white !important;
+      }
+    }
+  }
+}
+
+// 🌈 CONTENIDO PRINCIPAL CON GRADIENTE SUAVE
+ion-content {
+  --background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+// 💫 ANIMACIONES MODERNAS ESTILO GITHUB
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// 🔮 EFECTO GLASS MORPHISM
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
+  }
+}
+
+// 🎯 CARDS COMPACTAS ESTILO GITHUB CON GLASS EFFECT
+ion-card {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  animation: slideInUp 0.5s ease-out;
+  margin: 8px 0;
+  
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  ion-card-content {
+    padding: 12px 16px !important; // Más compacto
+  }
+}
+
+// 📊 CARDS DE ESTADÍSTICAS COMPACTAS CON GLASS
+.stats-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 4px 0;
+  
+  ion-card-content {
+    padding: 16px !important; // Más compacto que antes
+  }
+  
+  &.blue {
+    background: linear-gradient(135deg, rgba(92, 206, 223, 0.8), rgba(77, 184, 204, 0.8));
+    backdrop-filter: blur(15px);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  &.green {
+    background: linear-gradient(135deg, rgba(26, 127, 55, 0.8), rgba(17, 99, 41, 0.8));
+    backdrop-filter: blur(15px);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  &.purple {
+    background: linear-gradient(135deg, rgba(130, 80, 223, 0.8), rgba(111, 66, 193, 0.8));
+    backdrop-filter: blur(15px);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  &.orange {
+    background: linear-gradient(135deg, rgba(209, 71, 10, 0.8), rgba(188, 76, 0, 0.8));
+    backdrop-filter: blur(15px);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+// 🎨 SECCIONES MODERNAS COMPACTAS CON GLASS
+.section-header {
+  background: linear-gradient(135deg, rgba(36, 41, 47, 0.9), rgba(50, 56, 63, 0.9));
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 12px 16px; // Más compacto
+  border-radius: 12px 12px 0 0;
+  
+  h2 {
+    margin: 0;
+    font-size: 1rem; // Más pequeño
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// 📊 OPERACIONES GRID COMPACTO CON GLASS
+.operations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); // Más compacto
+  gap: 1px;
+  background: rgba(208, 215, 222, 0.5);
+  backdrop-filter: blur(5px);
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  
+  .operation-item {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 12px; // Más compacto
+    text-align: center;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(246, 248, 250, 0.9);
+    }
+    
+    .icon-wrapper {
+      width: 32px; // Más pequeño
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 8px;
+      
+      &.blue { background: rgba(92, 206, 223, 0.2); color: #4db8cc; }
+      &.green { background: rgba(220, 252, 231, 0.8); color: #166534; }
+      &.yellow { background: rgba(254, 243, 199, 0.8); color: #d97706; }
+      &.purple { background: rgba(243, 232, 255, 0.8); color: #7c3aed; }
+    }
+    
+    .count {
+      font-size: 1.25rem; // Más pequeño
+      font-weight: 700;
+      color: #24292f;
+      margin-bottom: 2px;
+    }
+    
+    .label {
+      font-size: 0.75rem; // Más pequeño
+      color: #656d76;
+      margin-bottom: 6px;
+    }
+    
+    ion-chip {
+      --background: rgba(246, 248, 250, 0.9);
+      --color: #24292f;
+      font-size: 0.65rem; // Más pequeño
+      font-weight: 600;
+      height: 20px;
+    }
+  }
+}
+
+// 👥 USUARIOS ACTIVOS COMPACTOS CON GLASS
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px; // Más compacto
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  margin-bottom: 6px;
+  
+  &:hover {
+    background: rgba(246, 248, 250, 0.8);
+    border-color: rgba(208, 215, 222, 0.5);
+  }
+  
+  .user-avatar {
+    width: 28px; // Más pequeño
+    height: 28px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0969da, #8250df);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-right: 8px;
+  }
+  
+  .user-info {
+    flex: 1;
+    
+    .name {
+      font-weight: 600;
+      color: #24292f;
+      margin-bottom: 1px;
+      font-size: 0.875rem; // Más pequeño
+    }
+    
+    .actions {
+      font-size: 0.75rem; // Más pequeño
+      color: #656d76;
+    }
+  }
+  
+  .user-badge {
+    --background: #0969da;
+    --color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    height: 22px;
+  }
+}
+
+// 🕒 ACTIVIDAD RECIENTE COMPACTA CON GLASS
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 12px; // Más compacto
+  border-radius: 8px;
+  border: 1px solid rgba(208, 215, 222, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+  margin-bottom: 6px;
+  
+  &:hover {
+    border-color: rgba(9, 105, 218, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 3px 8px rgba(9, 105, 218, 0.12);
+  }
+  
+  .activity-icon {
+    width: 24px; // Más pequeño
+    height: 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    flex-shrink: 0;
+    
+    &.login { background: #0969da; color: white; }
+    &.view { background: #1a7f37; color: white; }
+    &.reset { background: #d1470a; color: white; }
+    &.test { background: #8250df; color: white; }
+  }
+  
+  .activity-content {
+    flex: 1;
+    min-width: 0;
+    
+    .action-title {
+      font-weight: 600;
+      color: #24292f;
+      margin-bottom: 1px;
+      font-size: 0.875rem; // Más pequeño
+    }
+    
+    .action-meta {
+      font-size: 0.75rem; // Más pequeño
+      color: #656d76;
+    }
+    
+    .action-time {
+      font-size: 0.65rem; // Más pequeño
+      color: #8b949e;
+    }
+  }
+}
+
+// 🚀 BOTONES COMPACTOS CON GLASS
+.github-button {
+  background: rgba(246, 248, 250, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(208, 215, 222, 0.4);
+  color: #24292f;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(243, 244, 246, 0.9);
+    border-color: rgba(9, 105, 218, 0.4);
+    color: #0969da;
+  }
+  
+  .button-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    
+    ion-icon {
+      font-size: 1.25rem; // Más pequeño
+    }
+    
+    span {
+      font-size: 0.75rem; // Más pequeño
+      font-weight: 500;
+    }
+  }
+}
+
+// 📱 UTILIDADES RESPONSIVAS MEJORADAS
+.grid {
+  display: grid;
+  gap: 8px; // Más compacto
+  
+  &.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+    
+    @media (min-width: 768px) {
+      &.md\\:grid-cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  }
+}
+
+.space-y-6 > * + * {
+  margin-top: 16px; // Más compacto
+}
+
+.space-y-2 > * + * {
+  margin-top: 4px; // Muy compacto
+}
+
+// 🎯 ESTADOS DE LOADING COMPACTOS
+.loading-skeleton {
+  background: linear-gradient(90deg, rgba(246, 248, 250, 0.8) 25%, rgba(255, 255, 255, 0.8) 50%, rgba(246, 248, 250, 0.8) 75%);
+  backdrop-filter: blur(5px);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// 🌟 MODAL STYLES PARA DETALLES
+.log-detail-modal {
+  .modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}
+
+// 🚀 ESTILOS MEJORADOS PARA OPERATION BUTTONS
+.operation-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 120px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+
+  ion-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  span:last-child {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    opacity: 0.9;
+  }
+}

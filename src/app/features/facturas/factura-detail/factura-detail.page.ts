@@ -1,32 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { 
   IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton,
-  IonText, IonButton, IonIcon, IonButtons, LoadingController, ToastController,
-  IonList, IonItem, IonLabel
+  IonButton, IonIcon, IonButtons, LoadingController, ToastController,
+  IonList, IonItem, IonLabel, IonSkeletonText, IonChip
 } from '@ionic/angular/standalone';
 import { Invoice } from '../../../core/interfaces';
 import { BluetoothService } from '../../bluetooth/bluetooth.service';
 import { PrintingService } from '../../../shared/services/printing.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FacturasService } from '../facturas.service';
+import { Factura } from '../../../shared/interfaces';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-factura-detail',
   templateUrl: './factura-detail.page.html',
-  styleUrls: ['./factura-detail.page.scss'],
+  styleUrl: './factura-detail.page.scss',
   standalone: true,
   imports: [
     CommonModule,
     CurrencyPipe,
     DatePipe,
-    IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton, IonText,
-    IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel
+    IonContent, IonHeader, IonTitle, IonToolbar, IonBackButton,
+    IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel,
+    IonSkeletonText, IonChip
   ]
 })
 export class FacturaDetailPage implements OnInit {
   
-  factura: Invoice | null = null; // Asumimos que este objeto se carga de alguna manera
+  factura = signal<Factura | null>(null);
+  isLoading = signal(true);
+  error = signal<string | null>(null);
 
   constructor(
     private bluetoothService: BluetoothService,
@@ -34,31 +39,46 @@ export class FacturaDetailPage implements OnInit {
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     private route: ActivatedRoute,
+    private router: Router,
     private facturasService: FacturasService
   ) { }
 
-  ngOnInit() {
-    // Cargar datos de la factura (simulado)
+  async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    // this.facturasService.getFactura(id).subscribe(data => this.factura = data);
-    
-    // Datos de ejemplo mientras se implementa el servicio
-    this.factura = {
-      id: id || 'FAC-001',
-      date: new Date(),
-      customerName: 'Juan Perez',
-      items: [
-        { quantity: 2, description: 'Producto A', price: 10.00 },
-        { quantity: 1, description: 'Producto B', price: 25.50 },
-      ],
-      subtotal: 45.50,
-      tax: 6.83,
-      total: 52.33
-    };
+    if (!id) {
+      this.error.set('ID de factura no válido');
+      this.isLoading.set(false);
+      return;
+    }
+
+    try {
+      const response = await firstValueFrom(this.facturasService.getFacturaById(id));
+      if (response.data) {
+        this.factura.set(response.data);
+      } else {
+        this.error.set('Factura no encontrada');
+      }
+    } catch (error: any) {
+      console.error('Error cargando factura:', error);
+      this.error.set('Error al cargar la factura');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  goBack() {
+    this.router.navigate(['/facturas']);
+  }
+
+  editFactura() {
+    if (this.factura()) {
+      this.router.navigate(['/facturas/editar', this.factura()!.id]);
+    }
   }
 
   async printInvoice() {
-    if (!this.factura) {
+    const currentFactura = this.factura();
+    if (!currentFactura) {
       this.showToast('No hay datos de factura para imprimir.');
       return;
     }
@@ -76,7 +96,24 @@ export class FacturaDetailPage implements OnInit {
 
       this.bluetoothService.connect(printer.address).subscribe({
         next: async () => {
-          const formattedData = this.printingService.formatInvoiceForPrinting(this.factura!);
+          // Convertir Factura a Invoice para el servicio de impresión
+          const invoiceData: Invoice = {
+            id: currentFactura.numero_factura,
+            date: currentFactura.createdAt,
+            customerName: currentFactura.propietario_nombre || 'Sin propietario',
+            items: [
+              {
+                quantity: 1,
+                description: currentFactura.concepto,
+                price: currentFactura.monto
+              }
+            ],
+            subtotal: currentFactura.monto,
+            tax: 0,
+            total: currentFactura.monto
+          };
+          
+          const formattedData = this.printingService.formatInvoiceForPrinting(invoiceData);
           await this.bluetoothService.print(formattedData);
           await this.bluetoothService.disconnect();
           this.showToast('Factura impresa correctamente.');

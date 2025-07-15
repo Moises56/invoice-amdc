@@ -1,61 +1,197 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar class="municipal-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/facturas"></ion-back-button>
+      <ion-back-button defaultHref="/facturas"></ion-back-button>
     </ion-buttons>
-    <ion-title>Detalle Factura</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="printInvoice()">
-        <ion-icon slot="icon-only" name="print"></ion-icon>
+    <ion-title class="text-white font-semibold">
+      Detalle de Factura
+    </ion-title>
+    <ion-buttons slot="end" *ngIf="factura() && !isLoading()">
+      <ion-button (click)="printInvoice()" fill="clear">
+        <ion-icon name="print-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="editFactura()" fill="clear">
+        <ion-icon name="create-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <div *ngIf="factura">
-    <ion-list>
-      <ion-item>
-        <ion-label>Factura Nº:</ion-label>
-        <ion-text slot="end">{{ factura.id }}</ion-text>
-      </ion-item>
-      <ion-item>
-        <ion-label>Cliente:</ion-label>
-        <ion-text slot="end">{{ factura.customerName }}</ion-text>
-      </ion-item>
-      <ion-item>
-        <ion-label>Fecha:</ion-label>
-        <ion-text slot="end">{{ factura.date | date:'short' }}</ion-text>
-      </ion-item>
-    </ion-list>
+<ion-content class="bg-gray-50">
+  <div class="p-4">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="space-y-4">
+      <ion-list>
+        <ion-item *ngFor="let item of [1,2,3,4,5]">
+          <ion-label>
+            <ion-skeleton-text [animated]="true" style="width: 60%"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" style="width: 40%"></ion-skeleton-text>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
 
-    <h3 class="ion-padding-start">Items</h3>
-    <ion-list>
-      <ion-item *ngFor="let item of factura.items">
-        <ion-label>
-          <p>{{ item.quantity }}x {{ item.description }}</p>
-        </ion-label>
-        <ion-text slot="end">{{ item.price * item.quantity | currency:'USD' }}</ion-text>
-      </ion-item>
-    </ion-list>
+    <!-- Error State -->
+    <div *ngIf="!isLoading() && error()" class="text-center py-8">
+      <ion-icon name="alert-circle-outline" class="text-6xl text-red-500 mb-4"></ion-icon>
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Error</h2>
+      <p class="text-gray-500 mb-4">{{ error() }}</p>
+      <ion-button fill="outline" (click)="goBack()">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Volver
+      </ion-button>
+    </div>
 
-    <ion-list class="ion-margin-top">
-      <ion-item>
-        <ion-label>Subtotal</ion-label>
-        <ion-text slot="end">{{ factura.subtotal | currency:'USD' }}</ion-text>
-      </ion-item>
-      <ion-item>
-        <ion-label>ISV</ion-label>
-        <ion-text slot="end">{{ factura.tax | currency:'USD' }}</ion-text>
-      </ion-item>
-      <ion-item lines="full">
-        <ion-label><b>Total</b></ion-label>
-        <ion-text slot="end"><b>{{ factura.total | currency:'USD' }}</b></ion-text>
-      </ion-item>
-    </ion-list>
-  </div>
+    <!-- Factura Content -->
+    <div *ngIf="!isLoading() && !error() && factura()" class="space-y-4">
+      
+      <!-- Header Info -->
+      <ion-list class="rounded-lg">
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Número de Factura</h3>
+            <p class="text-gray-600">{{ factura()?.numero_factura }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Correlativo</h3>
+            <p class="text-gray-600">{{ factura()?.correlativo }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Concepto</h3>
+            <p class="text-gray-600">{{ factura()?.concepto }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Propietario</h3>
+            <p class="text-gray-600">{{ factura()?.propietario_nombre || 'No especificado' }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item *ngIf="factura()?.propietario_dni">
+          <ion-label>
+            <h3 class="font-medium">DNI</h3>
+            <p class="text-gray-600">{{ factura()?.propietario_dni }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
 
-  <div *ngIf="!factura" class="ion-text-center ion-padding">
-    <p>Cargando datos de la factura...</p>
+      <!-- Mercado y Local Info -->
+      <ion-list class="rounded-lg">
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Mercado</h3>
+            <p class="text-gray-600">{{ factura()?.mercado_nombre }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item *ngIf="factura()?.local_nombre">
+          <ion-label>
+            <h3 class="font-medium">Local</h3>
+            <p class="text-gray-600">{{ factura()?.local_nombre }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item *ngIf="factura()?.local_numero">
+          <ion-label>
+            <h3 class="font-medium">Número de Local</h3>
+            <p class="text-gray-600">{{ factura()?.local_numero }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Financial Info -->
+      <ion-list class="rounded-lg">
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Monto</h3>
+            <p class="text-2xl font-bold text-primary">{{ factura()?.monto | currency:'USD':'symbol':'1.2-2' }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Estado</h3>
+            <ion-chip 
+              [color]="factura()?.estado === 'PAGADA' ? 'success' : factura()?.estado === 'VENCIDA' ? 'danger' : 'warning'"
+              class="text-xs">
+              {{ factura()?.estado }}
+            </ion-chip>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Dates Info -->
+      <ion-list class="rounded-lg">
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Fecha de Vencimiento</h3>
+            <p class="text-gray-600">{{ factura()?.fecha_vencimiento | date:'dd/MM/yyyy' }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item *ngIf="factura()?.fecha_pago">
+          <ion-label>
+            <h3 class="font-medium">Fecha de Pago</h3>
+            <p class="text-gray-600">{{ factura()?.fecha_pago | date:'dd/MM/yyyy' }}</p>
+          </ion-label>
+        </ion-item>
+        
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Fecha de Creación</h3>
+            <p class="text-gray-600">{{ factura()?.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Observations -->
+      <ion-list class="rounded-lg" *ngIf="factura()?.observaciones">
+        <ion-item>
+          <ion-label>
+            <h3 class="font-medium">Observaciones</h3>
+            <p class="text-gray-600">{{ factura()?.observaciones }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Actions -->
+      <div class="flex gap-3 mt-6">
+        <ion-button 
+          expand="block" 
+          fill="outline" 
+          color="medium"
+          (click)="goBack()"
+          class="flex-1">
+          <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+          Volver
+        </ion-button>
+        
+        <ion-button 
+          expand="block" 
+          fill="outline"
+          (click)="printInvoice()"
+          class="flex-1">
+          <ion-icon name="print-outline" slot="start"></ion-icon>
+          Imprimir
+        </ion-button>
+        
+        <ion-button 
+          expand="block" 
+          (click)="editFactura()"
+          class="flex-1">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          Editar
+        </ion-button>
+      </div>
+    </div>
   </div>
 </ion-content>

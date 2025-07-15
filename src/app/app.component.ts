@@ -103,7 +103,7 @@ export class AppComponent implements OnInit {
     },
     {
       title: 'Auditoría',
-      url: '/audit',
+      url: '/auditoria',
       icon: 'analytics-outline',
       roles: [Role.ADMIN]
     },
