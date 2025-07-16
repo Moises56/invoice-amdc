@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 // Interfaces para manejar las respuestas del backend
 export interface AuditLog {
@@ -54,7 +55,7 @@ export interface RecentActivity {
   providedIn: 'root'
 })
 export class AuditoriaService {
-  private readonly baseUrl = 'http://localhost:3000/api/audit';
+  private readonly baseUrl = `${environment.apiUrl}/audit`;
   private readonly httpOptions = {
     withCredentials: true,
     headers: {
