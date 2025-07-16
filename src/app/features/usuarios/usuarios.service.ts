@@ -244,4 +244,11 @@ export class UsuariosService {
       return { text: 'Inactivo', color: 'danger' };
     }
   }
+
+  /**
+   * Actualizar estado de usuario (activo/inactivo)
+   */
+  updateUserStatus(userId: string, isActive: boolean): Observable<User> {
+    return this.http.patch<User>(`${this.baseUrl}/${userId}/status`, { isActive });
+  }
 }

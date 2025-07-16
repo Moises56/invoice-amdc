@@ -217,6 +217,7 @@ export class UsuarioFormPage implements OnInit {
 
           await this.usuariosService.updateUser(this.currentUser()!.id, updateData).toPromise();
           await this.showToast('Usuario actualizado correctamente', 'success');
+          
           // Cerrar modal si estamos en modo modal
           if (this.isEdit) {
             await this.modalController.dismiss({ success: true });
@@ -239,14 +240,15 @@ export class UsuarioFormPage implements OnInit {
 
           await this.usuariosService.createUser(createData).toPromise();
           await this.showToast('Usuario creado correctamente', 'success');
-          // Cerrar modal si estamos en modo modal
-          if (!this.isEdit) {
+          
+          // Si estamos en modo modal (crear desde lista), cerrar modal
+          if (this.isEdit !== undefined) {
             await this.modalController.dismiss({ success: true });
             return;
           }
         }
 
-        // Solo navegar si no estamos en modal
+        // Solo navegar si no estamos en modal (página independiente)
         if (!this.isEdit) {
           this.router.navigate(['/usuarios']);
         }
@@ -350,9 +352,11 @@ export class UsuarioFormPage implements OnInit {
    * Volver a la lista o cerrar modal
    */
   async goBack() {
-    if (this.isEdit) {
+    // Si estamos en modal (componente creado desde ModalController), cerrar modal
+    try {
       await this.modalController.dismiss({ success: false });
-    } else {
+    } catch (error) {
+      // Si falla el dismiss del modal, significa que no estamos en modal, navegar normalmente
       this.router.navigate(['/usuarios']);
     }
   }

@@ -1,0 +1,131 @@
+// ESTILOS OPTIMIZADOS PARA TABLA COMPACTA
+// Aplicar estos estilos sobre la base existente
+
+// MEJORAS DE ESPACIADO - TABLA COMPACTA
+.desktop-table {
+  .modern-table-wrapper {
+    // Header optimizado
+    .table-header {
+      min-height: 40px !important;
+      padding: 0.5rem 0.75rem !important;
+      
+      .header-cell {
+        padding: 0.25rem !important;
+        font-size: 0.85rem !important;
+      }
+    }
+    
+    // Filas optimizadas
+    .table-body {
+      .table-row {
+        min-height: 50px !important;
+        padding: 0.5rem 0.75rem !important;
+        
+        .table-cell {
+          padding: 0.4rem 0.75rem !important;
+          
+          // Usuario más compacto
+          &.user-col {
+            .user-info {
+              gap: 0.5rem !important;
+              
+              .user-avatar {
+                width: 36px !important;
+                height: 36px !important;
+                font-size: 0.85rem !important;
+              }
+              
+              .user-details {
+                .user-name {
+                  font-size: 0.9rem !important;
+                  margin-bottom: 0.1rem !important;
+                }
+                
+                .user-username {
+                  font-size: 0.75rem !important;
+                }
+              }
+            }
+          }
+          
+          // Role badges compactos
+          &.role-col {
+            .role-badge {
+              padding: 0.25rem 0.6rem !important;
+              border-radius: 8px !important;
+              font-size: 0.7rem !important;
+            }
+          }
+          
+          // Status badges compactos
+          &.status-col {
+            .status-badge {
+              padding: 0.25rem 0.6rem !important;
+              border-radius: 8px !important;
+              font-size: 0.75rem !important;
+              
+              .status-dot {
+                width: 6px !important;
+                height: 6px !important;
+              }
+            }
+          }
+          
+          // Botones de acción más pequeños
+          &.actions-col {
+            .action-buttons {
+              gap: 0.25rem !important;
+              
+              .action-btn {
+                width: 32px !important;
+                height: 32px !important;
+                border-radius: 8px !important;
+                font-size: 0.9rem !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Grid optimizado con columna de selección
+.modern-table-wrapper {
+  .table-header,
+  .table-row {
+    grid-template-columns: 60px 1.6fr 1.8fr 1fr 0.8fr 0.8fr 1fr 0.8fr !important;
+    gap: 0.25rem !important;
+  }
+}
+
+// Checkbox column optimization
+.select-col {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+  
+  .select-all-checkbox,
+  .row-checkbox {
+    --size: 18px !important;
+    margin: 0 !important;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .modern-table-wrapper {
+    .table-header,
+    .table-row {
+      grid-template-columns: 50px 1.4fr 1.6fr 0.9fr 0.7fr 0.7fr 0.9fr 0.7fr !important;
+      padding: 0.3rem 0.5rem !important;
+      min-height: 45px !important;
+    }
+  }
+  
+  .select-col {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+  }
+}

@@ -1,87 +1,764 @@
-// Toolbar personalizado
-.municipal-toolbar {
-  --background: var(--ion-color-primary);
-  --color: white;
+// ==========================================================================
+// DISEÑO MODERNO GLASSMORPHISM PARA FORMULARIO DE USUARIO
+// ==========================================================================
+
+// Variables de diseño actualizadas con nuevo color principal
+:root {
+  --form-primary: #5ccedf;
+  --form-primary-dark: #38b5c9;
+  --form-success: #10b981;
+  --form-warning: #f59e0b;
+  --form-danger: #ef4444;
+  --form-light: #f8fafc;
+  --form-dark: #1e293b;
+  --form-medium: #4a5568;
+  --form-text: #2d3748;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 1rem;
+  --radius-xl: 20px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 12px 35px rgba(0, 0, 0, 0.2);
 }
 
-// Cards personalizadas
+// Toolbar personalizado con glassmorphism
+.municipal-toolbar {
+  --background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+  --color: #1e293b;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(92, 206, 223, 0.05), rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  ion-title {
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #1e293b !important; // Color negro para mejor visibilidad
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.025em;
+  }
+  
+  .close-btn-modern {
+    position: relative !important;
+    z-index: 2 !important;
+    --color: #1e293b !important;
+    --background-hover: rgba(30, 41, 59, 0.1) !important;
+    --border-radius: 1rem !important;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
+    border-radius: 1rem !important;
+    --border-width: 0px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    
+    ion-icon {
+      font-size: 1.5rem !important;
+      color: #1e293b !important;
+      margin: 0 !important;
+    }
+    
+    &:hover {
+      transform: scale(1.1) !important;
+      --background-hover: rgba(30, 41, 59, 0.15) !important;
+    }
+  }
+  
+  ion-button {
+    position: relative;
+    z-index: 2;
+    --color: white;
+    --background-hover: rgba(255, 255, 255, 0.1);
+    --border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Contenido principal con fondo degradado
+ion-content {
+  --background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .scroll-content {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// Cards modernos con glassmorphism
 ion-card {
-  --background: white;
-  --border-radius: 12px;
-  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 0 0 16px 0;
+  --background: rgba(255, 255, 255, 0.9);
+  --border-radius: var(--radius-xl);
+  --box-shadow: var(--shadow-lg);
+  margin: 0 0 2rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--form-primary), var(--form-success), var(--form-warning));
+    opacity: 0.8;
+  }
+  
+  &:hover {
+    --box-shadow: var(--shadow-xl);
+    transform: translateY(-4px);
+    --background: rgba(255, 255, 255, 0.95);
+  }
   
   ion-card-header {
-    padding: 16px 16px 8px 16px;
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
     
     ion-card-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--ion-color-dark);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--form-dark);
       display: flex;
       align-items: center;
+      gap: 0.75rem;
+      margin: 0;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
       
       ion-icon {
-        margin-right: 8px;
-        color: var(--ion-color-primary);
+        font-size: 1.5rem;
+        color: var(--form-primary);
+        background: rgba(92, 206, 223, 0.15);
+        padding: 0.5rem;
+        border-radius: var(--radius-md);
+        box-shadow: 0 2px 8px rgba(92, 206, 223, 0.2);
       }
     }
   }
   
   ion-card-content {
-    padding: 0 16px 16px 16px;
+    padding: 1.5rem;
+    position: relative;
   }
 }
 
-// Inputs personalizados
+// Inputs modernos con glassmorphism y mejores sombras
 .custom-input {
-  --background: #f8f9fa;
-  --border-radius: 8px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --padding-top: 8px;
-  --padding-bottom: 8px;
-  --min-height: auto;
-  border: 1px solid #e9ecef;
-  margin-bottom: 4px;
+  --background: rgba(255, 255, 255, 0.95);
+  --border-radius: var(--radius-lg);
+  --box-shadow: 0 2px 8px rgba(92, 206, 223, 0.1), 0 4px 16px rgba(0, 0, 0, 0.08);
+  --padding-start: 1.5rem;
+  --padding-end: 1.5rem;
+  --min-height: 64px;
+  border: 2px solid rgba(92, 206, 223, 0.2);
+  margin-bottom: 1rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
   
-  &:hover {
-    --background: #f1f3f4;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(92, 206, 223, 0.03), rgba(16, 185, 129, 0.02));
+    pointer-events: none;
   }
   
-  &.is-invalid {
-    border-color: var(--ion-color-danger);
-    --background: #fef2f2;
+  &:hover {
+    --background: rgba(255, 255, 255, 1);
+    --box-shadow: 0 4px 12px rgba(92, 206, 223, 0.15), 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    border-color: rgba(92, 206, 223, 0.4);
+  }
+  
+  &:focus-within {
+    --background: rgba(255, 255, 255, 1);
+    --box-shadow: 0 0 0 3px rgba(92, 206, 223, 0.2), 0 8px 32px rgba(92, 206, 223, 0.25);
+    border-color: var(--form-primary);
+    transform: translateY(-2px);
   }
   
   ion-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--ion-color-medium-shade);
-    margin-bottom: 4px;
+    color: var(--form-text) !important;
+    font-weight: 700 !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 0.025em;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+  
+  ion-input, ion-select, ion-textarea {
+    --color: var(--form-text) !important;
+    --placeholder-color: var(--form-medium) !important;
+    font-weight: 600;
+    font-size: 1rem;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  }
+  
+  &.is-invalid {
+    border-color: var(--form-danger);
+    --background: rgba(239, 68, 68, 0.05);
+    --box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15), 0 4px 16px rgba(239, 68, 68, 0.2);
     
-    &[position="stacked"] {
-      transform: none;
-      font-size: 14px;
-      margin-bottom: 8px;
+    &:focus-within {
+      --box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25), 0 8px 32px rgba(239, 68, 68, 0.3);
+    }
+  }
+}
+
+// Mensajes de error con estilo mejorado
+.error-message {
+  color: var(--form-danger);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: -0.5rem 0 1rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &::before {
+    content: '⚠️';
+    font-size: 0.75rem;
+  }
+}
+
+// Selectores mejorados
+ion-select {
+  ion-icon {
+    color: var(--form-primary) !important;
+  }
+  
+  &::part(icon) {
+    color: var(--form-primary) !important;
+  }
+}
+
+// Contenedor principal del formulario mejorado
+.modern-form-content {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  
+  .form-container {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    @media (min-width: 768px) {
+      padding: 2rem;
+    }
+  }
+}
+
+// Grid responsivo para las tarjetas mejorado
+.cards-grid {
+  display: grid;
+  gap: 1.25rem;
+  
+  // Mobile: 1 columna con mejor espaciado
+  grid-template-columns: 1fr;
+  
+  // Desktop: 2 columnas con mejor distribución
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+  
+  @media (min-width: 1024px) {
+    gap: 2rem;
+  }
+}
+
+// Tarjetas con efecto glass mejoradas
+.glass-card {
+  background: rgba(92, 206, 223, 0.08) !important; // Menos opacidad
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(92, 206, 223, 0.15) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 
+    0 10px 40px rgba(92, 206, 223, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 !important;
+  overflow: hidden;
+  position: relative;
+  
+  // Efecto glass sutil en el fondo
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(92, 206, 223, 0.02) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+      0 15px 50px rgba(92, 206, 223, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(92, 206, 223, 0.25) !important;
+  }
+}
+
+// Encabezados de las tarjetas mejorados
+.card-header-modern {
+  padding: 1.5rem 1.5rem 1rem 1.5rem !important;
+  position: relative;
+  z-index: 2;
+  
+  .card-title-glass {
+    display: flex;
+    align-items: center;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    letter-spacing: 0.025em;
+    
+    .title-icon {
+      font-size: 1.25rem;
+      margin-right: 0.75rem;
+      color: #5ccedf;
+      opacity: 0.9;
+    }
+  }
+}
+
+// Contenido de las tarjetas mejorado
+.card-content-modern {
+  padding: 0 1.5rem 1.5rem 1.5rem !important;
+  position: relative;
+  z-index: 2;
+}
+
+// Inputs con efecto glass mejorados
+.input-glass {
+  position: relative;
+  z-index: 2;
+  
+  ion-item {
+    --background: rgba(255, 255, 255, 0.6);
+    --border-color: rgba(92, 206, 223, 0.2);
+    --color: #1e293b;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    --inner-padding-end: 0;
+    --min-height: 60px;
+    border-radius: 0.875rem !important;
+    margin-bottom: 1.25rem;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(92, 206, 223, 0.15) !important;
+    box-shadow: 
+      0 2px 10px rgba(92, 206, 223, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    &.item-has-focus {
+      --border-color: #5ccedf !important;
+      box-shadow: 
+        0 4px 20px rgba(92, 206, 223, 0.15),
+        0 0 0 3px rgba(92, 206, 223, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+      transform: translateY(-1px);
+      --background: rgba(255, 255, 255, 0.8);
+    }
+    
+    &:hover:not(.item-has-focus) {
+      --background: rgba(255, 255, 255, 0.7);
+      border-color: rgba(92, 206, 223, 0.3) !important;
     }
   }
   
   ion-input, ion-select, ion-textarea {
-    --color: var(--ion-color-dark);
-    --placeholder-color: var(--ion-color-medium);
-    font-size: 15px;
+    --color: #1e293b !important;
+    --placeholder-color: rgba(30, 41, 59, 0.5) !important;
+    position: relative;
+    z-index: 2;
+  }
+  
+  // Estilos especiales para el toggle
+  &.toggle-item {
+    ion-item {
+      --min-height: 70px;
+      
+      ion-toggle {
+        --handle-width: 26px;
+        --handle-height: 26px;
+        --track-width: 50px;
+        --track-height: 30px;
+      }
+    }
+  }
+}
+
+// Labels modernos mejorados
+.label-modern {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem !important;
+  margin-bottom: 0.375rem !important;
+  display: block;
+  letter-spacing: 0.025em;
+  position: relative;
+  z-index: 2;
+}
+
+// Mensajes de error mejorados
+.error-message {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  
+  &::before {
+    content: '⚠';
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+}
+
+// Toggle switches modernos
+ion-toggle {
+  --background: rgba(226, 232, 240, 0.8);
+  --background-checked: var(--form-primary);
+  --handle-background: white;
+  --handle-background-checked: white;
+  --border-radius: 2rem;
+  --handle-border-radius: 50%;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    --background: rgba(226, 232, 240, 1);
+    --background-checked: var(--form-primary-dark);
+  }
+}
+
+// Botones modernos con glassmorphism y espaciado mejorado
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+  margin-top: 1rem;
+  position: relative;
+  z-index: 2;
+  
+  @media (max-width: 767px) {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    padding: 2rem 1rem 1rem 1rem;
     
-    &.is-invalid {
-      --color: var(--ion-color-danger);
+    ion-button {
+      width: 100% !important;
+      justify-content: center !important;
     }
   }
   
-  ion-toggle {
-    --background: #e9ecef;
-    --background-checked: var(--ion-color-primary);
-    --handle-background: white;
-    --handle-background-checked: white;
+  ion-button {
+    --border-radius: 1rem !important;
+    --box-shadow: 0 4px 16px rgba(92, 206, 223, 0.15), 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    font-weight: 600 !important;
+    min-height: 56px !important;
+    min-width: 160px !important;
+    text-transform: none !important;
+    letter-spacing: 0.025em !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    text-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    border-radius: 1rem !important;
+    backdrop-filter: blur(8px);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    --border-width: 0px !important;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    
+    &:hover {
+      transform: translateY(-3px);
+      --box-shadow: 0 8px 24px rgba(92, 206, 223, 0.3), 0 4px 16px rgba(0, 0, 0, 0.15);
+      
+      &::before {
+        opacity: 1;
+      }
+    }
+    
+    &:active {
+      transform: translateY(-1px);
+    }
+    
+    // Botón primario (Guardar) mejorado
+    &.primary-btn {
+      --background: linear-gradient(135deg, #5ccedf, #38b5c9) !important;
+      --color: white !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      border-radius: 1rem !important;
+      --border-radius: 1rem !important;
+      background: linear-gradient(135deg, #5ccedf, #38b5c9) !important;
+      color: white !important;
+      box-shadow: 
+        0 4px 20px rgba(92, 206, 223, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+      
+      span, ion-icon, div {
+        color: white !important;
+        position: relative;
+        z-index: 2;
+        font-weight: 600;
+      }
+      
+      &:hover:not([disabled]) {
+        --background: linear-gradient(135deg, #38b5c9, #2a9eb0) !important;
+        background: linear-gradient(135deg, #38b5c9, #2a9eb0) !important;
+        transform: translateY(-2px);
+        box-shadow: 
+          0 6px 25px rgba(92, 206, 223, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+      }
+      
+      &[disabled] {
+        --background: rgba(148, 163, 184, 0.6) !important;
+        --color: rgba(255, 255, 255, 0.7) !important;
+        background: rgba(148, 163, 184, 0.6) !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        transform: none !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        cursor: not-allowed;
+        
+        span, ion-icon, div {
+          color: rgba(255, 255, 255, 0.7) !important;
+        }
+      }
+    }
+    
+    // Botón secundario (Cancelar) mejorado
+    &.secondary-btn {
+      --background: rgba(255, 255, 255, 0.8) !important;
+      --color: #475569 !important;
+      border: 1px solid rgba(92, 206, 223, 0.2) !important;
+      border-radius: 1rem !important;
+      --border-radius: 1rem !important;
+      background: rgba(255, 255, 255, 0.8) !important;
+      color: #475569 !important;
+      backdrop-filter: blur(10px);
+      box-shadow: 
+        0 2px 12px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+      
+      ion-icon, span {
+        color: #475569 !important;
+        position: relative;
+        z-index: 2;
+        font-weight: 500;
+      }
+      
+      &:hover {
+        --background: rgba(255, 255, 255, 0.95) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border-color: rgba(92, 206, 223, 0.3) !important;
+        transform: translateY(-1px);
+        box-shadow: 
+          0 4px 16px rgba(0, 0, 0, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+        
+        ion-icon, span {
+          color: #475569 !important;
+        }
+      }
+    }
+  }
+}
+
+// Spinner de carga moderno
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--form-medium);
+  font-weight: 500;
+  
+  ion-spinner {
+    --color: var(--form-primary);
+  }
+}
+
+// Animaciones de entrada
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-card {
+  animation: slideInUp 0.5s ease-out;
+  
+  &:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  
+  &:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  
+  &:nth-child(4) {
+    animation-delay: 0.3s;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  ion-card {
+    margin: 0 0 1.5rem 0;
+    --border-radius: var(--radius-lg);
+    
+    ion-card-header {
+      padding: 1rem 1rem 0.75rem 1rem;
+      
+      ion-card-title {
+        font-size: 1.125rem;
+        
+        ion-icon {
+          font-size: 1.25rem;
+          padding: 0.375rem;
+        }
+      }
+    }
+    
+    ion-card-content {
+      padding: 1rem;
+    }
+  }
+  
+  .custom-input {
+    --min-height: 56px;
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    padding: 1.5rem 0 1rem 0;
+    
+    ion-button {
+      width: 100%;
+      min-height: 48px;
+    }
   }
 }
 

@@ -1,6 +1,43 @@
-// Usuarios Page - Modern Glass Design para estructura Ionic
+// ==========================================================================
+// DISEÑO MODERNO PARA USUARIOS - GLASSMORPHISM & ANIMACIONES AVANZADAS
+// ==========================================================================
+
+// Variables de diseño
+:root {
+  --usuarios-primary: #3880ff;
+  --usuarios-success: #2dd36f;
+  --usuarios-warning: #ffc409;
+  --usuarios-danger: #eb445a;
+  --usuarios-medium: #92949c;
+  --usuarios-light: #f4f5f8;
+  --usuarios-dark: #222428;
+  
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 10px;
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+  
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+// ==========================================================================
+// CONTENEDOR PRINCIPAL CON ESPACIADO MEJORADO
+// ==========================================================================
 .users-page {
-  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding-bottom: 100px; // Espacio extra en la parte inferior
   
   &::before {
     content: '';
@@ -11,465 +48,631 @@
     bottom: 0;
     background: 
       radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(92, 206, 223, 0.2) 0%, transparent 50%);
+      radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
   }
-}
-
-// Header con efecto glass
-.sticky-header {
-  background: linear-gradient(135deg, rgba(92, 206, 223, 0.95) 0%, rgba(44, 160, 184, 0.95) 100%) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  padding: 2rem 1rem 3rem !important;
-  color: white !important;
-  position: relative !important;
-  overflow: hidden !important;
-  margin-bottom: 1rem !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
-  border-radius: 0 0 20px 20px !important;
-
-  .header-stats {
+  
+  .main-content {
     position: relative;
-    z-index: 2;
-
-    h1 {
-      margin: 0 0 2rem 0 !important;
-      font-size: 2.5rem !important;
-      font-weight: 800 !important;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    .stats-cards {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-      gap: 1rem !important;
-
-      .stat-item {
-        background: rgba(255, 255, 255, 0.15) !important;
-        backdrop-filter: blur(15px) !important;
-        -webkit-backdrop-filter: blur(15px) !important;
-        border-radius: 16px !important;
-        padding: 1.5rem !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 1rem !important;
-
-        &:hover {
-          transform: translateY(-4px) scale(1.02) !important;
-          background: rgba(255, 255, 255, 0.25) !important;
-          box-shadow: 0 16px 32px 0 rgba(31, 38, 135, 0.5) !important;
-        }
-
-        ion-icon {
-          font-size: 2.5rem !important;
-          opacity: 0.9 !important;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) !important;
-        }
-
-        div {
-          display: flex !important;
-          flex-direction: column !important;
-
-          .stat-number {
-            font-size: 2.2rem !important;
-            font-weight: 800 !important;
-            line-height: 1.2 !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-          }
-
-          .stat-label {
-            font-size: 0.875rem !important;
-            opacity: 0.9 !important;
-            font-weight: 500 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-          }
-        }
-
-        &.success ion-icon {
-          color: #10b981 !important;
-          filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5)) !important;
-        }
-
-        &.pending ion-icon {
-          color: #ef4444 !important;
-          filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5)) !important;
-        }
-
-        &.admin ion-icon {
-          color: #f59e0b !important;
-          filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5)) !important;
-        }
-      }
-    }
+    z-index: 1;
+    padding: 0 1.5rem; // Márgenes laterales mejorados
+    padding-bottom: 120px; // Espacio adicional para el FAB
   }
 }
 
-// Filtros con efecto glass
-.search-filters {
-  padding: 2rem !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  margin: 0 1rem 1rem !important;
-  border-radius: 20px !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
-  position: relative !important;
-  z-index: 3 !important;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-    border-radius: 20px 20px 0 0;
-  }
-
-  ion-searchbar {
-    --background: rgba(248, 250, 252, 0.8) !important;
-    --border-radius: 16px !important;
-    --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-    --padding-start: 1.5rem !important;
-    --padding-end: 1.5rem !important;
-    margin: 0 0 1.5rem 0 !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-
-    &.searchbar-has-value {
-      --background: rgba(255, 255, 255, 0.95) !important;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
-      transform: scale(1.02) !important;
-    }
-  }
-
-  .filters-row {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
-    gap: 1rem !important;
-    align-items: center !important;
-
-    .filter-item {
-      --background: transparent !important;
-      --inner-padding-end: 0 !important;
-      --padding-start: 0 !important;
-
-      ion-select {
-        --padding-start: 1.5rem !important;
-        --padding-end: 1.5rem !important;
-        background: rgba(248, 250, 252, 0.8) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border-radius: 12px !important;
-        border: 1px solid rgba(226, 232, 240, 0.8) !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-
-        &:hover {
-          border-color: var(--primary-color) !important;
-          background: rgba(255, 255, 255, 0.95) !important;
-          transform: translateY(-2px) !important;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-        }
-      }
-    }
-
-    .clear-filters-btn {
-      --color: var(--primary-color) !important;
-      --background: rgba(248, 250, 252, 0.8) !important;
-      --border-radius: 12px !important;
-      backdrop-filter: blur(10px) !important;
-      -webkit-backdrop-filter: blur(10px) !important;
-      border: 1px solid rgba(226, 232, 240, 0.8) !important;
-      transition: all 0.3s ease !important;
-
-      &:hover {
-        --background: rgba(255, 255, 255, 0.95) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-      }
-    }
-  }
-}
-
-// Grid de usuarios con efectos modernos
-.users-content {
-  padding: 0 1rem 2rem !important;
-  position: relative !important;
-  z-index: 1 !important;
-}
-
-.users-grid {
-  ion-row {
-    gap: 1.5rem !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-  }
-
-  ion-col {
-    padding: 0.75rem !important;
-    
-    // Móvil: 1 card por fila
-    @media (max-width: 767px) {
-      flex: 0 0 100% !important;
-      max-width: 100% !important;
-    }
-    
-    // Tablet pequeña: 2 cards por fila
-    @media (min-width: 768px) and (max-width: 991px) {
-      flex: 0 0 calc(50% - 0.75rem) !important;
-      max-width: calc(50% - 0.75rem) !important;
-    }
-    
-    // Tablet grande: 3 cards por fila
-    @media (min-width: 992px) and (max-width: 1199px) {
-      flex: 0 0 calc(33.333% - 1rem) !important;
-      max-width: calc(33.333% - 1rem) !important;
-    }
-    
-    // Escritorio: 4 cards por fila
-    @media (min-width: 1200px) {
-      flex: 0 0 calc(25% - 1.125rem) !important;
-      max-width: calc(25% - 1.125rem) !important;
-    }
-  }
-}
-
-// Cards de usuarios con glassmorphism
-ion-card.user-card,
-.user-card {
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-radius: 20px !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
-  overflow: hidden !important;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-  position: relative !important;
-  margin: 0 !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 480px !important;
-
-  // Responsive adjustments
-  @media (max-width: 767px) {
-    min-height: 420px !important;
-  }
-
-  @media (min-width: 1200px) {
-    min-height: 520px !important;
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 2;
-  }
-
+// ==========================================================================
+// HEADER MEJORADO CON GLASSMORPHISM Y ESPACIADO OPTIMIZADO
+// ==========================================================================
+.sticky-header {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem 2rem; // Padding más generoso con mejor espaciado
+  margin: 0 0 3rem 0; // Márgenes mejorados
+  border-radius: var(--radius-xl);
+  transition: var(--transition-normal);
+  
   &:hover {
-    transform: translateY(-12px) scale(1.02) !important;
-    box-shadow: 0 20px 64px 0 rgba(0, 0, 0, 0.2) !important;
-    border-color: var(--primary-color) !important;
-
-    &::before {
-      opacity: 1;
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  .header-stats {
+    margin-bottom: 2rem; // Mejor separación entre título y stats
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--usuarios-primary), #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 2rem; // Más espacio debajo del título
+      text-align: center;
     }
-  }
-
-  // Estados de los usuarios por rol
-  &.admin {
-    border-left: 4px solid #ef4444 !important;
-  }
-
-  &.market {
-    border-left: 4px solid #f59e0b !important;
-  }
-
-  &.user {
-    border-left: 4px solid #10b981 !important;
-  }
-
-  &.inactive {
-    opacity: 0.7 !important;
-    background: rgba(248, 250, 252, 0.8) !important;
-  }
-}
-
-// Header de las cards de usuario
-ion-card-header {
-  padding: 2rem 2rem 1.5rem !important;
-  background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.5) !important;
-  position: relative !important;
-  z-index: 1 !important;
-
-  .user-header {
-    display: flex !important;
-    align-items: center !important;
-    gap: 1rem !important;
-    margin-bottom: 1rem !important;
-
-    .user-avatar {
-      width: 56px !important;
-      height: 56px !important;
-      border-radius: 50% !important;
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      color: white !important;
-      font-weight: 800 !important;
-      font-size: 1.5rem !important;
-      text-transform: uppercase !important;
-      box-shadow: 0 8px 24px rgba(92, 206, 223, 0.4) !important;
-      backdrop-filter: blur(10px) !important;
-      -webkit-backdrop-filter: blur(10px) !important;
-      border: 2px solid rgba(255, 255, 255, 0.3) !important;
-    }
-
-    .user-info {
-      flex: 1 !important;
-
-      ion-card-title {
-        font-size: 1.25rem !important;
-        font-weight: 700 !important;
-        color: var(--ion-color-dark) !important;
-        margin: 0 0 0.25rem 0 !important;
-        line-height: 1.3 !important;
-      }
-
-      ion-card-subtitle {
-        font-size: 0.875rem !important;
-        color: var(--ion-color-medium) !important;
-        margin: 0 !important;
-        font-weight: 500 !important;
-      }
-    }
-  }
-
-  .user-badges {
-    display: flex !important;
-    gap: 0.75rem !important;
-    flex-wrap: wrap !important;
-
-    .role-badge {
-      padding: 0.5rem 1rem !important;
-      border-radius: 20px !important;
-      font-size: 0.75rem !important;
-      font-weight: 700 !important;
-      text-transform: uppercase !important;
-      letter-spacing: 0.5px !important;
-      backdrop-filter: blur(10px) !important;
-      -webkit-backdrop-filter: blur(10px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.3) !important;
-
-      &.admin {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9)) !important;
-        color: white !important;
-        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4) !important;
-      }
-
-      &.market {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9)) !important;
-        color: white !important;
-        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4) !important;
-      }
-
-      &.user {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.9)) !important;
-        color: white !important;
-        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4) !important;
-      }
-    }
-  }
-}
-
-// Contenido de las cards
-ion-card-content {
-  padding: 2rem !important;
-  position: relative !important;
-  z-index: 1 !important;
-
-  .user-details {
-    display: grid !important;
-    gap: 1rem !important;
-
-    .detail-row {
-      display: flex !important;
-      align-items: center !important;
-      gap: 1rem !important;
-      padding: 1rem !important;
-      background: rgba(248, 250, 252, 0.6) !important;
-      backdrop-filter: blur(5px) !important;
-      -webkit-backdrop-filter: blur(5px) !important;
-      border-radius: 12px !important;
-      border: 1px solid rgba(226, 232, 240, 0.5) !important;
-      transition: all 0.3s ease !important;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.8) !important;
-        transform: translateX(4px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-      }
-
-      ion-icon {
-        color: var(--primary-color) !important;
-        font-size: 1.25rem !important;
-        filter: drop-shadow(0 2px 4px rgba(92, 206, 223, 0.3)) !important;
-      }
-
-      .detail-content {
-        flex: 1 !important;
-
-        .detail-label {
-          font-size: 0.75rem !important;
-          color: var(--ion-color-medium) !important;
-          margin-bottom: 0.25rem !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.5px !important;
-          font-weight: 600 !important;
-          display: block !important;
+    
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); // Cards más anchas
+      gap: 2rem; // Más espacio entre cards
+      margin-bottom: 2rem; // Espacio adicional más generoso
+      
+      .stat-item {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem 1.5rem; // Padding más generoso
+        display: flex;
+        align-items: center;
+        gap: 1.25rem; // Más espacio entre ícono y texto
+        transition: var(--transition-normal);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+          transition: var(--transition-slow);
         }
+        
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-xl);
+          
+          &::before {
+            left: 100%;
+          }
+        }
+        
+        ion-icon {
+          font-size: 2rem; // Íconos más grandes y visibles
+          padding: 0.75rem;
+          border-radius: var(--radius-md);
+          background: var(--usuarios-light);
+          min-width: 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          color: var(--usuarios-primary); // Color base para todos los iconos
+          transition: all 0.3s ease;
+        }
+        
+        &.success ion-icon {
+          color: #10b981; // Verde más vibrante
+          background: rgba(16, 185, 129, 0.15);
+        }
+        
+        &.pending ion-icon {
+          color: #f59e0b; // Naranja más vibrante
+          background: rgba(245, 158, 11, 0.15);
+        }
+        
+        &.admin ion-icon {
+          color: #ef4444; // Rojo más vibrante
+          background: rgba(239, 68, 68, 0.15);
+        }
+        
+        .stat-number {
+          font-size: 1.375rem; // Números un poco más grandes
+          font-weight: 700;
+          color: var(--usuarios-dark);
+          line-height: 1.2;
+        }
+        
+        .stat-label {
+          font-size: 0.8rem;
+          color: var(--usuarios-medium);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          line-height: 1.2;
+        }
+      }
+    }
+  }
+  
+  .search-filters {
+    margin-top: 2.5rem; // Más espacio antes de los filtros
+    
+    ion-searchbar {
+      --background: rgba(255, 255, 255, 0.9);
+      --border-radius: var(--radius-lg);
+      --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      --color: var(--usuarios-dark);
+      --placeholder-color: var(--usuarios-medium);
+      --placeholder-font-weight: 500;
+      --icon-color: #3b82f6; // Icono de búsqueda azul vibrante
+      --clear-button-color: #6b7280; // Color del botón clear
+      margin-bottom: 2rem; // Más espacio debajo del buscador
+      border: none !important; // Remover borde
+      border-radius: var(--radius-lg);
+      
+      &:hover {
+        --background: rgba(255, 255, 255, 1);
+        --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        --icon-color: #1d4ed8; // Icono más oscuro en hover
+      }
+      
+      &:focus-within {
+        --box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 6px 20px rgba(0, 0, 0, 0.15);
+        border: none !important; // Remover borde en focus también
+        --icon-color: #1d4ed8; // Icono más oscuro en focus
+      }
+    }
+    
+    .filters-row {
+      display: flex;
+      gap: 1.5rem; // Más espacio entre filtros
+      flex-wrap: wrap;
+      align-items: stretch; // Alinear elementos para misma altura
+      justify-content: flex-start;
+      
+      .filter-item {
+        --background: rgba(255, 255, 255, 0.9);
+        --border-radius: var(--radius-lg);
+        --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        --padding-start: 1.25rem;
+        --padding-end: 1.25rem;
+        --min-height: 56px; // Altura mínima para evitar solapamiento
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        flex: 1;
+        min-width: 200px; // Filtros más anchos
+        margin-bottom: 0.5rem; // Separación vertical entre items
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: var(--radius-lg);
+        overflow: visible; // Permitir que el contenido se vea
+        z-index: 1; // Z-index para evitar solapamiento
+        
+        &:hover {
+          --background: rgba(255, 255, 255, 1);
+          --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+          border-color: rgba(59, 130, 246, 0.2);
+          z-index: 2; // Z-index más alto en hover
+        }
+        
+        &:focus-within {
+          --box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 6px 20px rgba(0, 0, 0, 0.15);
+          border-color: rgba(59, 130, 246, 0.3);
+          z-index: 3; // Z-index más alto en focus
+        }
+        
+        ion-select {
+          --placeholder-color: var(--usuarios-medium);
+          --color: var(--usuarios-dark);
+          font-weight: 500;
+          min-height: 48px; // Altura mínima del select
+          line-height: 1.4;
+          
+          ion-icon {
+            color: #3b82f6 !important; // Azul vibrante para iconos de select
+          }
+        }
+        
+        // Estilos específicos para el label del ion-item
+        ion-label {
+          position: static !important; // Evitar problemas de posicionamiento
+          transform: none !important;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--usuarios-medium);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+      
+      .clear-filters-btn {
+        --background: linear-gradient(135deg, var(--usuarios-warning), #ff6b6b);
+        --color: white;
+        --border-radius: var(--radius-lg);
+        --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 2rem; // Más padding horizontal
+        height: 52px; // Altura fija para alineación con filtros
+        font-weight: 600;
+        border: none !important; // Remover borde
+        outline: none !important; // Remover outline
+        position: relative; // Para controlar z-index
+        
+        &:hover {
+          --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+          transform: translateY(-2px) scale(1.02);
+          z-index: 10; // Z-index alto en hover
+        }
+        
+        ion-icon {
+          font-size: 1.25rem;
+          margin-right: 0.5rem;
+          color: #ffffff; // Color blanco para contraste
+        }
+        
+        &:hover {
+          transform: translateY(-2px);
+          --box-shadow: var(--shadow-lg);
+        }
+      }
+    }
+  }
+}
 
-        .detail-value {
-          font-size: 0.875rem !important;
-          color: var(--ion-color-dark) !important;
-          font-weight: 600 !important;
-
-          &.status {
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.5rem !important;
-
-            .status-indicator {
-              width: 8px !important;
-              height: 8px !important;
-              border-radius: 50% !important;
-              background: #10b981 !important;
-              box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3) !important;
-
+// ==========================================================================
+// TABLA MODERNA CON GLASSMORPHISM Y ESPACIADO MEJORADO
+// ==========================================================================
+.desktop-table {
+  margin-bottom: 3rem; // Más espacio debajo de la tabla
+  
+  .modern-table-wrapper {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    margin: 2rem 0 3rem 0; // Más margen vertical
+    transition: var(--transition-normal);
+    
+    &:hover {
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+    }
+    
+    // Barra de herramientas superior
+    .table-toolbar {
+      background: linear-gradient(135deg, var(--usuarios-primary), #764ba2);
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: slideInDown 0.5s ease;
+      
+      .selection-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        
+        ion-icon {
+          font-size: 1.25rem;
+        }
+      }
+      
+      .bulk-actions {
+        display: flex;
+        gap: 0.5rem;
+        
+        ion-button {
+          --border-radius: var(--radius-sm);
+          --background: rgba(255, 255, 255, 0.15);
+          --color: white;
+          --border-color: rgba(255, 255, 255, 0.3);
+          transition: var(--transition-fast);
+          
+          &:hover {
+            --background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+          }
+        }
+      }
+    }
+    
+    // Header de la tabla con espaciado mejorado
+    .table-header {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.95));
+      border-bottom: 2px solid rgba(56, 128, 255, 0.1);
+      padding: 1.25rem 2rem; // Más padding horizontal y vertical
+      display: grid;
+      grid-template-columns: 60px 1.8fr 1.6fr 1fr 0.9fr 0.9fr 1.1fr 1fr;
+      gap: 1.5rem; // Más espacio entre columnas
+      align-items: center;
+      font-weight: 600;
+      color: var(--usuarios-dark);
+      
+      .header-cell {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        
+        &.sortable-header {
+          cursor: pointer;
+          user-select: none;
+          transition: var(--transition-fast);
+          padding: 0.75rem; // Más padding para área clickeable
+          border-radius: var(--radius-sm);
+          position: relative;
+          
+          &:hover {
+            background: rgba(56, 128, 255, 0.05);
+            color: var(--usuarios-primary);
+          }
+          
+          &.active {
+            color: var(--usuarios-primary);
+            background: rgba(56, 128, 255, 0.1);
+          }
+          
+          .sort-indicators {
+            display: flex;
+            flex-direction: column;
+            margin-left: 0.75rem; // Más espacio del texto
+            gap: -2px;
+            
+            .sort-icon {
+              font-size: 0.75rem;
+              opacity: 0.3;
+              transition: var(--transition-fast);
+              
+              &.active {
+                opacity: 1;
+                color: var(--usuarios-primary);
+              }
+            }
+          }
+        }
+        
+        .select-all-checkbox {
+          --checkbox-background: rgba(255, 255, 255, 0.9);
+          --border-radius: var(--radius-sm);
+          --border-color: rgba(56, 128, 255, 0.3);
+          --checkmark-color: var(--usuarios-primary);
+        }
+      }
+    }
+    
+    // Cuerpo de la tabla con espaciado mejorado
+    .table-body {
+      .table-row {
+        display: grid;
+        grid-template-columns: 60px 1.8fr 1.6fr 1fr 0.9fr 0.9fr 1.1fr 1fr;
+        gap: 1.5rem; // Más espacio entre columnas
+        align-items: center;
+        padding: 1.25rem 2rem; // Más padding horizontal y vertical
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: var(--transition-fast);
+        cursor: pointer;
+        position: relative;
+        min-height: 75px; // Altura mínima más generosa
+        
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background: transparent;
+          transition: var(--transition-fast);
+        }
+        
+        &:hover {
+          background: rgba(56, 128, 255, 0.02);
+          transform: translateX(4px);
+          
+          &::before {
+            background: var(--usuarios-primary);
+          }
+        }
+        
+        &.selected {
+          background: rgba(56, 128, 255, 0.05);
+          
+          &::before {
+            background: var(--usuarios-primary);
+          }
+        }
+        
+        &.inactive {
+          opacity: 0.6;
+          
+          &::before {
+            background: var(--usuarios-medium);
+          }
+        }
+        
+        &.loading {
+          opacity: 0.5;
+          pointer-events: none;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 1.5s infinite;
+          }
+        }
+        
+        .table-cell {
+          display: flex;
+          align-items: center;
+          
+          .row-checkbox {
+            --checkbox-background: white;
+            --border-radius: var(--radius-sm);
+            --border-color: rgba(56, 128, 255, 0.3);
+            --checkmark-color: var(--usuarios-primary);
+          }
+          
+          // Información del usuario con espaciado mejorado
+          &.user-col {
+            .user-info {
+              display: flex;
+              align-items: center;
+              gap: 1rem; // Más espacio entre avatar y texto
+              
+              .user-avatar {
+                width: 48px; // Avatar un poco más grande
+                height: 48px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, var(--usuarios-primary), #764ba2);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 0.95rem; // Texto un poco más grande
+                box-shadow: var(--shadow-md);
+                border: 3px solid rgba(255, 255, 255, 0.8);
+                transition: var(--transition-fast);
+              }
+              
+              .user-details {
+                .user-name {
+                  font-weight: 600;
+                  color: var(--usuarios-dark);
+                  margin-bottom: 0.375rem; // Más espacio entre líneas
+                  font-size: 0.95rem; // Un poco más grande
+                  line-height: 1.3;
+                }
+                
+                .user-username {
+                  color: var(--usuarios-medium);
+                  font-size: 0.825rem; // Un poco más grande
+                  font-weight: 500;
+                  line-height: 1.3;
+                }
+              }
+            }
+          }
+          
+          // Texto general con mejor spacing
+          .cell-text {
+            color: var(--usuarios-dark);
+            font-size: 0.9rem; // Un poco más grande
+            font-weight: 500;
+            line-height: 1.4; // Mejor altura de línea
+          }
+          
+          // Badge de rol
+          &.role-col {
+            .role-badge {
+              padding: 0.375rem 0.75rem;
+              border-radius: var(--radius-lg);
+              font-size: 0.75rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              border: 1px solid;
+              
+              &.admin {
+                background: linear-gradient(135deg, rgba(235, 68, 90, 0.1), rgba(235, 68, 90, 0.05));
+                color: var(--usuarios-danger);
+                border-color: rgba(235, 68, 90, 0.2);
+              }
+              
+              &.market {
+                background: linear-gradient(135deg, rgba(255, 196, 9, 0.1), rgba(255, 196, 9, 0.05));
+                color: var(--usuarios-warning);
+                border-color: rgba(255, 196, 9, 0.2);
+              }
+              
+              &.user {
+                background: linear-gradient(135deg, rgba(56, 128, 255, 0.1), rgba(56, 128, 255, 0.05));
+                color: var(--usuarios-primary);
+                border-color: rgba(56, 128, 255, 0.2);
+              }
+            }
+          }
+          
+          // Badge de estado
+          &.status-col {
+            .status-badge {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.375rem 0.75rem;
+              border-radius: var(--radius-lg);
+              font-size: 0.75rem;
+              font-weight: 600;
+              background: linear-gradient(135deg, rgba(45, 211, 111, 0.1), rgba(45, 211, 111, 0.05));
+              color: var(--usuarios-success);
+              border: 1px solid rgba(45, 211, 111, 0.2);
+              
               &.inactive {
-                background: #ef4444 !important;
-                box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3) !important;
+                background: linear-gradient(135deg, rgba(146, 148, 156, 0.1), rgba(146, 148, 156, 0.05));
+                color: var(--usuarios-medium);
+                border-color: rgba(146, 148, 156, 0.2);
+              }
+              
+              .status-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: currentColor;
+              }
+            }
+          }
+          
+          // Botones de acción con más espacio
+          &.actions-col {
+            .action-buttons {
+              display: flex;
+              gap: 0.75rem; // Más espacio entre botones
+              
+              .action-btn {
+                width: 40px; // Botones un poco más grandes
+                height: 40px;
+                border: none;
+                border-radius: var(--radius-sm);
+                background: rgba(255, 255, 255, 0.8);
+                color: var(--usuarios-medium);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: var(--transition-fast);
+                box-shadow: var(--shadow-sm);
+                
+                &:hover {
+                  transform: translateY(-2px);
+                  box-shadow: var(--shadow-md);
+                }
+                
+                &.view-btn:hover {
+                  background: rgba(56, 128, 255, 0.15);
+                  color: #3b82f6; // Azul más vibrante
+                }
+                
+                &.edit-btn:hover {
+                  background: rgba(245, 158, 11, 0.15);
+                  color: #f59e0b; // Naranja más vibrante
+                }
+                
+                &.password-btn:hover {
+                  background: rgba(107, 114, 128, 0.15);
+                  color: #6b7280; // Gris más definido
+                }
+                
+                &.toggle-btn {
+                  &.activate:hover {
+                    background: rgba(16, 185, 129, 0.15);
+                    color: #10b981; // Verde más vibrante
+                  }
+                  
+                  &.deactivate:hover {
+                    background: rgba(239, 68, 68, 0.15);
+                    color: #ef4444; // Rojo más vibrante
+                  }
+                }
+                
+                ion-icon {
+                  font-size: 1.25rem; // Íconos más grandes y visibles
+                  font-weight: 500;
+                }
               }
             }
           }
@@ -477,125 +680,513 @@ ion-card-content {
       }
     }
   }
+}
 
-  .user-actions {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 0.5rem !important;
-    margin-top: 2rem !important;
-    padding-top: 2rem !important;
-    border-top: 1px solid rgba(226, 232, 240, 0.5) !important;
-
-    ion-button {
-      --border-radius: 12px !important;
-      --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-      font-weight: 600 !important;
-      text-transform: uppercase !important;
-      letter-spacing: 0.5px !important;
-      font-size: 0.7rem !important;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      backdrop-filter: blur(10px) !important;
-      -webkit-backdrop-filter: blur(10px) !important;
-      min-height: 36px !important;
-
+// ==========================================================================
+// CARDS MÓVILES MEJORADAS
+// ==========================================================================
+.mobile-cards {
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+    
+    .user-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1rem;
+      padding: 1.25rem;
+      box-shadow: var(--shadow-lg);
+      transition: var(--transition-normal);
+      cursor: pointer;
+      
       &:hover {
-        transform: translateY(-2px) !important;
-        --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-xl);
       }
-
-      &.view-button {
-        --background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
-        --color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      
+      &.inactive {
+        opacity: 0.6;
       }
-
-      &.edit-button {
-        --background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
-        --color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      }
-
-      &.password-button {
-        &[color="warning"] {
-          --background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-          --color: white !important;
-          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        
+        .user-info {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          
+          .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--usuarios-primary), #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+          }
+          
+          .user-details {
+            .user-name {
+              font-weight: 600;
+              color: var(--usuarios-dark);
+              margin-bottom: 0.25rem;
+            }
+            
+            .user-email {
+              color: var(--usuarios-medium);
+              font-size: 0.875rem;
+            }
+          }
+        }
+        
+        .user-status {
+          .status-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--usuarios-success);
+            
+            &.inactive {
+              background: var(--usuarios-medium);
+            }
+          }
         }
       }
-
-      &.toggle-button {
-        &[color="success"] {
-          --background: linear-gradient(135deg, #10b981, #059669) !important;
-          --color: white !important;
-          border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        }
-
-        &[color="danger"] {
-          --background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-          --color: white !important;
-          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      
+      .card-content {
+        .info-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.5rem;
+          
+          .label {
+            font-weight: 600;
+            color: var(--usuarios-medium);
+            font-size: 0.875rem;
+          }
+          
+          .value {
+            color: var(--usuarios-dark);
+            font-weight: 500;
+          }
+          
+          .role-badge.mobile {
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
         }
       }
-
-      &.delete-button {
-        --background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        --color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      
+      .card-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        
+        .mobile-action-btn {
+          width: 44px;
+          height: 44px;
+          border: none;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.8);
+          color: var(--usuarios-medium);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: var(--transition-fast);
+          box-shadow: var(--shadow-sm);
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+          }
+          
+          &.edit:hover {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b; // Naranja más vibrante
+          }
+          
+          &.password:hover {
+            background: rgba(107, 114, 128, 0.15);
+            color: #6b7280; // Gris más definido
+          }
+          
+          &.toggle {
+            &.activate:hover {
+              background: rgba(16, 185, 129, 0.15);
+              color: #10b981; // Verde más vibrante
+            }
+            
+            &.deactivate:hover {
+              background: rgba(239, 68, 68, 0.15);
+              color: #ef4444; // Rojo más vibrante
+            }
+          }
+          
+          ion-icon {
+            font-size: 1.25rem; // Iconos más grandes para móvil
+            font-weight: 500;
+          }
+        }
       }
     }
   }
 }
 
-// Loading state
-.loading-container {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  padding: 4rem 0 !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-radius: 20px !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
-  margin: 1rem !important;
-
-  ion-spinner {
-    --color: var(--primary-color) !important;
-    transform: scale(1.8) !important;
-    filter: drop-shadow(0 0 8px rgba(92, 206, 223, 0.5)) !important;
-    margin-bottom: 1rem !important;
+// ==========================================================================
+// ESTADO VACÍO MEJORADO CON ESPACIADO OPTIMIZADO
+// ==========================================================================
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem 5rem 2rem; // Más padding inferior
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-xl);
+  margin: 2rem 0 4rem 0; // Más margen inferior
+  box-shadow: var(--shadow-lg);
+  
+  ion-icon {
+    color: var(--usuarios-medium);
+    margin-bottom: 1.5rem; // Más espacio debajo del ícono
   }
-
+  
+  h3 {
+    color: var(--usuarios-dark);
+    margin-bottom: 1rem; // Más espacio debajo del título
+    font-weight: 600;
+    font-size: 1.25rem; // Un poco más grande
+  }
+  
   p {
-    color: var(--ion-color-medium) !important;
-    font-weight: 500 !important;
+    color: var(--usuarios-medium);
+    margin-bottom: 2rem; // Más espacio antes del botón
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  ion-button {
+    --background: linear-gradient(135deg, var(--usuarios-primary), #764ba2);
+    --color: white;
+    --border-radius: var(--radius-lg);
+    --box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+    --padding-start: 2rem;
+    --padding-end: 2rem;
+    --height: 48px; // Botón más alto
+    
+    &:hover {
+      transform: translateY(-2px);
+      --box-shadow: var(--shadow-lg);
+    }
+  }
+}
+
+// ==========================================================================
+// INFINITE SCROLL CON ESPACIADO MEJORADO
+// ==========================================================================
+ion-infinite-scroll {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  
+  ion-infinite-scroll-content {
+    padding: 2rem 0;
+    color: var(--usuarios-medium);
+    font-weight: 500;
+    
+    .infinite-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      
+      ion-spinner {
+        --color: var(--usuarios-primary);
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// FAB MEJORADO CON MEJOR POSICIONAMIENTO E ICONO
+// ==========================================================================
+ion-fab {
+  position: fixed !important; // Asegurar posición fija
+  bottom: 2rem; // Espacio desde el borde inferior
+  right: 2rem; // Espacio desde el borde derecho
+  z-index: 1000; // Z-index alto para estar sobre todo
+}
+
+ion-fab-button {
+  --background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  --color: white !important;
+  --box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  --border-radius: 50%;
+  width: 64px; // Botón más grande
+  height: 64px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none !important; // Eliminar cualquier borde
+  outline: none !important; // Eliminar outline
+  
+  &:hover {
+    transform: scale(1.1) rotate(90deg);
+    --box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
+    --background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  &:focus {
+    outline: none !important; // Eliminar focus outline
+    border: none !important;
+  }
+  
+  ion-icon {
+    font-size: 2rem; // Ícono mucho más grande y visible
+    font-weight: bold;
+    color: white !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+}
+
+// ==========================================================================
+// LOADING CONTAINER CON ESPACIADO MEJORADO
+// ==========================================================================
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  margin: 2rem 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  min-height: 200px;
+  
+  ion-spinner {
+    --color: var(--usuarios-primary);
+    margin-bottom: 1.5rem;
+    transform: scale(1.2);
+  }
+  
+  p {
+    color: var(--usuarios-medium);
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    margin: 0;
+  }
+}
+
+// ==========================================================================
+// ANIMACIONES Y EFECTOS
+// ==========================================================================
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Aplicar animación a las filas de la tabla
+.table-row {
+  animation: fadeInUp 0.5s ease forwards;
+  
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.05}s;
+    }
+  }
+}
+
+// ==========================================================================
+// RESPONSIVE DESIGN CON ESPACIADO OPTIMIZADO
+// ==========================================================================
+@media (max-width: 1200px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 50px 1.5fr 1.3fr 0.8fr 0.8fr 0.8fr 1fr 0.9fr !important;
+    gap: 1.25rem !important; // Mantener buen espaciado
+    padding: 1rem 1.5rem !important; // Padding reducido pero generoso
+  }
+  
+  .sticky-header {
+    padding: 1.5rem 1rem; // Reducir padding en pantallas medianas
+  }
+}
+
+@media (max-width: 968px) {
+  .desktop-table {
+    display: none;
+  }
+  
+  .mobile-cards {
+    display: block;
+  }
+  
+  .users-page .main-content {
+    padding: 0 1rem; // Menos padding en móvil
+    padding-bottom: 100px; // Mantener espacio para FAB
+  }
+}
+
+@media (max-width: 576px) {
+  .sticky-header {
+    padding: 1.25rem 0.75rem; // Padding más compacto en móviles pequeños
+    margin: 0 -1rem 2rem -1rem; // Ajustar márgenes
+    
+    .header-stats {
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem; // Mantener espacio generoso
+      }
+      
+      .stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem; // Reducir gap en móvil
+        
+        .stat-item {
+          padding: 1rem; // Padding reducido pero cómodo
+        }
+      }
+    }
+    
+    .search-filters {
+      .filters-row {
+        flex-direction: column;
+        gap: 1rem; // Mantener espacio entre filtros
+        align-items: stretch; // Elementos ocupan todo el ancho
+        
+        .filter-item {
+          min-width: 100%;
+          margin-bottom: 0.75rem; // Más separación en móvil
+          --min-height: 52px; // Altura ligeramente mayor en móvil
+        }
+        
+        .clear-filters-btn {
+          align-self: stretch; // Botón de ancho completo
+          --height: 52px; // Altura cómoda para touch
+          margin-top: 0.5rem; // Separación del último filtro
+        }
+      }
+    }
+  }
+  
+  .users-page .main-content {
+    padding: 0 0.75rem;
+    padding-bottom: 140px; // Más espacio para FAB en móvil
+  }
+  
+  ion-fab {
+    position: fixed !important;
+    bottom: 1.5rem !important; // Posición fija en móvil
+    right: 1.5rem !important;
+    z-index: 1001 !important; // Z-index muy alto
+  }
+  
+  ion-fab-button {
+    width: 56px !important; // Tamaño optimizado para móvil
+    height: 56px !important;
+    --box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5) !important;
+    
+    ion-icon {
+      font-size: 1.75rem !important; // Icono ligeramente más pequeño en móvil
+    }
+  }
+}
+
+// Checkbox column optimization
+.select-col {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+  
+  .select-all-checkbox,
+  .row-checkbox {
+    --size: 18px !important;
     margin: 0 !important;
   }
 }
 
-// FAB Button
-ion-fab {
-  ion-fab-button {
-    --background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)) !important;
-    --color: white !important;
-    --box-shadow: 0 12px 40px rgba(92, 206, 223, 0.4) !important;
-    --border-radius: 50% !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 2px solid rgba(255, 255, 255, 0.3) !important;
-
-    &:hover {
-      --background: linear-gradient(135deg, var(--primary-light), var(--primary-color)) !important;
-      transform: scale(1.15) rotate(180deg) !important;
-      --box-shadow: 0 16px 48px rgba(92, 206, 223, 0.6) !important;
+// Responsive adjustments
+@media (max-width: 768px) {
+  .modern-table-wrapper {
+    .table-header,
+    .table-row {
+      grid-template-columns: 50px 1.4fr 1.6fr 0.9fr 0.7fr 0.7fr 0.9fr 0.7fr !important;
+      padding: 0.3rem 0.5rem !important;
+      min-height: 45px !important;
     }
+  }
+  
+  .select-col {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+  }
+}
 
-    ion-icon {
-      font-size: 1.75rem !important;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) !important;
-    }
+// ==========================================================================
+// CORRECCIONES ADICIONALES PARA SOLAPAMIENTO
+// ==========================================================================
+.users-page {
+  // Evitar problemas de z-index con los selects
+  .filter-item {
+    contain: layout style; // Mejorar el rendimiento y evitar solapamientos
+  }
+  
+  // Asegurar que los popovers de los selects se muestren correctamente
+  ion-select {
+    --z-index: 1000;
+  }
+  
+  // Espaciado adicional para evitar problemas visuales
+  .sticky-header {
+    padding-bottom: 1rem; // Espacio adicional en la parte inferior
   }
 }

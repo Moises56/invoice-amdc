@@ -12,20 +12,12 @@ import {
   IonButton, 
   IonIcon, 
   IonSearchbar,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
   IonBadge,
   IonSpinner,
   IonRefresher,
   IonRefresherContent,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonFab,
   IonFabButton,
   IonSelect,
@@ -34,6 +26,7 @@ import {
   IonAvatar,
   IonAlert,
   IonToast,
+  IonCheckbox,
   AlertController,
   ToastController,
   ModalController
@@ -63,7 +56,12 @@ import {
   atOutline,
   statsChartOutline,
   toggleOutline,
-  warningOutline
+  warningOutline, 
+  downloadOutline, 
+  closeOutline, 
+  chevronUpOutline, 
+  chevronDownOutline,
+  checkmarkCircle
 } from 'ionicons/icons';
 import { UsuariosService } from '../usuarios.service';
 import { User, Role } from '../../../shared/interfaces';
@@ -89,6 +87,16 @@ export interface UserStats {
   };
 }
 
+export interface SortConfig {
+  field: 'name' | 'email' | 'role' | 'status' | 'lastLogin';
+  direction: 'asc' | 'desc';
+}
+
+export interface BulkAction {
+  type: 'activate' | 'deactivate' | 'export' | 'delete';
+  userIds: string[];
+}
+
 @Component({
   selector: 'app-usuarios-list',
   templateUrl: './usuarios-list.page.html',
@@ -107,24 +115,17 @@ export interface UserStats {
     IonButton, 
     IonIcon, 
     IonSearchbar,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
     IonSpinner,
     IonRefresher,
     IonRefresherContent,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonFab,
     IonFabButton,
     IonSelect,
     IonSelectOption,
-    IonItem
+    IonItem,
+    IonCheckbox
   ]
 })
 export class UsuariosListPage implements OnInit {
@@ -146,6 +147,13 @@ export class UsuariosListPage implements OnInit {
   selectedGerencia = signal('');
   userStats = signal<UserStats | null>(null);
 
+  // Nuevas funcionalidades - Signals
+  selectedUsers = signal<Set<string>>(new Set());
+  selectAll = signal(false);
+  currentSort = signal<SortConfig>({ field: 'name', direction: 'asc' });
+  bulkActionsLoading = signal(false);
+  userActionLoading = signal<Set<string>>(new Set());
+
   // Computed properties
   filteredByRole = computed(() => {
     return (role: Role) => this.usuarios().filter(u => u.role === role);
@@ -163,30 +171,158 @@ export class UsuariosListPage implements OnInit {
     return gerencias.sort();
   });
 
+  // Métodos de utilidad para el template
+  getInitials(name: string): string {
+    if (!name) return '?';
+    return name.split(' ')
+      .map(word => word.charAt(0))
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
+
+  getFullName(user: User): string {
+    if (user.nombre && user.apellido) {
+      return `${user.nombre} ${user.apellido}`.trim();
+    }
+    return user.username || user.nombre || user.apellido || 'Usuario';
+  }
+
+  getAvatarInitials(user: User): string {
+    return this.getInitials(this.getFullName(user));
+  }
+
+  getRoleText(role: Role): string {
+    return this.getRoleDisplayName(role);
+  }
+
+  getUserStatus(user: User): { text: string; class: string } {
+    return {
+      text: user.isActive ? 'Activo' : 'Inactivo',
+      class: user.isActive ? 'active' : 'inactive'
+    };
+  }
+
+  formatLastLogin(date: Date | string | null | undefined): string {
+    if (!date) return 'Nunca';
+    
+    let dateObj: Date;
+    if (typeof date === 'string') {
+      dateObj = new Date(date);
+    } else {
+      dateObj = date;
+    }
+    
+    if (isNaN(dateObj.getTime())) return 'Nunca';
+    
+    return dateObj.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  trackByUser(index: number, user: User): any {
+    return user.id || user.username || index;
+  }
+
+  formatDate(dateInput: Date | string | null | undefined): string {
+    if (!dateInput) return 'Nunca';
+    
+    let date: Date;
+    if (typeof dateInput === 'string') {
+      date = new Date(dateInput);
+    } else {
+      date = dateInput;
+    }
+    
+    if (isNaN(date.getTime())) return 'Nunca';
+    
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
+
+  formatDateTime(dateInput: Date | string | null | undefined): string {
+    if (!dateInput) return 'Nunca';
+    
+    let date: Date;
+    if (typeof dateInput === 'string') {
+      date = new Date(dateInput);
+    } else {
+      date = dateInput;
+    }
+    
+    if (isNaN(date.getTime())) return 'Nunca';
+    
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  getRoleDisplayName(role: Role): string {
+    const roleNames: Record<Role, string> = {
+      [Role.ADMIN]: 'Administrador',
+      [Role.MARKET]: 'Mercado',
+      [Role.USER]: 'Usuario'
+    };
+    return roleNames[role] || role;
+  }
+
+  getStatusText(isActive: boolean): string {
+    return isActive ? 'Activo' : 'Inactivo';
+  }
+
+  // Funciones para estadísticas
+  getActiveUsersCount(): number {
+    return this.usuarios().filter(user => user.isActive).length;
+  }
+
+  getInactiveUsersCount(): number {
+    return this.usuarios().filter(user => !user.isActive).length;
+  }
+
+  getAdminUsersCount(): number {
+    return this.usuarios().filter(user => user.role === Role.ADMIN).length;
+  }
+
   // Enum para el template
   Role = Role;
 
   constructor() {
     addIcons({
-      radioButtonOnOutline,
-      mailOutline,
-      callOutline,
-      atOutline,
       addOutline,
       peopleOutline,
       checkmarkCircleOutline,
       closeCircleOutline,
       shieldOutline,
       refreshOutline,
+      checkmarkCircle,
+      downloadOutline,
+      closeOutline,
+      chevronUpOutline,
+      chevronDownOutline,
+      eyeOutline,
+      createOutline,
+      keyOutline,
+      radioButtonOnOutline,
+      mailOutline,
+      callOutline,
+      atOutline,
       cardOutline,
       businessOutline,
       personOutline,
       timeOutline,
-      eyeOutline,
-      createOutline,
       searchOutline,
       trashOutline,
-      keyOutline,
       filterOutline,
       ellipsisVerticalOutline,
       statsChartOutline,
@@ -482,14 +618,324 @@ export class UsuariosListPage implements OnInit {
               await this.showToast('Usuario eliminado correctamente', 'success');
               await this.loadUsuarios(true);
             } catch (error) {
+              console.error('Error al eliminar usuario:', error);
               await this.showToast('Error al eliminar usuario', 'danger');
             }
           }
         }
       ]
     });
-
     await alert.present();
+  }
+
+  // =====================================
+  // NUEVAS FUNCIONALIDADES - SELECCIÓN MÚLTIPLE Y ORDENAMIENTO
+  // =====================================
+
+  /**
+   * Verificar si un usuario está seleccionado
+   */
+  isUserSelected(user: User): boolean {
+    return this.selectedUsers().has(user.id);
+  }
+
+  /**
+   * Alternar selección de usuario individual
+   */
+  toggleUserSelection(user: User, event: any): void {
+    const selected = new Set(this.selectedUsers());
+    
+    if (event.detail.checked) {
+      selected.add(user.id);
+    } else {
+      selected.delete(user.id);
+    }
+    
+    this.selectedUsers.set(selected);
+    this.updateSelectAllState();
+  }
+
+  /**
+   * Seleccionar/deseleccionar todos los usuarios
+   */
+  toggleSelectAll(event: any): void {
+    const selected = new Set<string>();
+    
+    if (event.detail.checked) {
+      this.usuarios().forEach(user => selected.add(user.id));
+    }
+    
+    this.selectedUsers.set(selected);
+    this.selectAll.set(event.detail.checked);
+  }
+
+  /**
+   * Verificar estado indeterminado del checkbox principal
+   */
+  isIndeterminate(): boolean {
+    const selectedCount = this.selectedUsers().size;
+    const totalCount = this.usuarios().length;
+    return selectedCount > 0 && selectedCount < totalCount;
+  }
+
+  /**
+   * Actualizar estado del checkbox "Seleccionar todo"
+   */
+  private updateSelectAllState(): void {
+    const selectedCount = this.selectedUsers().size;
+    const totalCount = this.usuarios().length;
+    
+    if (selectedCount === 0) {
+      this.selectAll.set(false);
+    } else if (selectedCount === totalCount) {
+      this.selectAll.set(true);
+    }
+  }
+
+  /**
+   * Limpiar selección
+   */
+  clearSelection(): void {
+    this.selectedUsers.set(new Set());
+    this.selectAll.set(false);
+  }
+
+  /**
+   * Manejar clic en fila (selección vs navegación)
+   */
+  onRowClick(user: User, event: MouseEvent): void {
+    // Si no hay usuarios seleccionados, ir a vista de detalle
+    if (this.selectedUsers().size === 0) {
+      this.viewUser(user);
+    } else {
+      // Si hay selecciones activas, alternar selección
+      const selected = new Set(this.selectedUsers());
+      if (selected.has(user.id)) {
+        selected.delete(user.id);
+      } else {
+        selected.add(user.id);
+      }
+      this.selectedUsers.set(selected);
+      this.updateSelectAllState();
+    }
+  }
+
+  /**
+   * Ordenar por columna
+   */
+  sortBy(field: SortConfig['field']): void {
+    const current = this.currentSort();
+    let direction: 'asc' | 'desc' = 'asc';
+    
+    if (current.field === field) {
+      direction = current.direction === 'asc' ? 'desc' : 'asc';
+    }
+    
+    this.currentSort.set({ field, direction });
+    this.applySorting();
+  }
+
+  /**
+   * Aplicar ordenamiento a la lista de usuarios
+   */
+  private applySorting(): void {
+    const { field, direction } = this.currentSort();
+    const sorted = [...this.usuarios()].sort((a, b) => {
+      let valueA: any;
+      let valueB: any;
+      
+      switch (field) {
+        case 'name':
+          valueA = this.getFullName(a).toLowerCase();
+          valueB = this.getFullName(b).toLowerCase();
+          break;
+        case 'email':
+          valueA = (a.correo || a.email || '').toLowerCase();
+          valueB = (b.correo || b.email || '').toLowerCase();
+          break;
+        case 'role':
+          valueA = a.role;
+          valueB = b.role;
+          break;
+        case 'status':
+          valueA = a.isActive ? 1 : 0;
+          valueB = b.isActive ? 1 : 0;
+          break;
+        case 'lastLogin':
+          valueA = a.lastLogin ? new Date(a.lastLogin).getTime() : 0;
+          valueB = b.lastLogin ? new Date(b.lastLogin).getTime() : 0;
+          break;
+        default:
+          valueA = '';
+          valueB = '';
+      }
+      
+      if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+      if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    
+    this.usuarios.set(sorted);
+  }
+
+  // =====================================
+  // ACCIONES EN LOTE
+  // =====================================
+
+  /**
+   * Activar usuarios seleccionados
+   */
+  async bulkActivateUsers(): Promise<void> {
+    if (this.selectedUsers().size === 0) return;
+    
+    const alert = await this.alertController.create({
+      header: 'Activar usuarios',
+      message: `¿Activar ${this.selectedUsers().size} usuario(s) seleccionado(s)?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Activar',
+          handler: () => this.executeBulkAction('activate')
+        }
+      ]
+    });
+    
+    await alert.present();
+  }
+
+  /**
+   * Desactivar usuarios seleccionados
+   */
+  async bulkDeactivateUsers(): Promise<void> {
+    if (this.selectedUsers().size === 0) return;
+    
+    const alert = await this.alertController.create({
+      header: 'Desactivar usuarios',
+      message: `¿Desactivar ${this.selectedUsers().size} usuario(s) seleccionado(s)?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Desactivar',
+          handler: () => this.executeBulkAction('deactivate')
+        }
+      ]
+    });
+    
+    await alert.present();
+  }
+
+  /**
+   * Exportar usuarios seleccionados
+   */
+  async bulkExportUsers(): Promise<void> {
+    if (this.selectedUsers().size === 0) return;
+    
+    try {
+      this.bulkActionsLoading.set(true);
+      const selectedUserData = this.usuarios().filter(user => 
+        this.selectedUsers().has(user.id)
+      );
+      
+      // Crear CSV
+      const csvContent = this.createCSV(selectedUserData);
+      this.downloadCSV(csvContent, `usuarios_seleccionados_${new Date().toISOString().split('T')[0]}.csv`);
+      
+      await this.showToast(`${selectedUserData.length} usuarios exportados correctamente`, 'success');
+      this.clearSelection();
+      
+    } catch (error) {
+      console.error('Error al exportar usuarios:', error);
+      await this.showToast('Error al exportar usuarios', 'danger');
+    } finally {
+      this.bulkActionsLoading.set(false);
+    }
+  }
+
+  /**
+   * Ejecutar acción en lote
+   */
+  private async executeBulkAction(action: 'activate' | 'deactivate'): Promise<void> {
+    try {
+      this.bulkActionsLoading.set(true);
+      const userIds = Array.from(this.selectedUsers());
+      const isActive = action === 'activate';
+      
+      // Ejecutar acciones en paralelo con límite
+      const promises = userIds.map(async (userId) => {
+        try {
+          await this.usuariosService.updateUserStatus(userId, isActive).toPromise();
+          return { success: true, userId };
+        } catch (error) {
+          return { success: false, userId, error };
+        }
+      });
+      
+      const results = await Promise.all(promises);
+      const successes = results.filter(r => r.success);
+      const failures = results.filter(r => !r.success);
+      
+      if (successes.length > 0) {
+        await this.showToast(
+          `${successes.length} usuario(s) ${action === 'activate' ? 'activado(s)' : 'desactivado(s)'} correctamente`,
+          'success'
+        );
+      }
+      
+      if (failures.length > 0) {
+        await this.showToast(
+          `Error al procesar ${failures.length} usuario(s)`,
+          'warning'
+        );
+      }
+      
+      this.clearSelection();
+      await this.loadUsuarios(true);
+      
+    } catch (error) {
+      console.error('Error en acción en lote:', error);
+      await this.showToast('Error al procesar la acción', 'danger');
+    } finally {
+      this.bulkActionsLoading.set(false);
+    }
+  }
+
+  /**
+   * Crear contenido CSV
+   */
+  private createCSV(users: User[]): string {
+    const headers = ['Nombre', 'Usuario', 'Email', 'Teléfono', 'Rol', 'Estado', 'Último Acceso', 'Gerencia'];
+    const rows = users.map(user => [
+      this.getFullName(user),
+      user.username,
+      user.correo || user.email || '',
+      user.telefono || user.phone || '',
+      this.getRoleDisplayName(user.role),
+      user.isActive ? 'Activo' : 'Inactivo',
+      this.formatLastLogin(user.lastLogin),
+      user.gerencia || ''
+    ]);
+    
+    return [headers, ...rows]
+      .map(row => row.map(cell => `"${cell}"`).join(','))
+      .join('\n');
+  }
+
+  /**
+   * Descargar archivo CSV
+   */
+  private downloadCSV(content: string, filename: string): void {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
 
   /**
@@ -502,31 +948,6 @@ export class UsuariosListPage implements OnInit {
     this.selectedGerencia.set('');
     this.currentPage.set(1);
     this.loadUsuarios(true);
-  }
-
-  // Helper methods delegated to service
-  getAvatarInitials(user: User): string {
-    return this.usuariosService.getAvatarInitials(user);
-  }
-
-  getFullName(user: User): string {
-    return this.usuariosService.getFullName(user);
-  }
-
-  getRoleText(role: Role): string {
-    return this.usuariosService.getRoleText(role);
-  }
-
-  getUserStatus(user: User): { text: string; color: string } {
-    return this.usuariosService.getUserStatus(user);
-  }
-
-  formatLastLogin(date: Date | null | undefined): string {
-    return this.usuariosService.formatLastLogin(date);
-  }
-
-  trackByUser(index: number, user: User): string {
-    return user.id;
   }
 
   /**

@@ -12,49 +12,50 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="users-page">    <!-- Header fijo con controles -->
+<ion-content [fullscreen]="true" class="users-page">    
+    <!-- Header fijo con controles -->
     <div class="sticky-header">
-      <!-- Título y estadísticas -->
+      <!-- Título y estadísticas mejoradas -->
       <div class="header-stats">
-        <h1>Gestión de Usuarios</h1>
+        <h1>🚀 Gestión de Usuarios</h1>
         <div class="stats-cards">
-          <div class="stat-item">
+          <div class="stat-item" (click)="clearFilters()">
             <ion-icon name="people-outline"></ion-icon>
             <div>
-              <span class="stat-number">{{ userStats()?.total || totalItems() }}</span>
+              <span class="stat-number">{{ usuarios().length || 0 }}</span>
               <span class="stat-label">Total</span>
             </div>
           </div>
-          <div class="stat-item success">
+          <div class="stat-item success" (click)="onStatusChange({ detail: { value: true } })">
             <ion-icon name="checkmark-circle-outline"></ion-icon>
             <div>
-              <span class="stat-number">{{ userStats()?.active || filteredByStatus()(true).length }}</span>
+              <span class="stat-number">{{ getActiveUsersCount() }}</span>
               <span class="stat-label">Activos</span>
             </div>
           </div>
-          <div class="stat-item pending">
+          <div class="stat-item pending" (click)="onStatusChange({ detail: { value: false } })">
             <ion-icon name="close-circle-outline"></ion-icon>
             <div>
-              <span class="stat-number">{{ userStats()?.inactive || filteredByStatus()(false).length }}</span>
+              <span class="stat-number">{{ getInactiveUsersCount() }}</span>
               <span class="stat-label">Inactivos</span>
             </div>
           </div>
-          <div class="stat-item admin">
+          <div class="stat-item admin" (click)="onRoleChange({ detail: { value: Role.ADMIN } })">
             <ion-icon name="shield-outline"></ion-icon>
             <div>
-              <span class="stat-number">{{ userStats()?.byRole?.ADMIN || filteredByRole()(Role.ADMIN).length }}</span>
+              <span class="stat-number">{{ getAdminUsersCount() }}</span>
               <span class="stat-label">Admins</span>
             </div>
           </div>
         </div>
       </div>
 
-    <!-- Buscador y filtros -->
+    <!-- Buscador y filtros mejorados -->
     <div class="search-filters">
       <ion-searchbar 
         [(ngModel)]="searchTerm"
         (ionInput)="onSearch($event)"
-        placeholder="Buscar por nombre, email, usuario..."
+        placeholder="🔍 Buscar por nombre, email, usuario..."
         debounce="500"
         show-clear-button="focus">
       </ion-searchbar>
@@ -64,12 +65,12 @@
           <ion-select 
             [(ngModel)]="selectedRole"
             (ionChange)="onRoleChange($event)"
-            placeholder="Rol"
+            placeholder="👥 Filtrar por Rol"
             interface="popover">
             <ion-select-option value="">Todos los roles</ion-select-option>
-            <ion-select-option [value]="Role.ADMIN">Administrador</ion-select-option>
-            <ion-select-option [value]="Role.MARKET">Gerente de Mercado</ion-select-option>
-            <ion-select-option [value]="Role.USER">Usuario</ion-select-option>
+            <ion-select-option [value]="Role.ADMIN">🛡️ Administrador</ion-select-option>
+            <ion-select-option [value]="Role.MARKET">🏪 Gerente de Mercado</ion-select-option>
+            <ion-select-option [value]="Role.USER">👤 Usuario</ion-select-option>
           </ion-select>
         </ion-item>
 
@@ -77,11 +78,11 @@
           <ion-select 
             [(ngModel)]="selectedStatus"
             (ionChange)="onStatusChange($event)"
-            placeholder="Estado"
+            placeholder="⚡ Filtrar por Estado"
             interface="popover">
             <ion-select-option value="">Todos los estados</ion-select-option>
-            <ion-select-option [value]="true">Activos</ion-select-option>
-            <ion-select-option [value]="false">Inactivos</ion-select-option>
+            <ion-select-option [value]="true">✅ Activos</ion-select-option>
+            <ion-select-option [value]="false">❌ Inactivos</ion-select-option>
           </ion-select>
         </ion-item>
 
@@ -89,7 +90,7 @@
           <ion-select 
             [(ngModel)]="selectedGerencia"
             (ionChange)="onGerenciaChange($event)"
-            placeholder="Gerencia"
+            placeholder="🏢 Filtrar por Gerencia"
             interface="popover">
             <ion-select-option value="">Todas las gerencias</ion-select-option>
             <ion-select-option [value]="gerencia" *ngFor="let gerencia of availableGerencias()">{{ gerencia }}</ion-select-option>
@@ -99,22 +100,25 @@
         <ion-button 
           fill="clear" 
           (click)="clearFilters()"
-          class="clear-filters-btn">
+          class="clear-filters-btn"
+          title="Limpiar todos los filtros">
           <ion-icon name="refresh-outline"></ion-icon>
+          <span>Limpiar</span>
         </ion-button>
       </div>
     </div>
   </div>
 
-  <!-- Refresher -->
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content
-      pulling-icon="chevron-down-circle-outline"
-      pulling-text="Desliza para actualizar"
-      refreshing-spinner="circles"
-      refreshing-text="Actualizando...">
-    </ion-refresher-content>
-  </ion-refresher>
+  <div class="main-content">
+    <!-- Refresher -->
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+      <ion-refresher-content
+        pulling-icon="chevron-down-circle-outline"
+        pulling-text="Desliza para actualizar"
+        refreshing-spinner="circles"
+        refreshing-text="Actualizando...">
+      </ion-refresher-content>
+    </ion-refresher>
 
   <!-- Loading spinner -->
   <div *ngIf="loading()" class="loading-container">
@@ -124,150 +128,340 @@
 
   <!-- Lista de usuarios -->
   <div *ngIf="!loading()" class="users-content">
-    <!-- Grid de usuarios -->
-    <div class="users-grid">
-      <ion-grid>
-        <ion-row>
-          <ion-col 
+    
+    <!-- Tabla para Desktop -->
+    <div class="desktop-table">
+      <div class="modern-table-wrapper">
+        
+        <!-- Barra de herramientas superior mejorada -->
+        <div class="table-toolbar" *ngIf="selectedUsers().size > 0">
+          <div class="selection-info">
+            <ion-icon name="checkmark-circle" color="light"></ion-icon>
+            <span>{{ selectedUsers().size }} usuario(s) seleccionado(s)</span>
+          </div>
+          <div class="bulk-actions">
+            <ion-button 
+              fill="outline" 
+              size="small" 
+              color="light"
+              (click)="bulkActivateUsers()"
+              [disabled]="bulkActionsLoading()"
+              title="Activar usuarios seleccionados">
+              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+              Activar
+            </ion-button>
+            <ion-button 
+              fill="outline" 
+              size="small" 
+              color="light"
+              (click)="bulkDeactivateUsers()"
+              [disabled]="bulkActionsLoading()"
+              title="Desactivar usuarios seleccionados">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Desactivar
+            </ion-button>
+            <ion-button 
+              fill="outline" 
+              size="small" 
+              color="light"
+              (click)="bulkExportUsers()"
+              [disabled]="bulkActionsLoading()"
+              title="Exportar usuarios seleccionados">
+              <ion-icon name="download-outline" slot="start"></ion-icon>
+              Exportar
+            </ion-button>
+            <ion-button 
+              fill="clear" 
+              size="small" 
+              color="light"
+              (click)="clearSelection()"
+              title="Limpiar selección">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Limpiar
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- Header mejorado con ordenamiento -->
+        <div class="table-header">
+          <div class="header-cell select-col">
+            <ion-checkbox 
+              [(ngModel)]="selectAll"
+              [indeterminate]="isIndeterminate()"
+              (ionChange)="toggleSelectAll($event)"
+              class="select-all-checkbox">
+            </ion-checkbox>
+          </div>
+          
+          <div class="header-cell sortable-header user-col" 
+               (click)="sortBy('name')"
+               [class.active]="currentSort().field === 'name'">
+            <span>Usuario</span>
+            <div class="sort-indicators">
+              <ion-icon 
+                name="chevron-up-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'name' && currentSort().direction === 'asc'">
+              </ion-icon>
+              <ion-icon 
+                name="chevron-down-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'name' && currentSort().direction === 'desc'">
+              </ion-icon>
+            </div>
+          </div>
+          
+          <div class="header-cell sortable-header email-col" 
+               (click)="sortBy('email')"
+               [class.active]="currentSort().field === 'email'">
+            <span>Email</span>
+            <div class="sort-indicators">
+              <ion-icon 
+                name="chevron-up-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'email' && currentSort().direction === 'asc'">
+              </ion-icon>
+              <ion-icon 
+                name="chevron-down-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'email' && currentSort().direction === 'desc'">
+              </ion-icon>
+            </div>
+          </div>
+          
+          <div class="header-cell phone-col">Teléfono</div>
+          
+          <div class="header-cell sortable-header role-col" 
+               (click)="sortBy('role')"
+               [class.active]="currentSort().field === 'role'">
+            <span>Rol</span>
+            <div class="sort-indicators">
+              <ion-icon 
+                name="chevron-up-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'role' && currentSort().direction === 'asc'">
+              </ion-icon>
+              <ion-icon 
+                name="chevron-down-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'role' && currentSort().direction === 'desc'">
+              </ion-icon>
+            </div>
+          </div>
+          
+          <div class="header-cell sortable-header status-col" 
+               (click)="sortBy('status')"
+               [class.active]="currentSort().field === 'status'">
+            <span>Estado</span>
+            <div class="sort-indicators">
+              <ion-icon 
+                name="chevron-up-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'status' && currentSort().direction === 'asc'">
+              </ion-icon>
+              <ion-icon 
+                name="chevron-down-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'status' && currentSort().direction === 'desc'">
+              </ion-icon>
+            </div>
+          </div>
+          
+          <div class="header-cell sortable-header access-col" 
+               (click)="sortBy('lastLogin')"
+               [class.active]="currentSort().field === 'lastLogin'">
+            <span>Último Acceso</span>
+            <div class="sort-indicators">
+              <ion-icon 
+                name="chevron-up-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'lastLogin' && currentSort().direction === 'asc'">
+              </ion-icon>
+              <ion-icon 
+                name="chevron-down-outline" 
+                class="sort-icon"
+                [class.active]="currentSort().field === 'lastLogin' && currentSort().direction === 'desc'">
+              </ion-icon>
+            </div>
+          </div>
+          
+          <div class="header-cell actions-col">Acciones</div>
+        </div>
+        
+        <div class="table-body">
+          <div 
             *ngFor="let user of usuarios(); trackBy: trackByUser"
-            size="12" 
-            size-sm="6" 
-            size-md="4" 
-            size-lg="3">
-            <ion-card 
-              class="user-card"
-              [class.admin]="user.role === Role.ADMIN"
-              [class.market]="user.role === Role.MARKET"
-              [class.user]="user.role === Role.USER"
-              [class.inactive]="!user.isActive">
-              <!-- Removido el (click)="viewUser(user)" para evitar navegación no deseada -->
-              
-              <ion-card-header>
-                <div class="user-header">
-                  <div class="user-avatar">
-                    {{ getAvatarInitials(user) }}
-                  </div>
-                  <div class="user-info">
-                    <ion-card-title>{{ getFullName(user) }}</ion-card-title>
-                    <ion-card-subtitle>{{ user.correo || user.email || user.username }}</ion-card-subtitle>
-                  </div>
+            class="table-row"
+            [class.inactive]="!user.isActive"
+            [class.selected]="isUserSelected(user)"
+            [class.loading]="userActionLoading().has(user.id)"
+            (click)="onRowClick(user, $event)">
+            
+            <!-- Checkbox de selección -->
+            <div class="table-cell select-col" (click)="$event.stopPropagation()">
+              <ion-checkbox 
+                [checked]="isUserSelected(user)"
+                (ionChange)="toggleUserSelection(user, $event)"
+                class="row-checkbox">
+              </ion-checkbox>
+            </div>
+            
+            <!-- Usuario -->
+            <div class="table-cell user-col">
+              <div class="user-info">
+                <div class="user-avatar">
+                  {{ getAvatarInitials(user) }}
                 </div>
-                <div class="user-badges">
-                  <div 
-                    class="role-badge"
-                    [class.admin]="user.role === Role.ADMIN"
-                    [class.market]="user.role === Role.MARKET"
-                    [class.user]="user.role === Role.USER">
-                    {{ getRoleText(user.role) }}
-                  </div>
-                </div>
-              </ion-card-header>
-
-              <ion-card-content>
                 <div class="user-details">
-                  <!-- Estado -->
-                  <div class="detail-row">
-                    <ion-icon name="radio-button-on-outline"></ion-icon>
-                    <div class="detail-content">
-                      <span class="detail-label">Estado</span>
-                      <span class="detail-value status">
-                        <span class="status-indicator" [class.inactive]="!user.isActive"></span>
-                        {{ getUserStatus(user).text }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Email -->
-                  <div class="detail-row" *ngIf="user.correo || user.email">
-                    <ion-icon name="mail-outline"></ion-icon>
-                    <div class="detail-content">
-                      <span class="detail-label">Email</span>
-                      <span class="detail-value">{{ user.correo || user.email }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Teléfono -->
-                  <div class="detail-row" *ngIf="user.telefono || user.phone">
-                    <ion-icon name="call-outline"></ion-icon>
-                    <div class="detail-content">
-                      <span class="detail-label">Teléfono</span>
-                      <span class="detail-value">{{ user.telefono || user.phone }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Username -->
-                  <div class="detail-row" *ngIf="user.username">
-                    <ion-icon name="at-outline"></ion-icon>
-                    <div class="detail-content">
-                      <span class="detail-label">Usuario</span>
-                      <span class="detail-value">{{ user.username }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Último acceso -->
-                  <div class="detail-row" *ngIf="user.lastLogin">
-                    <ion-icon name="time-outline"></ion-icon>
-                    <div class="detail-content">
-                      <span class="detail-label">Último acceso</span>
-                      <span class="detail-value">{{ formatLastLogin(user.lastLogin) }}</span>
-                    </div>
-                  </div>
+                  <div class="user-name">{{ getFullName(user) }}</div>
+                  <div class="user-username">{{ user.username }}</div>
                 </div>
+              </div>
+            </div>
 
-                <!-- Acciones -->
-                <div class="user-actions">
-                  <ion-button 
-                    class="view-button"
-                    size="small" 
-                    fill="outline"
-                    (click)="viewUser(user)">
-                    <ion-icon name="eye-outline" slot="start"></ion-icon>
-                    Ver
-                  </ion-button>
-                  <ion-button 
-                    class="edit-button"
-                    size="small" 
-                    (click)="editUser(user)">
-                    <ion-icon name="create-outline" slot="start"></ion-icon>
-                    Editar
-                  </ion-button>
-                  <ion-button 
-                    class="password-button"
-                    size="small" 
-                    fill="outline"
-                    color="warning"
-                    (click)="resetPassword(user)">
-                    <ion-icon name="key-outline" slot="start"></ion-icon>
-                    Contraseña
-                  </ion-button>
-                  <ion-button 
-                    class="toggle-button"
-                    size="small" 
-                    fill="outline"
-                    [color]="user.isActive ? 'danger' : 'success'"
-                    (click)="toggleUserStatus(user)">
-                    <ion-icon 
-                      [name]="user.isActive ? 'close-circle-outline' : 'checkmark-circle-outline'"
-                      slot="start">
-                    </ion-icon>
-                    {{ user.isActive ? 'Desactivar' : 'Activar' }}
-                  </ion-button>
-                </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+            <!-- Email -->
+            <div class="table-cell email-col">
+              <span class="cell-text">{{ user.correo || user.email || '-' }}</span>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="table-cell phone-col">
+              <span class="cell-text">{{ user.telefono || user.phone || '-' }}</span>
+            </div>
+
+            <!-- Rol -->
+            <div class="table-cell role-col">
+              <div 
+                class="role-badge"
+                [class.admin]="user.role === Role.ADMIN"
+                [class.market]="user.role === Role.MARKET"
+                [class.user]="user.role === Role.USER">
+                {{ getRoleText(user.role) }}
+              </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="table-cell status-col">
+              <div class="status-badge" [class.inactive]="!user.isActive">
+                <div class="status-dot"></div>
+                <span>{{ getUserStatus(user).text }}</span>
+              </div>
+            </div>
+
+            <!-- Último Acceso -->
+            <div class="table-cell access-col">
+              <span class="cell-text">{{ formatLastLogin(user.lastLogin) }}</span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="table-cell actions-col" (click)="$event.stopPropagation()">
+              <div class="action-buttons">
+                <button 
+                  class="action-btn view-btn"
+                  (click)="viewUser(user)"
+                  title="Ver detalles">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </button>
+                <button 
+                  class="action-btn edit-btn"
+                  (click)="editUser(user)"
+                  title="Editar usuario">
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button 
+                  class="action-btn password-btn"
+                  (click)="resetPassword(user)"
+                  title="Cambiar contraseña">
+                  <ion-icon name="key-outline"></ion-icon>
+                </button>
+                <button 
+                  class="action-btn toggle-btn"
+                  [class.deactivate]="user.isActive"
+                  [class.activate]="!user.isActive"
+                  (click)="toggleUserStatus(user)"
+                  [title]="user.isActive ? 'Desactivar usuario' : 'Activar usuario'">
+                  <ion-icon [name]="user.isActive ? 'close-circle-outline' : 'checkmark-circle-outline'"></ion-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Estado vacío -->
+    <!-- Cards para Móvil -->
+    <div class="mobile-cards">
+      <div class="user-card" 
+           *ngFor="let user of usuarios(); trackBy: trackByUser"
+           [class.inactive]="!user.isActive"
+           (click)="viewUser(user)">
+        
+        <div class="card-header">
+          <div class="user-info">
+            <div class="user-avatar">
+              {{ getAvatarInitials(user) }}
+            </div>
+            <div class="user-details">
+              <div class="user-name">{{ getFullName(user) }}</div>
+              <div class="user-email">{{ user.correo || user.email }}</div>
+            </div>
+          </div>
+          <div class="user-status">
+            <div class="status-badge" [class.inactive]="!user.isActive">
+              <div class="status-dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <div class="info-row">
+            <span class="label">Rol:</span>
+            <div 
+              class="role-badge mobile"
+              [class.admin]="user.role === Role.ADMIN"
+              [class.market]="user.role === Role.MARKET"
+              [class.user]="user.role === Role.USER">
+              {{ getRoleText(user.role) }}
+            </div>
+          </div>
+          
+          <div class="info-row" *ngIf="user.telefono || user.phone">
+            <span class="label">Teléfono:</span>
+            <span class="value">{{ user.telefono || user.phone }}</span>
+          </div>
+        </div>
+
+        <div class="card-actions" (click)="$event.stopPropagation()">
+          <button 
+            class="mobile-action-btn edit"
+            (click)="editUser(user)">
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+          <button 
+            class="mobile-action-btn password"
+            (click)="resetPassword(user)">
+            <ion-icon name="key-outline"></ion-icon>
+          </button>
+          <button 
+            class="mobile-action-btn toggle"
+            [class.deactivate]="user.isActive"
+            [class.activate]="!user.isActive"
+            (click)="toggleUserStatus(user)">
+            <ion-icon [name]="user.isActive ? 'close-circle-outline' : 'checkmark-circle-outline'"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estado vacío mejorado -->
     <div *ngIf="usuarios().length === 0" class="empty-state">
       <ion-icon name="people-outline" size="large"></ion-icon>
-      <h3>No se encontraron usuarios</h3>
+      <h3>😔 No se encontraron usuarios</h3>
       <p>No hay usuarios que coincidan con los filtros seleccionados.</p>
       <ion-button 
         (click)="clearFilters()" 
         fill="outline">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
         Limpiar filtros
       </ion-button>
     </div>
@@ -284,10 +478,11 @@
     </ion-infinite-scroll-content>
   </ion-infinite-scroll>
 
-  <!-- FAB para crear nuevo usuario -->
+  <!-- FAB mejorado para crear nuevo usuario -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="createUser()" color="primary">
+    <ion-fab-button (click)="createUser()" color="primary" title="Crear nuevo usuario">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+  </div>
 </ion-content>

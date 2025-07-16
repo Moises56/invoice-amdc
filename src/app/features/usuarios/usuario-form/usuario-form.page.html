@@ -3,41 +3,45 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/usuarios"></ion-back-button>
     </ion-buttons>
-    <ion-title class="text-white font-semibold">
+    <ion-title>
       {{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="goBack()" fill="clear">
+      <ion-button (click)="goBack()" fill="clear" class="close-btn-modern">
         <ion-icon name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg-gray-50">
-  <div class="p-4">
+<ion-content class="modern-form-content">
+  <div class="form-container">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       
-      <!-- Información básica -->
-      <ion-card class="shadow-sm mb-4">
-        <ion-card-header class="pb-2">
-          <ion-card-title class="text-lg text-gray-800 flex items-center">
-            <ion-icon name="person-outline" class="mr-2 text-primary"></ion-icon>
-            Información Básica
-          </ion-card-title>
-        </ion-card-header>
+      <!-- Grid de cards responsive -->
+      <div class="cards-grid">
+        <!-- Información básica -->
+        <ion-card class="glass-card">
+          <ion-card-header class="card-header-modern">
+            <ion-card-title class="card-title-glass">
+              <div class="title-icon">
+                <ion-icon name="person-outline"></ion-icon>
+              </div>
+              Información Básica
+            </ion-card-title>
+          </ion-card-header>
         
-        <ion-card-content class="pt-0">
+        <ion-card-content class="card-content-modern">
           <!-- Nombre -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Nombre *
             </ion-label>
             <ion-input
               formControlName="nombre"
               placeholder="Ingrese el nombre"
               [class.is-invalid]="hasError('nombre')"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
           <div *ngIf="hasError('nombre')" class="error-message">
@@ -45,15 +49,15 @@
           </div>
 
           <!-- Apellido -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Apellido *
             </ion-label>
             <ion-input
               formControlName="apellido"
               placeholder="Ingrese el apellido"
               [class.is-invalid]="hasError('apellido')"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
           <div *ngIf="hasError('apellido')" class="error-message">
@@ -61,8 +65,8 @@
           </div>
 
           <!-- Email -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Correo Electrónico *
             </ion-label>
             <ion-input
@@ -70,7 +74,7 @@
               type="email"
               placeholder="usuario@ejemplo.com"
               [class.is-invalid]="hasError('correo')"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
           <div *ngIf="hasError('correo')" class="error-message">
@@ -78,15 +82,15 @@
           </div>
 
           <!-- Username -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Usuario *
             </ion-label>
             <ion-input
               formControlName="username"
               placeholder="Nombre de usuario"
               [class.is-invalid]="hasError('username')"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
           <div *ngIf="hasError('username')" class="error-message">
@@ -94,15 +98,15 @@
           </div>
 
           <!-- DNI -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               DNI *
             </ion-label>
             <ion-input
               formControlName="dni"
               placeholder="Número de identidad"
               [class.is-invalid]="hasError('dni')"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
           <div *ngIf="hasError('dni')" class="error-message">
@@ -110,65 +114,67 @@
           </div>
 
           <!-- Teléfono -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Teléfono
             </ion-label>
             <ion-input
               formControlName="telefono"
               type="tel"
               placeholder="Número de teléfono"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
 
           <!-- Gerencia -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Gerencia
             </ion-label>
             <ion-input
               formControlName="gerencia"
               placeholder="Gerencia o departamento"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
 
           <!-- Número de empleado -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Número de Empleado
             </ion-label>
             <ion-input
               formControlName="numero_empleado"
               type="number"
               placeholder="Número de empleado"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
         </ion-card-content>
-      </ion-card>
+        </ion-card>
 
-      <!-- Configuración de acceso -->
-      <ion-card class="shadow-sm mb-4">
-        <ion-card-header class="pb-2">
-          <ion-card-title class="text-lg text-gray-800 flex items-center">
-            <ion-icon name="key-outline" class="mr-2 text-primary"></ion-icon>
-            Configuración de Acceso
-          </ion-card-title>
-        </ion-card-header>
+        <!-- Configuración de acceso -->
+        <ion-card class="glass-card">
+          <ion-card-header class="card-header-modern">
+            <ion-card-title class="card-title-glass">
+              <div class="title-icon">
+                <ion-icon name="key-outline"></ion-icon>
+              </div>
+              Configuración de Acceso
+            </ion-card-title>
+          </ion-card-header>
         
-        <ion-card-content class="pt-0">
+        <ion-card-content class="card-content-modern">
           <!-- Rol -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Rol *
             </ion-label>
             <ion-select
               formControlName="role"
               placeholder="Seleccione un rol"
               [class.is-invalid]="hasError('role')"
-              class="mt-1">
+              class="input-modern">
               <ion-select-option *ngFor="let role of availableRoles" [value]="role">
                 {{ getRoleText(role) }}
               </ion-select-option>
@@ -179,8 +185,8 @@
           </div>
 
           <!-- Password -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass" lines="none">
+            <ion-label position="stacked" class="label-modern">
               Contraseña {{ isEditing() ? '(dejar vacío para mantener actual)' : '*' }}
             </ion-label>
             <ion-input
@@ -188,7 +194,7 @@
               type="password"
               placeholder="Ingrese la contraseña"
               [class.is-invalid]="hasError('password')"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
           <div *ngIf="hasError('password')" class="error-message">
@@ -198,9 +204,9 @@
           <!-- Confirmar Password -->
           <ion-item 
             *ngIf="form.get('password')?.value" 
-            class="mb-3 rounded-lg custom-input" 
+            class="input-glass" 
             lines="none">
-            <ion-label position="stacked" class="text-sm font-medium text-gray-700">
+            <ion-label position="stacked" class="label-modern">
               Confirmar Contraseña *
             </ion-label>
             <ion-input
@@ -208,7 +214,7 @@
               type="password"
               placeholder="Confirme la contraseña"
               [class.is-invalid]="hasError('confirmPassword')"
-              class="mt-1">
+              class="input-modern">
             </ion-input>
           </ion-item>
           <div *ngIf="hasError('confirmPassword')" class="error-message">
@@ -216,8 +222,8 @@
           </div>
 
           <!-- Estado activo -->
-          <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-            <ion-label class="text-sm font-medium text-gray-700">
+          <ion-item class="input-glass toggle-item" lines="none">
+            <ion-label class="label-modern">
               Usuario Activo
             </ion-label>
             <ion-toggle 
@@ -227,28 +233,32 @@
             </ion-toggle>
           </ion-item>
         </ion-card-content>
-      </ion-card>
+        </ion-card>
+      </div>
 
       <!-- Botones de acción -->
-      <div class="flex gap-3 mt-6">
+      <div class="action-buttons">
         <ion-button 
-          expand="block" 
-          fill="outline" 
-          color="medium"
+          fill="solid" 
           (click)="goBack()"
-          class="flex-1">
+          class="secondary-btn">
           <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
           Cancelar
         </ion-button>
         
         <ion-button 
-          expand="block" 
+          fill="solid"
           type="submit"
           [disabled]="form.invalid || isLoading()"
-          class="flex-1">
-          <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
-          <ion-icon *ngIf="!isLoading()" name="save-outline" slot="start"></ion-icon>
-          {{ isEditing() ? 'Actualizar' : 'Crear' }}
+          class="primary-btn">
+          <div *ngIf="isLoading()" class="loading-spinner">
+            <ion-spinner name="crescent"></ion-spinner>
+            <span>Guardando...</span>
+          </div>
+          <div *ngIf="!isLoading()" style="display: flex; align-items: center; gap: 0.5rem;">
+            <ion-icon name="save-outline"></ion-icon>
+            <span>{{ isEditing() ? 'Actualizar' : 'Crear' }} Usuario</span>
+          </div>
         </ion-button>
       </div>
     </form>

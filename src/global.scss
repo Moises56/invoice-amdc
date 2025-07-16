@@ -49,6 +49,37 @@
   --success: #059669;
   --neutral-50: #f9fafb;
   
+  /* Nuevas variables del sistema de diseño moderno */
+  --usuarios-primary: #3880ff;
+  --usuarios-success: #2dd36f;
+  --usuarios-warning: #ffc409;
+  --usuarios-danger: #eb445a;
+  --usuarios-medium: #92949c;
+  --usuarios-light: #f4f5f8;
+  --usuarios-dark: #222428;
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 10px;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+  
+  /* Bordes redondeados */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  
+  /* Transiciones */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
   /* Facturas & Usuarios Variables */
   --primary-color: #5ccedf;
   --primary-light: #8fe0ed;
@@ -67,17 +98,9 @@
   --neutral-700: #495057;
   --neutral-800: #343a40;
   --neutral-900: #212529;
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
   --border-radius: 0.375rem;
   --border-radius-lg: 0.5rem;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  --neutral-100: #f3f4f6;
-  --neutral-200: #e5e7eb;
-  --neutral-500: #6b7280;
-  --neutral-900: #111827;
 
   /* Variables de Ionic que usan nuestros colores municipales */
   --ion-color-primary: #5ccedf;
@@ -94,10 +117,10 @@
   --ion-color-secondary-shade: #90b1d8;
   --ion-color-secondary-tint: #addaf6;
   
-  /* Glass Effect Variables */
-  --glass-bg: rgba(255, 255, 255, 0.25);
+  /* Glass Effect Variables corregidas */
+  --glass-bg-alt: rgba(255, 255, 255, 0.25);
   --glass-bg-dark: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border-alt: rgba(255, 255, 255, 0.18);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   --glass-backdrop: blur(20px);
   

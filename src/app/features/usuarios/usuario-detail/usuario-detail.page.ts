@@ -33,7 +33,7 @@ import {
   keypadOutline,
   callOutline,
   cardOutline,
-  briefcaseOutline, calendarOutline, refreshOutline, arrowBackOutline, alertCircleOutline } from 'ionicons/icons';
+  briefcaseOutline, calendarOutline, refreshOutline, arrowBackOutline, alertCircleOutline, settingsOutline } from 'ionicons/icons';
 
 import { firstValueFrom } from 'rxjs';
 
@@ -57,8 +57,6 @@ import { User, Role } from '../../../shared/interfaces';
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonItem,
-    IonLabel,
     IonChip,
     IonIcon,
     IonButton,
@@ -78,7 +76,7 @@ export class UsuarioDetailPage implements OnInit {
   userId = signal<string>('');
 
   constructor() {
-    addIcons({createOutline,personOutline,mailOutline,callOutline,cardOutline,briefcaseOutline,businessOutline,keypadOutline,keyOutline,calendarOutline,refreshOutline,arrowBackOutline,alertCircleOutline,checkmarkCircleOutline,closeCircleOutline});
+    addIcons({createOutline,mailOutline,callOutline,cardOutline,briefcaseOutline,businessOutline,keypadOutline,keyOutline,settingsOutline,personOutline,calendarOutline,refreshOutline,arrowBackOutline,alertCircleOutline,checkmarkCircleOutline,closeCircleOutline});
   }
 
   ngOnInit() {
@@ -131,6 +129,46 @@ export class UsuarioDetailPage implements OnInit {
       [Role.USER]: 'primary'
     };
     return roleColors[role] || 'medium';
+  }
+
+  /**
+   * Obtener iniciales del nombre completo
+   */
+  getInitials(user: User | null): string {
+    if (!user) return '?';
+    
+    const firstName = user.nombre || '';
+    const lastName = user.apellido || '';
+    const username = user.username || '';
+    
+    if (firstName && lastName) {
+      return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    } else if (firstName) {
+      return firstName.substring(0, 2).toUpperCase();
+    } else if (username) {
+      return username.substring(0, 2).toUpperCase();
+    }
+    
+    return '?';
+  }
+
+  /**
+   * Obtener nombre completo del usuario
+   */
+  getFullName(user: User | null): string {
+    if (!user) return 'Usuario';
+    
+    if (user.nombre && user.apellido) {
+      return `${user.nombre} ${user.apellido}`.trim();
+    } else if (user.nombre) {
+      return user.nombre;
+    } else if (user.apellido) {
+      return user.apellido;
+    } else if (user.username) {
+      return user.username;
+    }
+    
+    return 'Usuario';
   }
 
   /**
