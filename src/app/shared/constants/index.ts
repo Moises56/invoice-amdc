@@ -1,8 +1,8 @@
+import { environment } from '../../../environments/environment';
+
 // Configuración de la API
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:3000/api',
-  // BASE_URL: 'https://factback.amdc.hn/api',
-  // BASE_URL: 'https://merc-fact-back.onrender.com/api',
+  BASE_URL: environment.apiUrl,
   ENDPOINTS: {
     AUTH: {
       LOGIN: '/auth/login',
