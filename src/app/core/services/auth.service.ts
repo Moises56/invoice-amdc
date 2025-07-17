@@ -284,9 +284,19 @@ export class AuthService {
     this._isAuthenticated.set(false);
     this._isLoading.set(false);
     this._initializationState.set('failed');
+    this._authCheckComplete.set(true); // Importante: marcar como completado
     this.stopTokenRefreshTimer();
     this.refreshInProgress = false;
     this.retryAttempts = 0;
+    
+    // Limpiar cualquier almacenamiento local residual
+    try {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+    } catch (error) {
+      console.log('⚠️ Error limpiando localStorage:', error);
+    }
   }
 
   /**

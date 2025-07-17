@@ -18,7 +18,7 @@ import {
   IonCheckbox
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logInOutline, eyeOutline, eyeOffOutline, personOutline, lockClosedOutline, businessOutline } from 'ionicons/icons';
+import { logInOutline, eyeOutline, eyeOffOutline, personOutline, lockClosedOutline, businessOutline, alertCircleOutline, helpCircleOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
 import { VALIDATION_CONFIG } from '../../../shared/constants';
 
@@ -31,17 +31,9 @@ import { VALIDATION_CONFIG } from '../../../shared/constants';
     FormsModule,
     ReactiveFormsModule,
     IonContent,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonItem,
-    IonLabel,
     IonInput,
-    IonButton,
     IonIcon,
     IonSpinner,
-    IonText,
     IonCheckbox
   ]
 })
@@ -59,7 +51,7 @@ export class LoginPage {
   isAuthenticated = this.authService.isAuthenticated;
 
   constructor() {
-    addIcons({businessOutline,personOutline,lockClosedOutline,logInOutline,eyeOutline,eyeOffOutline});
+    addIcons({personOutline,alertCircleOutline,lockClosedOutline,logInOutline,helpCircleOutline,businessOutline,eyeOutline,eyeOffOutline});
     
     this.loginForm = this.fb.group({
       identifier: ['', [Validators.required]],
@@ -71,10 +63,31 @@ export class LoginPage {
   }
 
   /**
+   * Resetear formulario y estado de componente
+   */
+  private resetForm(): void {
+    console.log('🔄 Reseteando formulario de login...');
+    this.loginForm.reset();
+    this.loginForm.markAsUntouched();
+    this.loginForm.markAsPristine();
+    this.showPassword.set(false);
+    this.rememberMe.set(false);
+    
+    // Asegurar que los campos están limpios
+    this.loginForm.patchValue({
+      identifier: '',
+      contrasena: ''
+    });
+  }
+
+  /**
    * Verificar estado de autenticación de manera robusta
    */
   private async checkAuthenticationStatus(): Promise<void> {
     console.log('🔍 LoginPage: Verificando estado de autenticación...');
+    
+    // Resetear formulario al verificar autenticación
+    this.resetForm();
     
     // Esperar a que se complete la verificación de autenticación con timeout
     let attempts = 0;

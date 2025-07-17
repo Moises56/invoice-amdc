@@ -1,113 +1,121 @@
-<ion-content class="ion-padding bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-  <div class="flex items-center justify-center min-h-full py-8">
-    <div class="w-full max-w-md">
-      <!-- Logo y título -->
-      <div class="text-center mb-8">
-        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-          <ion-icon name="business-outline" class="text-3xl text-white"></ion-icon>
+<ion-content class="modern-login-content">
+  <div class="login-container">
+    <div class="login-wrapper">
+      
+      <!-- Logo y título modernos -->
+      <div class="header-section">
+        <div class="logo-container">
+          <img src="assets/logos/logo4.png" alt="AMDC Logo" class="main-logo">
         </div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
-        <!-- <p class="text-gray-600">Iniciar Sesión</p> -->
+        <h1 class="welcome-title">Bienvenido</h1>
+        <p class="welcome-subtitle">Iniciar Sesión en AMDC</p>
       </div>
 
-      <!-- Formulario de login -->
-      <ion-card class="municipal-card shadow-2xl">
-        <ion-card-header class="text-center pb-2">
-          <ion-card-title class="text-xl font-semibold text-gray-800">
-            AMDC
-          </ion-card-title>
-        </ion-card-header>
+      <!-- Formulario de login con glass effect -->
+      <div class="login-card-glass">
+        <div class="card-header-glass">
+          <h2 class="card-title">Acceso al Sistema</h2>
+          <div class="title-divider"></div>
+        </div>
 
-        <ion-card-content>
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
-            <!-- Campo de usuario/email -->
-            <ion-item class="rounded-lg border border-gray-200 mb-4" [class.ion-invalid]="hasError('identifier')">
-              <ion-icon name="person-outline" slot="start" class="text-gray-500"></ion-icon>
-              <ion-label position="stacked">Usuario o Correo</ion-label>
-              <ion-input 
-                formControlName="identifier"
-                type="text"
-                placeholder="Ingrese su usuario o correo"
-                autocomplete="username"
-                [class.ion-invalid]="hasError('identifier')">
-              </ion-input>
-            </ion-item>
-            <div *ngIf="hasError('identifier')" class="px-4 -mt-2 mb-2">
-              <ion-text color="danger" class="text-sm">
-                {{ getErrorMessage('identifier') }}
-              </ion-text>
+        <div class="card-content-glass">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+            
+            <!-- Campo de usuario/email con glass -->
+            <div class="input-group-glass">
+              <div class="input-wrapper-glass" [class.error]="hasError('identifier')">
+                <div class="input-icon">
+                  <ion-icon name="person-outline"></ion-icon>
+                </div>
+                <div class="input-content">
+                  <label class="input-label">Usuario o Correo</label>
+                  <ion-input 
+                    formControlName="identifier"
+                    type="text"
+                    placeholder="Ingrese su usuario o correo"
+                    autocomplete="username"
+                    class="glass-input"
+                    fill="outline">
+                  </ion-input>
+                </div>
+              </div>
+              <div *ngIf="hasError('identifier')" class="error-message-glass">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <span>{{ getErrorMessage('identifier') }}</span>
+              </div>
             </div>
 
-            <!-- Campo de contraseña -->
-            <ion-item class="rounded-lg border border-gray-200 mb-4" [class.ion-invalid]="hasError('contrasena')">
-              <ion-icon name="lock-closed-outline" slot="start" class="text-gray-500"></ion-icon>
-              <ion-label position="stacked">Contraseña</ion-label>
-              <ion-input 
-                formControlName="contrasena"
-                [type]="showPassword() ? 'text' : 'password'"
-                placeholder="Ingrese su contraseña"
-                autocomplete="current-password"
-                [class.ion-invalid]="hasError('contrasena')">
-              </ion-input>
-              <ion-button 
-                fill="clear" 
-                slot="end" 
-                (click)="togglePasswordVisibility()"
-                size="small">
-                <ion-icon 
-                  [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'"
-                  class="text-gray-500">
-                </ion-icon>
-              </ion-button>
-            </ion-item>
-            <div *ngIf="hasError('contrasena')" class="px-4 -mt-2 mb-2">
-              <ion-text color="danger" class="text-sm">
-                {{ getErrorMessage('contrasena') }}
-              </ion-text>
+            <!-- Campo de contraseña con glass -->
+            <div class="input-group-glass">
+              <div class="input-wrapper-glass" [class.error]="hasError('contrasena')">
+                <div class="input-icon">
+                  <ion-icon name="lock-closed-outline"></ion-icon>
+                </div>
+                <div class="input-content">
+                  <label class="input-label">Contraseña</label>
+                  <ion-input 
+                    formControlName="contrasena"
+                    [type]="showPassword() ? 'text' : 'password'"
+                    placeholder="Ingrese su contraseña"
+                    autocomplete="current-password"
+                    class="glass-input"
+                    fill="outline">
+                  </ion-input>
+                </div>
+                <button 
+                  type="button"
+                  class="password-toggle"
+                  (click)="togglePasswordVisibility()">
+                  <ion-icon 
+                    [name]="showPassword() ? 'eye-off-outline' : 'eye-outline'">
+                  </ion-icon>
+                </button>
+              </div>
+              <div *ngIf="hasError('contrasena')" class="error-message-glass">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <span>{{ getErrorMessage('contrasena') }}</span>
+              </div>
             </div>
 
             <!-- Recordar sesión -->
-            <div class="flex items-center justify-between px-4 mb-6">
-              <ion-item lines="none" class="p-0 min-h-0">
+            <div class="remember-section">
+              <label class="checkbox-wrapper-glass">
                 <ion-checkbox 
                   [checked]="rememberMe()"
                   (ionChange)="toggleRememberMe()"
-                  slot="start"
-                  class="mr-2">
+                  class="glass-checkbox">
                 </ion-checkbox>
-                <ion-label class="text-sm text-gray-600 ml-2">
-                  Recordar sesión
-                </ion-label>
-              </ion-item>
+                <span class="checkbox-label">Recordar sesión</span>
+              </label>
             </div>
 
             <!-- Botón de login -->
-            <ion-button 
+            <button 
               type="submit"
-              expand="block"
-              size="large"
-              [disabled]="!loginForm.valid || isLoading()"
-              class="mt-6 h-12 font-semibold text-white"
-              style="--background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);">
+              class="login-btn-glass"
+              [disabled]="!loginForm.valid || isLoading()">
               
-              <div *ngIf="!isLoading()" class="flex items-center">
-                <ion-icon name="log-in-outline" class="mr-2"></ion-icon>
-                Iniciar Sesión
+              <div *ngIf="!isLoading()" class="btn-content">
+                <ion-icon name="log-in-outline"></ion-icon>
+                <span>Iniciar Sesión</span>
               </div>
               
-              <div *ngIf="isLoading()" class="flex items-center">
-                <ion-spinner name="crescent" class="mr-2"></ion-spinner>
-                Autenticando...
+              <div *ngIf="isLoading()" class="btn-loading">
+                <ion-spinner name="crescent"></ion-spinner>
+                <span>Autenticando...</span>
               </div>
-            </ion-button>
+            </button>
           </form>
-        </ion-card-content>
-      </ion-card>
+        </div>
+      </div>
 
-      <!-- Información adicional -->
-      <div class="text-center mt-6 text-sm text-gray-600">
-        <p>¿Problemas para acceder?</p>
-        <p>Contacte al administrador del sistema</p>
+      <!-- Footer con información adicional -->
+      <div class="footer-section">
+        <div class="help-text">
+          <ion-icon name="help-circle-outline"></ion-icon>
+          <span>¿Problemas para acceder?</span>
+        </div>
+        <p class="contact-text">Contacte al administrador del sistema</p>
       </div>
     </div>
   </div>

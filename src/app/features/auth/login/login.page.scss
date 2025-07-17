@@ -1,61 +1,605 @@
-ion-content {
-  --padding-start: 1rem;
-  --padding-end: 1rem;
+// ==========================================================================
+// DISEÑO MODERNO GLASSMORPHISM PARA LOGIN
+// ==========================================================================
+
+// Variables de diseño
+:root {
+  --login-primary: #5ccedf;
+  --login-primary-dark: #38b5c9;
+  --login-glass-bg: rgba(255, 255, 255, 0.25);
+  --login-glass-border: rgba(255, 255, 255, 0.4);
+  --login-text-primary: #1e293b;
+  --login-text-secondary: #64748b;
+  --login-text-input: #374151;
+  --login-text-label: #4b5563;
+  --login-error: #ef4444;
+  --login-shadow: rgba(92, 206, 223, 0.2);
 }
 
-.bg-gradient-to-br {
-  background: linear-gradient(to bottom right, #f0f9ff, #e0e7ff);
+// Contenedor principal con fondo glass
+.modern-login-content {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 50%,
+    #5ccedf 100%
+  );
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(92, 206, 223, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(102, 126, 234, 0.2) 0%, transparent 50%);
+    animation: backgroundMove 20s ease-in-out infinite;
+  }
 }
 
-.from-blue-50 {
-  --tw-gradient-from: #eff6ff;
+@keyframes backgroundMove {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
 }
 
-.to-indigo-100 {
-  --tw-gradient-to: #e0e7ff;
+// Contenedor principal del login
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  z-index: 2;
 }
 
-.municipal-card {
-  border-radius: 1rem;
+.login-wrapper {
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+}
+
+// Sección de header con logo
+.header-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  
+  .logo-container {
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+    
+    .main-logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.1));
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+  }
+  
+  .welcome-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--login-text-primary);
+    margin: 0 0 0.25rem 0;
+    text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+    letter-spacing: -0.025em;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1rem;
+    color: var(--login-text-secondary);
+    margin: 0;
+    font-weight: 400;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+// Tarjeta principal con glass effect
+.login-card-glass {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(92, 206, 223, 0.3);
+  border-radius: 1.5rem;
+  box-shadow: 
+    0 25px 45px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(92, 206, 223, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.2) 100%
+    );
+    pointer-events: none;
+  }
+}
+
+// Header de la tarjeta
+.card-header-glass {
+  padding: 1.5rem 1.5rem 0.75rem 1.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--login-text-primary);
+    margin: 0 0 0.75rem 0;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+    letter-spacing: -0.015em;
+  }
+  
+  .title-divider {
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--login-primary), var(--login-primary-dark));
+    margin: 0 auto;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(92, 206, 223, 0.3);
+  }
+}
+
+// Contenido de la tarjeta
+.card-content-glass {
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+// Formulario de login
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// Grupos de input con glass
+.input-group-glass {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.input-wrapper-glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(92, 206, 223, 0.6);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  min-height: 56px;
+  box-shadow: 
+    0 2px 8px rgba(92, 206, 223, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+    pointer-events: none;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.75);
+    border-color: rgba(92, 206, 223, 0.8);
+    transform: translateY(-1px);
+    box-shadow: 
+      0 4px 12px rgba(92, 206, 223, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  &:focus-within {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(92, 206, 223, 1);
+    box-shadow: 
+      0 0 0 3px rgba(92, 206, 223, 0.2),
+      0 6px 20px rgba(92, 206, 223, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+  }
+  
+  &.error {
+    border-color: rgba(239, 68, 68, 0.8);
+    background: rgba(239, 68, 68, 0.15);
+    
+    &:focus-within {
+      box-shadow: 
+        0 0 0 3px rgba(239, 68, 68, 0.2),
+        0 8px 25px rgba(239, 68, 68, 0.15);
+    }
+    
+    .input-label {
+      color: #fca5a5;
+    }
+    
+    .input-icon {
+      color: #fca5a5;
+    }
+  }
+}
+
+// Estilos específicos para inputs de Ionic
+ion-input.glass-input {
+  --border-width: 0 !important;
+  --inner-border-width: 0 !important;
+  --highlight-color-focused: transparent !important;
+  --highlight-color-valid: transparent !important;
+  --highlight-color-invalid: transparent !important;
+  
+  .native-input {
+    color: var(--login-text-input) !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+    
+    &::placeholder {
+      color: var(--login-text-secondary) !important;
+      opacity: 0.7 !important;
+    }
+  }
+}
+
+.input-icon {
+  color: var(--login-text-secondary);
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  opacity: 0.8;
+}
+
+.input-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  position: relative;
+  z-index: 2;
+  
+  .input-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--login-text-label);
+    margin: 0;
+    line-height: 1;
+    opacity: 0.9;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  }
+  
+  ion-input {
+    --color: var(--login-text-input) !important;
+    --placeholder-color: var(--login-text-secondary) !important;
+    --background: transparent !important;
+    --padding-start: 0 !important;
+    --padding-end: 0 !important;
+    --padding-top: 0.25rem !important;
+    --padding-bottom: 0 !important;
+    font-size: 0.925rem;
+    font-weight: 500;
+    line-height: 1.2;
+    
+    input {
+      color: var(--login-text-input) !important;
+      font-weight: 500 !important;
+      
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-weight: 400 !important;
+      }
+    }
+  }
+}
+
+.password-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--login-text-secondary);
+  font-size: 1.125rem;
+  cursor: pointer;
+  padding: 0.375rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 3;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: var(--login-text-primary);
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Mensajes de error
+.error-message-glass {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #fca5a5;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 0.125rem;
+  
+  ion-icon {
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+}
+
+// Sección de recordar sesión
+.remember-section {
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+.checkbox-wrapper-glass {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .glass-checkbox {
+    --checkbox-background-checked: var(--login-primary);
+    --checkbox-background: rgba(255, 255, 255, 0.2);
+    --border-color-checked: var(--login-primary);
+    --border-color: rgba(255, 255, 255, 0.3);
+    --checkmark-color: white;
+    margin: 0;
+  }
+  
+  .checkbox-label {
+    color: var(--login-text-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  }
+}
+
+// Botón de login
+.login-btn-glass {
+  background: linear-gradient(135deg, var(--login-primary), var(--login-primary-dark));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: #1e293b;
+  font-size: 0.925rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
   overflow: hidden;
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 6px 20px rgba(92, 206, 223, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  margin-top: 0.5rem;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+    pointer-events: none;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 35px rgba(92, 206, 223, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #38b5c9, #2a9eb0);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    background: rgba(148, 163, 184, 0.6);
+  }
+  
+  .btn-content, .btn-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 2;
+    color: #1e293b;
+    
+    span {
+      color: #1e293b;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+    
+    ion-icon {
+      font-size: 1.25rem;
+      color: #1e293b;
+    }
+    
+    ion-spinner {
+      --color: #1e293b;
+    }
+  }
 }
 
-.shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+// Sección de footer
+.footer-section {
+  text-align: center;
+  margin-top: 1.25rem;
+  
+  .help-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    color: var(--login-text-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+    opacity: 0.9;
+    
+    ion-icon {
+      font-size: 0.875rem;
+    }
+  }
+  
+  .contact-text {
+    color: var(--login-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin: 0;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  }
 }
 
-ion-item {
-  --border-radius: 0.5rem;
-  --padding-start: 1rem;
-  --padding-end: 1rem;
-  --inner-padding-start: 0;
-  --inner-padding-end: 0;
-  margin-bottom: 0.5rem;
+// Responsive design
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1rem;
+  }
+  
+  .login-wrapper {
+    max-width: 100%;
+  }
+  
+  .header-section {
+    .main-logo {
+      width: 80px;
+      height: 80px;
+    }
+    
+    .welcome-title {
+      font-size: 2rem;
+    }
+  }
+  
+  .card-header-glass,
+  .card-content-glass {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
-ion-item.ion-invalid {
-  --border-color: var(--error);
-  --highlight-color-focused: var(--error);
+// Animaciones de entrada
+.login-card-glass {
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-ion-input.ion-invalid {
-  --color: var(--error);
+.header-section {
+  animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-ion-button[type="submit"] {
-  --border-radius: 0.75rem;
-  --box-shadow: 0 4px 14px 0 rgba(92, 206, 223, 0.4);
-  margin-top: 1.5rem;
-  font-weight: 600;
-  height: 3rem;
+.footer-section {
+  animation: fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-ion-button[type="submit"]:hover {
-  --box-shadow: 0 6px 20px 0 rgba(92, 206, 223, 0.6);
-  transform: translateY(-1px);
-  transition: all 0.2s ease;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 ion-checkbox {
