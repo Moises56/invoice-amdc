@@ -138,6 +138,7 @@ export class LocalDetailPage implements OnInit, OnDestroy {
   // Filtros como signals para reactividad
   filtroEstado = signal<string>('');
   filtroMes = signal<string>('');
+  filtroEstadisticaActivo = signal<string | null>(null);
   filtroAnio = signal<string>('');
 
   // Computed signals adicionales
@@ -187,6 +188,34 @@ export class LocalDetailPage implements OnInit, OnDestroy {
     if (this.filtroAnio()) {
       const anioNumber = parseInt(this.filtroAnio());
       filtered = filtered.filter(factura => factura.anio === anioNumber);
+    }
+
+    // Filtro por estadística activa (clickeable)
+    if (this.filtroEstadisticaActivo()) {
+      const filtroActivo = this.filtroEstadisticaActivo();
+      const today = new Date();
+      
+      switch (filtroActivo) {
+        case 'pagadas':
+          filtered = filtered.filter(factura => factura.estado === 'PAGADA');
+          break;
+        case 'pendientes':
+          filtered = filtered.filter(factura => factura.estado === 'PENDIENTE');
+          break;
+        case 'vencidas':
+          filtered = filtered.filter(factura => {
+            if (factura.estado === 'PAGADA') return false;
+            const fechaVencimiento = new Date(factura.fecha_vencimiento);
+            return fechaVencimiento < today;
+          });
+          break;
+        case 'anuladas':
+          filtered = filtered.filter(factura => factura.estado === 'ANULADA');
+          break;
+        case 'total':
+          // No filtrar, mostrar todas
+          break;
+      }
     }
     
     return filtered;
@@ -901,6 +930,21 @@ export class LocalDetailPage implements OnInit, OnDestroy {
       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
     return months[month - 1] || 'Mes desconocido';
+  }
+
+  /**
+   * Filtrar facturas por estadística clickeable
+   */
+  filtrarPorEstadistica(tipo: 'total' | 'pagadas' | 'pendientes' | 'vencidas' | 'anuladas') {
+    // Si ya está activo el mismo filtro, lo desactivamos
+    if (this.filtroEstadisticaActivo() === tipo) {
+      this.filtroEstadisticaActivo.set(null);
+    } else {
+      // Activamos el nuevo filtro y limpiamos otros filtros para evitar conflictos
+      this.filtroEstadisticaActivo.set(tipo);
+      this.filtroEstado.set('');
+      this.searchTerm.set('');
+    }
   }
 
   /**

@@ -179,7 +179,11 @@
               Facturas
             </h3>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+            <div 
+              class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200 cursor-pointer transition-all duration-200 hover:shadow-lg"
+              [class.ring-2]="filtroEstadisticaActivo() === 'total'"
+              [class.ring-blue-400]="filtroEstadisticaActivo() === 'total'"
+              (click)="filtrarPorEstadistica('total')">
               <div class="flex items-center justify-between mb-2">
                 <ion-icon name="document-text-outline" class="text-blue-600 text-xl"></ion-icon>
                 <span class="text-2xl font-bold text-blue-700">{{ estadisticasFacturas().total || 0 }}</span>
@@ -187,7 +191,11 @@
               <p class="text-sm font-medium text-blue-600">Total Facturas</p>
             </div>
             
-            <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+            <div 
+              class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200 cursor-pointer transition-all duration-200 hover:shadow-lg"
+              [class.ring-2]="filtroEstadisticaActivo() === 'pagadas'"
+              [class.ring-green-400]="filtroEstadisticaActivo() === 'pagadas'"
+              (click)="filtrarPorEstadistica('pagadas')">
               <div class="flex items-center justify-between mb-2">
                 <ion-icon name="checkmark-circle-outline" class="text-green-600 text-xl"></ion-icon>
                 <span class="text-2xl font-bold text-green-700">{{ estadisticasFacturas().pagadas || 0 }}</span>
@@ -195,7 +203,11 @@
               <p class="text-sm font-medium text-green-600">Pagadas</p>
             </div>
             
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200">
+            <div 
+              class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200 cursor-pointer transition-all duration-200 hover:shadow-lg"
+              [class.ring-2]="filtroEstadisticaActivo() === 'pendientes'"
+              [class.ring-orange-400]="filtroEstadisticaActivo() === 'pendientes'"
+              (click)="filtrarPorEstadistica('pendientes')">
               <div class="flex items-center justify-between mb-2">
                 <ion-icon name="time-outline" class="text-orange-600 text-xl"></ion-icon>
                 <span class="text-2xl font-bold text-orange-700">{{ estadisticasFacturas().pendientes || 0 }}</span>
@@ -203,7 +215,11 @@
               <p class="text-sm font-medium text-orange-600">Pendientes</p>
             </div>
             
-            <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-xl border border-red-200">
+            <div 
+              class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-xl border border-red-200 cursor-pointer transition-all duration-200 hover:shadow-lg"
+              [class.ring-2]="filtroEstadisticaActivo() === 'vencidas'"
+              [class.ring-red-400]="filtroEstadisticaActivo() === 'vencidas'"
+              (click)="filtrarPorEstadistica('vencidas')">
               <div class="flex items-center justify-between mb-2">
                 <ion-icon name="close-circle-outline" class="text-red-600 text-xl"></ion-icon>
                 <span class="text-2xl font-bold text-red-700">{{ estadisticasFacturas().vencidas || 0 }}</span>
@@ -211,7 +227,11 @@
               <p class="text-sm font-medium text-red-600">Vencidas</p>
             </div>
             
-            <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-xl border border-gray-200">
+            <div 
+              class="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-xl border border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-lg"
+              [class.ring-2]="filtroEstadisticaActivo() === 'anuladas'"
+              [class.ring-gray-400]="filtroEstadisticaActivo() === 'anuladas'"
+              (click)="filtrarPorEstadistica('anuladas')">
               <div class="flex items-center justify-between mb-2">
                 <ion-icon name="ban-outline" class="text-gray-600 text-xl"></ion-icon>
                 <span class="text-2xl font-bold text-gray-700">{{ estadisticasFacturas().anuladas || 0 }}</span>

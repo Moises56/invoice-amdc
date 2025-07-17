@@ -32,6 +32,30 @@
   }
 }
 
+// Grid system para 5 columnas en escritorio (Estado de Facturas)
+.desktop-five-columns {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1280px) {
+    gap: 2rem;
+  }
+}
+
 // Grid system para las tarjetas financieras (2 columnas en escritorio)
 .desktop-financial-grid {
   display: grid;
@@ -229,6 +253,10 @@
   color: #2563eb;
 }
 
+.medium-value {
+  color: #6b7280;
+}
+
 .primary-value {
   color: #7c3aed;
 }
@@ -256,6 +284,11 @@
 .info-icon {
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   color: #2563eb;
+}
+
+.medium-icon {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  color: #6b7280;
 }
 
 .primary-icon {
@@ -287,6 +320,10 @@
 
 .info-card {
   border-left: 4px solid #2563eb;
+}
+
+.medium-card {
+  border-left: 4px solid #6b7280;
 }
 
 .primary-card {

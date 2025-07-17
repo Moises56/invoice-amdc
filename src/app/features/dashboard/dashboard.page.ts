@@ -54,7 +54,7 @@ import {
   documentTextOutline, 
   analyticsOutline,
   analytics,
-  trendingUp, flashOutline, barChartOutline, arrowForward, bluetoothOutline, cogOutline, colorPaletteOutline } from 'ionicons/icons';
+  trendingUp, flashOutline, barChartOutline, arrowForward, bluetoothOutline, cogOutline, colorPaletteOutline, ban, banOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../shared/enums';
 import { MercadosService } from '../mercados/mercados.service';
@@ -151,6 +151,7 @@ export class DashboardPage implements OnInit {
     facturas_vencidas: this.invoiceStats()?.overdue || 0,
     facturas_pendientes: this.invoiceStats()?.pending || 0,
     facturas_pagadas: this.invoiceStats()?.paid || 0,
+    facturas_anuladas: this.invoiceStats()?.cancelled || 0,
     monto_pendiente: this.invoiceStats()?.pendingAmount || 0,
     monto_vencido: this.invoiceStats()?.overdueAmount || 0
   }));
@@ -235,7 +236,7 @@ export class DashboardPage implements OnInit {
   userName = this.authService.userName;
 
   constructor() {
-    addIcons({refreshOutline,logOutOutline,analyticsOutline,trendingUp,flagOutline,walletOutline,business,storefrontOutline,businessOutline,storefront,peopleOutline,analytics,calendarOutline,receiptOutline,alertCircle,cashOutline,alertCircleOutline,time,timeOutline,checkmarkCircle,trendingUpOutline,checkmarkCircleOutline,documentText,trophyOutline,chevronForwardOutline,flashOutline,documentTextOutline,barChartOutline,arrowForward,settings,bluetoothOutline,cogOutline,colorPaletteOutline,settingsOutline,addOutline,statsChartOutline,homeOutline,trendingDownOutline,atOutline});
+    addIcons({refreshOutline,logOutOutline,analyticsOutline,trendingUp,flagOutline,walletOutline,business,storefrontOutline,businessOutline,storefront,peopleOutline,analytics,calendarOutline,receiptOutline,alertCircle,cashOutline,alertCircleOutline,time,timeOutline,checkmarkCircle,trendingUpOutline,checkmarkCircleOutline,documentText,ban,documentTextOutline,banOutline,trophyOutline,chevronForwardOutline,flashOutline,barChartOutline,arrowForward,settings,bluetoothOutline,cogOutline,colorPaletteOutline,settingsOutline,addOutline,statsChartOutline,homeOutline,trendingDownOutline,atOutline});
   }
 
   ngOnInit() {

@@ -653,6 +653,21 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
   }
+
+  // Clase especial para estadísticas: 5 columnas en escritorio
+  &.desktop-five-columns {
+    // Escritorio: 5 columnas para estadísticas
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.875rem;
+    }
+    
+    // Pantallas muy grandes: mantener 5 columnas
+    @media (min-width: 1440px) {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+    }
+  }
 }
 
 // Tarjeta moderna de factura compacta
@@ -2450,7 +2465,12 @@ ion-alert.error-alert {
 .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
 @media (min-width: 768px) {
+  .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
 }
 
 .flex-shrink-0 { flex-shrink: 0 !important; }

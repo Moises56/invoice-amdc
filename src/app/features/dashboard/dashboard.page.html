@@ -180,15 +180,15 @@
           <ion-icon name="receipt-outline" color="warning" class="mr-2"></ion-icon>
           Estado de Facturas
         </h3>
-        <div *ngIf="statsLoading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <ion-card *ngFor="let i of [1,2,3,4]" class="p-4">
+        <div *ngIf="statsLoading()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <ion-card *ngFor="let i of [1,2,3,4,5]" class="p-4">
             <ion-skeleton-text animated style="width: 40%; height: 16px;"></ion-skeleton-text>
             <ion-skeleton-text animated style="width: 70%; height: 24px; margin-top: 8px;"></ion-skeleton-text>
             <ion-skeleton-text animated style="width: 30%; height: 16px; margin-top: 8px;"></ion-skeleton-text>
           </ion-card>
         </div>
         
-        <div *ngIf="!statsLoading() && !statsError()" class="desktop-four-columns">
+        <div *ngIf="!statsLoading() && !statsError()" class="desktop-five-columns">
           <!-- Facturas Vencidas (PRIORIDAD ALTA) -->
           <ion-card *ngIf="facturasStats()" class="stats-card danger-card priority-card">
             <ion-card-content>
@@ -272,6 +272,28 @@
                 </div>
                 <div class="card-icon info-icon">
                   <ion-icon name="receipt-outline" size="large"></ion-icon>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Facturas Anuladas -->
+          <ion-card *ngIf="facturasStats()" class="stats-card medium-card">
+            <ion-card-content>
+              <div class="card-header">
+                <div class="card-info">
+                  <div class="flex items-center mb-2">
+                    <ion-icon name="ban" color="medium" class="mr-2"></ion-icon>
+                    <h3 class="card-title">Facturas Anuladas</h3>
+                  </div>
+                  <div class="card-value medium-value">{{ formatNumber(facturasStats().facturas_anuladas) }}</div>
+                  <div class="card-subtitle">
+                    <ion-icon name="document-text-outline" color="medium" class="mr-1"></ion-icon>
+                    <span>{{ formatPercentage(facturasStats().facturas_anuladas / facturasStats().total_facturas) }} del total</span>
+                  </div>
+                </div>
+                <div class="card-icon medium-icon">
+                  <ion-icon name="ban-outline" size="large"></ion-icon>
                 </div>
               </div>
             </ion-card-content>
