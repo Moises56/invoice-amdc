@@ -178,7 +178,7 @@
               <ion-icon name="document-text-outline" class="text-blue-500"></ion-icon>
               Facturas
             </h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
               <div class="flex items-center justify-between mb-2">
                 <ion-icon name="document-text-outline" class="text-blue-600 text-xl"></ion-icon>
@@ -209,6 +209,14 @@
                 <span class="text-2xl font-bold text-red-700">{{ estadisticasFacturas().vencidas || 0 }}</span>
               </div>
               <p class="text-sm font-medium text-red-600">Vencidas</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-xl border border-gray-200">
+              <div class="flex items-center justify-between mb-2">
+                <ion-icon name="ban-outline" class="text-gray-600 text-xl"></ion-icon>
+                <span class="text-2xl font-bold text-gray-700">{{ estadisticasFacturas().anuladas || 0 }}</span>
+              </div>
+              <p class="text-sm font-medium text-gray-600">Anuladas</p>
             </div>
           </div>
         </div>
@@ -498,7 +506,8 @@
                         size="small" 
                         color="primary"
                         (click)="$event.stopPropagation(); verDetalleFactura(factura)"
-                        class="action-btn">
+                        class="action-btn"
+                        title="Ver detalles de la factura">
                         <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
                       </ion-button>
 
@@ -509,7 +518,8 @@
                         size="small" 
                         color="success"
                         (click)="$event.stopPropagation(); marcarComoPagada(factura)"
-                        class="action-btn">
+                        class="action-btn"
+                        title="Marcar como pagada">
                         <ion-icon name="checkmark-circle-outline" slot="icon-only"></ion-icon>
                       </ion-button>
 
@@ -520,7 +530,8 @@
                         size="small" 
                         color="secondary"
                         (click)="$event.stopPropagation(); reimprimirFactura(factura)"
-                        class="action-btn">
+                        class="action-btn"
+                        title="Reimprimir factura">
                         <ion-icon name="print-outline" slot="icon-only"></ion-icon>
                       </ion-button>
 
@@ -531,7 +542,8 @@
                         size="small" 
                         color="warning"
                         (click)="$event.stopPropagation(); editarFactura(factura)"
-                        class="action-btn">
+                        class="action-btn"
+                        title="Editar factura">
                         <ion-icon name="create-outline" slot="icon-only"></ion-icon>
                       </ion-button>
 
@@ -542,7 +554,8 @@
                         size="small" 
                         color="danger"
                         (click)="$event.stopPropagation(); anularFactura(factura)"
-                        class="action-btn">
+                        class="action-btn"
+                        title="Anular factura">
                         <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>
                       </ion-button>
 
@@ -553,7 +566,8 @@
                         size="small" 
                         color="danger"
                         (click)="$event.stopPropagation(); eliminarFactura(factura)"
-                        class="action-btn delete-btn">
+                        class="action-btn delete-btn"
+                        title="Eliminar factura permanentemente">
                         <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
                       </ion-button>
                     </div>
@@ -717,7 +731,7 @@
           </div>
         </div>
 
-        <!-- Contenido scrollable -->
+        <!-- Contenido principal con scroll -->
         <div class="modal-content" *ngIf="facturaSeleccionada()">
           
           <!-- Estado de la factura con mejor visibilidad -->
@@ -732,6 +746,33 @@
           <!-- Información detallada con mejor estructura -->
           <div class="details-grid">
             
+            <!-- Información del Local -->
+            <div class="detail-card local-info-card">
+              <div class="card-header">
+                <div class="card-icon local-icon">
+                  <ion-icon name="storefront-outline"></ion-icon>
+                </div>
+                <div class="card-title">
+                  <h4>Información del Local</h4>
+                  <p>Datos del establecimiento</p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="info-row">
+                  <span class="info-label">Local:</span>
+                  <span class="info-value">#{{ facturaSeleccionada()?.local_numero || 'N/A' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Propietario:</span>
+                  <span class="info-value">{{ facturaSeleccionada()?.propietario_nombre || 'Sin propietario' }}</span>
+                </div>
+                <div class="info-row" *ngIf="facturaSeleccionada()?.propietario_dni">
+                  <span class="info-label">DNI:</span>
+                  <span class="info-value">{{ facturaSeleccionada()?.propietario_dni }}</span>
+                </div>
+              </div>
+            </div>
+            
             <!-- Período de facturación -->
             <div class="detail-card period-card">
               <div class="card-header">
@@ -740,12 +781,15 @@
                 </div>
                 <div class="card-title">
                   <h4>Período de Facturación</h4>
-                  <p>Mes que se está cobrando</p>
+                  <p>Mes y año que se está cobrando</p>
                 </div>
               </div>
               <div class="card-content">
                 <div class="period-display">
                   {{ formatMesFromEndpoint(facturaSeleccionada()?.mes || '') }}
+                </div>
+                <div class="period-year" *ngIf="facturaSeleccionada()?.anio">
+                  Año: {{ facturaSeleccionada()?.anio }}
                 </div>
               </div>
             </div>
@@ -763,16 +807,56 @@
               </div>
               <div class="card-content">
                 <div class="date-row">
-                  <span class="date-label">Fecha de Creación:</span>
+                  <span class="date-label">
+                    <ion-icon name="document-outline"></ion-icon>
+                    Fecha de Creación:
+                  </span>
                   <span class="date-value">{{ facturaSeleccionada()?.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
                 </div>
                 <div class="date-row">
-                  <span class="date-label">Fecha de Vencimiento:</span>
+                  <span class="date-label">
+                    <ion-icon name="alert-circle-outline"></ion-icon>
+                    Fecha de Vencimiento:
+                  </span>
                   <span class="date-value">{{ facturaSeleccionada()?.fecha_vencimiento | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="date-row" *ngIf="facturaSeleccionada()?.fecha_pago">
-                  <span class="date-label">Fecha de Pago:</span>
+                  <span class="date-label">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    Fecha de Pago:
+                  </span>
                   <span class="date-value paid">{{ facturaSeleccionada()?.fecha_pago | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información Financiera -->
+            <div class="detail-card financial-card">
+              <div class="card-header">
+                <div class="card-icon financial-icon">
+                  <ion-icon name="cash-outline"></ion-icon>
+                </div>
+                <div class="card-title">
+                  <h4>Información Financiera</h4>
+                  <p>Detalles del monto</p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="financial-row main-amount">
+                  <span class="financial-label">Monto Total:</span>
+                  <span class="financial-value primary">L. {{ (facturaSeleccionada()?.monto || 0) | number:'1.2-2' }}</span>
+                </div>
+                <div class="financial-row" *ngIf="facturaSeleccionada()?.estado === 'PAGADA'">
+                  <span class="financial-label">Estado:</span>
+                  <span class="financial-value success">Pagada completamente</span>
+                </div>
+                <div class="financial-row" *ngIf="facturaSeleccionada()?.estado === 'PENDIENTE'">
+                  <span class="financial-label">Estado:</span>
+                  <span class="financial-value warning">Pago pendiente</span>
+                </div>
+                <div class="financial-row" *ngIf="facturaSeleccionada()?.estado === 'VENCIDA'">
+                  <span class="financial-label">Estado:</span>
+                  <span class="financial-value danger">Factura vencida</span>
                 </div>
               </div>
             </div>
@@ -793,59 +877,63 @@
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Botones de acción responsivos -->
-          <div class="actions-section">
+        <!-- Botones de acción fijos en la parte inferior -->
+        <div class="actions-section">
+          
+          <!-- Botón principal según estado -->
+          <div class="primary-action" *ngIf="facturaSeleccionada()?.estado === 'PENDIENTE' && canEditFactura()">
+            <ion-button 
+              expand="block" 
+              color="success" 
+              size="large"
+              (click)="marcarComoPagada(facturaSeleccionada()!)"
+              class="primary-button"
+              title="Cambiar estado de la factura a PAGADA">
+              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+              Marcar como Pagada
+            </ion-button>
+          </div>
+
+          <!-- Botones secundarios en línea -->
+          <div class="secondary-actions" 
+               [class.has-many-actions]="(facturaSeleccionada()?.estado !== 'ANULADA' && canEditFactura() && canAnularFactura())">
             
-            <!-- Botón principal según estado -->
-            <div class="primary-action" *ngIf="facturaSeleccionada()?.estado === 'PENDIENTE' && canEditFactura()">
-              <ion-button 
-                expand="block" 
-                color="success" 
-                size="large"
-                (click)="marcarComoPagada(facturaSeleccionada()!)"
-                class="primary-button">
-                <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-                Marcar como Pagada
-              </ion-button>
-            </div>
+            <ion-button 
+              fill="outline" 
+              color="primary" 
+              size="default"
+              (click)="reimprimirFactura(facturaSeleccionada()!)"
+              class="action-button"
+              title="Reimprimir factura">
+              <ion-icon name="print-outline" slot="start"></ion-icon>
+              <span class="button-text">Reimprimir</span>
+            </ion-button>
+            
+            <ion-button 
+              fill="outline" 
+              color="warning" 
+              size="default"
+              *ngIf="facturaSeleccionada()?.estado !== 'ANULADA' && canEditFactura()"
+              (click)="editarFactura(facturaSeleccionada()!)"
+              class="action-button"
+              title="Editar información de la factura">
+              <ion-icon name="create-outline" slot="start"></ion-icon>
+              <span class="button-text">Editar</span>
+            </ion-button>
 
-            <!-- Botones secundarios en línea -->
-            <div class="secondary-actions" 
-                 [class.has-many-actions]="(facturaSeleccionada()?.estado !== 'ANULADA' && canEditFactura() && canAnularFactura())">
-              
-              <ion-button 
-                fill="outline" 
-                color="primary" 
-                size="default"
-                (click)="reimprimirFactura(facturaSeleccionada()!)"
-                class="action-button">
-                <ion-icon name="print-outline" slot="start"></ion-icon>
-                <span class="button-text">Reimprimir</span>
-              </ion-button>
-              
-              <ion-button 
-                fill="outline" 
-                color="warning" 
-                size="default"
-                *ngIf="facturaSeleccionada()?.estado !== 'ANULADA' && canEditFactura()"
-                (click)="editarFactura(facturaSeleccionada()!)"
-                class="action-button">
-                <ion-icon name="create-outline" slot="start"></ion-icon>
-                <span class="button-text">Editar</span>
-              </ion-button>
-
-              <ion-button 
-                fill="outline" 
-                color="danger" 
-                size="default"
-                *ngIf="facturaSeleccionada()?.estado !== 'ANULADA' && canAnularFactura()"
-                (click)="anularFactura(facturaSeleccionada()!)"
-                class="action-button danger-button">
-                <ion-icon name="trash-outline" slot="start"></ion-icon>
-                <span class="button-text">Anular</span>
-              </ion-button>
-            </div>
+            <ion-button 
+              fill="outline" 
+              color="danger" 
+              size="default"
+              *ngIf="facturaSeleccionada()?.estado !== 'ANULADA' && canAnularFactura()"
+              (click)="anularFactura(facturaSeleccionada()!)"
+              class="action-button danger-button"
+              title="Anular factura (cambiar estado a ANULADA)">
+              <ion-icon name="trash-outline" slot="start"></ion-icon>
+              <span class="button-text">Anular</span>
+            </ion-button>
           </div>
         </div>
       </div>

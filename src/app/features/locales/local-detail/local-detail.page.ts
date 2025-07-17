@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,14 +25,14 @@ import {
   trendingUpOutline, pieChartOutline, barChartOutline, analyticsOutline,
   cardOutline as cardIcon, cashOutline as cashIcon, person, storefront, 
   calendar, time, checkmarkCircle, alertCircle, receipt, chatbubble,
-  print, create, trash, trophy, trophyOutline, medal, ribbon } from 'ionicons/icons';
+  print, create, trash, trophy, trophyOutline, medal, ribbon, chevronDownCircleOutline, banOutline } from 'ionicons/icons';
 
 import { LocalesService } from '../locales.service';
 import { FacturasService } from '../../facturas/facturas.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { 
   Local, Factura, EstadoLocal, EstadoFactura, 
-  TipoLocal, Role, User, CreateFacturaRequest, LocalStats 
+  TipoLocal, Role, User, CreateFacturaRequest, AnularFacturaRequest, LocalStats 
 } from '../../../shared/interfaces';
 import { PrintingService } from '../../../shared/services/printing.service';
 import { BluetoothService } from '../../bluetooth/bluetooth.service';
@@ -53,7 +53,7 @@ import { BluetoothService } from '../../bluetooth/bluetooth.service';
     IonModal
   ]
 })
-export class LocalDetailPage implements OnInit {
+export class LocalDetailPage implements OnInit, OnDestroy {
   // Nombre del mercado para mostrar en el modal
   mercadoNombre: string = '';
   /**
@@ -119,12 +119,14 @@ export class LocalDetailPage implements OnInit {
       total: stats.estadisticas_facturas.total_facturas,
       pagadas: stats.estadisticas_facturas.facturas_pagadas,
       pendientes: stats.estadisticas_facturas.facturas_pendientes,
-      vencidas: stats.estadisticas_facturas.facturas_vencidas
+      vencidas: stats.estadisticas_facturas.facturas_vencidas,
+      anuladas: stats.estadisticas_facturas.facturas_anuladas
     } : {
       total: 0,
       pagadas: 0,
       pendientes: 0,
-      vencidas: 0
+      vencidas: 0,
+      anuladas: 0
     };
   });
   
@@ -218,7 +220,7 @@ export class LocalDetailPage implements OnInit {
     const user = this.authService.user();
     return user && [Role.ADMIN, Role.MARKET].includes(user.role);
   });  constructor() {
-    addIcons({eyeOutline,createOutline,refreshOutline,alertCircleOutline,storefrontOutline,personOutline,callOutline,businessOutline,locationOutline,cashOutline,calendarOutline,analyticsOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,trendingUpOutline,walletOutline,pieChartOutline,barChartOutline,receiptOutline,addOutline,filterOutline,documentOutline,person,storefront,checkmarkCircle,alertCircle,checkmarkOutline,closeOutline,add,addCircleOutline,close,receipt,calendar,time,chatbubble,print,create,trash,printOutline,chevronDownOutline,chatbubbleOutline,closeSharp,cardOutline,mailOutline,helpCircleOutline,trashOutline,searchOutline,statsChartOutline,downloadOutline,pauseOutline,playOutline,documentAttachOutline,informationCircleOutline,cardIcon,cashIcon,trophy,trophyOutline,medal,ribbon});
+    addIcons({eyeOutline,createOutline,refreshOutline,alertCircleOutline,storefrontOutline,personOutline,callOutline,businessOutline,locationOutline,cashOutline,calendarOutline,analyticsOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,banOutline,trendingUpOutline,walletOutline,pieChartOutline,barChartOutline,receiptOutline,addOutline,filterOutline,documentOutline,person,checkmarkCircle,alertCircle,printOutline,trashOutline,add,closeOutline,addCircleOutline,close,chatbubbleOutline,storefront,checkmarkOutline,receipt,calendar,time,chatbubble,print,create,trash,chevronDownOutline,chevronDownCircleOutline,closeSharp,cardOutline,mailOutline,helpCircleOutline,searchOutline,statsChartOutline,downloadOutline,pauseOutline,playOutline,documentAttachOutline,informationCircleOutline,cardIcon,cashIcon,trophy,trophyOutline,medal,ribbon});
   }
 
   ngOnInit() {
@@ -362,9 +364,13 @@ export class LocalDetailPage implements OnInit {
    * Cerrar modal de crear factura
    */
   closeInvoiceModal() {
-    this.showInvoiceModal.set(false);
-    this.selectedMonth.set(0);
-    this.isCreatingInvoice.set(false);
+    try {
+      this.showInvoiceModal.set(false);
+      this.selectedMonth.set(0);
+      this.isCreatingInvoice.set(false);
+    } catch (error) {
+      console.warn('Error cerrando modal:', error);
+    }
   }
 
   /**
@@ -940,8 +946,12 @@ export class LocalDetailPage implements OnInit {
   }
 
   cerrarFacturaDetailModal() {
-    this.showFacturaDetailModal.set(false);
-    this.facturaSeleccionada.set(null);
+    try {
+      this.showFacturaDetailModal.set(false);
+      this.facturaSeleccionada.set(null);
+    } catch (error) {
+      console.warn('Error cerrando modal de detalle:', error);
+    }
   }
 
   /**
@@ -1010,12 +1020,13 @@ export class LocalDetailPage implements OnInit {
       subHeader: 'La factura cambiará su estado a ANULADA pero se mantendrá en el sistema para auditoría',
       inputs: [
         {
-          name: 'observaciones',
+          name: 'razon_anulacion',
           type: 'textarea',
-          placeholder: 'Motivo de la anulación (opcional)',
+          placeholder: 'Motivo de la anulación (requerido)',
           attributes: {
             maxlength: 255,
-            rows: 3
+            rows: 3,
+            required: true
           }
         }
       ],
@@ -1028,23 +1039,58 @@ export class LocalDetailPage implements OnInit {
           text: 'Anular Factura',
           role: 'destructive',
           handler: async (data) => {
+            // Validar que se ingrese la razón de anulación
+            if (!data.razon_anulacion || data.razon_anulacion.trim() === '') {
+              this.showToast('Debe ingresar el motivo de la anulación', 'warning');
+              return false; // Mantener el alert abierto
+            }
+
             const loading = await this.loadingController.create({
               message: 'Anulando factura...'
             });
             await loading.present();
 
             try {
-              await this.facturasService.anularFactura(factura.id, data.observaciones).toPromise();
+              const request: AnularFacturaRequest = {
+                razon_anulacion: data.razon_anulacion.trim()
+              };
+
+              const response = await this.facturasService.anularFacturaPatch(factura.id, request).toPromise();
               await loading.dismiss();
               
-              this.showToast('Factura anulada correctamente', 'success');
-              this.loadFacturas(true);
-              this.cargarEstadisticasFacturas();
-              this.cerrarFacturaDetailModal();
+              if (response?.data) {
+                const facturaAnulada = response.data;
+                this.showToast(
+                  `Factura ${facturaAnulada.correlativo} anulada correctamente`, 
+                  'success'
+                );
+                
+                // Actualizar la vista
+                this.loadFacturas(true);
+                this.cargarEstadisticasFacturas();
+                this.cerrarFacturaDetailModal();
+              } else {
+                this.showToast('Factura anulada, pero no se recibió confirmación completa', 'warning');
+              }
+              
+              return true; // Cerrar el alert
             } catch (error) {
               await loading.dismiss();
               console.error('Error al anular factura:', error);
-              this.showToast('Error al anular la factura', 'danger');
+              
+              // Manejar diferentes tipos de error
+              let errorMessage = 'Error al anular la factura';
+              if (error && typeof error === 'object' && 'error' in error) {
+                const apiError = error as any;
+                if (apiError.error?.message) {
+                  errorMessage = apiError.error.message;
+                } else if (apiError.message) {
+                  errorMessage = apiError.message;
+                }
+              }
+              
+              this.showToast(errorMessage, 'danger');
+              return false; // Mantener el alert abierto en caso de error
             }
           }
         }
@@ -1577,6 +1623,23 @@ export class LocalDetailPage implements OnInit {
     }
 
     return actions;
+  }
+
+  /**
+   * Limpieza del componente
+   */
+  ngOnDestroy() {
+    try {
+      // Cerrar modales si están abiertos
+      if (this.showInvoiceModal()) {
+        this.closeInvoiceModal();
+      }
+      if (this.showFacturaDetailModal()) {
+        this.cerrarFacturaDetailModal();
+      }
+    } catch (error) {
+      console.warn('Error en ngOnDestroy:', error);
+    }
   }
 
   // ...existing code...
