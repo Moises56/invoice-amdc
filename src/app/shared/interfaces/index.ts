@@ -261,6 +261,11 @@ export interface UpdateFacturaRequest {
   observaciones?: string;
 }
 
+export interface AnularFacturaRequest {
+  razon_anulacion: string;
+  observaciones?: string;
+}
+
 export interface MassiveFacturaRequest {
   mercadoId: string;
   mes: string;

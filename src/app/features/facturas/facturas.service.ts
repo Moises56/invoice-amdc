@@ -9,6 +9,7 @@ import {
   ApiResponse, 
   CreateFacturaRequest, 
   UpdateFacturaRequest,
+  AnularFacturaRequest,
   MassiveFacturaRequest,
   FacturaStats
 } from '../../shared/interfaces';
@@ -97,7 +98,8 @@ export class FacturasService {
   }
 
   /**
-   * Eliminar factura
+   * Eliminar factura físicamente (Solo ADMIN)
+   * @deprecated - Usar con precaución, elimina permanentemente
    */
   deleteFactura(id: string): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`).pipe(
@@ -128,7 +130,8 @@ export class FacturasService {
   }
 
   /**
-   * Anular factura
+   * Anular factura usando DELETE (ADMIN y MARKET)
+   * @deprecated - Usar anularFacturaPatch para el nuevo endpoint
    */
   anularFactura(id: string, observaciones?: string): Observable<ApiResponse<Factura>> {
     const body = observaciones ? { observaciones } : {};
@@ -138,6 +141,28 @@ export class FacturasService {
         const currentFacturas = this.facturasSubject.value;
         const filteredFacturas = currentFacturas.filter(f => f.id !== id);
         this.facturasSubject.next(filteredFacturas);
+      })
+    );
+  }
+
+  /**
+   * Anular factura usando PATCH (NUEVO ENDPOINT) - ADMIN y MARKET
+   * @param id ID de la factura a anular
+   * @param request Datos de anulación (razón, observaciones)
+   * @returns Observable con la factura anulada
+   */
+  anularFacturaPatch(id: string, request: AnularFacturaRequest): Observable<ApiResponse<Factura>> {
+    return this.http.patch<ApiResponse<Factura>>(`${this.apiUrl}/${id}/anular`, request).pipe(
+      tap(response => {
+        if (response.data) {
+          // Actualizar la factura en la lista local con estado ANULADA
+          const currentFacturas = this.facturasSubject.value;
+          const index = currentFacturas.findIndex(f => f.id === id);
+          if (index !== -1) {
+            currentFacturas[index] = response.data;
+            this.facturasSubject.next([...currentFacturas]);
+          }
+        }
       })
     );
   }

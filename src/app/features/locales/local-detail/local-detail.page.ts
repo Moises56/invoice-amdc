@@ -7,7 +7,7 @@ import {
   IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonLabel,
   IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
   IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
-  IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
+  IonSelect, IonSelectOption,
   IonModal,
   AlertController, ToastController, LoadingController
 } from '@ionic/angular/standalone';
@@ -25,7 +25,7 @@ import {
   trendingUpOutline, pieChartOutline, barChartOutline, analyticsOutline,
   cardOutline as cardIcon, cashOutline as cashIcon, person, storefront, 
   calendar, time, checkmarkCircle, alertCircle, receipt, chatbubble,
-  print, create, trash } from 'ionicons/icons';
+  print, create, trash, trophy, trophyOutline, medal, ribbon } from 'ionicons/icons';
 
 import { LocalesService } from '../locales.service';
 import { FacturasService } from '../../facturas/facturas.service';
@@ -49,7 +49,7 @@ import { BluetoothService } from '../../bluetooth/bluetooth.service';
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonBadge, IonButton, IonSpinner, IonIcon, IonFab, IonFabButton,
     IonSearchbar, IonInfiniteScroll, IonInfiniteScrollContent,
-    IonSelect, IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
+    IonSelect, IonSelectOption,
     IonModal
   ]
 })
@@ -133,10 +133,10 @@ export class LocalDetailPage implements OnInit {
   selectedMonth = signal<number>(0);
   isCreatingInvoice = signal(false);
   
-  // Filtros
-  filtroEstado = '';
-  filtroMes = '';
-  filtroAnio = '';
+  // Filtros como signals para reactividad
+  filtroEstado = signal<string>('');
+  filtroMes = signal<string>('');
+  filtroAnio = signal<string>('');
 
   // Computed signals adicionales
   canEditLocal = computed(() => this.canEdit());
@@ -147,16 +147,47 @@ export class LocalDetailPage implements OnInit {
     const facturasArray = this.facturas();
     const search = this.searchTerm().toLowerCase().trim();
     
-    if (!search) {
-      return facturasArray;
+    let filtered = facturasArray;
+    
+    // Filtro de búsqueda por texto
+    if (search) {
+      filtered = filtered.filter(factura => 
+        factura.numero_factura?.toLowerCase().includes(search) ||
+        factura.correlativo?.toLowerCase().includes(search) ||
+        factura.concepto?.toLowerCase().includes(search) ||
+        factura.mes?.toLowerCase().includes(search) ||
+        factura.anio?.toString().includes(search) ||
+        factura.propietario_nombre?.toLowerCase().includes(search)
+      );
     }
     
-    return facturasArray.filter(factura => 
-      factura.numero_factura?.toLowerCase().includes(search) ||
-      factura.concepto?.toLowerCase().includes(search) ||
-      factura.mes?.toLowerCase().includes(search) ||
-      factura.anio?.toString().includes(search)
-    );
+    // Filtro por estado
+    if (this.filtroEstado()) {
+      filtered = filtered.filter(factura => factura.estado === this.filtroEstado());
+    }
+    
+    // Filtro por mes
+    if (this.filtroMes()) {
+      const mesNumber = parseInt(this.filtroMes());
+      filtered = filtered.filter(factura => {
+        // Manejar formato "2025-08" del endpoint
+        if (factura.mes?.includes('-')) {
+          const mesFromDate = parseInt(factura.mes.split('-')[1]);
+          return mesFromDate === mesNumber;
+        }
+        // Formato legacy "MES_01", "MES_02", etc.
+        const facturaMonth = factura.mes?.match(/MES_(\d+)/)?.[1];
+        return facturaMonth ? parseInt(facturaMonth) === mesNumber : false;
+      });
+    }
+    
+    // Filtro por año
+    if (this.filtroAnio()) {
+      const anioNumber = parseInt(this.filtroAnio());
+      filtered = filtered.filter(factura => factura.anio === anioNumber);
+    }
+    
+    return filtered;
   });
 
   // Permisos específicos para facturas
@@ -165,9 +196,10 @@ export class LocalDetailPage implements OnInit {
     return user && [Role.ADMIN, Role.MARKET].includes(user.role);
   });
 
-  canDelete = computed(() => {
+  // Solo ADMIN puede eliminar facturas físicamente
+  canDeleteFactura = computed(() => {
     const user = this.authService.user();
-    return user && [Role.ADMIN].includes(user.role);
+    return user && user.role === Role.ADMIN;
   });
 
   canCreateFactura = computed(() => {
@@ -181,11 +213,12 @@ export class LocalDetailPage implements OnInit {
     return user && user.role === Role.ADMIN;
   });
 
+  // ADMIN y MARKET pueden anular facturas (cambiar estado)
   canAnularFactura = computed(() => {
     const user = this.authService.user();
-    return user && user.role === Role.ADMIN;
+    return user && [Role.ADMIN, Role.MARKET].includes(user.role);
   });  constructor() {
-    addIcons({eyeOutline,createOutline,refreshOutline,alertCircleOutline,storefrontOutline,personOutline,callOutline,businessOutline,locationOutline,cashOutline,calendarOutline,analyticsOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,trendingUpOutline,walletOutline,pieChartOutline,barChartOutline,receiptOutline,addOutline,filterOutline,documentOutline,person,storefront,checkmarkCircle,alertCircle,checkmarkOutline,closeOutline,add,addCircleOutline,close,receipt,calendar,time,chatbubble,print,create,trash,printOutline,chevronDownOutline,chatbubbleOutline,closeSharp,cardOutline,mailOutline,helpCircleOutline,trashOutline,searchOutline,statsChartOutline,downloadOutline,pauseOutline,playOutline,documentAttachOutline,informationCircleOutline,cardIcon,cashIcon});
+    addIcons({eyeOutline,createOutline,refreshOutline,alertCircleOutline,storefrontOutline,personOutline,callOutline,businessOutline,locationOutline,cashOutline,calendarOutline,analyticsOutline,documentTextOutline,checkmarkCircleOutline,timeOutline,closeCircleOutline,trendingUpOutline,walletOutline,pieChartOutline,barChartOutline,receiptOutline,addOutline,filterOutline,documentOutline,person,storefront,checkmarkCircle,alertCircle,checkmarkOutline,closeOutline,add,addCircleOutline,close,receipt,calendar,time,chatbubble,print,create,trash,printOutline,chevronDownOutline,chatbubbleOutline,closeSharp,cardOutline,mailOutline,helpCircleOutline,trashOutline,searchOutline,statsChartOutline,downloadOutline,pauseOutline,playOutline,documentAttachOutline,informationCircleOutline,cardIcon,cashIcon,trophy,trophyOutline,medal,ribbon});
   }
 
   ngOnInit() {
@@ -968,13 +1001,13 @@ export class LocalDetailPage implements OnInit {
   }
 
   /**
-   * Anular factura
+   * Anular factura (cambiar estado a ANULADA) - ADMIN y MARKET
    */
   async anularFactura(factura: Factura) {
     const alert = await this.alertController.create({
       header: 'Anular Factura',
-      message: `¿Está seguro de que desea eliminar definitivamente la factura ${factura.correlativo}?`,
-      subHeader: 'Esta acción no se puede deshacer',
+      message: `¿Está seguro de que desea anular la factura ${factura.correlativo}?`,
+      subHeader: 'La factura cambiará su estado a ANULADA pero se mantendrá en el sistema para auditoría',
       inputs: [
         {
           name: 'observaciones',
@@ -992,11 +1025,11 @@ export class LocalDetailPage implements OnInit {
           role: 'cancel'
         },
         {
-          text: 'Eliminar Factura',
+          text: 'Anular Factura',
           role: 'destructive',
           handler: async (data) => {
             const loading = await this.loadingController.create({
-              message: 'Eliminando factura...'
+              message: 'Anulando factura...'
             });
             await loading.present();
 
@@ -1004,14 +1037,89 @@ export class LocalDetailPage implements OnInit {
               await this.facturasService.anularFactura(factura.id, data.observaciones).toPromise();
               await loading.dismiss();
               
-              this.showToast('Factura eliminada correctamente', 'success');
+              this.showToast('Factura anulada correctamente', 'success');
               this.loadFacturas(true);
               this.cargarEstadisticasFacturas();
               this.cerrarFacturaDetailModal();
             } catch (error) {
               await loading.dismiss();
+              console.error('Error al anular factura:', error);
+              this.showToast('Error al anular la factura', 'danger');
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /**
+   * Eliminar factura físicamente (Solo ADMIN)
+   */
+  async eliminarFactura(factura: Factura) {
+    const alert = await this.alertController.create({
+      header: '⚠️ Eliminar Factura Permanentemente',
+      message: `¿Está seguro de que desea ELIMINAR DEFINITIVAMENTE la factura ${factura.correlativo}?`,
+      subHeader: '🚨 ADVERTENCIA: Esta acción NO se puede deshacer. La factura será eliminada permanentemente del sistema.',
+      inputs: [
+        {
+          name: 'confirmacion',
+          type: 'text',
+          placeholder: 'Escriba "ELIMINAR" para confirmar',
+          attributes: {
+            maxlength: 20
+          }
+        },
+        {
+          name: 'observaciones',
+          type: 'textarea',
+          placeholder: 'Motivo de la eliminación (obligatorio)',
+          attributes: {
+            maxlength: 500,
+            rows: 3
+          }
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: '🗑️ Eliminar Permanentemente',
+          role: 'destructive',
+          handler: async (data) => {
+            // Validar confirmación
+            if (data.confirmacion?.toUpperCase() !== 'ELIMINAR') {
+              this.showToast('Debe escribir "ELIMINAR" para confirmar', 'warning');
+              return false;
+            }
+
+            if (!data.observaciones?.trim()) {
+              this.showToast('Debe especificar el motivo de la eliminación', 'warning');
+              return false;
+            }
+
+            const loading = await this.loadingController.create({
+              message: 'Eliminando factura permanentemente...'
+            });
+            await loading.present();
+
+            try {
+              await this.facturasService.deleteFactura(factura.id).toPromise();
+              await loading.dismiss();
+              
+              this.showToast('Factura eliminada permanentemente', 'success');
+              this.loadFacturas(true);
+              this.cargarEstadisticasFacturas();
+              this.cerrarFacturaDetailModal();
+              return true;
+            } catch (error) {
+              await loading.dismiss();
               console.error('Error al eliminar factura:', error);
               this.showToast('Error al eliminar la factura', 'danger');
+              return false;
             }
           }
         }
@@ -1025,19 +1133,60 @@ export class LocalDetailPage implements OnInit {
    * Aplicar filtros
    */
   aplicarFiltros() {
-    // Implementar lógica de filtros
-    this.loadFacturas(true);
+    // Los filtros se aplican automáticamente a través del computed signal
+    // No necesitamos hacer nada más aquí ya que filteredFacturas() se actualiza reactivamente
   }
 
   /**
    * Limpiar filtros
    */
   limpiarFiltros() {
-    this.filtroEstado = '';
-    this.filtroMes = '';
-    this.filtroAnio = '';
+    this.filtroEstado.set('');
+    this.filtroMes.set('');
+    this.filtroAnio.set('');
     this.searchTerm.set('');
-    this.loadFacturas(true);
+  }
+
+  /**
+   * Obtener años disponibles para el filtro
+   * Empezando desde 2025 hacia adelante
+   */
+  getAvailableYears(): number[] {
+    const currentYear = new Date().getFullYear();
+    const startYear = 2025;
+    const endYear = Math.max(currentYear + 1, startYear + 1); // Al menos hasta el próximo año
+    
+    const years: number[] = [];
+    for (let year = endYear; year >= startYear; year--) {
+      years.push(year);
+    }
+    return years;
+  }
+
+  /**
+   * Verificar si hay filtros activos
+   */
+  hasActiveFilters(): boolean {
+    return !!(this.filtroEstado() || this.filtroMes() || this.filtroAnio() || this.searchTerm().trim());
+  }
+
+  /**
+   * Handlers para cambios en filtros
+   */
+  onEstadoChange(event: any) {
+    this.filtroEstado.set(event.detail.value || '');
+  }
+
+  onMesChange(event: any) {
+    this.filtroMes.set(event.detail.value || '');
+  }
+
+  onAnioChange(event: any) {
+    this.filtroAnio.set(event.detail.value || '');
+  }
+
+  onSearchTermChange(value: string) {
+    this.searchTerm.set(value);
   }
 
   /**
@@ -1194,12 +1343,6 @@ export class LocalDetailPage implements OnInit {
       position: 'top'
     });
     await toast.present();
-  }  /**
-   * Manejar cambio en la búsqueda
-   */
-  onSearchChange(event: any) {
-    const query = event.target.value;
-    this.searchTerm.set(query);
   }
 
   /**
