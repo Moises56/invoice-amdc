@@ -13,6 +13,11 @@ const config: CapacitorConfig = {
     },
     CapacitorCookies: {
       enabled: true
+    },
+    StatusBar: {
+      style: 'dark',
+      backgroundColor: '#667eea',
+      overlaysWebView: true
     }
   }
 };

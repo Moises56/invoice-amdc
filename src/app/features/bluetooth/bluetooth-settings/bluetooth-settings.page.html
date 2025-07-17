@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header [translucent]="true" class="custom-header">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/tab3"></ion-back-button>
@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="printer-settings-content">
+<ion-content class="printer-settings-content" [fullscreen]="true">
   <!-- Welcome Header -->
   <div class="welcome-header">
     <div class="welcome-content">
@@ -59,52 +59,85 @@
 
   <!-- Actions Grid -->
   <div class="actions-grid">
-    <!-- Search Printer Card -->
-    <div class="glass-card action-card search-card">
-      <div class="action-content">
-        <div class="action-icon">
+    <!-- Mobile Action Buttons Row - Compact Icon-Only Buttons -->
+    <div class="mobile-actions-row">
+      <div class="mobile-action-container">
+        <button class="mobile-icon-btn primary-btn" (click)="openDeviceList()" title="Buscar Impresora">
           <ion-icon name="search"></ion-icon>
-        </div>
-        <h4 class="action-title">Buscar Impresora</h4>
-        <p class="action-description">Encuentra y conecta una nueva impresora</p>
-        <button class="glass-button primary-button" (click)="openDeviceList()">
-          <ion-icon name="search"></ion-icon>
-          <span>Buscar</span>
         </button>
+        <span class="action-label">Buscar</span>
       </div>
-    </div>
-
-    <!-- Test Print Card -->
-    <div class="glass-card action-card test-card">
-      <div class="action-content">
-        <div class="action-icon">
-          <ion-icon name="document-outline"></ion-icon>
-        </div>
-        <h4 class="action-title">Página de Prueba</h4>
-        <p class="action-description">Verifica que la impresora funcione</p>
-        <button class="glass-button secondary-button" 
+      
+      <div class="mobile-action-container">
+        <button class="mobile-icon-btn secondary-btn" 
                 (click)="printTestPage()" 
-                [disabled]="!(connectionStatus$ | async)">
+                [disabled]="!(connectionStatus$ | async)"
+                title="Página de Prueba">
           <ion-icon name="print"></ion-icon>
-          <span>Imprimir</span>
         </button>
+        <span class="action-label">Prueba</span>
+      </div>
+      
+      <div class="mobile-action-container">
+        <button class="mobile-icon-btn danger-btn" 
+                (click)="disconnect()" 
+                [disabled]="!(connectionStatus$ | async)"
+                title="Desconectar">
+          <ion-icon name="close-circle"></ion-icon>
+        </button>
+        <span class="action-label">Desconectar</span>
       </div>
     </div>
 
-    <!-- Disconnect Card -->
-    <div class="glass-card action-card disconnect-card">
-      <div class="action-content">
-        <div class="action-icon">
-          <ion-icon name="close-circle-outline"></ion-icon>
+    <!-- Desktop Action Cards (hidden on mobile) -->
+    <div class="desktop-actions-cards">
+      <!-- Search Printer Card -->
+      <div class="glass-card action-card search-card">
+        <div class="action-content">
+          <div class="action-icon">
+            <ion-icon name="search"></ion-icon>
+          </div>
+          <h4 class="action-title">Buscar Impresora</h4>
+          <p class="action-description">Encuentra y conecta una nueva impresora</p>
+          <button class="glass-button primary-button" (click)="openDeviceList()">
+            <ion-icon name="search"></ion-icon>
+            <span>Buscar</span>
+          </button>
         </div>
-        <h4 class="action-title">Desconectar</h4>
-        <p class="action-description">Termina la conexión actual</p>
-        <button class="glass-button danger-button" 
-                (click)="disconnect()" 
-                [disabled]="!(connectionStatus$ | async)">
-          <ion-icon name="close-circle"></ion-icon>
-          <span>Desconectar</span>
-        </button>
+      </div>
+
+      <!-- Test Print Card -->
+      <div class="glass-card action-card test-card">
+        <div class="action-content">
+          <div class="action-icon">
+            <ion-icon name="document-outline"></ion-icon>
+          </div>
+          <h4 class="action-title">Página de Prueba</h4>
+          <p class="action-description">Verifica que la impresora funcione</p>
+          <button class="glass-button secondary-button" 
+                  (click)="printTestPage()" 
+                  [disabled]="!(connectionStatus$ | async)">
+            <ion-icon name="print"></ion-icon>
+            <span>Imprimir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Disconnect Card -->
+      <div class="glass-card action-card disconnect-card">
+        <div class="action-content">
+          <div class="action-icon">
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </div>
+          <h4 class="action-title">Desconectar</h4>
+          <p class="action-description">Termina la conexión actual</p>
+          <button class="glass-button danger-button" 
+                  (click)="disconnect()" 
+                  [disabled]="!(connectionStatus$ | async)">
+            <ion-icon name="close-circle"></ion-icon>
+            <span>Desconectar</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

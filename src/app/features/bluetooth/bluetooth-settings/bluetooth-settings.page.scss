@@ -1,28 +1,71 @@
 /* ===== PRINTER SETTINGS GLASSMORPHISM STYLES ===== */
 
+// Custom Header with Status Bar Coverage
+.custom-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --color: white;
+    --border-width: 0;
+    --min-height: 56px;
+    
+    // Ensure header covers status bar on mobile
+    @media (max-width: 767px) {
+      --padding-top: calc(var(--ion-safe-area-top, 0px) + 8px);
+      --min-height: calc(56px + var(--ion-safe-area-top, 0px));
+    }
+    
+    ion-title {
+      font-weight: 600;
+      font-size: 18px;
+      
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
+    }
+    
+    ion-back-button {
+      --color: white;
+      --icon-font-size: 24px;
+    }
+  }
+}
+
 // Content Container
 .printer-settings-content {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  padding: 24px; // Improved spacing
+  padding: 20px; // Optimized spacing
   --padding-start: 0;
   --padding-end: 0;
   --padding-top: 0;
   --padding-bottom: 0;
+  position: relative;
+  z-index: 1;
+  
+  // Add top padding to account for translucent header
+  padding-top: calc(var(--ion-safe-area-top, 0px) + 80px);
 
   @media (min-width: 768px) {
     padding: 32px; // Better spacing for tablets
+    padding-top: calc(var(--ion-safe-area-top, 0px) + 88px);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Ensure background on desktop
+    overflow-x: visible;
+    overflow-y: auto;
   }
 
   // Desktop optimizations
   @media (min-width: 1024px) {
     padding: 48px; // Better spacing
+    padding-top: calc(var(--ion-safe-area-top, 0px) + 96px);
     max-width: 1400px;
     margin: 0 auto;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; // Force background
+    min-height: 100vh !important;
   }
 
   @media (min-width: 1200px) {
     padding: 64px; // Optimal spacing for large screens
+    padding-top: calc(var(--ion-safe-area-top, 0px) + 104px);
   }
 
   &::before {
@@ -422,26 +465,125 @@
 
 // Actions Grid
 .actions-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px; // Improved spacing
-  margin-bottom: 32px; // Better spacing
+  margin-bottom: 30px; // Reduced spacing
 
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 28px; // Better spacing
+  // Mobile Actions Row - Compact icon-only buttons
+  .mobile-actions-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 0;
+    padding: 16px;
+
+    @media (min-width: 768px) {
+      display: none; // Hide on tablet and desktop
+    }
+
+    .mobile-action-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+
+      .mobile-icon-btn {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        
+        ion-icon {
+          font-size: 24px;
+          color: white;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          transform: none;
+        }
+
+        // Primary button (search)
+        &.primary-btn {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          
+          &:hover:not(:disabled) {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+          }
+        }
+
+        // Secondary button (print)
+        &.secondary-btn {
+          background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+          
+          ion-icon {
+            color: #4a5568;
+          }
+          
+          &:hover:not(:disabled) {
+            background: linear-gradient(135deg, #81e6d9 0%, #fbb6ce 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(168, 237, 234, 0.4);
+          }
+        }
+
+        // Danger button (disconnect)
+        &.danger-btn {
+          background: linear-gradient(135deg, #ff8a80 0%, #ff5722 100%);
+          
+          &:hover:not(:disabled) {
+            background: linear-gradient(135deg, #ff7043 0%, #e53e3e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 138, 128, 0.4);
+          }
+        }
+      }
+
+      .action-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #2d3748;
+        text-align: center;
+        line-height: 1.2;
+      }
+    }
   }
 
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px; // Optimal spacing
-  }
+  // Desktop Action Cards - Full cards with descriptions
+  .desktop-actions-cards {
+    display: none; // Hide on mobile
 
-  @media (min-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 1200px;
-    margin: 0 auto 32px auto; // Better spacing
-    gap: 36px; // Optimal spacing for large screens
+    @media (min-width: 768px) {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 28px;
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    @media (min-width: 1200px) {
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 36px;
+    }
   }
 }
 
@@ -563,12 +705,17 @@
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.3) 0%, rgba(255, 152, 0, 0.15) 100%);
   border: 1px solid rgba(255, 152, 0, 0.4);
   padding: 24px; // Improved spacing
+  margin-bottom: 40px; // Add bottom margin to prevent sticking to bottom
+
+  @media (min-width: 768px) {
+    margin-bottom: 50px; // More space on larger screens
+  }
 
   @media (min-width: 1024px) {
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 20px;
+    margin-bottom: 60px; // Even more space on desktop
     padding: 32px; // Better spacing for larger screens
   }
 
