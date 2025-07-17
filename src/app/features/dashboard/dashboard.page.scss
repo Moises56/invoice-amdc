@@ -378,12 +378,225 @@
   }
 }
 
+// TARJETAS PRINCIPALES DEL DASHBOARD - GLASSMORPHISM
 .dashboard-card {
-  border-radius: 1rem;
-  border: 1px solid #e5e7eb;
-  background: white;
+  position: relative;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.1), 
+    rgba(255, 255, 255, 0.05)
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  
+  // Efectos de glassmorphism adicionales
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.4), 
+      transparent
+    );
+    opacity: 0.6;
+    transition: opacity 0.5s ease-in-out, background 0.5s ease-in-out;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, 
+      rgba(255, 255, 255, 0.2), 
+      transparent
+    );
+    opacity: 0.7;
+  }
+
+  ion-card-content {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem !important;
+    
+    @media (min-width: 1024px) {
+      padding: 1.25rem !important;
+    }
+  }
+
+  // Header de la tarjeta mejorado
+  .flex.items-center.justify-between {
+    margin-bottom: 1.5rem;
+    
+    .flex-1 {
+      h3 {
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        
+        @media (min-width: 1024px) {
+          font-size: 0.9rem;
+          margin-bottom: 0.375rem;
+        }
+      }
+      
+      p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.4;
+        font-weight: 500;
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+        
+        @media (min-width: 1024px) {
+          font-size: 0.8rem;
+          line-height: 1.3;
+        }
+      }
+    }
+  }
+
+  // Contenedor de icono mejorado
+  .flex-shrink-0 {
+    .w-12.h-12 {
+      width: 3.5rem;
+      height: 3.5rem;
+      background: linear-gradient(145deg, 
+        rgba(255, 255, 255, 0.25), 
+        rgba(255, 255, 255, 0.1)
+      ) !important;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 
+        0 4px 16px 0 rgba(31, 38, 135, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      
+      @media (min-width: 1024px) {
+        width: 3rem;
+        height: 3rem;
+      }
+      
+      ion-icon {
+        font-size: 1.75rem !important;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        transition: all 0.4s ease-in-out;
+        
+        @media (min-width: 1024px) {
+          font-size: 1.5rem !important;
+        }
+      }
+    }
+  }
+
+  // Footer con contador mejorado
+  .flex.items-end.justify-between {
+    margin-top: 1rem;
+    
+    .text-2xl {
+      font-size: 2.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      
+      @media (min-width: 1024px) {
+        font-size: 1.875rem;
+      }
+    }
+    
+    ion-icon {
+      opacity: 0.6;
+      transition: all 0.5s ease-in-out;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    }
+  }
+}
+
+.dashboard-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px 0 rgba(31, 38, 135, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  
+  // Efecto de brillo en hover
+  &::before {
+    opacity: 1;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.6), 
+      transparent
+    );
+  }
+  
+  .flex.items-end.justify-between ion-icon {
+    opacity: 0.8;
+    transform: translateX(2px);
+  }
+  
+  .text-2xl {
+    transform: scale(1.05);
+  }
+}
+
+// Variaciones de color para diferentes tipos de tarjetas
+.dashboard-card {
+  // Mercados - Azul
+  &.mercados-card {
+    background: linear-gradient(145deg, 
+      rgba(59, 130, 246, 0.1), 
+      rgba(29, 78, 216, 0.05)
+    );
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+  
+  // Locales - Verde
+  &.locales-card {
+    background: linear-gradient(145deg, 
+      rgba(34, 197, 94, 0.1), 
+      rgba(21, 128, 61, 0.05)
+    );
+    border-color: rgba(34, 197, 94, 0.2);
+  }
+  
+  // Facturas - Naranja
+  &.facturas-card {
+    background: linear-gradient(145deg, 
+      rgba(249, 115, 22, 0.1), 
+      rgba(194, 65, 12, 0.05)
+    );
+    border-color: rgba(249, 115, 22, 0.2);
+  }
+  
+  // Usuarios - Púrpura
+  &.usuarios-card {
+    background: linear-gradient(145deg, 
+      rgba(168, 85, 247, 0.1), 
+      rgba(124, 58, 237, 0.05)
+    );
+    border-color: rgba(168, 85, 247, 0.2);
+  }
 }
 
 // Optimización para layout de 4 columnas
@@ -490,10 +703,7 @@ ion-card-content {
   }
 }
 
-.dashboard-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
+// Hover effects ya están incluidos en la clase .dashboard-card arriba
 
 .quick-action-card {
   border-radius: 0.75rem;

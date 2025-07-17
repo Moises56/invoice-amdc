@@ -392,7 +392,7 @@
     <ion-grid class="p-0">
       <ion-row>
         <ion-col 
-          *ngFor="let card of dashboardCards()" 
+          *ngFor="let card of dashboardCards(); let i = index" 
           size="12" 
           size-md="6" 
           size-lg="3"
@@ -400,7 +400,13 @@
           <ion-card 
             button="true"
             (click)="navigateTo(card.route)"
-            class="dashboard-card h-full shadow-md hover:shadow-lg transition-shadow duration-200">
+            class="dashboard-card h-full shadow-md hover:shadow-lg transition-shadow duration-200"
+            [ngClass]="{
+              'mercados-card': card.title === 'Mercados',
+              'locales-card': card.title === 'Locales', 
+              'facturas-card': card.title === 'Facturas',
+              'usuarios-card': card.title === 'Usuarios'
+            }">
             <ion-card-content class="p-4">
               <div class="flex items-center justify-between mb-3">
                 <div class="flex-1">

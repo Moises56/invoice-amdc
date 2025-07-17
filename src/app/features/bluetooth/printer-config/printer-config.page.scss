@@ -1,31 +1,423 @@
-ion-card {
-  margin: 16px;
-  border-radius: 12px;
+// Toolbar municipal moderno
+.municipal-toolbar {
+  --background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+  --color: white;
 }
 
-ion-card-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+// Glassmorphism Cards
+.glass-card {
+  position: relative;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.25), 
+    rgba(255, 255, 255, 0.1)
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+  margin-bottom: 1.5rem;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  
+  // Efectos de glassmorphism adicionales
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.4), 
+      transparent
+    );
+    opacity: 0.6;
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, 
+      rgba(255, 255, 255, 0.2), 
+      transparent
+    );
+    opacity: 0.7;
+  }
+
+  .card-header {
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+    
+    @media (max-width: 768px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 16px 40px 0 rgba(31, 38, 135, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    
+    &::before {
+      opacity: 1;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.6), 
+        transparent
+      );
+    }
+  }
 }
 
-ion-card-content {
-  padding: 16px;
+// Tarjeta de estado de conexión
+.connection-status-card {
+  background: linear-gradient(145deg, 
+    rgba(34, 197, 94, 0.1), 
+    rgba(21, 128, 61, 0.05)
+  );
+  border-color: rgba(34, 197, 94, 0.2);
+
+  .status-icon-container {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: all 0.5s ease;
+
+    &.connected {
+      background: linear-gradient(145deg, 
+        rgba(34, 197, 94, 0.2), 
+        rgba(21, 128, 61, 0.1)
+      );
+      box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+    }
+
+    &.disconnected {
+      background: linear-gradient(145deg, 
+        rgba(239, 68, 68, 0.2), 
+        rgba(185, 28, 28, 0.1)
+      );
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+    }
+
+    .status-main-icon {
+      font-size: 2rem;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+  }
+
+  .connection-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
 }
 
-ion-button {
-  margin: 8px 0;
+// Tarjeta de selección de impresora
+.printer-selection-card {
+  background: linear-gradient(145deg, 
+    rgba(59, 130, 246, 0.1), 
+    rgba(29, 78, 216, 0.05)
+  );
+  border-color: rgba(59, 130, 246, 0.2);
+
+  .printer-selector-container {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .custom-select-wrapper {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .refresh-button {
+    white-space: nowrap;
+  }
 }
 
-ion-list {
-  margin-bottom: 16px;
+// Tarjeta de configuraciones
+.printer-settings-card {
+  background: linear-gradient(145deg, 
+    rgba(168, 85, 247, 0.1), 
+    rgba(124, 58, 237, 0.05)
+  );
+  border-color: rgba(168, 85, 247, 0.2);
+
+  .settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: linear-gradient(145deg, 
+      rgba(255, 255, 255, 0.1), 
+      rgba(255, 255, 255, 0.05)
+    );
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: linear-gradient(145deg, 
+        rgba(255, 255, 255, 0.15), 
+        rgba(255, 255, 255, 0.08)
+      );
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  }
+
+  .setting-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .setting-icon {
+      font-size: 1.5rem;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .setting-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+
+    .setting-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  .setting-control {
+    min-width: 120px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      min-width: unset;
+    }
+  }
 }
 
-ion-item {
-  --border-color: transparent;
-  --background: var(--ion-color-light);
-  border-radius: 8px;
-  margin-bottom: 8px;
+// Tarjeta de prueba de impresión
+.test-print-card {
+  background: linear-gradient(145deg, 
+    rgba(34, 197, 94, 0.1), 
+    rgba(21, 128, 61, 0.05)
+  );
+  border-color: rgba(34, 197, 94, 0.2);
+
+  .test-content {
+    .test-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: linear-gradient(145deg, 
+        rgba(59, 130, 246, 0.1), 
+        rgba(29, 78, 216, 0.05)
+      );
+      border-radius: 1rem;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+
+      .info-icon {
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+      }
+
+      .test-description {
+        color: #374151;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin: 0;
+      }
+    }
+
+    .test-button {
+      width: 100%;
+    }
+  }
+}
+
+// Tarjeta de información del sistema
+.system-info-card {
+  background: linear-gradient(145deg, 
+    rgba(107, 114, 128, 0.1), 
+    rgba(75, 85, 99, 0.05)
+  );
+  border-color: rgba(107, 114, 128, 0.2);
+}
+
+// Botones glassmorphism
+.glass-button {
+  --background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  --color: var(--ion-color-dark);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    --background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  &.primary-button {
+    --background: linear-gradient(145deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.1));
+    --color: var(--ion-color-primary);
+    border-color: rgba(59, 130, 246, 0.3);
+    
+    &:hover {
+      --background: linear-gradient(145deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.15));
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+    }
+  }
+
+  &.secondary-button {
+    --background: linear-gradient(145deg, rgba(107, 114, 128, 0.2), rgba(75, 85, 99, 0.1));
+    --color: var(--ion-color-medium);
+    border-color: rgba(107, 114, 128, 0.3);
+    
+    &:hover {
+      --background: linear-gradient(145deg, rgba(107, 114, 128, 0.3), rgba(75, 85, 99, 0.15));
+      box-shadow: 0 8px 25px rgba(107, 114, 128, 0.2);
+    }
+  }
+
+  &.success-button {
+    --background: linear-gradient(145deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.1));
+    --color: var(--ion-color-success);
+    border-color: rgba(34, 197, 94, 0.3);
+    
+    &:hover {
+      --background: linear-gradient(145deg, rgba(34, 197, 94, 0.3), rgba(21, 128, 61, 0.15));
+      box-shadow: 0 8px 25px rgba(34, 197, 94, 0.2);
+    }
+  }
+
+  &.danger-button {
+    --background: linear-gradient(145deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.1));
+    --color: var(--ion-color-danger);
+    border-color: rgba(239, 68, 68, 0.3);
+    
+    &:hover {
+      --background: linear-gradient(145deg, rgba(239, 68, 68, 0.3), rgba(185, 28, 28, 0.15));
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.2);
+    }
+  }
+
+  ion-icon {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+}
+
+// Selectores glassmorphism
+.glass-select {
+  --background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  --color: var(--ion-color-dark);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  min-height: 48px;
+  
+  &.compact {
+    min-height: 40px;
+    font-size: 0.875rem;
+  }
+}
+
+// Toggle glassmorphism
+.glass-toggle {
+  --background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  --background-checked: var(--ion-color-primary);
+  --handle-background: white;
+  --handle-background-checked: white;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 1rem;
+}
+
+// Header de bienvenida
+.welcome-header {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="1000,100 1000,0 0,100"/></svg>');
+    background-size: cover;
+    background-position: bottom;
+  }
+  
+  h1, p {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+// Animaciones y utilidades
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
 }
 
 ion-select {

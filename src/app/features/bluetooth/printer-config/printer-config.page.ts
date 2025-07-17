@@ -8,19 +8,13 @@ import {
   IonToolbar,
   IonBackButton,
   IonButtons,
-  IonList,
-  IonItem,
-  IonLabel,
   IonSelect,
   IonSelectOption,
   IonButton,
   IonIcon,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonToggle,
-  IonAlert
+  IonAlert,
+  IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -28,7 +22,19 @@ import {
   settingsOutline, 
   checkmarkCircleOutline,
   closeCircleOutline,
-  refreshOutline
+  settings,
+  print,
+  cog,
+  bluetooth,
+  bluetoothOutline,
+  refresh,
+  refreshOutline,
+  documentOutline,
+  codeOutline,
+  flash,
+  informationCircle,
+  checkmarkCircle,
+  closeCircle
 } from 'ionicons/icons';
 
 @Component({
@@ -45,19 +51,13 @@ import {
     IonToolbar,
     IonBackButton,
     IonButtons,
-    IonList,
-    IonItem,
-    IonLabel,
     IonSelect,
     IonSelectOption,
     IonButton,
     IonIcon,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonToggle,
-    IonAlert
+    IonAlert,
+    IonBadge
   ]
 })
 export class PrinterConfigPage implements OnInit {
@@ -75,11 +75,23 @@ export class PrinterConfigPage implements OnInit {
   alertMessage = '';
   constructor() {
     addIcons({
-      printOutline,
+      settings,
+      bluetooth,
+      bluetoothOutline,
+      print,
+      refresh,
+      refreshOutline,
+      cog,
+      documentOutline,
+      codeOutline,
+      flash,
+      informationCircle,
       settingsOutline,
+      printOutline,
       checkmarkCircleOutline,
       closeCircleOutline,
-      refreshOutline
+      checkmarkCircle,
+      closeCircle
     });
   }
 

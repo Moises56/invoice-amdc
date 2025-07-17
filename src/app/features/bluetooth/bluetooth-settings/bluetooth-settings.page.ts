@@ -10,18 +10,30 @@ import {
   IonBackButton,
   IonTitle,
   IonContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonText,
   IonButton,
   IonIcon,
+  IonToggle,
 } from '@ionic/angular/standalone';
 import { Observable } from 'rxjs';
 import { BluetoothService } from '../bluetooth.service';
 import { BluetoothDevice } from '../../../core/interfaces';
 import { DeviceListPage } from '../device-list/device-list.page';
 import { PrintingService } from '../../../shared/services/printing.service';
+import { addIcons } from 'ionicons';
+import {
+  printOutline,
+  bluetooth,
+  bluetoothOutline,
+  search,
+  documentOutline,
+  print,
+  closeCircleOutline,
+  closeCircle,
+  settingsOutline,
+  flash,
+  cog,
+  chevronForward
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-bluetooth-settings',
@@ -37,12 +49,8 @@ import { PrintingService } from '../../../shared/services/printing.service';
     IonBackButton,
     IonTitle,
     IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonText,
-    IonButton,
     IonIcon,
+    IonToggle,
   ],
 })
 export class BluetoothSettingsPage implements OnInit {
@@ -56,6 +64,22 @@ export class BluetoothSettingsPage implements OnInit {
     private toastCtrl: ToastController
   ) {
     this.connectionStatus$ = this.bluetoothService.checkConnectionStatus();
+    
+    // Add icons
+    addIcons({
+      printOutline,
+      bluetooth,
+      bluetoothOutline,
+      search,
+      documentOutline,
+      print,
+      closeCircleOutline,
+      closeCircle,
+      settingsOutline,
+      flash,
+      cog,
+      chevronForward
+    });
   }
 
   async ngOnInit() {

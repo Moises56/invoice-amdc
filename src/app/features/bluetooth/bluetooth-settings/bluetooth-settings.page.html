@@ -7,45 +7,146 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-list>
-    <ion-item>
-      <ion-label>Estado</ion-label>
-      <ion-text
-        slot="end"
-        [color]="(connectionStatus$ | async) ? 'success' : 'danger'"
-      >
-        {{ (connectionStatus$ | async) ? 'Conectado' : 'Desconectado' }}
-      </ion-text>
-    </ion-item>
-    <ion-item>
-      <ion-label>Impresora Guardada</ion-label>
-      <ion-text slot="end">{{ defaultPrinter?.name || 'Ninguna' }}</ion-text>
-    </ion-item>
-  </ion-list>
+<ion-content class="printer-settings-content">
+  <!-- Welcome Header -->
+  <div class="welcome-header">
+    <div class="welcome-content">
+      <h1 class="welcome-title">Configuración de Impresora</h1>
+      <p class="welcome-subtitle">Gestiona tu impresora Bluetooth para facturación</p>
+    </div>
+    <div class="welcome-icon">
+      <ion-icon name="print-outline"></ion-icon>
+    </div>
+  </div>
 
-  <ion-button expand="block" (click)="openDeviceList()" class="ion-margin-top">
-    <ion-icon slot="start" name="search"></ion-icon>
-    Buscar y Seleccionar Impresora
-  </ion-button>
+  <!-- Status and Printer Info Row -->
+  <div class="status-row">
+    <!-- Status Card -->
+    <div class="glass-card status-card">
+      <div class="card-header">
+        <div class="status-info">
+          <h3 class="card-title">Estado de Conexión</h3>
+          <div class="status-indicator">
+            <div class="status-dot" [class.connected]="(connectionStatus$ | async)" [class.disconnected]="!(connectionStatus$ | async)"></div>
+            <span class="status-text" [class.connected]="(connectionStatus$ | async)" [class.disconnected]="!(connectionStatus$ | async)">
+              {{ (connectionStatus$ | async) ? 'Conectado' : 'Desconectado' }}
+            </span>
+          </div>
+        </div>
+        <div class="status-icon">
+          <ion-icon [name]="(connectionStatus$ | async) ? 'bluetooth' : 'bluetooth-outline'"></ion-icon>
+        </div>
+      </div>
+    </div>
 
-  <ion-button
-    expand="block"
-    (click)="printTestPage()"
-    color="secondary"
-    [disabled]="!(connectionStatus$ | async)"
-  >
-    <ion-icon slot="start" name="print"></ion-icon>
-    Imprimir Página de Prueba
-  </ion-button>
+    <!-- Printer Info Card -->
+    <div class="glass-card printer-info-card">
+      <div class="card-header">
+        <div class="printer-details">
+          <h3 class="card-title">Impresora Configurada</h3>
+          <div class="printer-name">
+            <ion-icon name="print"></ion-icon>
+            <span>{{ defaultPrinter?.name || 'Ninguna impresora seleccionada' }}</span>
+          </div>
+          <div class="printer-type" *ngIf="defaultPrinter">
+            <span class="type-label">Tipo:</span>
+            <span class="type-value">Bluetooth</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <ion-button
-    expand="block"
-    (click)="disconnect()"
-    color="danger"
-    [disabled]="!(connectionStatus$ | async)"
-  >
-    <ion-icon slot="start" name="close-circle"></ion-icon>
-    Desconectar
-  </ion-button>
+  <!-- Actions Grid -->
+  <div class="actions-grid">
+    <!-- Search Printer Card -->
+    <div class="glass-card action-card search-card">
+      <div class="action-content">
+        <div class="action-icon">
+          <ion-icon name="search"></ion-icon>
+        </div>
+        <h4 class="action-title">Buscar Impresora</h4>
+        <p class="action-description">Encuentra y conecta una nueva impresora</p>
+        <button class="glass-button primary-button" (click)="openDeviceList()">
+          <ion-icon name="search"></ion-icon>
+          <span>Buscar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Test Print Card -->
+    <div class="glass-card action-card test-card">
+      <div class="action-content">
+        <div class="action-icon">
+          <ion-icon name="document-outline"></ion-icon>
+        </div>
+        <h4 class="action-title">Página de Prueba</h4>
+        <p class="action-description">Verifica que la impresora funcione</p>
+        <button class="glass-button secondary-button" 
+                (click)="printTestPage()" 
+                [disabled]="!(connectionStatus$ | async)">
+          <ion-icon name="print"></ion-icon>
+          <span>Imprimir</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Disconnect Card -->
+    <div class="glass-card action-card disconnect-card">
+      <div class="action-content">
+        <div class="action-icon">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
+        <h4 class="action-title">Desconectar</h4>
+        <p class="action-description">Termina la conexión actual</p>
+        <button class="glass-button danger-button" 
+                (click)="disconnect()" 
+                [disabled]="!(connectionStatus$ | async)">
+          <ion-icon name="close-circle"></ion-icon>
+          <span>Desconectar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Settings Card -->
+  <div class="glass-card settings-card">
+    <div class="card-header">
+      <h3 class="card-title">Configuración Rápida</h3>
+      <ion-icon name="settings-outline"></ion-icon>
+    </div>
+    <div class="settings-grid">
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon">
+            <ion-icon name="flash"></ion-icon>
+          </div>
+          <div>
+            <h4 class="setting-title">Reconexión Automática</h4>
+            <p class="setting-description">Conectar automáticamente al abrir la app</p>
+          </div>
+        </div>
+        <div class="setting-control">
+          <ion-toggle class="glass-toggle"></ion-toggle>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon">
+            <ion-icon name="cog"></ion-icon>
+          </div>
+          <div>
+            <h4 class="setting-title">Configuración Avanzada</h4>
+            <p class="setting-description">Ajustes adicionales de impresión</p>
+          </div>
+        </div>
+        <div class="setting-control">
+          <button class="glass-button config-button">
+            <ion-icon name="chevron-forward"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </ion-content>

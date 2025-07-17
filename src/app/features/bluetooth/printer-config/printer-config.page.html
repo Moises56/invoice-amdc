@@ -1,115 +1,214 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar class="municipal-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/bluetooth"></ion-back-button>
+      <ion-back-button defaultHref="/dashboard" color="light"></ion-back-button>
     </ion-buttons>
-    <ion-title>Configuración de Impresora</ion-title>
+    <ion-title class="text-white font-semibold">Configuración de Impresora</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Configuración</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="bg-gradient-to-br from-slate-50 to-blue-50">
+  <!-- Header de bienvenida -->
+  <div class="welcome-header p-6 bg-gradient-to-r from-primary to-secondary text-white">
+    <h1 class="text-xl font-bold mb-2 flex items-center">
+      <ion-icon name="settings" class="mr-3"></ion-icon>
+      Configuración Bluetooth
+    </h1>
+    <p class="text-blue-100 opacity-90">
+      Administra y configura tu impresora Bluetooth
+    </p>
+  </div>
 
-  <!-- Printer Connection Status -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon [name]="isConnected ? 'checkmark-circle-outline' : 'close-circle-outline'" 
-                  [color]="isConnected ? 'success' : 'danger'"></ion-icon>
-        Estado de Conexión
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>{{ isConnected ? 'Conectado' : 'Desconectado' }}</p>
-      <ion-button *ngIf="!isConnected" (click)="connectToPrinter()" fill="solid" color="primary">
-        <ion-icon name="printer-outline" slot="start"></ion-icon>
-        Conectar
-      </ion-button>
-      <ion-button *ngIf="isConnected" (click)="disconnectPrinter()" fill="solid" color="danger">
-        Desconectar
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+  <div class="p-4 space-y-6">
+    <!-- Estado de Conexión - Glass Card -->
+    <div class="glass-card connection-status-card">
+      <div class="card-header">
+        <div class="flex items-center mb-4">
+          <div class="status-icon-container" [ngClass]="isConnected ? 'connected' : 'disconnected'">
+            <ion-icon 
+              [name]="isConnected ? 'checkmark-circle' : 'close-circle'" 
+              class="status-main-icon">
+            </ion-icon>
+          </div>
+          <div class="ml-4">
+            <h2 class="text-xl font-bold text-gray-800">Estado de Conexión</h2>
+            <p class="text-sm" [ngClass]="isConnected ? 'text-green-600' : 'text-red-600'">
+              {{ isConnected ? 'Impresora conectada y lista' : 'Sin conexión activa' }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="connection-actions">
+          <ion-button 
+            *ngIf="!isConnected" 
+            (click)="connectToPrinter()" 
+            class="glass-button primary-button"
+            fill="clear">
+            <ion-icon name="bluetooth" slot="start"></ion-icon>
+            Conectar Impresora
+          </ion-button>
+          
+          <ion-button 
+            *ngIf="isConnected" 
+            (click)="disconnectPrinter()" 
+            class="glass-button danger-button"
+            fill="clear">
+            <ion-icon name="bluetooth-outline" slot="start"></ion-icon>
+            Desconectar
+          </ion-button>
+        </div>
+      </div>
+    </div>
 
-  <!-- Printer Selection -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Selección de Impresora</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item>
-          <ion-select 
-            [(ngModel)]="selectedPrinter" 
-            placeholder="Selecciona una impresora"
-            interface="action-sheet">
-            <ion-select-option *ngFor="let printer of availablePrinters" [value]="printer.id">
-              {{ printer.name }} ({{ printer.type }})
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-      </ion-list>
-      
-      <ion-button (click)="refreshPrinters()" fill="outline" color="medium">
-        <ion-icon name="refresh-outline" slot="start"></ion-icon>
-        Actualizar Lista
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+    <!-- Selección de Impresora - Glass Card -->
+    <div class="glass-card printer-selection-card">
+      <div class="card-header">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <ion-icon name="print" color="secondary" class="mr-3"></ion-icon>
+          Selección de Impresora
+        </h2>
+        
+        <div class="printer-selector-container">
+          <div class="custom-select-wrapper">
+            <ion-select 
+              [(ngModel)]="selectedPrinter" 
+              placeholder="Selecciona una impresora"
+              interface="action-sheet"
+              class="glass-select">
+              <ion-select-option *ngFor="let printer of availablePrinters" [value]="printer.id">
+                {{ printer.name }} ({{ printer.type }})
+              </ion-select-option>
+            </ion-select>
+          </div>
+          
+          <ion-button 
+            (click)="refreshPrinters()" 
+            class="glass-button secondary-button refresh-button"
+            fill="clear">
+            <ion-icon name="refresh" slot="start"></ion-icon>
+            Actualizar
+          </ion-button>
+        </div>
+      </div>
+    </div>
 
-  <!-- Printer Settings -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="settings-outline"></ion-icon>
-        Configuraciones
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item>
-          <ion-label>Tamaño de Papel</ion-label>
-          <ion-select [(ngModel)]="printerSettings.paperSize" slot="end">
-            <ion-select-option value="58mm">58mm</ion-select-option>
-            <ion-select-option value="80mm">80mm</ion-select-option>
-            <ion-select-option value="A4">A4</ion-select-option>
-          </ion-select>
-        </ion-item>
+    <!-- Configuraciones de Impresora - Glass Card -->
+    <div class="glass-card printer-settings-card">
+      <div class="card-header">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <ion-icon name="cog" color="tertiary" class="mr-3"></ion-icon>
+          Configuraciones Avanzadas
+        </h2>
+        
+        <div class="settings-grid">
+          <!-- Tamaño de Papel -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <ion-icon name="document-outline" color="primary" class="setting-icon"></ion-icon>
+              <div>
+                <h4 class="setting-title">Tamaño de Papel</h4>
+                <p class="setting-description">Formato de impresión</p>
+              </div>
+            </div>
+            <div class="setting-control">
+              <ion-select 
+                [(ngModel)]="printerSettings.paperSize" 
+                interface="popover"
+                class="glass-select compact">
+                <ion-select-option value="58mm">58mm</ion-select-option>
+                <ion-select-option value="80mm">80mm</ion-select-option>
+                <ion-select-option value="A4">A4</ion-select-option>
+              </ion-select>
+            </div>
+          </div>
 
-        <ion-item>
-          <ion-label>Codificación</ion-label>
-          <ion-select [(ngModel)]="printerSettings.encoding" slot="end">
-            <ion-select-option value="UTF-8">UTF-8</ion-select-option>
-            <ion-select-option value="ISO-8859-1">ISO-8859-1</ion-select-option>
-            <ion-select-option value="Windows-1252">Windows-1252</ion-select-option>
-          </ion-select>
-        </ion-item>
+          <!-- Codificación -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <ion-icon name="code-outline" color="secondary" class="setting-icon"></ion-icon>
+              <div>
+                <h4 class="setting-title">Codificación</h4>
+                <p class="setting-description">Tipo de caracteres</p>
+              </div>
+            </div>
+            <div class="setting-control">
+              <ion-select 
+                [(ngModel)]="printerSettings.encoding" 
+                interface="popover"
+                class="glass-select compact">
+                <ion-select-option value="UTF-8">UTF-8</ion-select-option>
+                <ion-select-option value="ISO-8859-1">ISO-8859-1</ion-select-option>
+                <ion-select-option value="Windows-1252">Windows-1252</ion-select-option>
+              </ion-select>
+            </div>
+          </div>
 
-        <ion-item>
-          <ion-label>Conexión Automática</ion-label>
-          <ion-toggle [(ngModel)]="printerSettings.autoConnect" slot="end"></ion-toggle>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
+          <!-- Conexión Automática -->
+          <div class="setting-item">
+            <div class="setting-info">
+              <ion-icon name="flash" color="warning" class="setting-icon"></ion-icon>
+              <div>
+                <h4 class="setting-title">Conexión Automática</h4>
+                <p class="setting-description">Conectar al iniciar</p>
+              </div>
+            </div>
+            <div class="setting-control">
+              <ion-toggle 
+                [(ngModel)]="printerSettings.autoConnect" 
+                class="glass-toggle">
+              </ion-toggle>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- Test Print -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Prueba de Impresión</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <p>Envía una página de prueba para verificar la configuración.</p>
-      <ion-button (click)="testPrint()" fill="solid" color="secondary" [disabled]="!isConnected">
-        <ion-icon name="printer-outline" slot="start"></ion-icon>
-        Imprimir Prueba
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+    <!-- Prueba de Impresión - Glass Card -->
+    <div class="glass-card test-print-card">
+      <div class="card-header">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <ion-icon name="print" color="success" class="mr-3"></ion-icon>
+          Prueba de Impresión
+        </h2>
+        
+        <div class="test-content">
+          <div class="test-info">
+            <ion-icon name="information-circle" color="primary" class="info-icon"></ion-icon>
+            <p class="test-description">
+              Envía una página de prueba para verificar que la configuración funciona correctamente.
+            </p>
+          </div>
+          
+          <ion-button 
+            (click)="testPrint()" 
+            class="glass-button success-button test-button"
+            fill="clear"
+            [disabled]="!isConnected">
+            <ion-icon name="print" slot="start"></ion-icon>
+            {{ isConnected ? 'Imprimir Página de Prueba' : 'Conecta una impresora primero' }}
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Sistema -->
+    <div class="glass-card system-info-card">
+      <div class="card-header">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <ion-icon name="information-circle" color="medium" class="mr-3"></ion-icon>
+            <div>
+              <h3 class="text-sm font-semibold text-gray-700">Sistema de Configuración Bluetooth</h3>
+              <p class="text-xs text-gray-500 mt-1">
+                Versión 1.0.0 - Compatible con impresoras térmicas
+              </p>
+            </div>
+          </div>
+          <ion-badge color="primary" class="text-xs">Activo</ion-badge>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Alert -->
   <ion-alert
@@ -119,5 +218,4 @@
     [message]="alertMessage"
     [buttons]="['OK']">
   </ion-alert>
-
 </ion-content>
