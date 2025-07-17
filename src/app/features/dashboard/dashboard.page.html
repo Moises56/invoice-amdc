@@ -87,7 +87,7 @@
                          [ngClass]="(additionalStats()?.cumplimientoMensual || 0) >= 100 ? 'text-green-700' : 'text-orange-600'">
                       <ion-icon [name]="(additionalStats()?.cumplimientoMensual || 0) >= 100 ? 'checkmark-circle' : 'alert-circle'" 
                                 class="mr-1"></ion-icon>
-                      <span class="font-bold">{{ formatPercentage((additionalStats()?.cumplimientoMensual || 0) / 100) }}</span>
+                      <span class="font-bold">{{ formatPercentage((additionalStats()?.cumplimientoMensual || 0) / 100) }} cumplimiento</span>
                     </div>
                   </div>
                 </div>
@@ -152,9 +152,17 @@
                     <h3 class="card-title">Recaudación Anual</h3>
                   </div>
                   <div class="card-value info-value">{{ formatCurrency(additionalStats()?.ingresoAnual) }}</div>
-                  <div class="card-subtitle">
-                    <ion-icon name="trending-up-outline" color="primary" class="mr-1"></ion-icon>
-                    <span>{{ formatPercentage((additionalStats()?.cumplimientoAnual || 0) / 100) }} de meta anual</span>
+                  <div class="card-subtitle-detailed">
+                    <div class="flex items-center mb-1">
+                      <ion-icon name="flag-outline" color="primary" class="mr-1"></ion-icon>
+                      <span>Meta: {{ formatCurrency(additionalStats()?.ingresoAnualEsperado) }}</span>
+                    </div>
+                    <div class="flex items-center" 
+                         [ngClass]="(additionalStats()?.cumplimientoAnual || 0) >= 100 ? 'text-green-700' : 'text-orange-600'">
+                      <ion-icon [name]="(additionalStats()?.cumplimientoAnual || 0) >= 100 ? 'checkmark-circle' : 'alert-circle'" 
+                                class="mr-1"></ion-icon>
+                      <span class="font-bold">{{ formatPercentage((additionalStats()?.cumplimientoAnual || 0) / 100) }} cumplimiento</span>
+                    </div>
                   </div>
                 </div>
                 <div class="card-icon info-icon">
@@ -166,78 +174,7 @@
         </div>
       </div>
 
-      <!-- SECCIÓN 2: RESUMEN FINANCIERO -->
-      <div class="mb-6">
-        <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
-          <ion-icon name="wallet-outline" color="success" class="mr-2"></ion-icon>
-          Resumen Financiero Detallado
-        </h3>
-        <div *ngIf="statsLoading()" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ion-card *ngFor="let i of [1,2]" class="p-4">
-            <ion-skeleton-text animated style="width: 40%; height: 16px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 70%; height: 24px; margin-top: 8px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 30%; height: 16px; margin-top: 8px;"></ion-skeleton-text>
-          </ion-card>
-        </div>
-        
-        <div *ngIf="!statsLoading() && !statsError()" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Detalles de Recaudación Mensual -->
-          <ion-card *ngIf="additionalStats()" class="stats-card financial-card detailed-card">
-            <ion-card-content>
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="text-sm font-medium text-gray-600 mb-1">Análisis Mensual Detallado</h3>
-                  <div class="text-3xl font-bold text-green-700 mb-2">{{ formatCurrency(additionalStats()?.ingresoMensual) }}</div>
-                  <div class="flex flex-col text-xs space-y-1">
-                    <div class="flex items-center">
-                      <ion-icon name="flag-outline" color="success" class="mr-1"></ion-icon>
-                      <span class="text-gray-600">Meta: {{ formatCurrency(additionalStats()?.ingresoMensualEsperado) }}</span>
-                    </div>
-                    <div class="flex items-center" 
-                         [ngClass]="(additionalStats()?.cumplimientoMensual || 0) >= 100 ? 'text-green-700' : 'text-red-600'">
-                      <ion-icon [name]="(additionalStats()?.cumplimientoMensual || 0) >= 100 ? 'trending-up-outline' : 'trending-down-outline'" 
-                                class="mr-1"></ion-icon>
-                      <span class="font-semibold">{{ formatPercentage((additionalStats()?.cumplimientoMensual || 0) / 100) }} de cumplimiento</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="bg-green-100 p-3 rounded-full">
-                  <ion-icon name="wallet-outline" color="success" size="large"></ion-icon>
-                </div>
-              </div>
-            </ion-card-content>
-          </ion-card>
-
-          <!-- Detalles de Recaudación Anual -->
-          <ion-card *ngIf="additionalStats()" class="stats-card financial-card detailed-card">
-            <ion-card-content>
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="text-sm font-medium text-gray-600 mb-1">Análisis Anual Detallado</h3>
-                  <div class="text-3xl font-bold text-green-700 mb-2">{{ formatCurrency(additionalStats()?.ingresoAnual) }}</div>
-                  <div class="flex flex-col text-xs space-y-1">
-                    <div class="flex items-center">
-                      <ion-icon name="flag-outline" color="success" class="mr-1"></ion-icon>
-                      <span class="text-gray-600">Meta: {{ formatCurrency(additionalStats()?.ingresoAnualEsperado) }}</span>
-                    </div>
-                    <div class="flex items-center" 
-                         [ngClass]="(additionalStats()?.cumplimientoAnual || 0) >= 100 ? 'text-green-700' : 'text-red-600'">
-                      <ion-icon [name]="(additionalStats()?.cumplimientoAnual || 0) >= 100 ? 'trending-up-outline' : 'trending-down-outline'" 
-                                class="mr-1"></ion-icon>
-                      <span class="font-semibold">{{ formatPercentage((additionalStats()?.cumplimientoAnual || 0) / 100) }} de cumplimiento</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="bg-green-100 p-3 rounded-full">
-                  <ion-icon name="calendar-outline" color="success" size="large"></ion-icon>
-                </div>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </div>
-      </div>
-
-      <!-- SECCIÓN 4: ESTADO DE FACTURAS -->
+      <!-- SECCIÓN 2: ESTADO DE FACTURAS -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
           <ion-icon name="receipt-outline" color="warning" class="mr-2"></ion-icon>

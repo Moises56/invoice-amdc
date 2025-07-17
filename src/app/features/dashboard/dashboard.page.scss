@@ -32,6 +32,22 @@
   }
 }
 
+// Grid system para las tarjetas financieras (2 columnas en escritorio)
+.desktop-financial-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 1280px) {
+    gap: 2rem;
+  }
+}
+
 .stats-card {
   border-radius: 24px;
   overflow: hidden;
