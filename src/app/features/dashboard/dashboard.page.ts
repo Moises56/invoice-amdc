@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
 import { 
   IonContent, 
   IonHeader, 
@@ -101,6 +102,7 @@ export class DashboardPage implements OnInit {
   private router = inject(Router);
   private mercadosService = inject(MercadosService);
   private dashboardService = inject(DashboardService);
+  private toastController = inject(ToastController);
 
   // Signals principales
   isLoading = signal<boolean>(true);
@@ -309,25 +311,80 @@ export class DashboardPage implements OnInit {
   }
 
   /**
-   * Refresh de datos (pull-to-refresh)
+   * Refresh de datos con mejor UX y manejo de errores
    */
   async refresh(): Promise<void> {
     console.log('🔄 Refreshing dashboard data...');
     
+    // Activar estado de carga
+    this.statsLoading.set(true);
+    this.statsError.set(null);
+    
     try {
-      const stats = await this.dashboardService.refreshDashboardStatistics().toPromise();
+      // Usar Promise.race para timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 10000)
+      );
+      
+      const statsPromise = this.dashboardService.refreshDashboardStatistics().toPromise();
+      
+      const stats = await Promise.race([statsPromise, timeoutPromise]) as DashboardStatistics;
       
       if (stats) {
         this.dashboardStats.set(stats);
         this.lastUpdated.set(new Date());
         this.statsError.set(null);
         console.log('✅ Dashboard refreshed successfully');
+        
+        // Feedback visual de éxito
+        this.showSuccessToast('Datos actualizados correctamente');
       }
       
     } catch (error: any) {
       console.error('❌ Error refreshing dashboard:', error);
-      this.statsError.set('Error al actualizar datos');
+      
+      let errorMessage = 'Error al actualizar datos';
+      if (error.message === 'Timeout') {
+        errorMessage = 'Tiempo de espera agotado. Verifique su conexión.';
+      } else if (error.status === 0) {
+        errorMessage = 'Sin conexión a internet';
+      } else if (error.status >= 500) {
+        errorMessage = 'Error del servidor. Intente más tarde.';
+      }
+      
+      this.statsError.set(errorMessage);
+      this.showErrorToast(errorMessage);
+    } finally {
+      this.statsLoading.set(false);
     }
+  }
+
+  /**
+   * Mostrar toast de éxito
+   */
+  private async showSuccessToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'top',
+      color: 'success',
+      icon: 'checkmark-circle-outline'
+    });
+    await toast.present();
+  }
+
+  /**
+   * Mostrar toast de error
+   */
+  private async showErrorToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      color: 'danger',
+      icon: 'alert-circle-outline'
+    });
+    await toast.present();
   }
 
   /**
@@ -545,11 +602,23 @@ export class DashboardPage implements OnInit {
   }
 
   /**
-   * Cerrar sesión
+   * Cerrar sesión de manera robusta
    */
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    console.log('🚪 Iniciando logout desde dashboard...');
+    
+    // Suscribirse al observable del logout para manejo correcto
+    this.authService.logout().subscribe({
+      next: () => {
+        console.log('✅ Logout completado exitosamente');
+        // La navegación ya se maneja en el AuthService
+      },
+      error: (error) => {
+        console.error('❌ Error en logout:', error);
+        // Forzar navegación incluso si hay error
+        this.router.navigate(['/login'], { replaceUrl: true });
+      }
+    });
   }
 
   /**

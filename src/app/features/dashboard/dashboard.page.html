@@ -9,10 +9,19 @@
     </ion-title>
 
     <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="refresh()" [disabled]="isLoading()">
-        <ion-icon name="refresh-outline" color="light"></ion-icon>
+      <ion-button fill="clear" (click)="refresh()" [disabled]="isLoading() || statsLoading()">
+        <ion-icon 
+          *ngIf="!statsLoading()" 
+          name="refresh-outline" 
+          color="light">
+        </ion-icon>
+        <ion-spinner 
+          *ngIf="statsLoading()" 
+          name="crescent" 
+          color="light">
+        </ion-spinner>
       </ion-button>
-      <ion-button fill="clear" (click)="logout()">
+      <ion-button fill="clear" (click)="logout()" [disabled]="isLoading()">
         <ion-icon name="log-out-outline" color="light"></ion-icon>
       </ion-button>
     </ion-buttons>
