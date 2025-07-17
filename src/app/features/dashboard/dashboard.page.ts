@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
@@ -40,8 +40,20 @@ import {
   cashOutline,
   walletOutline, 
   timeOutline, 
-  trophyOutline 
-} from 'ionicons/icons';
+  trophyOutline, 
+  flagOutline, 
+  calendarOutline, 
+  documentText,
+  alertCircle,
+  time,
+  checkmarkCircle,
+  business,
+  storefront,
+  atOutline,
+  documentTextOutline, 
+  analyticsOutline,
+  analytics,
+  trendingUp } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../shared/enums';
 import { MercadosService } from '../mercados/mercados.service';
@@ -225,23 +237,36 @@ export class DashboardPage implements OnInit {
     addIcons({
       refreshOutline,
       logOutOutline,
-      businessOutline,
-      storefrontOutline,
-      cashOutline,
-      receiptOutline,
+      analyticsOutline,
+      analytics,
+      trendingUp,
       walletOutline,
+      business,
+      storefrontOutline,
+      businessOutline,
+      storefront,
+      peopleOutline,
+      trendingUpOutline,
+      calendarOutline,
+      flagOutline,
+      receiptOutline,
+      alertCircle,
+      cashOutline,
       alertCircleOutline,
+      time,
       timeOutline,
+      checkmarkCircle,
+      checkmarkCircleOutline,
+      documentText,
       trophyOutline,
       chevronForwardOutline,
       addOutline,
       statsChartOutline,
       settingsOutline,
+      documentTextOutline,
       homeOutline,
-      peopleOutline,
-      trendingUpOutline,
       trendingDownOutline,
-      checkmarkCircleOutline
+      atOutline
     });
   }
 
