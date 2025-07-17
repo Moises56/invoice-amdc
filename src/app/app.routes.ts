@@ -19,6 +19,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'reportes',
+    loadComponent: () => import('./features/reportes/reportes.page').then(m => m.ReportesPage),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'usuarios',
     loadChildren: () => import('./features/usuarios/usuarios.routes').then(m => m.routes),
     canActivate: [AuthGuard, RoleGuard],

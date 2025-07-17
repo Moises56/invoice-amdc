@@ -29,6 +29,7 @@ import {
   peopleOutline,
   statsChartOutline,
   settingsOutline,
+  settings,
   logOutOutline,
   refreshOutline,
   addOutline,
@@ -53,7 +54,7 @@ import {
   documentTextOutline, 
   analyticsOutline,
   analytics,
-  trendingUp } from 'ionicons/icons';
+  trendingUp, flashOutline, barChartOutline, arrowForward, bluetoothOutline, cogOutline, colorPaletteOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../shared/enums';
 import { MercadosService } from '../mercados/mercados.service';
@@ -234,40 +235,7 @@ export class DashboardPage implements OnInit {
   userName = this.authService.userName;
 
   constructor() {
-    addIcons({
-      refreshOutline,
-      logOutOutline,
-      analyticsOutline,
-      analytics,
-      trendingUp,
-      walletOutline,
-      business,
-      storefrontOutline,
-      businessOutline,
-      storefront,
-      peopleOutline,
-      trendingUpOutline,
-      calendarOutline,
-      flagOutline,
-      receiptOutline,
-      alertCircle,
-      cashOutline,
-      alertCircleOutline,
-      time,
-      timeOutline,
-      checkmarkCircle,
-      checkmarkCircleOutline,
-      documentText,
-      trophyOutline,
-      chevronForwardOutline,
-      addOutline,
-      statsChartOutline,
-      settingsOutline,
-      documentTextOutline,
-      homeOutline,
-      trendingDownOutline,
-      atOutline
-    });
+    addIcons({refreshOutline,logOutOutline,analyticsOutline,trendingUp,flagOutline,walletOutline,business,storefrontOutline,businessOutline,storefront,peopleOutline,analytics,calendarOutline,receiptOutline,alertCircle,cashOutline,alertCircleOutline,time,timeOutline,checkmarkCircle,trendingUpOutline,checkmarkCircleOutline,documentText,trophyOutline,chevronForwardOutline,flashOutline,documentTextOutline,barChartOutline,arrowForward,settings,bluetoothOutline,cogOutline,colorPaletteOutline,settingsOutline,addOutline,statsChartOutline,homeOutline,trendingDownOutline,atOutline});
   }
 
   ngOnInit() {

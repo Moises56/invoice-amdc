@@ -296,58 +296,83 @@
       </div>
     </div>
 
-    <!-- Top Mercados por Recaudación -->
-    <div *ngIf="!statsLoading() && topMarketsByRevenue().length > 0" class="mb-6">
-      <h2 class="text-xl font-bold text-gray-700 mb-4">Mejores Mercados por Recaudación</h2>
+    <!-- Ranking de Ingresos por Mercado -->
+    <div *ngIf="!statsLoading() && topMarketsByRevenue().length > 0" class="mb-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center">
+          <ion-icon name="trophy-outline" color="warning" class="mr-2"></ion-icon>
+          Ranking de Ingresos por Mercado
+        </h2>
+        <ion-badge color="warning" class="text-xs">Top 3</ion-badge>
+      </div>
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <ion-card *ngFor="let market of topMarketsByRevenue(); let i = index" 
-                  class="market-ranking-card"
-                  [class.border-l-4]="true"
-                  [class.border-yellow-400]="i === 0"
-                  [class.border-gray-400]="i === 1"
-                  [class.border-orange-400]="i === 2">
-          <ion-card-content class="p-4">
-            <div class="flex items-start justify-between">
-              <div class="flex-1">
-                <div class="flex items-center mb-2">
-                  <span class="text-2xl font-bold mr-2"
-                        [class.text-yellow-600]="i === 0"
-                        [class.text-gray-600]="i === 1"
-                        [class.text-orange-600]="i === 2">
-                    #{{ i + 1 }}
-                  </span>
-                  <div>
-                    <h3 class="text-sm font-semibold text-gray-800">{{ market.name }}</h3>
-                    <p class="text-xs text-gray-500">{{ formatNumber(market.totalLocals) }} locales</p>
-                  </div>
-                </div>
-                
-                <div class="space-y-1">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">Recaudación:</span>
-                    <span class="text-sm font-bold text-green-600">{{ formatCurrency(market.total) }}</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">Promedio x Local:</span>
-                    <span class="text-sm font-medium text-blue-600">{{ formatCurrency(market.averagePerLocal) }}</span>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">% del Total:</span>
-                    <span class="text-sm font-medium text-purple-600">{{ formatPercentage(market.percentage) }}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="ml-3">
-                <ion-icon name="trophy-outline" 
-                          [color]="i === 0 ? 'warning' : i === 1 ? 'medium' : 'tertiary'"
-                          size="large">
-                </ion-icon>
+        <div *ngFor="let market of topMarketsByRevenue(); let i = index" 
+             class="ranking-market-card glass-card"
+             [class.first-place]="i === 0"
+             [class.second-place]="i === 1"
+             [class.third-place]="i === 2">
+          
+          <!-- Header con posición y medalla -->
+          <div class="ranking-header">
+            <div class="ranking-position" 
+                 [class.gold]="i === 0"
+                 [class.silver]="i === 1"
+                 [class.bronze]="i === 2">
+              <span class="position-number">#{{ i + 1 }}</span>
+              <ion-icon [name]="i === 0 ? 'trophy' : i === 1 ? 'medal' : 'ribbon'" 
+                        [color]="i === 0 ? 'warning' : i === 1 ? 'medium' : 'tertiary'"
+                        class="medal-icon"></ion-icon>
+            </div>
+            <div class="market-info">
+              <h3 class="market-name">{{ market.name }}</h3>
+              <div class="market-subtitle">
+                <ion-icon name="storefront-outline" class="mr-1"></ion-icon>
+                <span>{{ formatNumber(market.totalLocals) }} locales activos</span>
               </div>
             </div>
-          </ion-card-content>
-        </ion-card>
+          </div>
+
+          <!-- Métricas principales -->
+          <div class="ranking-metrics">
+            <div class="primary-metric">
+              <span class="metric-label">Recaudación Total</span>
+              <span class="metric-value primary-value">{{ formatCurrency(market.total) }}</span>
+            </div>
+
+            <div class="secondary-metrics">
+              <div class="metric-item">
+                <div class="metric-header">
+                  <ion-icon name="trending-up-outline" color="success" class="mr-1"></ion-icon>
+                  <span class="metric-label">Promedio por Local</span>
+                </div>
+                <span class="metric-value success-value">{{ formatCurrency(market.averagePerLocal) }}</span>
+              </div>
+
+              <div class="metric-item">
+                <div class="metric-header">
+                  <ion-icon name="analytics-outline" color="primary" class="mr-1"></ion-icon>
+                  <span class="metric-label">Participación</span>
+                </div>
+                <span class="metric-value primary-value">{{ formatPercentage(market.percentage) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicador de rendimiento -->
+          <div class="performance-indicator">
+            <div class="performance-bar">
+              <div class="performance-fill" 
+                   [style.width.%]="market.percentage * 2"
+                   [class.gold-fill]="i === 0"
+                   [class.silver-fill]="i === 1"
+                   [class.bronze-fill]="i === 2"></div>
+            </div>
+            <span class="performance-text">
+              {{ i === 0 ? 'Líder en recaudación' : i === 1 ? 'Excelente desempeño' : 'Buen rendimiento' }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -414,42 +439,77 @@
     </ion-grid>
 
     <!-- Acciones rápidas -->
-    <div class="mt-6">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">Acciones Rápidas</h2>
+    <div class="mt-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center">
+          <ion-icon name="flash-outline" color="tertiary" class="mr-2"></ion-icon>
+          Acciones Rápidas
+        </h2>
+        <ion-badge color="tertiary" class="text-xs">2 opciones</ion-badge>
+      </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <!-- Crear Factura -->
-        <ion-card 
-          button="true"
-          (click)="navigateTo('/facturas/crear')"
-          class="quick-action-card">
-          <ion-card-content class="p-4 text-center">
-            <ion-icon name="add-outline" color="primary" class="text-2xl mb-2"></ion-icon>
-            <h4 class="text-sm font-medium text-gray-700">Nueva Factura</h4>
-          </ion-card-content>
-        </ion-card>
-
+      <div class="grid grid-cols-2 gap-3 md:gap-6">
         <!-- Ver Reportes -->
-        <ion-card 
-          button="true"
-          (click)="navigateTo('/reportes')"
-          class="quick-action-card">
-          <ion-card-content class="p-4 text-center">
-            <ion-icon name="stats-chart-outline" color="secondary" class="text-2xl mb-2"></ion-icon>
-            <h4 class="text-sm font-medium text-gray-700">Ver Reportes</h4>
-          </ion-card-content>
-        </ion-card>
+        <div class="quick-action-glass-card reports-card" (click)="navigateTo('/reportes')">
+          <div class="action-icon-container reports-bg">
+            <ion-icon name="analytics" color="light" class="action-main-icon"></ion-icon>
+          </div>
+          <div class="action-content">
+            <h3 class="action-title">Ver Reportes</h3>
+            <p class="action-description">
+              Genera reportes detallados de recaudación mensual y anual. 
+              Exporta en PDF/Excel y visualiza gráficamente los datos.
+            </p>
+            <div class="action-features">
+              <div class="feature-item">
+                <ion-icon name="document-text-outline" class="mr-1"></ion-icon>
+                <span>Reportes PDF/Excel</span>
+              </div>
+              <div class="feature-item">
+                <ion-icon name="bar-chart-outline" class="mr-1"></ion-icon>
+                <span>Gráficos interactivos</span>
+              </div>
+              <div class="feature-item">
+                <ion-icon name="calendar-outline" class="mr-1"></ion-icon>
+                <span>Mensual/Anual</span>
+              </div>
+            </div>
+          </div>
+          <div class="action-arrow">
+            <ion-icon name="arrow-forward" color="primary"></ion-icon>
+          </div>
+        </div>
 
-        <!-- Configuración -->
-        <ion-card 
-          button="true"
-          (click)="navigateTo('/configuracion')"
-          class="quick-action-card">
-          <ion-card-content class="p-4 text-center">
-            <ion-icon name="settings-outline" color="tertiary" class="text-2xl mb-2"></ion-icon>
-            <h4 class="text-sm font-medium text-gray-700">Configuración</h4>
-          </ion-card-content>
-        </ion-card>
+        <!-- Configuración Bluetooth -->
+        <div class="quick-action-glass-card config-card" (click)="navigateTo('/bluetooth/settings')">
+          <div class="action-icon-container config-bg">
+            <ion-icon name="settings" color="light" class="action-main-icon"></ion-icon>
+          </div>
+          <div class="action-content">
+            <h3 class="action-title">Configuración</h3>
+            <p class="action-description">
+              Configura impresoras Bluetooth, ajusta parámetros del sistema 
+              y personaliza la aplicación según tus necesidades.
+            </p>
+            <div class="action-features">
+              <div class="feature-item">
+                <ion-icon name="bluetooth-outline" class="mr-1"></ion-icon>
+                <span>Impresoras Bluetooth</span>
+              </div>
+              <div class="feature-item">
+                <ion-icon name="cog-outline" class="mr-1"></ion-icon>
+                <span>Parámetros sistema</span>
+              </div>
+              <div class="feature-item">
+                <ion-icon name="color-palette-outline" class="mr-1"></ion-icon>
+                <span>Personalización</span>
+              </div>
+            </div>
+          </div>
+          <div class="action-arrow">
+            <ion-icon name="arrow-forward" color="secondary"></ion-icon>
+          </div>
+        </div>
       </div>
     </div>
 

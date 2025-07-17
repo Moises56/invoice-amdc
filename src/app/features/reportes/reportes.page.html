@@ -1,0 +1,427 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="reports-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button color="light" defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    
+    <ion-title class="text-white font-semibold">
+      Centro de Reportes
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="refresh()" [disabled]="isLoading()">
+        <ion-icon 
+          *ngIf="!isLoading()" 
+          name="refresh-outline" 
+          color="light">
+        </ion-icon>
+        <ion-spinner 
+          *ngIf="isLoading()" 
+          name="crescent" 
+          color="light">
+        </ion-spinner>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="reports-bg">
+  <!-- Header principal -->
+  <div class="reports-hero">
+    <div class="hero-content">
+      <div class="hero-icon">
+        <ion-icon name="analytics" color="light"></ion-icon>
+      </div>
+      <h1 class="hero-title">Centro de Reportes Avanzados</h1>
+      <p class="hero-subtitle">
+        Genera reportes detallados, visualiza datos en tiempo real y exporta información 
+        en múltiples formatos para una gestión eficiente.
+      </p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-number">{{ totalReports() }}</span>
+        <span class="stat-label">Reportes Disponibles</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ lastGenerated() }}</span>
+        <span class="stat-label">Último Generado</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reports-container">
+    <!-- Filtros y controles principales -->
+    <div class="filters-section glass-panel">
+      <h2 class="section-title">
+        <ion-icon name="filter-outline" color="primary" class="mr-2"></ion-icon>
+        Configuración de Reportes
+      </h2>
+      
+      <div class="filters-grid">
+        <!-- Rango de fechas -->
+        <div class="filter-group">
+          <label class="filter-label">Período de tiempo</label>
+          <ion-select 
+            [(ngModel)]="selectedPeriod" 
+            placeholder="Seleccionar período"
+            class="glass-select">
+            <ion-select-option value="monthly">Mensual</ion-select-option>
+            <ion-select-option value="quarterly">Trimestral</ion-select-option>
+            <ion-select-option value="yearly">Anual</ion-select-option>
+            <ion-select-option value="custom">Personalizado</ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Tipo de reporte -->
+        <div class="filter-group">
+          <label class="filter-label">Tipo de análisis</label>
+          <ion-select 
+            [(ngModel)]="selectedType" 
+            placeholder="Tipo de reporte"
+            class="glass-select">
+            <ion-select-option value="revenue">Recaudación</ion-select-option>
+            <ion-select-option value="invoices">Facturas</ion-select-option>
+            <ion-select-option value="markets">Por Mercado</ion-select-option>
+            <ion-select-option value="locals">Por Local</ion-select-option>
+            <ion-select-option value="comparative">Comparativo</ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Mercado específico -->
+        <div class="filter-group">
+          <label class="filter-label">Mercado específico</label>
+          <ion-select 
+            [(ngModel)]="selectedMarket" 
+            placeholder="Todos los mercados"
+            class="glass-select">
+            <ion-select-option value="all">Todos los mercados</ion-select-option>
+            <ion-select-option *ngFor="let market of availableMarkets()" [value]="market.id">
+              {{ market.name }}
+            </ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Botón de generación -->
+        <div class="filter-group">
+          <ion-button 
+            expand="block" 
+            class="generate-btn"
+            (click)="generateReport()"
+            [disabled]="!selectedPeriod || !selectedType">
+            <ion-icon name="play-outline" slot="start"></ion-icon>
+            Generar Reporte
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tipos de reportes disponibles -->
+    <div class="reports-grid">
+      <h2 class="section-title">
+        <ion-icon name="library-outline" color="secondary" class="mr-2"></ion-icon>
+        Reportes Disponibles
+      </h2>
+
+      <!-- Reporte de Recaudación Mensual -->
+      <div class="report-card revenue-card">
+        <div class="report-header">
+          <div class="report-icon revenue-icon">
+            <ion-icon name="trending-up" color="light"></ion-icon>
+          </div>
+          <div class="report-info">
+            <h3 class="report-title">Recaudación Mensual</h3>
+            <p class="report-description">
+              Análisis detallado de ingresos mensuales con comparativas y tendencias.
+            </p>
+          </div>
+        </div>
+        
+        <div class="report-features">
+          <div class="feature-item">
+            <ion-icon name="bar-chart-outline" class="mr-1"></ion-icon>
+            <span>Gráficos interactivos</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="trending-up-outline" class="mr-1"></ion-icon>
+            <span>Análisis de tendencias</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="calendar-outline" class="mr-1"></ion-icon>
+            <span>Comparación mensual</span>
+          </div>
+        </div>
+
+        <div class="export-options">
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="success"
+            (click)="exportReport('monthly', 'pdf')">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            PDF
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="success"
+            (click)="exportReport('monthly', 'excel')">
+            <ion-icon name="grid-outline" slot="start"></ion-icon>
+            Excel
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="solid" 
+            color="primary"
+            (click)="viewReport('monthly')">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver Reporte
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Reporte de Recaudación Anual -->
+      <div class="report-card yearly-card">
+        <div class="report-header">
+          <div class="report-icon yearly-icon">
+            <ion-icon name="calendar" color="light"></ion-icon>
+          </div>
+          <div class="report-info">
+            <h3 class="report-title">Recaudación Anual</h3>
+            <p class="report-description">
+              Resumen anual completo con metas, cumplimiento y proyecciones.
+            </p>
+          </div>
+        </div>
+        
+        <div class="report-features">
+          <div class="feature-item">
+            <ion-icon name="analytics-outline" class="mr-1"></ion-icon>
+            <span>Análisis profundo</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="target-outline" class="mr-1"></ion-icon>
+            <span>Metas vs. Real</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="trending-up-outline" class="mr-1"></ion-icon>
+            <span>Proyecciones</span>
+          </div>
+        </div>
+
+        <div class="export-options">
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="warning"
+            (click)="exportReport('yearly', 'pdf')">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            PDF
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="warning"
+            (click)="exportReport('yearly', 'excel')">
+            <ion-icon name="grid-outline" slot="start"></ion-icon>
+            Excel
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="solid" 
+            color="secondary"
+            (click)="viewReport('yearly')">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver Reporte
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Reporte por Mercado -->
+      <div class="report-card market-card">
+        <div class="report-header">
+          <div class="report-icon market-icon">
+            <ion-icon name="business" color="light"></ion-icon>
+          </div>
+          <div class="report-info">
+            <h3 class="report-title">Análisis por Mercado</h3>
+            <p class="report-description">
+              Desempeño individual de cada mercado con ranking y comparativas.
+            </p>
+          </div>
+        </div>
+        
+        <div class="report-features">
+          <div class="feature-item">
+            <ion-icon name="trophy-outline" class="mr-1"></ion-icon>
+            <span>Ranking de mercados</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="stats-chart-outline" class="mr-1"></ion-icon>
+            <span>Métricas detalladas</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="pie-chart-outline" class="mr-1"></ion-icon>
+            <span>Participación %</span>
+          </div>
+        </div>
+
+        <div class="export-options">
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="tertiary"
+            (click)="exportReport('market', 'pdf')">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            PDF
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="tertiary"
+            (click)="exportReport('market', 'excel')">
+            <ion-icon name="grid-outline" slot="start"></ion-icon>
+            Excel
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="solid" 
+            color="tertiary"
+            (click)="viewReport('market')">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver Reporte
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Reporte por Local -->
+      <div class="report-card local-card">
+        <div class="report-header">
+          <div class="report-icon local-icon">
+            <ion-icon name="storefront" color="light"></ion-icon>
+          </div>
+          <div class="report-info">
+            <h3 class="report-title">Análisis por Local</h3>
+            <p class="report-description">
+              Rendimiento detallado de locales individuales y comparativas.
+            </p>
+          </div>
+        </div>
+        
+        <div class="report-features">
+          <div class="feature-item">
+            <ion-icon name="location-outline" class="mr-1"></ion-icon>
+            <span>Por ubicación</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="people-outline" class="mr-1"></ion-icon>
+            <span>Por propietario</span>
+          </div>
+          <div class="feature-item">
+            <ion-icon name="cash-outline" class="mr-1"></ion-icon>
+            <span>Recaudación individual</span>
+          </div>
+        </div>
+
+        <div class="export-options">
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="dark"
+            (click)="exportReport('local', 'pdf')">
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            PDF
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="outline" 
+            color="dark"
+            (click)="exportReport('local', 'excel')">
+            <ion-icon name="grid-outline" slot="start"></ion-icon>
+            Excel
+          </ion-button>
+          <ion-button 
+            size="small" 
+            fill="solid" 
+            color="dark"
+            (click)="viewReport('local')">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            Ver Reporte
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visualización gráfica en tiempo real -->
+    <div class="charts-section glass-panel">
+      <h2 class="section-title">
+        <ion-icon name="bar-chart-outline" color="success" class="mr-2"></ion-icon>
+        Visualización en Tiempo Real
+      </h2>
+      
+      <div class="charts-grid">
+        <!-- Gráfico de recaudación mensual -->
+        <div class="chart-container">
+          <h3 class="chart-title">Recaudación por Mes</h3>
+          <div class="chart-placeholder">
+            <ion-icon name="bar-chart-outline" color="primary"></ion-icon>
+            <p>Gráfico de barras interactivo</p>
+            <span class="chart-note">Chart.js / D3.js integration</span>
+          </div>
+        </div>
+
+        <!-- Gráfico de participación por mercado -->
+        <div class="chart-container">
+          <h3 class="chart-title">Participación por Mercado</h3>
+          <div class="chart-placeholder">
+            <ion-icon name="pie-chart-outline" color="secondary"></ion-icon>
+            <p>Gráfico circular dinámico</p>
+            <span class="chart-note">Datos actualizados en tiempo real</span>
+          </div>
+        </div>
+
+        <!-- Gráfico de tendencias -->
+        <div class="chart-container full-width">
+          <h3 class="chart-title">Tendencias de Recaudación</h3>
+          <div class="chart-placeholder large">
+            <ion-icon name="trending-up-outline" color="success"></ion-icon>
+            <p>Gráfico de líneas con tendencias</p>
+            <span class="chart-note">Análisis predictivo incluido</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de reportes generados -->
+    <div class="history-section glass-panel">
+      <h2 class="section-title">
+        <ion-icon name="time-outline" color="warning" class="mr-2"></ion-icon>
+        Historial de Reportes
+      </h2>
+      
+      <div class="history-list">
+        <div *ngFor="let report of recentReports()" class="history-item">
+          <div class="history-info">
+            <div class="history-icon">
+              <ion-icon [name]="getReportIcon(report.type)" [color]="getReportColor(report.type)"></ion-icon>
+            </div>
+            <div class="history-details">
+              <h4 class="history-title">{{ report.title }}</h4>
+              <p class="history-meta">
+                {{ report.date }} • {{ report.size }} • {{ report.format }}
+              </p>
+            </div>
+          </div>
+          <div class="history-actions">
+            <ion-button size="small" fill="clear" (click)="downloadReport(report)">
+              <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button size="small" fill="clear" (click)="shareReport(report)">
+              <ion-icon name="share-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
