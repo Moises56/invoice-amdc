@@ -1,0 +1,205 @@
+<!-- Dashboard de Estadísticas -->
+<div class="dashboard-stats" [class.show]="showStats()">
+  <!-- Header con botón de refresh -->
+  <div class="stats-header mb-4">
+    <h3 class="text-xl font-bold text-white flex items-center gap-3">
+      <ion-icon name="analytics-outline" color="primary" size="large"></ion-icon>
+      Dashboard de Estadísticas
+    </h3>
+    <ion-button 
+      (click)="refreshStats()" 
+      fill="clear" 
+      size="small"
+      [disabled]="refreshing()"
+      class="refresh-btn">
+      <ion-spinner *ngIf="refreshing()" name="crescent" slot="icon-only"></ion-spinner>
+      <ion-icon *ngIf="!refreshing()" name="refresh-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let i of [1,2,3,4,5]">
+          <div class="stat-card-skeleton glass-panel"></div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Estadísticas principales -->
+  <div *ngIf="!isLoading && statsComputadas()" class="stats-grid">
+    <ion-grid>
+      <ion-row>
+        <!-- Total Mercados -->
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-card class="stat-card glass-card animate-slide-up" button (click)="refreshStats()">
+            <ion-ripple-effect></ion-ripple-effect>
+            <ion-card-content>
+              <div class="stat-header">
+                <div class="stat-icon-container" [attr.data-color]="statsComputadas()!.totalMercados.color">
+                  <ion-icon 
+                    [name]="statsComputadas()!.totalMercados.icon" 
+                    [color]="statsComputadas()!.totalMercados.color"
+                    size="large">
+                  </ion-icon>
+                </div>
+                <div class="stat-change">
+                  <ion-badge 
+                    [color]="getTrendingColor(statsComputadas()!.totalMercados.trending)"
+                    class="change-badge">
+                    <ion-icon [name]="getTrendingIcon(statsComputadas()!.totalMercados.trending)"></ion-icon>
+                    {{ statsComputadas()!.totalMercados.change }}
+                  </ion-badge>
+                </div>
+              </div>
+              
+              <div class="stat-content">
+                <h2 class="stat-value">{{ formatNumber(statsComputadas()!.totalMercados.valor) }}</h2>
+                <p class="stat-label">{{ statsComputadas()!.totalMercados.label }}</p>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <!-- Total Locales -->
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-card class="stat-card glass-card animate-slide-up" button (click)="refreshStats()">
+            <ion-ripple-effect></ion-ripple-effect>
+            <ion-card-content>
+              <div class="stat-header">
+                <div class="stat-icon-container" [attr.data-color]="statsComputadas()!.totalLocales.color">
+                  <ion-icon 
+                    [name]="statsComputadas()!.totalLocales.icon" 
+                    [color]="statsComputadas()!.totalLocales.color"
+                    size="large">
+                  </ion-icon>
+                </div>
+                <div class="stat-change">
+                  <ion-badge 
+                    [color]="getTrendingColor(statsComputadas()!.totalLocales.trending)"
+                    class="change-badge">
+                    <ion-icon [name]="getTrendingIcon(statsComputadas()!.totalLocales.trending)"></ion-icon>
+                    {{ statsComputadas()!.totalLocales.change }}
+                  </ion-badge>
+                </div>
+              </div>
+              
+              <div class="stat-content">
+                <h2 class="stat-value">{{ formatNumber(statsComputadas()!.totalLocales.valor) }}</h2>
+                <p class="stat-label">{{ statsComputadas()!.totalLocales.label }}</p>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <!-- Total Facturas -->
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-card class="stat-card glass-card animate-slide-up" button (click)="refreshStats()">
+            <ion-ripple-effect></ion-ripple-effect>
+            <ion-card-content>
+              <div class="stat-header">
+                <div class="stat-icon-container" [attr.data-color]="statsComputadas()!.totalFacturas.color">
+                  <ion-icon 
+                    [name]="statsComputadas()!.totalFacturas.icon" 
+                    [color]="statsComputadas()!.totalFacturas.color"
+                    size="large">
+                  </ion-icon>
+                </div>
+                <div class="stat-change">
+                  <ion-badge 
+                    [color]="getTrendingColor(statsComputadas()!.totalFacturas.trending)"
+                    class="change-badge">
+                    <ion-icon [name]="getTrendingIcon(statsComputadas()!.totalFacturas.trending)"></ion-icon>
+                    {{ statsComputadas()!.totalFacturas.change }}
+                  </ion-badge>
+                </div>
+              </div>
+              
+              <div class="stat-content">
+                <h2 class="stat-value">{{ formatNumber(statsComputadas()!.totalFacturas.valor) }}</h2>
+                <p class="stat-label">{{ statsComputadas()!.totalFacturas.label }}</p>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <!-- Total Recaudado -->
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-card class="stat-card glass-card animate-slide-up" button (click)="refreshStats()">
+            <ion-ripple-effect></ion-ripple-effect>
+            <ion-card-content>
+              <div class="stat-header">
+                <div class="stat-icon-container" [attr.data-color]="statsComputadas()!.totalRecaudado.color">
+                  <ion-icon 
+                    [name]="statsComputadas()!.totalRecaudado.icon" 
+                    [color]="statsComputadas()!.totalRecaudado.color"
+                    size="large">
+                  </ion-icon>
+                </div>
+                <div class="stat-change">
+                  <ion-badge 
+                    [color]="getTrendingColor(statsComputadas()!.totalRecaudado.trending)"
+                    class="change-badge">
+                    <ion-icon [name]="getTrendingIcon(statsComputadas()!.totalRecaudado.trending)"></ion-icon>
+                    {{ statsComputadas()!.totalRecaudado.change }}
+                  </ion-badge>
+                </div>
+              </div>
+              
+              <div class="stat-content">
+                <h2 class="stat-value highlight-money">{{ formatCurrency(statsComputadas()!.totalRecaudado.valor) }}</h2>
+                <p class="stat-label">{{ statsComputadas()!.totalRecaudado.label }}</p>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <!-- Promedio Factura -->
+        <ion-col size="12" size-md="6" size-lg="4">
+          <ion-card class="stat-card glass-card animate-slide-up" button (click)="refreshStats()">
+            <ion-ripple-effect></ion-ripple-effect>
+            <ion-card-content>
+              <div class="stat-header">
+                <div class="stat-icon-container" [attr.data-color]="statsComputadas()!.promedioFactura.color">
+                  <ion-icon 
+                    [name]="statsComputadas()!.promedioFactura.icon" 
+                    [color]="statsComputadas()!.promedioFactura.color"
+                    size="large">
+                  </ion-icon>
+                </div>
+                <div class="stat-change">
+                  <ion-badge 
+                    [color]="getTrendingColor(statsComputadas()!.promedioFactura.trending)"
+                    class="change-badge">
+                    <ion-icon [name]="getTrendingIcon(statsComputadas()!.promedioFactura.trending)"></ion-icon>
+                    {{ statsComputadas()!.promedioFactura.change }}
+                  </ion-badge>
+                </div>
+              </div>
+              
+              <div class="stat-content">
+                <h2 class="stat-value">{{ formatCurrency(statsComputadas()!.promedioFactura.valor) }}</h2>
+                <p class="stat-label">{{ statsComputadas()!.promedioFactura.label }}</p>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!isLoading && !statsComputadas()" class="empty-state">
+    <div class="glass-panel p-8 text-center">
+      <ion-icon name="analytics-outline" size="large" color="medium"></ion-icon>
+      <h3 class="text-lg font-semibold text-white mt-4 mb-2">No hay datos disponibles</h3>
+      <p class="text-gray-400 mb-4">Las estadísticas se cargarán cuando haya datos disponibles</p>
+      <ion-button (click)="refreshStats()" fill="outline" color="primary">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Intentar de nuevo
+      </ion-button>
+    </div>
+  </div>
+</div>

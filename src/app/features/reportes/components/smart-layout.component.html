@@ -1,0 +1,205 @@
+<!-- Smart Layout Container -->
+<div class="smart-layout-container" [attr.data-layout]="currentLayout()">
+  
+  <!-- Header de Layout con controles -->
+  <div class="layout-header">
+    <div class="layout-info">
+      <h3 class="text-lg font-bold text-white">Reportes Disponibles</h3>
+      <p class="text-sm text-gray-300">Layout: {{ currentLayout() | titlecase }}</p>
+    </div>
+    
+    <ion-button 
+      (click)="toggleLayout()" 
+      fill="outline" 
+      size="small"
+      class="layout-toggle">
+      <ion-icon name="swap-vertical-outline" slot="start"></ion-icon>
+      Cambiar Vista
+    </ion-button>
+  </div>
+
+  <!-- Grid Principal Adaptativo -->
+  <ion-grid class="reports-smart-grid">
+    
+    <!-- Layout por Prioridad -->
+    <div *ngIf="currentLayout() === 'priority'" class="priority-layout">
+      <div *ngFor="let group of organizedCards(); let groupIndex = index" 
+           class="priority-group"
+           [attr.data-priority]="groupIndex === 0 ? 'high' : groupIndex === 1 ? 'medium' : 'low'">
+        
+        <div class="priority-header" *ngIf="group.length > 0">
+          <h4 class="priority-title">
+            {{ groupIndex === 0 ? 'Alta Prioridad' : groupIndex === 1 ? 'Prioridad Media' : 'Información Adicional' }}
+          </h4>
+          <ion-badge [color]="groupIndex === 0 ? 'success' : groupIndex === 1 ? 'warning' : 'medium'">
+            {{ group.length }} reporte{{ group.length !== 1 ? 's' : '' }}
+          </ion-badge>
+        </div>
+
+        <ion-row>
+          <ion-col 
+            *ngFor="let card of group; let i = index" 
+            [size]="getColumnSize(card, i)"
+            [sizeMd]="columnConfig().sizeMd"
+            [sizeLg]="columnConfig().sizeLg"
+            class="report-col">
+            
+            <ion-card 
+              class="report-card smart-card" 
+              [attr.data-type]="card.type"
+              [attr.data-priority]="card.priority"
+              button>
+              <ion-ripple-effect></ion-ripple-effect>
+              
+              <ion-card-content>
+                <!-- Header de la Card -->
+                <div class="card-header">
+                  <div class="card-icon-container" [attr.data-color]="card.color">
+                    <ion-icon [name]="card.icon" [color]="card.color" size="large"></ion-icon>
+                  </div>
+                  <div class="card-priority-badge">
+                    <ion-badge [color]="card.priority === 'high' ? 'success' : card.priority === 'medium' ? 'warning' : 'medium'">
+                      {{ card.priority === 'high' ? 'Prioritario' : card.priority === 'medium' ? 'Normal' : 'Opcional' }}
+                    </ion-badge>
+                  </div>
+                </div>
+
+                <!-- Contenido de la Card -->
+                <div class="card-content">
+                  <h3 class="card-title">{{ card.title }}</h3>
+                  <p class="card-description">{{ card.description }}</p>
+                  
+                  <!-- Features -->
+                  <div class="card-features">
+                    <span *ngFor="let feature of card.features" class="feature-tag">
+                      {{ feature }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="card-actions">
+                  <ion-button 
+                    (click)="onCardView(card)" 
+                    fill="clear" 
+                    size="small"
+                    [color]="card.color">
+                    <ion-icon name="eye-outline" slot="start"></ion-icon>
+                    Ver
+                  </ion-button>
+                  
+                  <ion-button 
+                    (click)="onCardGenerate(card)" 
+                    fill="solid" 
+                    size="small"
+                    [color]="card.color">
+                    <ion-icon name="download-outline" slot="start"></ion-icon>
+                    Generar
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </div>
+    </div>
+
+    <!-- Layout Grid/Masonry Estándar -->
+    <ion-row *ngIf="currentLayout() !== 'priority'" class="standard-layout">
+      <ion-col 
+        *ngFor="let card of organizedCards()[0] || []; let i = index" 
+        [size]="getColumnSize(card, i)"
+        [sizeMd]="columnConfig().sizeMd"
+        [sizeLg]="columnConfig().sizeLg"
+        class="report-col"
+        [attr.data-masonry]="currentLayout() === 'masonry'">
+        
+        <ion-card 
+          class="report-card smart-card" 
+          [attr.data-type]="card.type"
+          [attr.data-category]="card.category"
+          button>
+          <ion-ripple-effect></ion-ripple-effect>
+          
+          <ion-card-content>
+            <!-- Header compacto para grid -->
+            <div class="card-header compact">
+              <div class="card-icon-container" [attr.data-color]="card.color">
+                <ion-icon [name]="card.icon" [color]="card.color"></ion-icon>
+              </div>
+              <div class="card-meta">
+                <h3 class="card-title">{{ card.title }}</h3>
+                <ion-badge [color]="card.color" class="category-badge">
+                  {{ card.category | titlecase }}
+                </ion-badge>
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <p class="card-description">{{ card.description }}</p>
+            
+            <!-- Features compactas -->
+            <div class="card-features compact">
+              <span *ngFor="let feature of card.features.slice(0, 2)" class="feature-tag">
+                {{ feature }}
+              </span>
+              <span *ngIf="card.features.length > 2" class="feature-tag more">
+                +{{ card.features.length - 2 }} más
+              </span>
+            </div>
+
+            <!-- Acciones horizontales -->
+            <div class="card-actions horizontal">
+              <ion-button 
+                (click)="onCardView(card)" 
+                fill="clear" 
+                size="small">
+                <ion-icon name="eye-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              
+              <ion-button 
+                (click)="onCardGenerate(card)" 
+                fill="solid" 
+                size="small"
+                [color]="card.color">
+                <ion-icon name="download-outline" slot="start"></ion-icon>
+                Generar
+              </ion-button>
+              
+              <ion-button 
+                (click)="onCardExport(card, 'PDF')" 
+                fill="clear" 
+                size="small">
+                <ion-icon name="share-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Indicador de layout activo -->
+  <div class="layout-indicator">
+    <div class="indicator-dots">
+      <span 
+        class="dot" 
+        [class.active]="currentLayout() === 'grid'"
+        (click)="currentLayout.set('grid')">
+      </span>
+      <span 
+        class="dot" 
+        [class.active]="currentLayout() === 'masonry'"
+        (click)="currentLayout.set('masonry')">
+      </span>
+      <span 
+        class="dot" 
+        [class.active]="currentLayout() === 'priority'"
+        (click)="currentLayout.set('priority')">
+      </span>
+    </div>
+    <ion-text color="medium" class="indicator-label">
+      {{ currentLayout() === 'grid' ? 'Vista Grid' : currentLayout() === 'masonry' ? 'Vista Masonry' : 'Vista Prioridad' }}
+    </ion-text>
+  </div>
+</div>

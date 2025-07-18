@@ -2,14 +2,20 @@
 // REPORTES PAGE - GLASSMORPHISM DESIGN
 // ========================================
 
+// Usar colores personalizados
+@use './styles/custom-colors.scss';
+
+// Usar estilos de componentes modernos (nueva sintaxis Sass)
+@use './styles/tabs.scss';
+
 .reports-toolbar {
-  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-tertiary) 100%);
   --color: white;
 }
 
 .reports-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  --background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-secondary) 50%, var(--custom-tertiary) 100%);
+  --background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-secondary) 50%, var(--custom-tertiary) 100%);
 }
 
 // ========================================
@@ -608,5 +614,26 @@
     ion-button {
       flex: none;
     }
+  }
+}
+
+// ========================================
+// STATISTICS SECTION
+// ========================================
+
+.statistics-section {
+  margin: 2rem 0;
+  padding: 0 1rem;
+  
+  app-dashboard-stats {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .statistics-section {
+    margin: 1.5rem 0;
+    padding: 0 0.5rem;
   }
 }

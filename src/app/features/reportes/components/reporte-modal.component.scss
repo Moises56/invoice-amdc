@@ -1,0 +1,322 @@
+/* Estilos para el Modal de Reportes */
+.modal-content {
+  --background: linear-gradient(135deg, rgba(14, 14, 14, 0.95) 0%, rgba(30, 30, 30, 0.98) 100%);
+  
+  ion-content {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+}
+
+/* Header con glass morphism */
+.glass-header {
+  ion-toolbar {
+    --background: rgba(255, 255, 255, 0.1);
+    --color: white;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  ion-title {
+    h2 {
+      margin: 0;
+      font-weight: 700;
+    }
+    
+    p {
+      margin: 2px 0 0 0;
+      opacity: 0.8;
+    }
+  }
+}
+
+/* Paneles con efecto glass */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Tabs con diseño moderno */
+.segment-tabs {
+  --background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 4px;
+  
+  ion-segment-button {
+    --background: transparent;
+    --background-checked: rgba(var(--ion-color-primary-rgb), 0.3);
+    --color: rgba(255, 255, 255, 0.7);
+    --color-checked: white;
+    --border-radius: 8px;
+    margin: 2px;
+    min-height: 44px;
+    
+    ion-icon {
+      margin-bottom: 4px;
+    }
+    
+    ion-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    &.segment-button-checked {
+      box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+    }
+  }
+}
+
+/* Cards de estadísticas */
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  ion-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  
+  .stat-content {
+    flex: 1;
+    
+    h4 {
+      margin: 0 0 4px 0;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .stat-value {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+  }
+}
+
+/* Cards de mercados */
+.mercado-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+  }
+  
+  h4 {
+    margin: 0;
+    color: white;
+  }
+  
+  .metric {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    ion-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    
+    div {
+      flex: 1;
+      
+      p:first-child {
+        margin: 0 0 2px 0;
+        font-weight: 500;
+      }
+      
+      p:last-child {
+        margin: 0;
+        font-weight: 600;
+      }
+    }
+  }
+  
+  .progress-section {
+    margin-top: 8px;
+    
+    ion-progress-bar {
+      --background: rgba(255, 255, 255, 0.1);
+      --progress-background: var(--ion-color-success);
+      height: 6px;
+      border-radius: 3px;
+    }
+  }
+}
+
+/* Cards de locales */
+.local-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
+  }
+  
+  h4 {
+    margin: 0;
+    color: white;
+  }
+  
+  .metric-small {
+    text-align: center;
+    
+    p:first-child {
+      margin: 0 0 2px 0;
+      font-weight: 500;
+    }
+    
+    p:last-child {
+      margin: 0;
+      font-weight: 600;
+    }
+  }
+  
+  ion-chip {
+    --background: rgba(var(--ion-color-primary-rgb), 0.2);
+    --color: var(--ion-color-primary-contrast);
+    font-size: 11px;
+    height: 24px;
+  }
+}
+
+/* Lista transparente */
+.transparent-list {
+  background: transparent;
+  
+  ion-item {
+    --background: rgba(255, 255, 255, 0.02);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --color: white;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    
+    &:hover {
+      --background: rgba(255, 255, 255, 0.05);
+    }
+    
+    ion-label {
+      h3 {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      
+      p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .stat-card {
+    padding: 12px;
+    
+    .stat-content {
+      .stat-value {
+        font-size: 16px;
+      }
+    }
+  }
+  
+  .mercado-card,
+  .local-card {
+    padding: 12px;
+  }
+  
+  .glass-panel {
+    margin: 0 8px;
+    padding: 16px !important;
+  }
+}
+
+/* Animaciones */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.glass-panel {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Mejoras para badges y chips */
+ion-badge {
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+ion-chip {
+  font-weight: 500;
+  
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+/* Progress bars personalizadas */
+ion-progress-bar {
+  --background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Fab button personalizado */
+ion-fab-button {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+  --box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb), 0.4);
+  
+  &:hover {
+    --box-shadow: 0 6px 20px rgba(var(--ion-color-primary-rgb), 0.6);
+    transform: scale(1.05);
+  }
+}

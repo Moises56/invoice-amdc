@@ -1,0 +1,297 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="cerrarModal()">
+  <ng-template>
+    <!-- Header del Modal -->
+    <ion-header class="glass-header">
+      <ion-toolbar>
+        <ion-title>
+          <div class="flex items-center gap-3">
+            <ion-icon [name]="getIconoTipo()" [color]="getColorTipo()" size="large"></ion-icon>
+            <div>
+              <h2 class="text-lg font-bold text-white">{{ getReportTypeLabel(tipoReporte()) }}</h2>
+              <p class="text-sm text-gray-300">{{ fechaGeneracion() }}</p>
+            </div>
+          </div>
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="mostrarOpciones()" fill="clear">
+            <ion-icon name="ellipsis-horizontal-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button (click)="cerrarModal()" fill="clear">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <!-- Contenido del Modal -->
+    <ion-content class="modal-content">
+      <ion-refresher slot="fixed" (ionRefresh)="refrescarReporte()">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
+      <!-- Navegación por Tabs -->
+      <div class="glass-panel mx-4 mt-4 mb-6">
+        <ion-segment [value]="currentTab()" (ionChange)="cambiarTab($any($event.detail.value))" class="segment-tabs">
+          <ion-segment-button value="resumen">
+            <ion-icon name="analytics-outline"></ion-icon>
+            <ion-label>Resumen</ion-label>
+          </ion-segment-button>
+          
+          <ion-segment-button value="detalles" *ngIf="tipoReporte() === 'FINANCIERO' || tipoReporte() === 'OPERACIONAL'">
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            <ion-label>Detalles</ion-label>
+          </ion-segment-button>
+          
+          <ion-segment-button value="mercados" *ngIf="mercadosData().length > 0">
+            <ion-icon name="business-outline"></ion-icon>
+            <ion-label>Mercados</ion-label>
+          </ion-segment-button>
+          
+          <ion-segment-button value="locales" *ngIf="localesData().length > 0">
+            <ion-icon name="storefront-outline"></ion-icon>
+            <ion-label>Locales</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <!-- Tab: Resumen -->
+      <div *ngIf="currentTab() === 'resumen'" class="px-4">
+        <!-- Estadísticas Principales -->
+        <div class="glass-panel p-6 mb-6">
+          <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <ion-icon name="stats-chart-outline" color="primary"></ion-icon>
+            Estadísticas Principales
+          </h3>
+          
+          <ion-grid>
+            <ion-row *ngIf="estadisticasPrincipales() as stats">
+              <ion-col size="6" *ngIf="stats.totalRecaudado !== undefined">
+                <div class="stat-card">
+                  <ion-icon name="cash-outline" color="success"></ion-icon>
+                  <div class="stat-content">
+                    <h4>Total Recaudado</h4>
+                    <p class="stat-value text-green-400">{{ formatearMoneda(stats.totalRecaudado) }}</p>
+                  </div>
+                </div>
+              </ion-col>
+              
+              <ion-col size="6" *ngIf="stats.totalFacturas !== undefined">
+                <div class="stat-card">
+                  <ion-icon name="document-text-outline" color="primary"></ion-icon>
+                  <div class="stat-content">
+                    <h4>Total Facturas</h4>
+                    <p class="stat-value text-blue-400">{{ formatearNumero(stats.totalFacturas) }}</p>
+                  </div>
+                </div>
+              </ion-col>
+              
+              <ion-col size="6" *ngIf="stats.promedioFactura !== undefined">
+                <div class="stat-card">
+                  <ion-icon name="trending-up-outline" color="tertiary"></ion-icon>
+                  <div class="stat-content">
+                    <h4>Promedio Factura</h4>
+                    <p class="stat-value text-purple-400">{{ formatearMoneda(stats.promedioFactura) }}</p>
+                  </div>
+                </div>
+              </ion-col>
+              
+              <ion-col size="6" *ngIf="stats.mercadosActivos !== undefined">
+                <div class="stat-card">
+                  <ion-icon name="business-outline" color="warning"></ion-icon>
+                  <div class="stat-content">
+                    <h4>Mercados Activos</h4>
+                    <p class="stat-value text-yellow-400">{{ formatearNumero(stats.mercadosActivos) }}</p>
+                  </div>
+                </div>
+              </ion-col>
+              
+              <ion-col size="6" *ngIf="stats.localesActivos !== undefined">
+                <div class="stat-card">
+                  <ion-icon name="storefront-outline" color="secondary"></ion-icon>
+                  <div class="stat-content">
+                    <h4>Locales Activos</h4>
+                    <p class="stat-value text-cyan-400">{{ formatearNumero(stats.localesActivos) }}</p>
+                  </div>
+                </div>
+              </ion-col>
+              
+              <ion-col size="6" *ngIf="stats.eficiencia !== undefined">
+                <div class="stat-card">
+                  <ion-icon name="speedometer-outline" [color]="getColorEstado(stats.eficiencia)"></ion-icon>
+                  <div class="stat-content">
+                    <h4>Eficiencia</h4>
+                    <ion-badge [color]="getColorEstado(stats.eficiencia)">{{ stats.eficiencia }}</ion-badge>
+                  </div>
+                </div>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+
+        <!-- Información del Reporte -->
+        <div class="glass-panel p-6">
+          <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <ion-icon name="information-circle-outline" color="primary"></ion-icon>
+            Información del Reporte
+          </h3>
+          
+          <ion-list class="transparent-list">
+            <ion-item>
+              <ion-icon name="document-text-outline" slot="start" color="primary"></ion-icon>
+              <ion-label>
+                <h3>Tipo de Reporte</h3>
+                <p>{{ getReportTypeLabel(tipoReporte()) }}</p>
+              </ion-label>
+            </ion-item>
+            
+            <ion-item>
+              <ion-icon name="calendar-outline" slot="start" color="secondary"></ion-icon>
+              <ion-label>
+                <h3>Fecha de Generación</h3>
+                <p>{{ fechaGeneracion() }}</p>
+              </ion-label>
+            </ion-item>
+            
+            <ion-item *ngIf="reporte?.metadata?.periodo">
+              <ion-icon name="time-outline" slot="start" color="tertiary"></ion-icon>
+              <ion-label>
+                <h3>Período</h3>
+                <p>{{ reporte!.metadata!.periodo.inicio | date:'dd/MM/yyyy' }} - {{ reporte!.metadata!.periodo.fin | date:'dd/MM/yyyy' }}</p>
+              </ion-label>
+            </ion-item>
+            
+            <ion-item *ngIf="reporte?.metadata?.tiempo_procesamiento">
+              <ion-icon name="stopwatch-outline" slot="start" color="warning"></ion-icon>
+              <ion-label>
+                <h3>Tiempo de Procesamiento</h3>
+                <p>{{ reporte!.metadata!.tiempo_procesamiento }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </div>
+      </div>
+
+      <!-- Tab: Mercados -->
+      <div *ngIf="currentTab() === 'mercados' && mercadosData().length > 0" class="px-4">
+        <div class="glass-panel p-6">
+          <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <ion-icon name="business-outline" color="tertiary"></ion-icon>
+            Reporte por Mercados
+          </h3>
+          
+          <div class="space-y-4">
+            <div *ngFor="let mercado of mercadosData()" class="mercado-card glass-panel p-4">
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <h4 class="text-lg font-semibold text-white">{{ mercado.nombre_mercado }}</h4>
+                  <p class="text-sm text-gray-400">ID: {{ mercado.mercado_id }}</p>
+                </div>
+                <ion-badge color="primary">{{ formatearNumero(mercado.total_locales) }} locales</ion-badge>
+              </div>
+              
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <div class="metric">
+                      <ion-icon name="cash-outline" color="success"></ion-icon>
+                      <div>
+                        <p class="text-xs text-gray-400">Recaudado</p>
+                        <p class="text-sm font-bold text-green-400">{{ formatearMoneda(mercado.total_recaudado) }}</p>
+                      </div>
+                    </div>
+                  </ion-col>
+                  <ion-col size="6">
+                    <div class="metric">
+                      <ion-icon name="document-text-outline" color="primary"></ion-icon>
+                      <div>
+                        <p class="text-xs text-gray-400">Facturas</p>
+                        <p class="text-sm font-bold text-blue-400">{{ formatearNumero(mercado.total_facturas) }}</p>
+                      </div>
+                    </div>
+                  </ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col size="12">
+                    <div class="progress-section">
+                      <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>Facturas Pagadas</span>
+                        <span>{{ calcularPorcentaje(mercado.facturas_pagadas, mercado.total_facturas) }}%</span>
+                      </div>
+                      <ion-progress-bar 
+                        [value]="calcularPorcentaje(mercado.facturas_pagadas, mercado.total_facturas) / 100"
+                        color="success">
+                      </ion-progress-bar>
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Locales -->
+      <div *ngIf="currentTab() === 'locales' && localesData().length > 0" class="px-4">
+        <div class="glass-panel p-6">
+          <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <ion-icon name="storefront-outline" color="warning"></ion-icon>
+            Reporte por Locales
+          </h3>
+          
+          <div class="space-y-3">
+            <div *ngFor="let local of localesData()" class="local-card glass-panel p-4">
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <h4 class="text-base font-semibold text-white">{{ local.nombre_local }}</h4>
+                  <p class="text-sm text-gray-400">Local {{ local.numero_local }} - {{ local.mercado }}</p>
+                </div>
+                <ion-chip color="primary" outline>
+                  <ion-icon name="location-outline"></ion-icon>
+                  <ion-label>{{ local.mercado }}</ion-label>
+                </ion-chip>
+              </div>
+              
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="4">
+                    <div class="metric-small">
+                      <p class="text-xs text-gray-400">Recaudado</p>
+                      <p class="text-sm font-bold text-green-400">{{ formatearMoneda(local.total_recaudado) }}</p>
+                    </div>
+                  </ion-col>
+                  <ion-col size="4">
+                    <div class="metric-small">
+                      <p class="text-xs text-gray-400">Facturas</p>
+                      <p class="text-sm font-bold text-blue-400">{{ formatearNumero(local.total_facturas) }}</p>
+                    </div>
+                  </ion-col>
+                  <ion-col size="4">
+                    <div class="metric-small">
+                      <p class="text-xs text-gray-400">Pagadas</p>
+                      <p class="text-sm font-bold text-cyan-400">{{ formatearNumero(local.facturas_pagadas) }}</p>
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón flotante para acciones -->
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button (click)="mostrarOpciones()" color="primary">
+          <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-content>
+
+    <!-- Action Sheet para opciones -->
+    <ion-action-sheet
+      [isOpen]="showActionSheet()"
+      header="Opciones del Reporte"
+      (didDismiss)="showActionSheet.set(false)"
+      [buttons]="actionSheetButtons">
+    </ion-action-sheet>
+  </ng-template>
+</ion-modal>

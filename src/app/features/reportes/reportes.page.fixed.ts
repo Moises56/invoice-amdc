@@ -16,8 +16,7 @@ import {
   IonSelectOption,
   ToastController,
   LoadingController,
-  AlertController,
-  ModalController
+  AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -46,26 +45,17 @@ import {
   downloadOutline,
   shareOutline,
   flashOutline, 
-  calendarOutline, layersOutline } from 'ionicons/icons';
+  calendarOutline 
+} from 'ionicons/icons';
 
 // Importar los nuevos servicios e interfaces
 import { ReportesService } from '../../services/reportes/reportes.service';
 import { ReportesConfigService } from '../../services/reportes/reportes-config.service';
-import { ReporteModalComponent } from './components/reporte-modal.component';
-import { DashboardStatsComponent } from './components/dashboard-stats.component';
-import { SmartLayoutComponent } from './components/smart-layout.component';
-import { ReportChartComponent } from './components/report-chart.component';
-import { AdvancedFiltersComponent, ReportFilter } from './components/advanced-filters.component';
-import { ModernTabsComponent } from './components/modern-tabs.component';
-import { ReportCard } from './interfaces/common.interface';
-import { ChartableData, TabItem } from './interfaces/shared.interface';
-import { ReportesDataService, MercadoEndpoint, ConfiguracionReportes } from '../../services/reportes/reportes-data.service';
 import { 
   ReporteRequest, 
-  ReporteResponse,
-  MercadoStats,
-  LocalStats 
+  ReporteResponse 
 } from '../../interfaces/reportes/reporte.interface';
+import { ConfiguracionReportes } from '../../interfaces/reportes/mercado.interface';
 import { EstadisticasGenerales, DemoResponse } from '../../interfaces/reportes/estadisticas.interface';
 
 interface Market {
@@ -100,23 +90,16 @@ interface ReportHistoryItem {
     IonIcon,
     IonSpinner,
     IonSelect,
-    IonSelectOption,
-    DashboardStatsComponent,
-    SmartLayoutComponent,
-    ReportChartComponent,
-    AdvancedFiltersComponent,
-    ModernTabsComponent
+    IonSelectOption
   ]
 })
 export class ReportesPage implements OnInit {
   // Inyección de servicios
   private reportesService = inject(ReportesService);
   private configService = inject(ReportesConfigService);
-  private reportesDataService = inject(ReportesDataService);
   private toastController = inject(ToastController);
   private loadingController = inject(LoadingController);
   private alertController = inject(AlertController);
-  private modalController = inject(ModalController);
   private router = inject(Router);
 
   // Señales para el estado de la aplicación
@@ -126,12 +109,6 @@ export class ReportesPage implements OnInit {
 
   // Configuración de reportes desde el backend
   configuracion = signal<ConfiguracionReportes | null>(null);
-  
-  // Nuevos signals para datos reales del endpoint
-  mercadosReales = signal<MercadoEndpoint[]>([]);
-  configuracionEndpoint = signal<ConfiguracionReportes | null>(null);
-  
-  activeTab = signal('overview');
   
   // Datos de reportes reales
   reportesData = signal<ReporteResponse[]>([]);
@@ -151,60 +128,15 @@ export class ReportesPage implements OnInit {
   totalReports = computed(() => this.reportesData().length || 4);
   lastGenerated = computed(() => {
     const reports = this.reportesData();
-    return reports.length > 0 ? 'Hoy' : 'N/A';
-  });
-
-  // Métodos calculados para el template con datos reales
-  totalMercados = computed(() => {
-    const mercados = this.reportesDataService.getMercadosFromEndpoint();
-    return Array.isArray(mercados) ? mercados.length : 0;
-  });
-  
-  totalLocales = computed(() => 
-    this.reportesDataService.getMercadosFromEndpoint()
-      .filter(mercado => mercado && mercado._count)
-      .reduce((sum, mercado) => sum + (mercado._count?.locales || 0), 0)
-  );
-
-  mercadosData = computed(() => 
-    this.reportesDataService.getMercadosFromEndpoint()
-      .filter(mercado => mercado && mercado.id)
-      .map(mercado => ({
-        ...mercado,
-        locales_count: mercado._count?.locales || 0
-      }))
-  );
-
-  // Configuración de tabs modernas actualizada (reemplaza la versión signal anterior)
-  reportTabs = computed(() => [
-    {
-      id: 'overview',
-      label: 'Resumen',
-      icon: 'grid-outline',
-      badge: this.totalReports(),
-      color: 'primary' as const
-    },
-    {
-      id: 'charts',
-      label: 'Gráficos',
-      icon: 'bar-chart-outline',
-      badge: this.totalMercados(),
-      color: 'secondary' as const
-    },
-    {
-      id: 'filters',
-      label: 'Filtros',
-      icon: 'filter-outline',
-      color: 'warning' as const
-    },
-    {
-      id: 'data',
-      label: 'Datos',
-      icon: 'layers-outline',
-      badge: this.totalLocales(),
-      color: 'success' as const
+    if (reports.length > 0) {
+      const latest = reports[0];
+      const now = new Date();
+      const reportDate = new Date(latest.timestamp);
+      const diffHours = Math.floor((now.getTime() - reportDate.getTime()) / (1000 * 60 * 60));
+      return diffHours > 0 ? `${diffHours} horas` : 'Recién generado';
     }
-  ]);
+    return '2 horas';
+  });
 
   // Getters y setters para two-way binding (compatibilidad con template)
   get selectedPeriod() { return this._selectedPeriod(); }
@@ -219,16 +151,12 @@ export class ReportesPage implements OnInit {
   availableMarkets = computed(() => this._availableMarkets());
   recentReports = computed(() => this._recentReports());
 
-  // Computed para activeTab para compatibilidad con template
-  currentActiveTab = computed(() => this.activeTab());
-
   constructor() {
     this.addAllIcons();
   }
 
   async ngOnInit() {
     await this.inicializarDatos();
-    await this.loadRealData();
   }
 
   // Inicialización de datos con servicios reales
@@ -251,8 +179,7 @@ export class ReportesPage implements OnInit {
       const config = await this.reportesService.obtenerConfiguracionPublica();
       
       if (config.success && config.demo_data) {
-        // TODO: Unificar interfaces ConfiguracionReportes
-        // this.configuracion.set(config.demo_data.configuracion_ui);
+        this.configuracion.set(config.demo_data.configuracion_ui);
 
         // Paso 3: Cargar mercados disponibles desde la configuración
         if (config.demo_data.mercados_sample) {
@@ -495,61 +422,10 @@ export class ReportesPage implements OnInit {
     }
   }
 
-  // Ver reporte en modal
+  // Ver reporte en modal (se implementará más adelante)
   async viewReport(reportType: string) {
-    try {
-      // Si hay un reporte actual, mostrarlo
-      let reporteParaMostrar = this.reporteActual();
-      
-      // Si no hay reporte actual, generar uno demo
-      if (!reporteParaMostrar) {
-        const loading = await this.loadingController.create({
-          message: 'Preparando vista del reporte...',
-          spinner: 'crescent'
-        });
-        await loading.present();
-
-        try {
-          // Generar un reporte demo básico
-          const request: ReporteRequest = {
-            tipo: reportType as 'FINANCIERO' | 'OPERACIONAL' | 'MERCADO' | 'LOCAL',
-            periodo: 'MENSUAL',
-            formato: 'JSON'
-          };
-
-          const resultado = await this.reportesService.generarReporte(request);
-          await loading.dismiss();
-
-          if (resultado.success && resultado.data) {
-            reporteParaMostrar = resultado;
-          } else {
-            await this.mostrarToast('No se pudo cargar el reporte', 'warning');
-            return;
-          }
-        } catch (error) {
-          await loading.dismiss();
-          await this.mostrarToast('Error al cargar el reporte', 'danger');
-          return;
-        }
-      }
-
-      // Abrir el modal
-      const modal = await this.modalController.create({
-        component: ReporteModalComponent,
-        componentProps: {
-          reporte: reporteParaMostrar,
-          isOpen: true
-        },
-        cssClass: 'reporte-modal-class',
-        backdropDismiss: true
-      });
-
-      await modal.present();
-      
-    } catch (error) {
-      console.error('Error al abrir modal de reporte:', error);
-      await this.mostrarToast('Error al abrir el reporte', 'danger');
-    }
+    await this.mostrarToast(`Abriendo vista del reporte: ${this.getReportTypeLabel(reportType)}`, 'success');
+    // TODO: Abrir modal con ReporteModalComponent
   }
 
   // Descargar reporte del historial
@@ -691,210 +567,4 @@ export class ReportesPage implements OnInit {
       flashOutline
     });
   }
-
-  // Signals y computed para Smart Layout
-  viewportWidth = signal(window.innerWidth);
-  layoutMode = signal<'auto' | 'grid' | 'masonry' | 'priority'>('auto');
-
-  setLayoutMode(mode: 'auto' | 'grid' | 'masonry' | 'priority') {
-    this.layoutMode.set(mode);
-  }
-
-  // Computed para las tarjetas de reportes
-  reportCards = computed<ReportCard[]>(() => [
-    {
-      id: 'monthly',
-      title: 'Recaudación Mensual',
-      description: 'Análisis detallado de ingresos mensuales con comparativas y tendencias.',
-      icon: 'trending-up',
-      color: 'success',
-      features: ['Gráficos interactivos', 'Análisis de tendencias', 'Comparación mensual'],
-      priority: 'high',
-      category: 'financial',
-      actions: {
-        pdf: () => this.exportReport('monthly', 'pdf'),
-        excel: () => this.exportReport('monthly', 'excel'),
-        view: () => this.viewReport('monthly')
-      }
-    },
-    {
-      id: 'yearly',
-      title: 'Recaudación Anual', 
-      description: 'Resumen anual completo con metas, cumplimiento y proyecciones.',
-      icon: 'calendar',
-      color: 'warning',
-      features: ['Análisis profundo', 'Metas vs. Real', 'Proyecciones'],
-      priority: 'high',
-      category: 'financial',
-      actions: {
-        pdf: () => this.exportReport('yearly', 'pdf'),
-        excel: () => this.exportReport('yearly', 'excel'),
-        view: () => this.viewReport('yearly')
-      }
-    },
-    {
-      id: 'market',
-      title: 'Análisis por Mercado',
-      description: 'Desempeño individual de cada mercado con ranking y comparativas.',
-      icon: 'business',
-      color: 'tertiary',
-      features: ['Ranking de mercados', 'Métricas detalladas', 'Participación %'],
-      priority: 'medium',
-      category: 'operational',
-      actions: {
-        pdf: () => this.exportReport('market', 'pdf'),
-        excel: () => this.exportReport('market', 'excel'),
-        view: () => this.viewReport('market')
-      }
-    },
-    {
-      id: 'local',
-      title: 'Análisis por Local',
-      description: 'Rendimiento detallado de locales individuales y comparativas.',
-      icon: 'storefront',
-      color: 'dark',
-      features: ['Por ubicación', 'Por propietario', 'Recaudación individual'],
-      priority: 'medium',
-      category: 'operational',
-      actions: {
-        pdf: () => this.exportReport('local', 'pdf'),
-        excel: () => this.exportReport('local', 'excel'),
-        view: () => this.viewReport('local')
-      }
-    }
-  ]);
-
-  // Datos para gráficos
-  monthlyData = computed<ChartableData[]>(() => [
-    { etiqueta: 'Enero', valor: 45000 },
-    { etiqueta: 'Febrero', valor: 52000 },
-    { etiqueta: 'Marzo', valor: 48000 },
-    { etiqueta: 'Abril', valor: 61000 },
-    { etiqueta: 'Mayo', valor: 55000 },
-    { etiqueta: 'Junio', valor: 67000 }
-  ]);
-
-  marketData = computed<ChartableData[]>(() => {
-    // Simulación de datos de mercados
-    return [
-      { etiqueta: 'Mercado Central', valor: 125000 },
-      { etiqueta: 'Mercado Los Andes', valor: 89000 },
-      { etiqueta: 'Mercado Guamilito', valor: 156000 },
-      { etiqueta: 'Mercado Zonal Belén', valor: 78000 }
-    ];
-  });
-
-  trendData = computed<ChartableData[]>(() => [
-    { etiqueta: 'Sem 1', valor: 15000 },
-    { etiqueta: 'Sem 2', valor: 18000 },
-    { etiqueta: 'Sem 3', valor: 22000 },
-    { etiqueta: 'Sem 4', valor: 19000 },
-    { etiqueta: 'Sem 5', valor: 25000 },
-    { etiqueta: 'Sem 6', valor: 28000 }
-  ]);
-
-  // Método para manejar cambios en filtros avanzados
-  onFiltersChange(filters: ReportFilter) {
-    console.log('Filtros aplicados:', filters);
-    // Aquí se puede implementar la lógica para aplicar los filtros
-    // Por ejemplo, llamar al servicio de reportes con los filtros
-    this.applyAdvancedFilters(filters);
-  }
-
-  private async applyAdvancedFilters(filters: ReportFilter) {
-    try {
-      this.isLoading.set(true);
-      
-      // Convertir los filtros al formato del backend
-      const request: ReporteRequest = {
-        tipo: this.selectedType === 'revenue' ? 'FINANCIERO' : 
-              this.selectedType === 'markets' ? 'MERCADO' : 
-              this.selectedType === 'locals' ? 'LOCAL' : 'OPERACIONAL',
-        periodo: 'MENSUAL', // Se puede mapear desde filters.dateRange.preset
-        formato: 'JSON',
-        fechaInicio: filters.dateRange.start.split('T')[0],
-        fechaFin: filters.dateRange.end.split('T')[0],
-        mercados: filters.markets.length > 0 ? filters.markets : undefined,
-        locales: filters.locals.length > 0 ? filters.locals : undefined
-      };
-
-      const response = await this.reportesService.generarReporte(request);
-      
-      if (response.success) {
-        console.log('Reporte generado con filtros:', response.data);
-        // Actualizar los datos de los gráficos con los resultados filtrados
-        this.updateChartsWithFilteredData(response.data);
-      }
-    } catch (error) {
-      console.error('Error aplicando filtros:', error);
-      const toast = await this.toastController.create({
-        message: 'Error al aplicar los filtros',
-        duration: 2000,
-        color: 'danger'
-      });
-      await toast.present();
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  private updateChartsWithFilteredData(data: any) {
-    // Actualizar los datos de los gráficos basándose en la respuesta filtrada
-    // Esta implementación dependerá de la estructura exacta de la respuesta del backend
-    console.log('Actualizando gráficos con datos filtrados:', data);
-  }
-
-  // Método para cargar datos reales del endpoint
-  private async loadRealData() {
-    try {
-      this.isLoading.set(true);
-      const config = await this.reportesDataService.getConfiguracionReportes();
-      
-      this.configuracionEndpoint.set(config);
-      this.mercadosReales.set(config.configuracion.mercados_disponibles);
-      
-      // Actualizar datos de gráficos con datos reales
-      this.updateChartsWithRealData();
-      
-    } catch (error) {
-      console.error('Error cargando datos reales:', error);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  private updateChartsWithRealData() {
-    const mercados = this.mercadosReales();
-    if (mercados.length === 0) return;
-    
-    const chartData = this.reportesDataService.generateRealisticChartData(mercados);
-    
-    // Los gráficos se actualizarán automáticamente a través de computed properties
-    console.log('Gráficos actualizados con datos reales de mercados');
-  }
-
-  // Método para formatear moneda en lempiras
-  formatLempira(amount: number, showDecimals: boolean = true): string {
-    return this.reportesDataService.formatLempira(amount, showDecimals);
-  }
-
-  // Método para cambiar de tab
-  onTabChange(tabId: string) {
-    this.activeTab.set(tabId);
-  }
-
-  // Computed para mercados usando datos reales del endpoint
-  availableMarketsReal = computed(() => {
-    const mercados = this.mercadosReales();
-    return mercados
-      .filter(m => m && m.id && m.nombre_mercado) // Validar estructura básica
-      .map(m => ({
-        id: m.id,
-        name: m.nombre_mercado,
-        direccion: m.direccion || 'Sin dirección',
-        locales: m._count?.locales || 0
-      }));
-  });
-
-
 }

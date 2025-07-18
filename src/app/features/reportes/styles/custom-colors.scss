@@ -1,0 +1,84 @@
+// Custom Color Variables
+:root {
+  // Colores personalizados principales
+  --custom-primary: #5ccedf;
+  --custom-primary-rgb: 92, 206, 223;
+  --custom-primary-contrast: #ffffff;
+  --custom-primary-contrast-rgb: 255, 255, 255;
+  --custom-primary-shade: #51b7c4;
+  --custom-primary-tint: #6cd3e2;
+
+  --custom-secondary: #bbd2c5;
+  --custom-secondary-rgb: 187, 210, 197;
+  --custom-secondary-contrast: #000000;
+  --custom-secondary-contrast-rgb: 0, 0, 0;
+  --custom-secondary-shade: #a5b9ad;
+  --custom-secondary-tint: #c2d7cb;
+
+  --custom-tertiary: #536976;
+  --custom-tertiary-rgb: 83, 105, 118;
+  --custom-tertiary-contrast: #ffffff;
+  --custom-tertiary-contrast-rgb: 255, 255, 255;
+  --custom-tertiary-shade: #495c68;
+  --custom-tertiary-tint: #647681;
+
+  // Sobrescribir variables de Ionic
+  --ion-color-primary: var(--custom-primary);
+  --ion-color-primary-rgb: var(--custom-primary-rgb);
+  --ion-color-primary-contrast: var(--custom-primary-contrast);
+  --ion-color-primary-contrast-rgb: var(--custom-primary-contrast-rgb);
+  --ion-color-primary-shade: var(--custom-primary-shade);
+  --ion-color-primary-tint: var(--custom-primary-tint);
+
+  --ion-color-secondary: var(--custom-secondary);
+  --ion-color-secondary-rgb: var(--custom-secondary-rgb);
+  --ion-color-secondary-contrast: var(--custom-secondary-contrast);
+  --ion-color-secondary-contrast-rgb: var(--custom-secondary-contrast-rgb);
+  --ion-color-secondary-shade: var(--custom-secondary-shade);
+  --ion-color-secondary-tint: var(--custom-secondary-tint);
+
+  --ion-color-tertiary: var(--custom-tertiary);
+  --ion-color-tertiary-rgb: var(--custom-tertiary-rgb);
+  --ion-color-tertiary-contrast: var(--custom-tertiary-contrast);
+  --ion-color-tertiary-contrast-rgb: var(--custom-tertiary-contrast-rgb);
+  --ion-color-tertiary-shade: var(--custom-tertiary-shade);
+  --ion-color-tertiary-tint: var(--custom-tertiary-tint);
+}
+
+// Clases de utilidad para los colores personalizados
+.color-primary {
+  color: var(--custom-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--custom-primary) !important;
+}
+
+.color-secondary {
+  color: var(--custom-secondary) !important;
+}
+
+.bg-secondary {
+  background-color: var(--custom-secondary) !important;
+}
+
+.color-tertiary {
+  color: var(--custom-tertiary) !important;
+}
+
+.bg-tertiary {
+  background-color: var(--custom-tertiary) !important;
+}
+
+// Gradientes personalizados
+.gradient-primary {
+  background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-secondary) 50%, var(--custom-tertiary) 100%);
+}
+
+.gradient-primary-secondary {
+  background: linear-gradient(135deg, var(--custom-primary) 0%, var(--custom-secondary) 100%);
+}
+
+.gradient-secondary-tertiary {
+  background: linear-gradient(135deg, var(--custom-secondary) 0%, var(--custom-tertiary) 100%);
+}
