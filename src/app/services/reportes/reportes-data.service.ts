@@ -109,17 +109,17 @@ export class ReportesDataService {
         ],
         "formatos": [
           {
-            "value": "JSON",
+            "value": "json",
             "label": "Vista Previa",
             "icon": "eye-outline"
           },
           {
-            "value": "PDF",
+            "value": "pdf",
             "label": "PDF",
             "icon": "document-text-outline"
           },
           {
-            "value": "EXCEL",
+            "value": "xlsx",
             "label": "Excel",
             "icon": "grid-outline"
           }

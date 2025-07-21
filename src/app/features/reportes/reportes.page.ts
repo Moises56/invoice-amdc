@@ -80,6 +80,8 @@ interface ReportHistoryItem {
   date: string;
   size: string;
   format: string;
+  request: ReporteRequest; // Guardar el request original
+  data?: ReporteResponse; // Opcional: guardar los datos del reporte
 }
 
 @Component({
@@ -300,7 +302,8 @@ export class ReportesPage implements OnInit {
             type: 'FINANCIERO',
             date: new Date().toLocaleDateString(),
             size: '2.3 MB',
-            format: 'PDF'
+            format: 'PDF',
+            request: { tipo: 'FINANCIERO', periodo: 'MENSUAL' }
           },
           {
             id: '2', 
@@ -308,7 +311,8 @@ export class ReportesPage implements OnInit {
             type: 'OPERACIONAL',
             date: new Date().toLocaleDateString(),
             size: '1.8 MB',
-            format: 'PDF'
+            format: 'PDF',
+            request: { tipo: 'OPERACIONAL', periodo: 'MENSUAL' }
           }
         ];
         
@@ -340,7 +344,8 @@ export class ReportesPage implements OnInit {
         type: 'FINANCIERO',
         date: new Date().toLocaleDateString(),
         size: '2.3 MB',
-        format: 'PDF'
+        format: 'PDF',
+        request: { tipo: 'FINANCIERO', periodo: 'MENSUAL' }
       },
       {
         id: '2', 
@@ -348,7 +353,8 @@ export class ReportesPage implements OnInit {
         type: 'OPERACIONAL',
         date: new Date().toLocaleDateString(),
         size: '1.8 MB',
-        format: 'PDF'
+        format: 'PDF',
+        request: { tipo: 'OPERACIONAL', periodo: 'MENSUAL' }
       }
     ];
     
@@ -418,12 +424,14 @@ export class ReportesPage implements OnInit {
           id: Date.now().toString(),
           title: `${this.getReportTypeLabel(this.selectedType)} - ${this.getPeriodLabel(this.selectedPeriod)}`,
           type: this.selectedType,
-          date: 'Ahora',
-          size: '2.1 MB',
-          format: 'PDF'
+          date: new Date().toLocaleDateString(),
+          size: this.calcularTamanoReporte(resultado),
+          format: request.formato || 'JSON',
+          request: request, // Guardar el request original
+          data: resultado // Guardar la respuesta completa
         };
         
-        this._recentReports.update(reports => [newReport, ...reports]);
+        this._recentReports.update(reports => [newReport, ...reports].slice(0, 10)); // Mantener solo los últimos 10
       } else {
         await this.mostrarToast(resultado.error || 'Error al generar reporte', 'danger');
       }
@@ -554,20 +562,56 @@ export class ReportesPage implements OnInit {
 
   // Descargar reporte del historial
   async downloadReport(report: ReportHistoryItem) {
+    const alert = await this.alertController.create({
+      header: 'Seleccionar Formato',
+      message: '¿En qué formato deseas descargar el reporte?',
+      buttons: [
+        {
+          text: 'PDF',
+          handler: async () => {
+            await this.exportarYDescargar(report, 'PDF');
+          }
+        },
+        {
+          text: 'Excel',
+          handler: async () => {
+            await this.exportarYDescargar(report, 'EXCEL');
+          }
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async exportarYDescargar(report: ReportHistoryItem, formato: 'PDF' | 'EXCEL') {
     const loading = await this.loadingController.create({
-      message: 'Descargando reporte...',
+      message: `Exportando a ${formato}...`,
       spinner: 'crescent'
     });
     await loading.present();
 
     try {
-      // Simular descarga
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      await this.mostrarToast(`Descarga iniciada: ${report.title}`, 'success');
+      // Usar el request guardado en el historial
+      const request = { ...report.request, formato };
       
+      const blob = await this.reportesService.exportarReporte(request, formato);
+      
+      // Crear un nombre de archivo descriptivo
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const filename = `Reporte_${report.type}_${timestamp}.${formato === 'EXCEL' ? 'xlsx' : 'pdf'}`;
+      
+      // Usar el método del servicio para descargar el archivo
+      this.reportesService.downloadFile(blob, filename);
+      
+      await this.mostrarToast(`Descarga iniciada: ${filename}`, 'success');
+
     } catch (error) {
-      console.error('Error al descargar reporte:', error);
-      await this.mostrarToast('Error al descargar reporte', 'danger');
+      console.error(`Error al exportar a ${formato}:`, error);
+      await this.mostrarToast(`Error al exportar a ${formato}`, 'danger');
     } finally {
       await loading.dismiss();
     }

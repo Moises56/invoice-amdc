@@ -28,9 +28,9 @@ export class ReportesConfigService {
         { value: 'ANUAL', label: 'Anual' }
       ],
       formatos: [
-        { value: 'JSON', label: 'Vista Previa', icon: 'eye-outline' },
-        { value: 'PDF', label: 'PDF', icon: 'document-text-outline' },
-        { value: 'EXCEL', label: 'Excel', icon: 'grid-outline' }
+        { value: 'json', label: 'Vista Previa', icon: 'eye-outline' },
+        { value: 'pdf', label: 'PDF', icon: 'document-text-outline' },
+        { value: 'xlsx', label: 'Excel', icon: 'grid-outline' }
       ],
       mercados_disponibles: [],
       tipos_local: []

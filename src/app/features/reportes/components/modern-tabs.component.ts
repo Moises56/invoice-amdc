@@ -40,7 +40,7 @@ export interface TabItem {
     IonBadge
   ],
   template: `
-    <div class="modern-tabs-container">
+    <div class="modern-tabs-container" style="width: 100%; min-height: 100%; background: #000;">
       <!-- Glass Tab Navigation -->
       <div class="glass-tab-nav">
         <ion-segment 

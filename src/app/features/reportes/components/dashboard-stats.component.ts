@@ -58,29 +58,13 @@ export class DashboardStatsComponent implements OnInit {
   // Estadísticas computadas con formato
   statsComputadas = computed(() => {
     if (!this.estadisticas) return null;
-
     return {
-      totalMercados: {
-        valor: this.estadisticas.total_mercados,
-        label: 'Total Mercados',
-        icon: 'business-outline',
-        color: 'tertiary',
-        change: '+2%',
-        trending: 'up'
-      },
-      totalLocales: {
-        valor: this.estadisticas.total_locales,
-        label: 'Total Locales',
-        icon: 'storefront-outline',
-        color: 'warning',
-        change: '+5%',
-        trending: 'up'
-      },
       totalFacturas: {
         valor: this.estadisticas.total_facturas,
         label: 'Total Facturas',
         icon: 'document-text-outline',
-        color: 'primary',
+        color: '#5ccedf',
+        bg: 'linear-gradient(120deg, #e0f7fa 0%, #b2ebf2 100%)',
         change: '+12%',
         trending: 'up'
       },
@@ -88,18 +72,10 @@ export class DashboardStatsComponent implements OnInit {
         valor: this.estadisticas.total_recaudado,
         label: 'Total Recaudado',
         icon: 'cash-outline',
-        color: 'success',
+        color: '#1976d2',
+        bg: 'linear-gradient(120deg, #b2ebf2 0%, #e3f2fd 100%)',
         change: '+8%',
         trending: 'up',
-        isMoney: true
-      },
-      promedioFactura: {
-        valor: this.estadisticas.promedio_factura,
-        label: 'Promedio Factura',
-        icon: 'analytics-outline',
-        color: 'secondary',
-        change: '-2%',
-        trending: 'down',
         isMoney: true
       }
     };
@@ -128,22 +104,16 @@ export class DashboardStatsComponent implements OnInit {
 
   // Formatear números
   formatNumber(value: number): string {
-    if (value >= 1000000) {
-      return (value / 1000000).toFixed(1) + 'M';
-    } else if (value >= 1000) {
-      return (value / 1000).toFixed(1) + 'K';
-    }
-    return value.toLocaleString('es-ES');
+    return value.toLocaleString('es-HN');
   }
 
   // Formatear moneda
   formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
+    // Formato Lempira: L 1,234,567
+    return 'L ' + value.toLocaleString('es-HN', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0
-    }).format(value);
+    });
   }
 
   // Obtener color de tendencia

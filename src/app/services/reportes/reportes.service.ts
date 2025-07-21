@@ -1,9 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as xlsx from 'xlsx';
 import { 
   ReporteRequest, 
-  ReporteResponse 
+  ReporteResponse,
+  ReporteData,
+  MercadoStats
 } from '../../interfaces/reportes/reporte.interface';
 import { ConfiguracionReportes } from '../../interfaces/reportes/mercado.interface';
 import { EstadisticasGenerales, DemoResponse } from '../../interfaces/reportes/estadisticas.interface';
@@ -66,11 +71,11 @@ export class ReportesService {
   // 🔒 MÉTODOS CON AUTENTICACIÓN
 
   /**
-   * Generar reporte completo con autenticación
+   * Generar reporte completo con autenticación usando el endpoint real
    */
   async generarReporte(request: ReporteRequest): Promise<ReporteResponse> {
     const loading = await this.loadingCtrl.create({
-      message: 'Generando reporte...',
+      message: `Generando reporte ${request.tipo}...`,
       spinner: 'dots'
     });
     
@@ -100,17 +105,22 @@ export class ReportesService {
         cleanRequest.locales = request.locales;
       }
 
-      console.log('Enviando request limpio:', cleanRequest);
+      console.log('Enviando request al endpoint real:', cleanRequest);
       
-      const headers = await this.getAuthHeaders();
+      // Usar el endpoint real documentado (sin duplicar /api)
       const response = await this.http.post<ReporteResponse>(
         `${this.baseUrl}/reportes/generar`, 
-        cleanRequest, 
-        { headers }
+        cleanRequest,
+        { 
+          withCredentials: true,  // Para incluir cookies JWT
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       ).toPromise();
 
       this.reportesSubject.next(response!);
-      await this.showSuccess(`Reporte ${request.tipo} generado exitosamente`);
+      await this.showSuccess(`Reporte ${request.tipo} generado exitosamente en ${response!.metadata.tiempo_procesamiento}`);
       
       return response!;
     } catch (error) {
@@ -123,14 +133,121 @@ export class ReportesService {
   }
 
   /**
-   * Obtener configuración completa con autenticación
+   * Métodos específicos para cada tipo de reporte
+   */
+  async generarReporteFinanciero(filtros: Partial<ReporteRequest>): Promise<ReporteResponse> {
+    return this.generarReporte({
+      tipo: 'FINANCIERO',
+      periodo: 'MENSUAL',
+      ...filtros
+    });
+  }
+
+  async generarReporteOperacional(filtros: Partial<ReporteRequest>): Promise<ReporteResponse> {
+    return this.generarReporte({
+      tipo: 'OPERACIONAL',
+      periodo: 'MENSUAL',
+      ...filtros
+    });
+  }
+
+  async generarReporteMercado(filtros: Partial<ReporteRequest>): Promise<ReporteResponse> {
+    return this.generarReporte({
+      tipo: 'MERCADO',
+      periodo: 'MENSUAL',
+      ...filtros
+    });
+  }
+
+  async generarReporteLocal(filtros: Partial<ReporteRequest>): Promise<ReporteResponse> {
+    return this.generarReporte({
+      tipo: 'LOCAL',
+      periodo: 'MENSUAL',
+      ...filtros
+    });
+  }
+
+  /**
+   * Exportar reporte en formato específico
+   */
+  async exportarReporte(request: ReporteRequest, formato: 'PDF' | 'EXCEL'): Promise<Blob> {
+    const loading = await this.loadingCtrl.create({
+      message: `Exportando reporte a ${formato}...`,
+      spinner: 'dots'
+    });
+  
+    try {
+      await loading.present();
+  
+      // Primero, obtenemos los datos en formato JSON
+      const jsonRequest = { ...request, formato: 'JSON' as const };
+      const reporteResponse = await this.generarReporte(jsonRequest);
+  
+      if (!reporteResponse.success || !reporteResponse.data) {
+        throw new Error('No se pudieron obtener los datos para generar el archivo.');
+      }
+  
+      let fileBuffer: ArrayBuffer;
+  
+      if (formato === 'PDF') {
+        fileBuffer = await this.generatePdf(reporteResponse.data);
+      } else {
+        fileBuffer = await this.generateXlsx(reporteResponse.data);
+      }
+  
+      await this.showSuccess(`Reporte exportado a ${formato} exitosamente`);
+      return new Blob([fileBuffer], { 
+        type: formato === 'PDF' 
+          ? 'application/pdf' 
+          : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+  
+    } catch (error) {
+      await this.showError(`Error exportando a ${formato}`, error);
+      throw error;
+    } finally {
+      await loading.dismiss();
+    }
+  }
+
+  private async generatePdf(data: ReporteData): Promise<ArrayBuffer> {
+    const doc = new jsPDF();
+    doc.text('Reporte Financiero', 14, 16);
+
+    const head = [['Mercado', 'Total Recaudado', 'Total Facturas', 'Facturas Pagadas']];
+    const body = (data.por_mercado || []).map((m: MercadoStats) => [
+      m.nombre_mercado,
+      `L ${m.total_recaudado.toFixed(2)}`,
+      m.total_facturas,
+      m.facturas_pagadas,
+    ]);
+
+    autoTable(doc, {
+      head,
+      body,
+      startY: 20,
+    });
+
+    return doc.output('arraybuffer');
+  }
+
+  private async generateXlsx(data: ReporteData): Promise<ArrayBuffer> {
+    const worksheet = xlsx.utils.json_to_sheet(data.por_mercado || []);
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Reporte');
+
+    const buffer = xlsx.write(workbook, { type: 'array', bookType: 'xlsx' });
+    return buffer;
+  }
+
+  /**
+   * Obtener configuración completa con autenticación usando endpoint real
    */
   async obtenerConfiguracion(): Promise<{ success: boolean; configuracion: ConfiguracionReportes }> {
     try {
-      const headers = await this.getAuthHeaders();
       const response = await this.http.get<{ success: boolean; configuracion: ConfiguracionReportes }>(
-        `${this.baseUrl}/reportes/configuracion`, 
-        { headers }
+        `${this.baseUrl}/reportes/configuracion`,
+        { withCredentials: true }
       ).toPromise();
       return response!;
     } catch (error) {
@@ -140,12 +257,14 @@ export class ReportesService {
   }
 
   /**
-   * Test con autenticación
+   * Test con autenticación usando endpoint real
    */
   async testAutenticado(): Promise<any> {
     try {
-      const headers = await this.getAuthHeaders();
-      return await this.http.get(`${this.baseUrl}/reportes/test`, { headers }).toPromise();
+      return await this.http.get(
+        `${this.baseUrl}/reportes/test`, 
+        { withCredentials: true }
+      ).toPromise();
     } catch (error) {
       await this.showError('Error en test autenticado', error);
       throw error;
@@ -153,18 +272,6 @@ export class ReportesService {
   }
 
   // 🎯 MÉTODOS DE UTILIDAD
-
-  /**
-   * Obtener headers con autenticación
-   */
-  private async getAuthHeaders(): Promise<HttpHeaders> {
-    // Usar el token del AuthService existente
-    const token = localStorage.getItem('authToken'); // O usar el método del AuthService
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-  }
 
   /**
    * Mostrar mensaje de éxito
@@ -221,5 +328,30 @@ export class ReportesService {
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  /**
+   * Descargar archivo blob
+   */
+  downloadFile(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Si es PDF, abrir en nueva pestaña
+    if (filename.toLowerCase().endsWith('.pdf')) {
+      window.open(url, '_blank');
+      // No revocar el objeto URL inmediatamente para que el PDF se muestre
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 2000);
+    } else {
+      window.URL.revokeObjectURL(url);
+    }
   }
 }

@@ -138,7 +138,7 @@
       </div>
 
       <!-- Smart Layout para tarjetas de reportes -->
-      <div class="reports-section">
+      <!-- <div class="reports-section">
         <h2 class="section-title">
           <ion-icon name="library-outline" color="secondary" class="mr-2"></ion-icon>
           Reportes Disponibles
@@ -148,6 +148,38 @@
           [reportCards]="reportCards()" 
           [layoutMode]="layoutMode()">
         </app-smart-layout>
+      </div> -->
+
+      <!-- Historial de reportes generados -->
+      <div class="history-section glass-panel" *ngIf="recentReports().length > 0">
+        <h2 class="section-title">
+          <ion-icon name="time-outline" color="warning" class="mr-2"></ion-icon>
+          Historial de Reportes Recientes
+        </h2>
+        
+        <div class="history-list">
+          <div *ngFor="let report of recentReports()" class="history-item">
+            <div class="history-info">
+              <div class="history-icon">
+                <ion-icon [name]="getReportIcon(report.type)" [color]="getReportColor(report.type)"></ion-icon>
+              </div>
+              <div class="history-details">
+                <h4 class="history-title">{{ report.title }}</h4>
+                <p class="history-meta">
+                  {{ report.date }} • {{ report.size }} • {{ report.format }}
+                </p>
+              </div>
+            </div>
+            <div class="history-actions">
+              <ion-button size="small" fill="clear" (click)="downloadReport(report)">
+                <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button size="small" fill="clear" (click)="shareReport(report)">
+                <ion-icon name="share-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -248,37 +280,6 @@
         </div>
       </div>
 
-      <!-- Historial de reportes generados -->
-      <div class="history-section glass-panel">
-        <h2 class="section-title">
-          <ion-icon name="time-outline" color="warning" class="mr-2"></ion-icon>
-          Historial de Reportes
-        </h2>
-        
-        <div class="history-list">
-          <div *ngFor="let report of recentReports()" class="history-item">
-            <div class="history-info">
-              <div class="history-icon">
-                <ion-icon [name]="getReportIcon(report.type)" [color]="getReportColor(report.type)"></ion-icon>
-              </div>
-              <div class="history-details">
-                <h4 class="history-title">{{ report.title }}</h4>
-                <p class="history-meta">
-                  {{ report.date }} • {{ report.size }} • {{ report.format }}
-                </p>
-              </div>
-            </div>
-            <div class="history-actions">
-              <ion-button size="small" fill="clear" (click)="downloadReport(report)">
-                <ion-icon name="download-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-              <ion-button size="small" fill="clear" (click)="shareReport(report)">
-                <ion-icon name="share-outline" slot="icon-only"></ion-icon>
-              </ion-button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </app-modern-tabs>
 </ion-content>

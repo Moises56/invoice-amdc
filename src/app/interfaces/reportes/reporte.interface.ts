@@ -1,23 +1,89 @@
 export interface ReporteRequest {
   tipo: 'FINANCIERO' | 'OPERACIONAL' | 'MERCADO' | 'LOCAL';
-  periodo: 'MENSUAL' | 'TRIMESTRAL' | 'ANUAL';
-  formato?: 'JSON' | 'PDF' | 'EXCEL' | 'CSV';
-  fechaInicio?: string;
-  fechaFin?: string;
-  mercados?: string[];
-  locales?: string[];
+  periodo: 'MENSUAL' | 'ANUAL';
+  formato?: 'JSON' | 'PDF' | 'EXCEL';
+  fechaInicio?: string;    // ISO Date string (opcional)
+  fechaFin?: string;       // ISO Date string (opcional)
+  mercados?: string[];     // Array de IDs de mercados (opcional)
+  locales?: string[];      // Array de IDs de locales (opcional)
 }
 
 export interface ReporteResponse {
   success: boolean;
   data: ReporteData;
   metadata: ReporteMetadata;
-  filtros_aplicados?: FiltrosAplicados;
+  filtros_aplicados: FiltrosAplicados;
   error?: string;
-  timestamp: string;
+  timestamp?: string;
+}
+
+// Interfaces específicas para cada tipo de reporte
+export interface ReporteFinancieroResponse {
+  success: true;
+  data: ReporteFinancieroData;
+  metadata: ReporteMetadata;
+  filtros_aplicados: FiltrosAplicados;
+}
+
+export interface ReporteOperacionalResponse {
+  success: true;
+  data: ReporteOperacionalData;
+  metadata: ReporteMetadata;
+  filtros_aplicados: FiltrosAplicados;
+}
+
+export interface ReporteMercadoResponse {
+  success: true;
+  data: ReporteMercadoData;
+  metadata: ReporteMetadata;
+  filtros_aplicados: FiltrosAplicados;
+}
+
+export interface ReporteLocalResponse {
+  success: true;
+  data: ReporteLocalData;
+  metadata: ReporteMetadata;
+  filtros_aplicados: FiltrosAplicados;
+}
+
+// Datos específicos por tipo de reporte
+export interface ReporteFinancieroData {
+  resumen: {
+    total_recaudado: number;     // Total en dinero recaudado
+    total_facturas: number;      // Cantidad total de facturas
+    promedio_factura: number;    // Promedio por factura
+  };
+  por_estado: {
+    [estado: string]: {
+      cantidad: number;          // Cantidad de facturas
+      monto: number;            // Monto total del estado
+    }
+  };
+  por_mercado: MercadoStats[];
+}
+
+export interface ReporteOperacionalData {
+  estadisticas: {
+    total_facturas: number;      // Total de facturas en el período
+    mercados_activos: number;    // Mercados con actividad
+    locales_activos: number;     // Locales con actividad
+  };
+  rendimiento: {
+    facturas_hoy: number;        // Facturas creadas hoy
+    eficiencia: 'ALTA' | 'MEDIA' | 'BAJA'; // Clasificación de eficiencia
+  };
+}
+
+export interface ReporteMercadoData {
+  mercados: MercadoStats[];
+}
+
+export interface ReporteLocalData {
+  locales: LocalStats[];
 }
 
 export interface ReporteData {
+  // Mantener compatibilidad con código existente
   // Para tipo FINANCIERO
   resumen?: {
     total_recaudado: number;
@@ -40,7 +106,7 @@ export interface ReporteData {
   };
   rendimiento?: {
     facturas_hoy: number;
-    eficiencia: 'ALTA' | 'BAJA';
+    eficiencia: 'ALTA' | 'MEDIA' | 'BAJA';
   };
   
   // Para tipo MERCADO
@@ -70,15 +136,15 @@ export interface LocalStats {
 }
 
 export interface ReporteMetadata {
-  tipo: string;
+  tipo: 'FINANCIERO' | 'OPERACIONAL' | 'MERCADO' | 'LOCAL';
   periodo: {
-    inicio: string;
-    fin: string;
+    inicio: string;              // ISO Date string
+    fin: string;                 // ISO Date string
   };
-  formato: string;
-  tiempo_procesamiento: string;
-  timestamp: string;
-  usuario?: string;
+  formato: 'JSON' | 'PDF' | 'EXCEL';
+  tiempo_procesamiento: string; // Ej: "125ms"
+  timestamp: string;            // ISO Date string
+  usuario: string;              // Username del usuario autenticado
 }
 
 export interface FiltrosAplicados {
