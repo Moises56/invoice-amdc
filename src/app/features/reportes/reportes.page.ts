@@ -53,7 +53,6 @@ import { ReportesService } from '../../services/reportes/reportes.service';
 import { ReportesConfigService } from '../../services/reportes/reportes-config.service';
 import { ReporteModalComponent } from './components/reporte-modal.component';
 import { DashboardStatsComponent } from './components/dashboard-stats.component';
-import { SmartLayoutComponent } from './components/smart-layout.component';
 import { ReportChartComponent } from './components/report-chart.component';
 import { AdvancedFiltersComponent, ReportFilter } from './components/advanced-filters.component';
 import { ModernTabsComponent } from './components/modern-tabs.component';
@@ -104,7 +103,6 @@ interface ReportHistoryItem {
     IonSelect,
     IonSelectOption,
     DashboardStatsComponent,
-    SmartLayoutComponent,
     ReportChartComponent,
     AdvancedFiltersComponent,
     ModernTabsComponent

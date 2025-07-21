@@ -10,8 +10,7 @@
 
 .reports-toolbar {
   --background: #5ccedf;
-  --color: #1a237e;
-  box-shadow: 0 2px 12px 0 rgba(92, 206, 223, 0.10);
+  --color: white;
 }
 
 .reports-bg {
@@ -526,6 +525,10 @@
     font-size: 0.8rem;
     color: #6b7280;
   }
+}
+
+.history-title{
+  color: #00040a !important;
 }
 
 .history-actions {

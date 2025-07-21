@@ -190,9 +190,9 @@ export class ReportesService {
       let fileBuffer: ArrayBuffer;
   
       if (formato === 'PDF') {
-        fileBuffer = await this.generatePdf(reporteResponse.data);
+        fileBuffer = await this.generatePdf(reporteResponse.data, request.tipo);
       } else {
-        fileBuffer = await this.generateXlsx(reporteResponse.data);
+        fileBuffer = await this.generateXlsx(reporteResponse.data, request.tipo);
       }
   
       await this.showSuccess(`Reporte exportado a ${formato} exitosamente`);
@@ -210,34 +210,194 @@ export class ReportesService {
     }
   }
 
-  private async generatePdf(data: ReporteData): Promise<ArrayBuffer> {
+  private async generatePdf(data: ReporteData, tipo: string): Promise<ArrayBuffer> {
+    switch (tipo) {
+      case 'FINANCIERO':
+        return this.generateFinancialPdf(data);
+      case 'OPERACIONAL':
+        return this.generateOperationalPdf(data);
+      case 'MERCADO':
+        return this.generateMarketPdf(data);
+      case 'LOCAL':
+        return this.generateLocalPdf(data);
+      default:
+        throw new Error(`Tipo de reporte no soportado para PDF: ${tipo}`);
+    }
+  }
+
+  private async generateXlsx(data: ReporteData, tipo: string): Promise<ArrayBuffer> {
+    switch (tipo) {
+      case 'FINANCIERO':
+        return this.generateFinancialXlsx(data);
+      case 'OPERACIONAL':
+        return this.generateOperationalXlsx(data);
+      case 'MERCADO':
+        return this.generateMarketXlsx(data);
+      case 'LOCAL':
+        return this.generateLocalXlsx(data);
+      default:
+        throw new Error(`Tipo de reporte no soportado para Excel: ${tipo}`);
+    }
+  }
+
+  // --- Generadores de PDF ---
+
+  private async generateFinancialPdf(data: ReporteData): Promise<ArrayBuffer> {
     const doc = new jsPDF();
     doc.text('Reporte Financiero', 14, 16);
 
-    const head = [['Mercado', 'Total Recaudado', 'Total Facturas', 'Facturas Pagadas']];
-    const body = (data.por_mercado || []).map((m: MercadoStats) => [
-      m.nombre_mercado,
-      `L ${m.total_recaudado.toFixed(2)}`,
-      m.total_facturas,
-      m.facturas_pagadas,
-    ]);
+    if (data.resumen) {
+      autoTable(doc, {
+        startY: 20,
+        head: [['Resumen', 'Valor']],
+        body: [
+          ['Total Recaudado', `L ${data.resumen.total_recaudado.toFixed(2)}`],
+          ['Total Facturas', data.resumen.total_facturas],
+          ['Promedio por Factura', `L ${data.resumen.promedio_factura.toFixed(2)}`],
+        ],
+      });
+    }
+
+    if (data.por_estado) {
+      autoTable(doc, {
+        head: [['Estado', 'Cantidad', 'Monto']],
+        body: Object.entries(data.por_estado).map(([estado, valores]) => [
+          estado,
+          valores.cantidad,
+          `L ${valores.monto.toFixed(2)}`,
+        ]),
+      });
+    }
 
     autoTable(doc, {
-      head,
-      body,
-      startY: 20,
+      head: [['Mercado', 'Total Recaudado', 'Total Facturas', 'Facturas Pagadas']],
+      body: (data.por_mercado || []).map((m: MercadoStats) => [
+        m.nombre_mercado,
+        `L ${m.total_recaudado.toFixed(2)}`,
+        m.total_facturas,
+        m.facturas_pagadas,
+      ]),
     });
 
     return doc.output('arraybuffer');
   }
 
-  private async generateXlsx(data: ReporteData): Promise<ArrayBuffer> {
-    const worksheet = xlsx.utils.json_to_sheet(data.por_mercado || []);
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, 'Reporte');
+  private async generateOperationalPdf(data: ReporteData): Promise<ArrayBuffer> {
+    const doc = new jsPDF();
+    doc.text('Reporte Operacional', 14, 16);
 
-    const buffer = xlsx.write(workbook, { type: 'array', bookType: 'xlsx' });
-    return buffer;
+    if (data.estadisticas) {
+      autoTable(doc, {
+        startY: 20,
+        head: [['Estadísticas', 'Valor']],
+        body: [
+          ['Total Facturas', data.estadisticas.total_facturas],
+          ['Mercados Activos', data.estadisticas.mercados_activos],
+          ['Locales Activos', data.estadisticas.locales_activos],
+        ],
+      });
+    }
+
+    if (data.rendimiento) {
+      autoTable(doc, {
+        head: [['Rendimiento', 'Valor']],
+        body: [
+          ['Facturas Hoy', data.rendimiento.facturas_hoy],
+          ['Eficiencia', data.rendimiento.eficiencia],
+        ],
+      });
+    }
+
+    return doc.output('arraybuffer');
+  }
+
+  private async generateMarketPdf(data: ReporteData): Promise<ArrayBuffer> {
+    const doc = new jsPDF();
+    doc.text('Reporte por Mercado', 14, 16);
+
+    autoTable(doc, {
+      startY: 20,
+      head: [['Mercado', 'Total Recaudado', 'Total Facturas', 'Facturas Pagadas', 'Total Locales']],
+      body: (data.mercados || []).map((m: any) => [
+        m.nombre_mercado,
+        `L ${m.total_recaudado.toFixed(2)}`,
+        m.total_facturas,
+        m.facturas_pagadas,
+        m.total_locales,
+      ]),
+    });
+
+    return doc.output('arraybuffer');
+  }
+
+  private async generateLocalPdf(data: ReporteData): Promise<ArrayBuffer> {
+    const doc = new jsPDF();
+    doc.text('Reporte por Local', 14, 16);
+
+    autoTable(doc, {
+      startY: 20,
+      head: [['Local', 'Número', 'Mercado', 'Total Recaudado', 'Total Facturas', 'Facturas Pagadas']],
+      body: (data.locales || []).map((l: any) => [
+        l.nombre_local,
+        l.numero_local,
+        l.mercado,
+        `L ${l.total_recaudado.toFixed(2)}`,
+        l.total_facturas,
+        l.facturas_pagadas,
+      ]),
+    });
+
+    return doc.output('arraybuffer');
+  }
+
+  // --- Generadores de Excel ---
+
+  private async generateFinancialXlsx(data: ReporteData): Promise<ArrayBuffer> {
+    const wb = xlsx.utils.book_new();
+    if (data.resumen) {
+      const resumen = xlsx.utils.json_to_sheet([data.resumen]);
+      xlsx.utils.book_append_sheet(wb, resumen, 'Resumen');
+    }
+    if (data.por_estado) {
+      const porEstado = xlsx.utils.json_to_sheet(Object.entries(data.por_estado).map(([estado, valores]) => ({ Estado: estado, ...valores })));
+      xlsx.utils.book_append_sheet(wb, porEstado, 'Por Estado');
+    }
+    if (data.por_mercado) {
+      const porMercado = xlsx.utils.json_to_sheet(data.por_mercado);
+      xlsx.utils.book_append_sheet(wb, porMercado, 'Por Mercado');
+    }
+    return xlsx.write(wb, { type: 'array', bookType: 'xlsx' });
+  }
+
+  private async generateOperationalXlsx(data: ReporteData): Promise<ArrayBuffer> {
+    const wb = xlsx.utils.book_new();
+    if (data.estadisticas) {
+      const estadisticas = xlsx.utils.json_to_sheet([data.estadisticas]);
+      xlsx.utils.book_append_sheet(wb, estadisticas, 'Estadísticas');
+    }
+    if (data.rendimiento) {
+      const rendimiento = xlsx.utils.json_to_sheet([data.rendimiento]);
+      xlsx.utils.book_append_sheet(wb, rendimiento, 'Rendimiento');
+    }
+    return xlsx.write(wb, { type: 'array', bookType: 'xlsx' });
+  }
+
+  private async generateMarketXlsx(data: ReporteData): Promise<ArrayBuffer> {
+    const wb = xlsx.utils.book_new();
+    if (data.mercados) {
+      const mercados = xlsx.utils.json_to_sheet(data.mercados);
+      xlsx.utils.book_append_sheet(wb, mercados, 'Mercados');
+    }
+    return xlsx.write(wb, { type: 'array', bookType: 'xlsx' });
+  }
+
+  private async generateLocalXlsx(data: ReporteData): Promise<ArrayBuffer> {
+    const wb = xlsx.utils.book_new();
+    if (data.locales) {
+      const locales = xlsx.utils.json_to_sheet(data.locales);
+      xlsx.utils.book_append_sheet(wb, locales, 'Locales');
+    }
+    return xlsx.write(wb, { type: 'array', bookType: 'xlsx' });
   }
 
   /**

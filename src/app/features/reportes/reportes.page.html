@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar class="reports-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button color="light" defaultHref="/dashboard"></ion-back-button>
+      <ion-back-button color="dark" defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
     
     <ion-title class="text-white font-semibold">
@@ -30,7 +30,7 @@
   <div class="reports-hero">
     <div class="hero-content">
       <div class="hero-icon">
-        <ion-icon name="analytics" color="light"></ion-icon>
+        <ion-icon name="analytics" color="dark"></ion-icon>
       </div>
       <h1 class="hero-title">Centro de Reportes Avanzados</h1>
       <p class="hero-subtitle">
@@ -164,7 +164,7 @@
                 <ion-icon [name]="getReportIcon(report.type)" [color]="getReportColor(report.type)"></ion-icon>
               </div>
               <div class="history-details">
-                <h4 class="history-title">{{ report.title }}</h4>
+                <h4 class="history-title ">{{ report.title }}</h4>
                 <p class="history-meta">
                   {{ report.date }} • {{ report.size }} • {{ report.format }}
                 </p>
@@ -202,7 +202,7 @@
               [datos]="marketData()" 
               [tipo]="'bar'"
               [titulo]="'Recaudación por Mercado'"
-              [colorPrincipal]="'#3880ff'">
+              [colorPrincipal]="'#5ccedf'">
             </app-report-chart>
           </div>
 
