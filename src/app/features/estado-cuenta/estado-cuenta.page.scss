@@ -1,0 +1,23 @@
+/* Estilos para la página de Estado de Cuenta */
+
+ion-card {
+  margin: 16px;
+  padding: 16px;
+}
+
+ion-card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ion-color-step-150, #d7d8da);
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}

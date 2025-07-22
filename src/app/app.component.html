@@ -25,9 +25,8 @@
 
       <!-- Menú de navegación -->
       <ion-list class="py-2">
-        <ion-menu-toggle *ngFor="let item of menuItems" autoHide="false">
+        <ion-menu-toggle *ngFor="let item of visibleMenuItems()" autoHide="false">
           <ion-item 
-            *ngIf="hasAccess(item)"
             button="true" 
             (click)="navigateTo(item.url)"
             class="menu-item">

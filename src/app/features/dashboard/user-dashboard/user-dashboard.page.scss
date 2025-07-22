@@ -1,0 +1,17 @@
+ion-card {
+  text-align: center;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+ion-card-title {
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+ion-icon {
+  font-size: 48px;
+}

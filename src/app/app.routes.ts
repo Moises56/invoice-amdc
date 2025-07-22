@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 import { Role } from './shared/enums';
+import { userRoleRedirectGuard } from './core/guards/user-role-redirect.guard';
 
 export const routes: Routes = [
   {
@@ -15,8 +16,31 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/dashboard.page').then(m => m.DashboardPage),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, userRoleRedirectGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/dashboard/dashboard.page').then(m => m.DashboardPage),
+        data: { roles: [Role.ADMIN, Role.MARKET] }
+      },
+      {
+        path: 'user',
+        loadComponent: () => import('./features/dashboard/user-dashboard/user-dashboard.page').then(m => m.UserDashboardPage),
+        data: { roles: [Role.USER] }
+      }
+    ]
+  },
+  {
+    path: 'estado-cuenta',
+    loadChildren: () => import('./features/estado-cuenta/estado-cuenta.routes').then(m => m.routes),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role.USER] }
+  },
+  {
+    path: 'estado-cuenta-amnistia',
+    loadChildren: () => import('./features/estado-cuenta-amnistia/estado-cuenta-amnistia.routes').then(m => m.routes),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role.USER] }
   },
   {
     path: 'reportes',

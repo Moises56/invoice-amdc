@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { 
@@ -27,7 +27,11 @@ import {
   bluetoothOutline,
   personOutline,
   logOutOutline,
-  settingsOutline
+  settingsOutline,
+  documentTextOutline,
+  shieldCheckmarkOutline,
+  statsChartOutline,
+  documentAttachOutline
 } from 'ionicons/icons';
 import { AuthService } from './core/services/auth.service';
 import { Role } from './shared/enums';
@@ -36,7 +40,6 @@ interface MenuItem {
   title: string;
   url: string;
   icon: string;
-  roles?: Role[];
 }
 
 @Component({
@@ -65,92 +68,66 @@ export class AppComponent implements OnInit {
   private router = inject(Router);
   private menuController = inject(MenuController);
 
-  // Computed signals
+  // Signals
   user = this.authService.user;
   isAuthenticated = this.authService.isAuthenticated;
-  userRole = this.authService.userRole;
   userName = this.authService.userName;
+  userRole = this.authService.userRole;
 
-  menuItems: MenuItem[] = [
-    {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: 'home-outline'
-    },
-    {
-      title: 'Usuarios',
-      url: '/usuarios',
-      icon: 'people-outline',
-      roles: [Role.ADMIN]
-    },
-    {
-      title: 'Mercados',
-      url: '/mercados',
-      icon: 'business-outline',
-      roles: [Role.ADMIN, Role.MARKET]
-    },
-    {
-      title: 'Locales',
-      url: '/locales',
-      icon: 'storefront-outline',
-      roles: [Role.ADMIN, Role.MARKET, Role.USER]
-    },
-    {
-      title: 'Facturas',
-      url: '/facturas',
-      icon: 'receipt-outline',
-      roles: [Role.ADMIN, Role.MARKET, Role.USER]
-    },
-    {
-      title: 'Auditoría',
-      url: '/auditoria',
-      icon: 'analytics-outline',
-      roles: [Role.ADMIN]
-    },
-    {
-      title: 'Bluetooth',
-      url: '/bluetooth',
-      icon: 'bluetooth-outline'
-    }
+  private adminMenu: MenuItem[] = [
+    { title: 'Dashboard', url: '/dashboard', icon: 'stats-chart-outline' },
+    { title: 'Usuarios', url: '/usuarios', icon: 'people-outline' },
+    { title: 'Mercados', url: '/mercados', icon: 'business-outline' },
+    { title: 'Reportes', url: '/reportes', icon: 'document-attach-outline' },
+    { title: 'Auditoría', url: '/auditoria', icon: 'analytics-outline' },
   ];
+
+  private marketMenu: MenuItem[] = [
+    { title: 'Dashboard', url: '/dashboard', icon: 'stats-chart-outline' },
+    { title: 'Locales', url: '/locales', icon: 'storefront-outline' },
+    { title: 'Facturas', url: '/facturas', icon: 'receipt-outline' },
+    { title: 'Reportes', url: '/reportes', icon: 'document-attach-outline' },
+  ];
+
+  private userMenu: MenuItem[] = [
+    { title: 'Mi Dashboard', url: '/dashboard/user', icon: 'home-outline' },
+    { title: 'Estado de Cuenta', url: '/estado-cuenta', icon: 'document-text-outline' },
+    { title: 'Cuenta con Amnistía', url: '/estado-cuenta-amnistia', icon: 'shield-checkmark-outline' },
+    { title: 'Config. Bluetooth', url: '/bluetooth', icon: 'bluetooth-outline' },
+  ];
+
+  visibleMenuItems = computed(() => {
+    const role = this.authService.userRole();
+    switch (role) {
+      case Role.ADMIN:
+        return this.adminMenu;
+      case Role.MARKET:
+        return this.marketMenu;
+      case Role.USER:
+        return this.userMenu;
+      default:
+        return [];
+    }
+  });
 
   constructor() {
     addIcons({
-      homeOutline,
-      businessOutline,
-      storefrontOutline,
-      receiptOutline,
-      peopleOutline,
-      analyticsOutline,
-      bluetoothOutline,
-      personOutline,
-      logOutOutline,
-      settingsOutline
+      homeOutline, businessOutline, storefrontOutline, receiptOutline, 
+      peopleOutline, analyticsOutline, bluetoothOutline, personOutline, 
+      logOutOutline, settingsOutline, documentTextOutline, shieldCheckmarkOutline,
+      statsChartOutline, documentAttachOutline
     });
   }
 
   ngOnInit() {
-    // Redireccionar al login si no está autenticado
-    if (!this.isAuthenticated() && this.router.url !== '/login') {
-      this.router.navigate(['/login']);
-    }
-  }
-
-  /**
-   * Verificar si el usuario tiene acceso a un item del menú
-   */
-  hasAccess(item: MenuItem): boolean {
-    if (!item.roles || item.roles.length === 0) {
-      return true;
-    }
-    return this.authService.hasAnyRole(item.roles);
+    // La lógica de redirección ahora está en los guards
   }
 
   /**
    * Navegar a una página
    */
   navigateTo(url: string): void {
-    this.router.navigate([url]);
+    this.router.navigateByUrl(url);
     this.menuController.close();
   }
 

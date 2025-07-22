@@ -1,0 +1,19 @@
+/* Estilos para la página de Estado de Cuenta con Amnistía */
+
+ion-card {
+  margin: 16px;
+  padding: 16px;
+}
+
+ion-card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+}
+
+.amnesty-info {
+  background-color: var(--ion-color-tertiary-tint);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 16px;
+}
