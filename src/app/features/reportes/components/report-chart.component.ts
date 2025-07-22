@@ -74,7 +74,7 @@ export class ReportChartComponent implements OnInit, OnDestroy {
         datasets: [{
           label: this.titulo,
           data: values,
-          backgroundColor: this.tipo === 'pie' || this.tipo === 'doughnut' ? colors : this.colorPrincipal,
+          backgroundColor: (this.tipo === 'pie' || this.tipo === 'doughnut') ? colors : (this.tipo === 'bar' ? colors : this.colorPrincipal),
           borderColor: this.tipo === 'line' ? this.colorPrincipal : colors,
           borderWidth: 2,
           fill: this.tipo === 'line' ? false : true
@@ -99,13 +99,27 @@ export class ReportChartComponent implements OnInit, OnDestroy {
           tooltip: {
             callbacks: {
               label: (context) => {
-                const value = context.parsed;
-                const formattedValue = typeof value === 'number' 
-                  ? new Intl.NumberFormat('es-HN', { 
-                      style: 'currency', 
-                      currency: 'HNL' 
-                    }).format(value)
-                  : value;
+                // context.parsed puede ser un objeto si el dataset es complejo, pero aquí debe ser el valor numérico
+                const raw = context.parsed;
+                const v = raw as any;
+                let result: number;
+                if (typeof v.y === 'number') {
+                  result = v.y;
+                } else if (typeof v.x === 'number') {
+                  result = v.x;
+                } else if (typeof v.valor === 'number') {
+                  result = v.valor;
+                } else if (typeof raw === 'number') {
+                  result = raw;
+                } else {
+                  result = 0;
+                }
+                const formattedValue = new Intl.NumberFormat('es-HN', {
+                  style: 'currency',
+                  currency: 'HNL',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(result);
                 return `${context.label}: ${formattedValue}`;
               }
             }

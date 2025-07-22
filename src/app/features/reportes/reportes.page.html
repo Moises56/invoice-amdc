@@ -194,42 +194,43 @@
         <div class="charts-grid">
           <!-- Gráfico de recaudación por mercado -->
           <div class="chart-container">
-            <h3 class="chart-title">Recaudación por Mercado</h3>
-            <div class="chart-info">
+            <h3 class="chart-title" style="color: #111">Recaudación por Mercado</h3>
+            <div class="chart-info" style="color: #111">
               <span>Datos de {{ totalMercados() }} mercados activos</span>
             </div>
             <app-report-chart 
-              [datos]="marketData()" 
+              [datos]="marketChartData()" 
               [tipo]="'bar'"
               [titulo]="'Recaudación por Mercado'"
-              [colorPrincipal]="'#5ccedf'">
+              [colorPrincipal]="'#111'">
             </app-report-chart>
           </div>
 
           <!-- Gráfico de participación -->
           <div class="chart-container">
-            <h3 class="chart-title">Participación por Mercado</h3>
-            <div class="chart-info">
+            <h3 class="chart-title" style="color: #111">Participación por Mercado</h3>
+            <div class="chart-info" style="color: #111">
               <span>Distribución porcentual</span>
             </div>
             <app-report-chart 
-              [datos]="marketData()" 
+              [datos]="marketChartData()" 
               [tipo]="'pie'"
-              [titulo]="'Participación por Mercado'">
+              [titulo]="'Participación por Mercado'"
+              [colorPrincipal]="'#111'">
             </app-report-chart>
           </div>
 
           <!-- Gráfico de tendencias -->
           <div class="chart-container full-width">
-            <h3 class="chart-title">Tendencias de Recaudación</h3>
-            <div class="chart-info">
+            <h3 class="chart-title" style="color: #111">Tendencias de Recaudación</h3>
+            <div class="chart-info" style="color: #111">
               <span>Evolución mensual en Lempiras (L.)</span>
             </div>
             <app-report-chart 
               [datos]="trendData()" 
               [tipo]="'line'"
               [titulo]="'Tendencias de Recaudación'"
-              [colorPrincipal]="'#2fdf75'">
+              [colorPrincipal]="'#111'">
             </app-report-chart>
           </div>
         </div>

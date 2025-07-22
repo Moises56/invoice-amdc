@@ -65,6 +65,13 @@ import {
   MercadoStats,
   LocalStats 
 } from '../../interfaces/reportes/reporte.interface';
+
+// Extiende la interfaz MercadoEndpoint para incluir total_recaudado
+declare module '../../services/reportes/reportes-data.service' {
+  interface MercadoEndpoint {
+    total_recaudado?: number;
+  }
+}
 import { EstadisticasGenerales, DemoResponse } from '../../interfaces/reportes/estadisticas.interface';
 
 interface Market {
@@ -835,6 +842,31 @@ export class ReportesPage implements OnInit {
     { etiqueta: 'Sem 6', valor: 28000 }
   ]);
 
+  // Computed para datos de gráficos con datos reales de mercados
+  public marketChartData = computed(() => {
+    // Paleta de colores para las barras (puedes personalizar estos colores)
+    const colores = [
+      '#3880ff', // azul
+      '#2fdf75', // verde
+      '#ffce00', // amarillo
+      '#ff6b6b', // rojo
+      '#845ec2', // morado
+      '#f39c12', // naranja
+      '#e74c3c', // coral
+      '#1abc9c', // turquesa
+      '#34495e', // gris
+      '#9b59b6', // violeta
+      '#16a085', // verde oscuro
+    ];
+    const mercados = this.reportesDataService.getMercadosFromEndpoint()
+      .filter(m => m && m.nombre_mercado);
+    return mercados.map((m, i) => ({
+      etiqueta: m.nombre_mercado,
+      valor: m.total_recaudado || 0,
+      color: colores[i % colores.length]
+    }));
+  });
+
   // Método para manejar cambios en filtros avanzados
   onFiltersChange(filters: ReportFilter) {
     console.log('Filtros aplicados:', filters);
@@ -937,6 +969,5 @@ export class ReportesPage implements OnInit {
         locales: m._count?.locales || 0
       }));
   });
-
 
 }

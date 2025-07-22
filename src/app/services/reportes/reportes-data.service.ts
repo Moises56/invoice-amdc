@@ -10,6 +10,7 @@ export interface MercadoEndpoint {
   _count: {
     locales: number;
   };
+  total_recaudado?: number;
 }
 
 export interface ConfiguracionReportes {
@@ -131,7 +132,8 @@ export class ReportesDataService {
             "direccion": "Sendero Costarrisence, Distrito Belén, Comayagüela",
             "_count": {
               "locales": 1277
-            }
+            },
+            "total_recaudado": 1050
           },
           {
             "id": "7f82f552-4d7f-477b-8ab4-e54b5c82a24e",
@@ -139,7 +141,8 @@ export class ReportesDataService {
             "direccion": "Dirección  Pruebas",
             "_count": {
               "locales": 0
-            }
+            },
+            "total_recaudado": 0
           },
           {
             "id": "866595cc-c500-4eec-a625-92dee38bc244",
@@ -147,7 +150,8 @@ export class ReportesDataService {
             "direccion": "Bulevar Centroamérica, Colonia Miraflores, Distrito Kennedy",
             "_count": {
               "locales": 183
-            }
+            },
+            "total_recaudado": 930
           },
           {
             "id": "a2564f93-d208-4d63-a394-2d0cf89bd23b",
@@ -155,7 +159,8 @@ export class ReportesDataService {
             "direccion": "Avenida Juan Gutemberg, Barrio La Plazuela, Distrito Histórico",
             "_count": {
               "locales": 95
-            }
+            },
+            "total_recaudado": 5550
           },
           {
             "id": "b52495e3-ff73-43a1-b0aa-f68bf82a0c3c",
@@ -163,7 +168,8 @@ export class ReportesDataService {
             "direccion": "Avenida Paulino Valladares, Barrio Los Dolores, Distrito Histórico",
             "_count": {
               "locales": 341
-            }
+            },
+            "total_recaudado": 1200
           },
           {
             "id": "b9a05043-c4b4-4472-b8ec-b53095730ed6",
@@ -171,7 +177,8 @@ export class ReportesDataService {
             "direccion": "Paseo El Manchén, El Manchen, Distrito El Picacho",
             "_count": {
               "locales": 171
-            }
+            },
+            "total_recaudado": 1200
           }
         ],
         "tipos_local": [
