@@ -135,7 +135,13 @@ export class ReportesPage implements OnInit {
   configuracion = signal<ConfiguracionReportes | null>(null);
   
   // Nuevos signals para datos reales del endpoint
-  mercadosReales = signal<MercadoEndpoint[]>([]);
+  private _mercadosReales = signal<MercadoEndpoint[]>([]);
+
+  // Método público para acceder a los mercados reales desde el template
+  public mercadosReales(): MercadoEndpoint[] {
+    console.log('Accediendo a mercados reales:', this._mercadosReales());
+    return this._mercadosReales();
+  }
   configuracionEndpoint = signal<ConfiguracionReportes | null>(null);
   
   activeTab = signal('overview');
@@ -163,15 +169,16 @@ export class ReportesPage implements OnInit {
 
   // Métodos calculados para el template con datos reales
   totalMercados = computed(() => {
-    const mercados = this.reportesDataService.getMercadosFromEndpoint();
+    const mercados = this.mercadosReales();
     return Array.isArray(mercados) ? mercados.length : 0;
   });
   
-  totalLocales = computed(() => 
-    this.reportesDataService.getMercadosFromEndpoint()
-      .filter(mercado => mercado && mercado._count)
-      .reduce((sum, mercado) => sum + (mercado._count?.locales || 0), 0)
-  );
+totalLocales = computed(() => {
+  const mercados = this.mercadosReales();
+  return Array.isArray(mercados)
+    ? mercados.reduce((sum, mercado) => sum + (mercado._count && mercado._count.locales ? mercado._count.locales : 0), 0)
+    : 0;
+});
 
   mercadosData = computed(() => 
     this.reportesDataService.getMercadosFromEndpoint()
@@ -925,7 +932,7 @@ export class ReportesPage implements OnInit {
       const config = await this.reportesDataService.getConfiguracionReportes();
       
       this.configuracionEndpoint.set(config);
-      this.mercadosReales.set(config.configuracion.mercados_disponibles);
+      this._mercadosReales.set(config.configuracion.mercados_disponibles);
       
       // Actualizar datos de gráficos con datos reales
       this.updateChartsWithRealData();
@@ -948,7 +955,7 @@ export class ReportesPage implements OnInit {
   }
 
   // Método para formatear moneda en lempiras
-  formatLempira(amount: number, showDecimals: boolean = true): string {
+  public formatLempira(amount: number, showDecimals: boolean = true): string {
     return this.reportesDataService.formatLempira(amount, showDecimals);
   }
 
@@ -966,7 +973,8 @@ export class ReportesPage implements OnInit {
         id: m.id,
         name: m.nombre_mercado,
         direccion: m.direccion || 'Sin dirección',
-        locales: m._count?.locales || 0
+        locales: m._count?.locales || 0,
+        total_recaudado: m.total_recaudado || 0
       }));
   });
 

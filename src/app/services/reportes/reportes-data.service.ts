@@ -52,7 +52,7 @@ export class ReportesDataService {
       }
 
       const response = await this.http.get<ConfiguracionReportes>(
-        `${environment.apiUrl}/reportes/configuracion`
+        `${environment.apiUrl}/reportes-demo/configuracion`
       ).toPromise();
       
       if (response) {

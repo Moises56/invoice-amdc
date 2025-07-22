@@ -3,22 +3,14 @@
     <ion-buttons slot="start">
       <ion-back-button color="dark" defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
-    
-    <ion-title class="text-white font-semibold">
-      Centro de Reportes
-    </ion-title>
+
+    <ion-title class="text-white font-semibold"> Centro de Reportes </ion-title>
 
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="refresh()" [disabled]="isLoading()">
-        <ion-icon 
-          *ngIf="!isLoading()" 
-          name="refresh-outline" 
-          color="light">
+        <ion-icon *ngIf="!isLoading()" name="refresh-outline" color="light">
         </ion-icon>
-        <ion-spinner 
-          *ngIf="isLoading()" 
-          name="crescent" 
-          color="light">
+        <ion-spinner *ngIf="isLoading()" name="crescent" color="light">
         </ion-spinner>
       </ion-button>
     </ion-buttons>
@@ -34,8 +26,9 @@
       </div>
       <h1 class="hero-title">Centro de Reportes Avanzados</h1>
       <p class="hero-subtitle">
-        Genera reportes detallados con datos reales de {{ totalMercados() }} mercados,
-        visualiza información en tiempo real y exporta en múltiples formatos.
+        Genera reportes detallados con datos reales de {{ totalMercados() }}
+        mercados, visualiza información en tiempo real y exporta en múltiples
+        formatos.
       </p>
     </div>
     <div class="hero-stats">
@@ -55,42 +48,52 @@
   </div>
 
   <!-- Sistema de Tabs Moderno -->
-  <app-modern-tabs 
+  <app-modern-tabs
     [tabs]="reportTabs()"
     [initialTab]="'overview'"
     [showControls]="false"
-    (tabChange)="onTabChange($event)">
-    
+    (tabChange)="onTabChange($event)"
+  >
     <!-- Tab 1: Resumen General -->
     <div *ngIf="currentActiveTab() === 'overview'" class="tab-content-overview">
       <!-- Dashboard de Estadísticas -->
       <div class="statistics-section">
-        <app-dashboard-stats 
-          [estadisticas]="estadisticasGenerales()" 
-          [isLoading]="isLoading()">
+        <app-dashboard-stats
+          [estadisticas]="estadisticasGenerales()"
+          [isLoading]="isLoading()"
+        >
         </app-dashboard-stats>
       </div>
 
       <!-- Generación rápida de reportes -->
       <div class="quick-filters glass-panel">
         <h2 class="section-title">
-          <ion-icon name="flash-outline" color="warning" class="mr-2"></ion-icon>
+          <ion-icon
+            name="flash-outline"
+            color="warning"
+            class="mr-2"
+          ></ion-icon>
           Generación Rápida
         </h2>
-        
+
         <div class="filter-grid">
           <!-- Período -->
           <div class="filter-group">
             <label class="filter-label">Período</label>
-            <ion-select 
-              [(ngModel)]="selectedPeriod" 
+            <ion-select
+              [(ngModel)]="selectedPeriod"
               placeholder="Seleccionar período"
-              class="glass-select">
+              class="glass-select"
+            >
               <ion-select-option value="HOY">Hoy</ion-select-option>
               <ion-select-option value="AYER">Ayer</ion-select-option>
-              <ion-select-option value="ESTA_SEMANA">Esta Semana</ion-select-option>
+              <ion-select-option value="ESTA_SEMANA"
+                >Esta Semana</ion-select-option
+              >
               <ion-select-option value="ESTE_MES">Este Mes</ion-select-option>
-              <ion-select-option value="ULTIMO_MES">Último Mes</ion-select-option>
+              <ion-select-option value="ULTIMO_MES"
+                >Último Mes</ion-select-option
+              >
               <ion-select-option value="ESTE_ANNO">Este Año</ion-select-option>
             </ion-select>
           </div>
@@ -98,12 +101,17 @@
           <!-- Tipo de reporte -->
           <div class="filter-group">
             <label class="filter-label">Tipo de reporte</label>
-            <ion-select 
-              [(ngModel)]="selectedType" 
+            <ion-select
+              [(ngModel)]="selectedType"
               placeholder="Tipo de reporte"
-              class="glass-select">
-              <ion-select-option value="FINANCIERO">Financiero</ion-select-option>
-              <ion-select-option value="OPERACIONAL">Operacional</ion-select-option>
+              class="glass-select"
+            >
+              <ion-select-option value="FINANCIERO"
+                >Financiero</ion-select-option
+              >
+              <ion-select-option value="OPERACIONAL"
+                >Operacional</ion-select-option
+              >
               <ion-select-option value="MERCADO">Por Mercado</ion-select-option>
               <ion-select-option value="LOCAL">Por Local</ion-select-option>
             </ion-select>
@@ -112,12 +120,18 @@
           <!-- Mercado específico con datos reales -->
           <div class="filter-group">
             <label class="filter-label">Mercado específico</label>
-            <ion-select 
-              [(ngModel)]="selectedMarket" 
+            <ion-select
+              [(ngModel)]="selectedMarket"
               placeholder="Todos los mercados"
-              class="glass-select">
-              <ion-select-option value="all">Todos los mercados</ion-select-option>
-              <ion-select-option *ngFor="let market of availableMarketsReal()" [value]="market.id">
+              class="glass-select"
+            >
+              <ion-select-option value="all"
+                >Todos los mercados</ion-select-option
+              >
+              <ion-select-option
+                *ngFor="let market of availableMarketsReal()"
+                [value]="market.id"
+              >
                 {{ market.name }} ({{ market.locales }} locales)
               </ion-select-option>
             </ion-select>
@@ -125,11 +139,12 @@
 
           <!-- Botón de generación -->
           <div class="filter-group">
-            <ion-button 
-              expand="block" 
+            <ion-button
+              expand="block"
               class="generate-btn"
               (click)="generateReport()"
-              [disabled]="!selectedPeriod || !selectedType">
+              [disabled]="!selectedPeriod || !selectedType"
+            >
               <ion-icon name="play-outline" slot="start"></ion-icon>
               Generar Reporte
             </ion-button>
@@ -151,30 +166,44 @@
       </div> -->
 
       <!-- Historial de reportes generados -->
-      <div class="history-section glass-panel" *ngIf="recentReports().length > 0">
+      <div
+        class="history-section glass-panel"
+        *ngIf="recentReports().length > 0"
+      >
         <h2 class="section-title">
           <ion-icon name="time-outline" color="warning" class="mr-2"></ion-icon>
           Historial de Reportes Recientes
         </h2>
-        
+
         <div class="history-list">
           <div *ngFor="let report of recentReports()" class="history-item">
             <div class="history-info">
               <div class="history-icon">
-                <ion-icon [name]="getReportIcon(report.type)" [color]="getReportColor(report.type)"></ion-icon>
+                <ion-icon
+                  [name]="getReportIcon(report.type)"
+                  [color]="getReportColor(report.type)"
+                ></ion-icon>
               </div>
               <div class="history-details">
-                <h4 class="history-title ">{{ report.title }}</h4>
+                <h4 class="history-title">{{ report.title }}</h4>
                 <p class="history-meta">
                   {{ report.date }} • {{ report.size }} • {{ report.format }}
                 </p>
               </div>
             </div>
             <div class="history-actions">
-              <ion-button size="small" fill="clear" (click)="downloadReport(report)">
+              <ion-button
+                size="small"
+                fill="clear"
+                (click)="downloadReport(report)"
+              >
                 <ion-icon name="download-outline" slot="icon-only"></ion-icon>
               </ion-button>
-              <ion-button size="small" fill="clear" (click)="shareReport(report)">
+              <ion-button
+                size="small"
+                fill="clear"
+                (click)="shareReport(report)"
+              >
                 <ion-icon name="share-outline" slot="icon-only"></ion-icon>
               </ion-button>
             </div>
@@ -187,50 +216,63 @@
     <div *ngIf="currentActiveTab() === 'charts'" class="tab-content-charts">
       <div class="charts-section glass-panel">
         <h2 class="section-title">
-          <ion-icon name="bar-chart-outline" color="success" class="mr-2"></ion-icon>
+          <ion-icon
+            name="bar-chart-outline"
+            color="success"
+            class="mr-2"
+          ></ion-icon>
           Visualización de Datos en Tiempo Real
         </h2>
-        
+
         <div class="charts-grid">
           <!-- Gráfico de recaudación por mercado -->
           <div class="chart-container">
-            <h3 class="chart-title" style="color: #111">Recaudación por Mercado</h3>
+            <h3 class="chart-title" style="color: #111">
+              Recaudación por Mercado
+            </h3>
             <div class="chart-info" style="color: #111">
               <span>Datos de {{ totalMercados() }} mercados activos</span>
             </div>
-            <app-report-chart 
-              [datos]="marketChartData()" 
+            <app-report-chart
+              [datos]="marketChartData()"
               [tipo]="'bar'"
               [titulo]="'Recaudación por Mercado'"
-              [colorPrincipal]="'#111'">
+              [colorPrincipal]="'#111'"
+            >
             </app-report-chart>
           </div>
 
           <!-- Gráfico de participación -->
           <div class="chart-container">
-            <h3 class="chart-title" style="color: #111">Participación por Mercado</h3>
+            <h3 class="chart-title" style="color: #111">
+              Participación por Mercado
+            </h3>
             <div class="chart-info" style="color: #111">
               <span>Distribución porcentual</span>
             </div>
-            <app-report-chart 
-              [datos]="marketChartData()" 
+            <app-report-chart
+              [datos]="marketChartData()"
               [tipo]="'pie'"
               [titulo]="'Participación por Mercado'"
-              [colorPrincipal]="'#111'">
+              [colorPrincipal]="'#111'"
+            >
             </app-report-chart>
           </div>
 
           <!-- Gráfico de tendencias -->
           <div class="chart-container full-width">
-            <h3 class="chart-title" style="color: #111">Tendencias de Recaudación</h3>
+            <h3 class="chart-title" style="color: #111">
+              Tendencias de Recaudación
+            </h3>
             <div class="chart-info" style="color: #111">
               <span>Evolución mensual en Lempiras (L.)</span>
             </div>
-            <app-report-chart 
-              [datos]="trendData()" 
+            <app-report-chart
+              [datos]="trendData()"
               [tipo]="'line'"
               [titulo]="'Tendencias de Recaudación'"
-              [colorPrincipal]="'#111'">
+              [colorPrincipal]="'#111'"
+            >
             </app-report-chart>
           </div>
         </div>
@@ -239,40 +281,54 @@
 
     <!-- Tab 3: Filtros Avanzados -->
     <div *ngIf="currentActiveTab() === 'filters'" class="tab-content-filters">
-      <app-advanced-filters 
-        (filtersChange)="onFiltersChange($event)">
+      <app-advanced-filters (filtersChange)="onFiltersChange($event)">
       </app-advanced-filters>
     </div>
 
     <!-- Tab 4: Datos y Mercados -->
     <div *ngIf="currentActiveTab() === 'data'" class="tab-content-data">
       <div class="data-section glass-panel">
-        <h2 class="section-title">
-          <ion-icon name="layers-outline" color="primary" class="mr-2"></ion-icon>
-          Mercados Registrados
+        <h2 class="section-title" style="font-weight: bold">
+          <ion-icon
+            name="layers-outline"
+            color="primary"
+            class="mr-2"
+          ></ion-icon>
+          <b>Mercados Registrados</b>
         </h2>
-        
         <div class="markets-grid">
-          <div 
-            *ngFor="let mercado of mercadosData()" 
-            class="market-card glass-card">
+          <div
+            *ngFor="let mercado of mercadosReales()"
+            class="market-card glass-card"
+          >
             <div class="market-header">
-              <h3 class="market-name">{{ mercado.nombre_mercado }}</h3>
+              <h3 class="market-name" style="font-weight: bold; color: #111">
+                {{ mercado.nombre_mercado }}
+              </h3>
               <div class="market-stats">
-                <span class="locals-count">{{ mercado.locales_count }} locales</span>
+                <span class="locals-count"
+                  ><b>{{ mercado._count ? mercado._count.locales : 0 }}</b> locales</span
+                >
               </div>
             </div>
             <div class="market-info">
-              <p class="market-address">{{ mercado.direccion }}</p>
+              <p class="market-address"><b>{{ mercado.direccion }}</b></p>
               <div class="market-metrics">
                 <div class="metric">
-                  <span class="metric-label">Recaudación estimada:</span>
-                  <span class="metric-value">{{ formatLempira(mercado.locales_count * 1250.50) }}</span>
+                  <span class="metric-label"><b>Recaudación real:</b></span>
+                  <span class="metric-value"
+                    ><b
+                      >{{ formatLempira(mercado.total_recaudado ?? 0) }}</b
+                    ></span
+                  >
                 </div>
                 <div class="metric">
-                  <span class="metric-label">Estado:</span>
-                  <span class="metric-value" [class]="mercado.locales_count > 0 ? 'active' : 'inactive'">
-                    {{ mercado.locales_count > 0 ? 'Activo' : 'Inactivo' }}
+                  <span class="metric-label"><b>Estado:</b></span>
+                  <span
+                    class="metric-value"
+                    [class]="mercado._count && mercado._count.locales > 0 ? 'active' : 'inactive'"
+                  >
+                    <b>{{ mercado._count && mercado._count.locales > 0 ? 'Activo' : 'Inactivo' }}</b>
                   </span>
                 </div>
               </div>
@@ -280,7 +336,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </app-modern-tabs>
 </ion-content>
