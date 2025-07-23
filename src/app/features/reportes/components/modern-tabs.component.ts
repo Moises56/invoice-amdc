@@ -115,7 +115,7 @@ export interface TabItem {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgb(0,0,0);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -311,7 +311,7 @@ export interface TabItem {
     /* Dark mode support */
     @media (prefers-color-scheme: dark) {
       .glass-tab-nav {
-        background: rgba(0, 0, 0, 0.2);
+        background: rgb(0,0,0);
         border-bottom-color: rgba(255, 255, 255, 0.1);
       }
 

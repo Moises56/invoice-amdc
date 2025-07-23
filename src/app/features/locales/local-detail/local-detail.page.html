@@ -4,10 +4,10 @@
       <ion-back-button [defaultHref]="'/mercados/' + mercadoId()"></ion-back-button>
     </ion-buttons>
     <ion-title style="color:#fff; font-weight:bold;">{{ local()?.numero_local ? `Local ${local()?.numero_local}` : 'Detalle Local' }}</ion-title>    <ion-buttons slot="end">
-      <ion-button (click)="verDetalleCompleto()">
+      <!-- <ion-button (click)="verDetalleCompleto()">
         <ion-icon name="eye-outline"></ion-icon>
         Ver
-      </ion-button>
+      </ion-button> -->
       <ion-button *ngIf="canEditLocal()" (click)="editarLocal()">
         <ion-icon name="create-outline"></ion-icon>
       </ion-button>

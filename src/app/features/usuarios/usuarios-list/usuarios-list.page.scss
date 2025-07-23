@@ -181,127 +181,143 @@
   }
   
   .search-filters {
-    margin-top: 2.5rem; // Más espacio antes de los filtros
+  margin-top: 2.5rem; // Más espacio antes de los filtros
+  
+  ion-searchbar {
+    --background: rgba(255, 255, 255, 0.9);
+    --border-radius: var(--radius-lg);
+    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --color: var(--usuarios-dark);
+    --placeholder-color: var(--usuarios-medium);
+    --placeholder-font-weight: 500;
+    --icon-color: #3b82f6; // Icono de búsqueda azul vibrante
+    --clear-button-color: #6b7280; // Color del botón clear
+    margin-bottom: 2rem; // Más espacio debajo del buscador
+    border: none !important; // Remover borde
+    border-radius: var(--radius-lg);
+    width: 100%; // Ensure full width by default
     
-    ion-searchbar {
+    &:hover {
+      --background: rgba(255, 255, 255, 1);
+      --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      --icon-color: #1d4ed8; // Icono más oscuro en hover
+    }
+    
+    &:focus-within {
+      --box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 6px 20px rgba(0, 0, 0, 0.15);
+      border: none !important; // Remover borde en focus también
+      --icon-color: #1d4ed8; // Icono más oscuro en focus
+    }
+  }
+  
+  .filters-row {
+    display: flex;
+    gap: 1.5rem; // Más espacio entre filtros
+    flex-wrap: wrap;
+    align-items: stretch; // Alinear elementos para misma altura
+    justify-content: flex-start;
+    
+    .filter-item {
       --background: rgba(255, 255, 255, 0.9);
       --border-radius: var(--radius-lg);
       --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      --color: var(--usuarios-dark);
-      --placeholder-color: var(--usuarios-medium);
-      --placeholder-font-weight: 500;
-      --icon-color: #3b82f6; // Icono de búsqueda azul vibrante
-      --clear-button-color: #6b7280; // Color del botón clear
-      margin-bottom: 2rem; // Más espacio debajo del buscador
-      border: none !important; // Remover borde
+      --padding-start: 1.25rem;
+      --padding-end: 1.25rem;
+      --min-height: 56px; // Altura mínima para evitar solapamiento
+      border: 1px solid rgba(226, 232, 240, 0.6);
+      flex: 1;
+      min-width: 200px; // Filtros más anchos
+      margin-bottom: 0.5rem; // Separación vertical entre items
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: var(--radius-lg);
+      overflow: visible; // Permitir que el contenido se vea
+      z-index: 1; // Z-index para evitar solapamiento
       
       &:hover {
         --background: rgba(255, 255, 255, 1);
         --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        --icon-color: #1d4ed8; // Icono más oscuro en hover
+        transform: translateY(-2px);
+        border-color: rgba(59, 130, 246, 0.2);
+        z-index: 2; // Z-index más alto en hover
       }
       
       &:focus-within {
         --box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 6px 20px rgba(0, 0, 0, 0.15);
-        border: none !important; // Remover borde en focus también
-        --icon-color: #1d4ed8; // Icono más oscuro en focus
+        border-color: rgba(59, 130, 246, 0.3);
+        z-index: 3; // Z-index más alto en focus
+      }
+      
+      ion-select {
+        --placeholder-color: var(--usuarios-medium);
+        --color: var(--usuarios-dark);
+        font-weight: 500;
+        min-height: 48px; // Altura mínima del select
+        line-height: 1.4;
+        
+        ion-icon {
+          color: #3b82f6 !important; // Azul vibrante para iconos de select
+        }
+      }
+      
+      // Estilos específicos para el label del ion-item
+      ion-label {
+        position: static !important; // Evitar problemas de posicionamiento
+        transform: none !important;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--usuarios-medium);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
     
-    .filters-row {
-      display: flex;
-      gap: 1.5rem; // Más espacio entre filtros
-      flex-wrap: wrap;
-      align-items: stretch; // Alinear elementos para misma altura
-      justify-content: flex-start;
+    .clear-filters-btn {
+      --background: linear-gradient(135deg, var(--usuarios-warning), #ff6b6b);
+      --color: white;
+      --border-radius: var(--radius-lg);
+      --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0 2rem; // Más padding horizontal
+      height: 52px; // Altura fija para alineación con filtros
+      font-weight: 600;
+      border: none !important; // Remover borde
+      outline: none !important; // Remover outline
+      position: relative; // Para controlar z-index
       
-      .filter-item {
-        --background: rgba(255, 255, 255, 0.9);
-        --border-radius: var(--radius-lg);
-        --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        --padding-start: 1.25rem;
-        --padding-end: 1.25rem;
-        --min-height: 56px; // Altura mínima para evitar solapamiento
-        border: 1px solid rgba(226, 232, 240, 0.6);
-        flex: 1;
-        min-width: 200px; // Filtros más anchos
-        margin-bottom: 0.5rem; // Separación vertical entre items
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: var(--radius-lg);
-        overflow: visible; // Permitir que el contenido se vea
-        z-index: 1; // Z-index para evitar solapamiento
-        
-        &:hover {
-          --background: rgba(255, 255, 255, 1);
-          --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-          transform: translateY(-2px);
-          border-color: rgba(59, 130, 246, 0.2);
-          z-index: 2; // Z-index más alto en hover
-        }
-        
-        &:focus-within {
-          --box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 6px 20px rgba(0, 0, 0, 0.15);
-          border-color: rgba(59, 130, 246, 0.3);
-          z-index: 3; // Z-index más alto en focus
-        }
-        
-        ion-select {
-          --placeholder-color: var(--usuarios-medium);
-          --color: var(--usuarios-dark);
-          font-weight: 500;
-          min-height: 48px; // Altura mínima del select
-          line-height: 1.4;
-          
-          ion-icon {
-            color: #3b82f6 !important; // Azul vibrante para iconos de select
-          }
-        }
-        
-        // Estilos específicos para el label del ion-item
-        ion-label {
-          position: static !important; // Evitar problemas de posicionamiento
-          transform: none !important;
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--usuarios-medium);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+      &:hover {
+        --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(-2px) scale(1.02);
+        z-index: 10; // Z-index alto en hover
       }
       
-      .clear-filters-btn {
-        --background: linear-gradient(135deg, var(--usuarios-warning), #ff6b6b);
-        --color: white;
-        --border-radius: var(--radius-lg);
-        --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 0 2rem; // Más padding horizontal
-        height: 52px; // Altura fija para alineación con filtros
-        font-weight: 600;
-        border: none !important; // Remover borde
-        outline: none !important; // Remover outline
-        position: relative; // Para controlar z-index
-        
-        &:hover {
-          --box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-          transform: translateY(-2px) scale(1.02);
-          z-index: 10; // Z-index alto en hover
-        }
-        
-        ion-icon {
-          font-size: 1.25rem;
-          margin-right: 0.5rem;
-          color: #ffffff; // Color blanco para contraste
-        }
-        
-        &:hover {
-          transform: translateY(-2px);
-          --box-shadow: var(--shadow-lg);
-        }
+      ion-icon {
+        font-size: 1.25rem;
+        margin-right: 0.5rem;
+        color: #ffffff; // Color blanco para contraste
+      }
+      
+      &:hover {
+        transform: translateY(-2px);
+        --box-shadow: var(--shadow-lg);
       }
     }
+  }
+}
+}
+
+@media (max-width: 600px) {
+  .filters-row {
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: -10rem !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .filters-row {
+    margin-top: -10rem;
   }
 }
 
@@ -1075,6 +1091,9 @@ ion-fab-button {
   }
 }
 
+// RESPONSIVE DESIGN WITH ENHANCED MOBILE LAYOUT
+// ==========================================================================
+
 @media (max-width: 576px) {
   .sticky-header {
     padding: 1.25rem 0.75rem; // Padding más compacto en móviles pequeños
@@ -1098,44 +1117,53 @@ ion-fab-button {
     
     .search-filters {
       .filters-row {
-        flex-direction: column;
-        gap: 1rem; // Mantener espacio entre filtros
-        align-items: stretch; // Elementos ocupan todo el ancho
+        flex-direction: column; // Stack filters vertically
+        gap: 1rem; // Maintain spacing between filters
+        align-items: stretch; // Full width for each filter
         
         .filter-item {
-          min-width: 100%;
-          margin-bottom: 0.75rem; // Más separación en móvil
-          --min-height: 52px; // Altura ligeramente mayor en móvil
+          min-width: 100%; // Full width for each filter
+          margin-bottom: 0.75rem; // More separation
+          --min-height: 52px; // Slightly taller for touch
+          --padding-start: 1rem; // Reduce padding
+          --padding-end: 1rem;
         }
         
         .clear-filters-btn {
-          align-self: stretch; // Botón de ancho completo
-          --height: 52px; // Altura cómoda para touch
-          margin-top: 0.5rem; // Separación del último filtro
+          align-self: stretch; // Full width for the button
+          --height: 52px; // Consistent height
+          margin-top: 0.5rem; // Separation from last filter
+          --padding-start: 1.5rem; // Adjust padding
+          --padding-end: 1.5rem;
         }
+      }
+      
+      ion-searchbar {
+        margin-bottom: 1.5rem; // Reduce space below searchbar
+        --padding-start: 1rem; // Adjust padding for mobile
+        --padding-end: 1rem;
       }
     }
   }
   
   .users-page .main-content {
     padding: 0 0.75rem;
-    padding-bottom: 140px; // Más espacio para FAB en móvil
+    padding-bottom: 140px; // More space for FAB
   }
   
   ion-fab {
-    position: fixed !important;
-    bottom: 1.5rem !important; // Posición fija en móvil
+    bottom: 1.5rem !important;
     right: 1.5rem !important;
-    z-index: 1001 !important; // Z-index muy alto
+    z-index: 1001 !important;
   }
   
   ion-fab-button {
-    width: 56px !important; // Tamaño optimizado para móvil
+    width: 56px !important;
     height: 56px !important;
     --box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5) !important;
     
     ion-icon {
-      font-size: 1.75rem !important; // Icono ligeramente más pequeño en móvil
+      font-size: 1.75rem !important;
     }
   }
 }

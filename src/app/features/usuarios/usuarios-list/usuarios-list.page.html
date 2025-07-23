@@ -50,63 +50,115 @@
         </div>
       </div>
 
-    <!-- Buscador y filtros mejorados -->
-    <div class="search-filters">
-      <ion-searchbar 
-        [(ngModel)]="searchTerm"
-        (ionInput)="onSearch($event)"
-        placeholder="🔍 Buscar por nombre, email, usuario..."
-        debounce="500"
-        show-clear-button="focus">
-      </ion-searchbar>
-      
-      <div class="filters-row">
-        <ion-item class="filter-item">
-          <ion-select 
-            [(ngModel)]="selectedRole"
-            (ionChange)="onRoleChange($event)"
-            placeholder="👥 Filtrar por Rol"
-            interface="popover">
-            <ion-select-option value="">Todos los roles</ion-select-option>
-            <ion-select-option [value]="Role.ADMIN">🛡️ Administrador</ion-select-option>
-            <ion-select-option [value]="Role.MARKET">🏪 Gerente de Mercado</ion-select-option>
-            <ion-select-option [value]="Role.USER">👤 Usuario</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item class="filter-item">
-          <ion-select 
-            [(ngModel)]="selectedStatus"
-            (ionChange)="onStatusChange($event)"
-            placeholder="⚡ Filtrar por Estado"
-            interface="popover">
-            <ion-select-option value="">Todos los estados</ion-select-option>
-            <ion-select-option [value]="true">✅ Activos</ion-select-option>
-            <ion-select-option [value]="false">❌ Inactivos</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item class="filter-item" *ngIf="availableGerencias().length > 0">
-          <ion-select 
-            [(ngModel)]="selectedGerencia"
-            (ionChange)="onGerenciaChange($event)"
-            placeholder="🏢 Filtrar por Gerencia"
-            interface="popover">
-            <ion-select-option value="">Todas las gerencias</ion-select-option>
-            <ion-select-option [value]="gerencia" *ngFor="let gerencia of availableGerencias()">{{ gerencia }}</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-button 
-          fill="clear" 
-          (click)="clearFilters()"
-          class="clear-filters-btn"
-          title="Limpiar todos los filtros">
-          <ion-icon name="refresh-outline"></ion-icon>
-          <span>Limpiar</span>
-        </ion-button>
-      </div>
-    </div>
+    <!-- Buscador y filtros juntos, barra moderna sobre la tabla -->
+    <!-- Eliminado: barra de filtros y buscador fuera de la tabla, solo queda la integrada en la tabla -->
+  <style>
+    /* Modern responsive toolbar for search/filters */
+    .table-toolbar.table-toolbar-inside {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      background: #fff;
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 1rem 1.5rem 0.5rem 1.5rem;
+      margin-bottom: 1.2rem;
+    }
+    .searchbar-table-wrapper {
+      flex: 1 1 220px;
+      min-width: 180px;
+      max-width: 350px;
+    }
+    .table-searchbar {
+      --border-radius: 0.5rem;
+      --box-shadow: none;
+      --background: #f4f6fb;
+      --color: #222;
+      --placeholder-color: #888;
+      font-size: 1rem;
+    }
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      align-items: center;
+    }
+    .filter-item {
+      --background: #f4f6fb;
+      --border-radius: 0.5rem;
+      --padding-start: 0.5rem;
+      --padding-end: 0.5rem;
+      min-width: 120px;
+      max-width: 180px;
+      font-size: 0.98rem;
+    }
+    .clear-filters-btn {
+      --border-radius: 0.5rem;
+      font-size: 0.98rem;
+      margin-left: 0.5rem;
+    }
+    @media (max-width: 900px) {
+      .table-toolbar.table-toolbar-inside {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.7rem 0.7rem 0.5rem 0.7rem;
+        gap: 0.7rem;
+      }
+      .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+      }
+      .searchbar-table-wrapper {
+        max-width: 100%;
+      }
+    }
+    @media (max-width: 600px) {
+      .table-toolbar.table-toolbar-inside {
+        border-radius: 0.28rem;
+        box-shadow: none;
+        padding: 0.05rem 0.02rem 0.02rem 0.02rem;
+        margin-bottom: 0;
+        gap: 0.02rem;
+      }
+      .searchbar-table-wrapper {
+        min-width: 0;
+        max-width: 100%;
+        margin-bottom: 0;
+        padding: 0;
+      }
+      .filters-row {
+        gap: 0;
+        margin: 0;
+        padding: 0;
+        margin-top: -2px;
+      }
+      .table-toolbar.table-toolbar-inside {
+        gap: 0.08rem;
+      }
+      .filter-item {
+        min-width: 0;
+        max-width: 100%;
+        --border-radius: 0.28rem;
+        font-size: 0.97rem;
+        margin-bottom: 0;
+        padding: 0;
+      }
+      .clear-filters-btn {
+        margin-left: 0;
+        width: 100%;
+        --border-radius: 0.28rem;
+        font-size: 0.97rem;
+        margin-bottom: 0;
+        padding: 0;
+      }
+      .table-searchbar {
+        --border-radius: 0.28rem;
+        font-size: 0.97rem;
+      }
+    }
+  </style>
   </div>
 
   <div class="main-content">
@@ -129,11 +181,65 @@
   <!-- Lista de usuarios -->
   <div *ngIf="!loading()" class="users-content">
     
+    <!-- Barra de búsqueda y filtros siempre visible (responsive) -->
+    <div class="table-toolbar table-toolbar-inside">
+      <div class="searchbar-table-wrapper">
+        <ion-searchbar
+          [(ngModel)]="searchTerm"
+          (ionInput)="onSearch($event)"
+          placeholder="Buscar usuario, email..."
+          debounce="400"
+          show-clear-button="focus"
+          class="table-searchbar"
+          mode="md"
+        >
+        </ion-searchbar>
+      </div>
+      <div class="filters-row">
+        <ion-item class="filter-item">
+          <ion-select 
+            [(ngModel)]="selectedRole"
+            (ionChange)="onRoleChange($event)"
+            placeholder="👥 Rol"
+            interface="popover">
+            <ion-select-option value="">Todos los roles</ion-select-option>
+            <ion-select-option [value]="Role.ADMIN">🛡️ Administrador</ion-select-option>
+            <ion-select-option [value]="Role.MARKET">🏪 Gerente de Mercado</ion-select-option>
+            <ion-select-option [value]="Role.USER">👤 Usuario</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item class="filter-item">
+          <ion-select 
+            [(ngModel)]="selectedStatus"
+            (ionChange)="onStatusChange($event)"
+            placeholder="⚡ Estado"
+            interface="popover">
+            <ion-select-option value="">Todos los estados</ion-select-option>
+            <ion-select-option [value]="true">✅ Activos</ion-select-option>
+            <ion-select-option [value]="false">❌ Inactivos</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item class="filter-item" *ngIf="availableGerencias().length > 0">
+          <ion-select 
+            [(ngModel)]="selectedGerencia"
+            (ionChange)="onGerenciaChange($event)"
+            placeholder="🏢 Gerencia"
+            interface="popover">
+            <ion-select-option value="">Todas las gerencias</ion-select-option>
+            <ion-select-option [value]="gerencia" *ngFor="let gerencia of availableGerencias()">{{ gerencia }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-button fill="clear" (click)="clearFilters()" class="clear-filters-btn" title="Limpiar filtros">
+          <ion-icon name="refresh-outline"></ion-icon>
+          <span>Limpiar</span>
+        </ion-button>
+      </div>
+    </div>
     <!-- Tabla para Desktop -->
     <div class="desktop-table">
       <div class="modern-table-wrapper">
-        
-        <!-- Barra de herramientas superior mejorada -->
+        <!-- ...existing code... -->
+        <!-- Barra de herramientas superior para selección múltiple -->
         <div class="table-toolbar" *ngIf="selectedUsers().size > 0">
           <div class="selection-info">
             <ion-icon name="checkmark-circle" color="light"></ion-icon>
