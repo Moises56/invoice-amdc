@@ -15,7 +15,77 @@
   </ion-header>
 
   <div class="ion-padding">
-    <p>Aquí se mostrará el estado de cuenta con amnistía del usuario.</p>
-    <!-- El contenido detallado se implementará más adelante -->
+    <ion-item>
+      <ion-input label="Clave Catastral" labelPlacement="stacked" [(ngModel)]="claveCatastral" (ionChange)="consultarEstadoCuenta()"></ion-input>
+    </ion-item>
+
+    <div *ngIf="isLoading()" class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+
+    <div *ngIf="!isLoading() && estadoCuenta() as data">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ data.nombre }}</ion-card-title>
+          <ion-card-subtitle>{{ data.identidad }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Clave Catastral:</strong> {{ data.claveCatastral }}</p>
+          <p><strong>Colonia:</strong> {{ data.colonia }}</p>
+          <p><strong>Fecha:</strong> {{ data.fecha }} - {{ data.hora }}</p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="data.amnistiaVigente">
+        <ion-card-header color="success">
+          <ion-card-title>Amnistía Vigente</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Aproveche la amnistía hasta el: <strong>{{ data.fechaFinAmnistia }}</strong></p>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Detalle de la Mora</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Año</th>
+                  <th>Impuesto</th>
+                  <th>Tren de Aseo</th>
+                  <th>Bomberos</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let detalle of data.detallesMora">
+                  <td>{{ detalle.year }}</td>
+                  <td>{{ detalle.impuesto }}</td>
+                  <td>{{ detalle.trenDeAseo }}</td>
+                  <td>{{ detalle.tasaBomberos }}</td>
+                  <td><strong>{{ detalle.total }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ion-item lines="none" class="total-general">
+            <ion-label>Total General</ion-label>
+            <ion-note slot="end">{{ data.totalGeneral }}</ion-note>
+          </ion-item>
+        </ion-card-content>
+      </ion-card>
+      <div class="ion-padding ion-text-center">
+        <ion-button color="primary"
+          (click)="imprimirRecibo()"
+          [disabled]="isLoading() || !estadoCuenta()">
+          <ion-icon name="print-outline" slot="start"></ion-icon>
+          Imprimir recibo
+        </ion-button>
+      </div>
+    </div>
   </div>
 </ion-content>

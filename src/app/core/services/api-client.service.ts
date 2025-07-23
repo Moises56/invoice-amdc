@@ -7,17 +7,17 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class ApiClientService {
-  private readonly apiUrl = environment.apiUrl;
+  private readonly apiUrlE = environment.apiUrlE;
 
   constructor(private http: HttpClient) { }
 
   get<T>(path: string, params: HttpParams = new HttpParams()): Observable<T> {
-    return this.http.get<T>(`${this.apiUrl}${path}`, { params, withCredentials: true });
+    return this.http.get<T>(`${this.apiUrlE}${path}`, { params, withCredentials: true });
   }
 
   post<T>(path: string, body: object = {}): Observable<T> {
     return this.http.post<T>(
-      `${this.apiUrl}${path}`,
+      `${this.apiUrlE}${path}`,
       JSON.stringify(body),
       { headers: this.getHeaders(), withCredentials: true }
     );
@@ -25,14 +25,14 @@ export class ApiClientService {
 
   put<T>(path: string, body: object = {}): Observable<T> {
     return this.http.put<T>(
-      `${this.apiUrl}${path}`,
+      `${this.apiUrlE}${path}`,
       JSON.stringify(body),
       { headers: this.getHeaders(), withCredentials: true }
     );
   }
 
   delete<T>(path: string): Observable<T> {
-    return this.http.delete<T>(`${this.apiUrl}${path}`, { headers: this.getHeaders(), withCredentials: true });
+    return this.http.delete<T>(`${this.apiUrlE}${path}`, { headers: this.getHeaders(), withCredentials: true });
   }
 
   private getHeaders(): HttpHeaders {

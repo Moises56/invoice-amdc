@@ -13,6 +13,7 @@ export interface User {
   role: Role;
   username: string;
   isActive: boolean;
+  claveCatastral?: string;
   // UI compatibility properties
   name?: string;
   email?: string;

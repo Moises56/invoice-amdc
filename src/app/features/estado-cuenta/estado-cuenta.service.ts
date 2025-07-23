@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ApiClientService } from 'src/app/core/services/api-client.service';
 import { Observable } from 'rxjs';
+import { EstadoCuentaResponse } from 'src/app/shared/interfaces/estado-cuenta.interface';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -9,15 +11,13 @@ export class EstadoCuentaService {
 
   constructor(private apiClient: ApiClientService) { }
 
-  // Ejemplo de cómo se podría obtener el estado de cuenta
-  getEstadoDeCuenta(): Observable<any> {
-    // Este endpoint es un ejemplo y deberá ser reemplazado por el real
-    return this.apiClient.get('/estado-de-cuenta');
+  getEstadoDeCuenta(claveCatastral: string): Observable<EstadoCuentaResponse> {
+    const params = new HttpParams().set('claveCatastral', claveCatastral);
+    return this.apiClient.get<EstadoCuentaResponse>('/estado-cuenta', params);
   }
 
-  // Ejemplo para el estado de cuenta con amnistía
-  getEstadoDeCuentaConAmnistia(): Observable<any> {
-    // Este endpoint es un ejemplo y deberá ser reemplazado por el real
-    return this.apiClient.get('/estado-de-cuenta/amnistia');
+  getEstadoDeCuentaConAmnistia(claveCatastral: string): Observable<EstadoCuentaResponse> {
+    const params = new HttpParams().set('claveCatastral', claveCatastral);
+    return this.apiClient.get<EstadoCuentaResponse>('/estado-cuenta/con-amnistia', params);
   }
 }
