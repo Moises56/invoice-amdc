@@ -1,9 +1,9 @@
-<ion-header>
-  <ion-toolbar class="municipal-toolbar">
+<ion-header style="background:#5ccedf;">
+  <ion-toolbar class="municipal-toolbar" style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/usuarios"></ion-back-button>
     </ion-buttons>
-    <ion-title>
+    <ion-title style="color:#fff; font-weight:bold;">
       {{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}
     </ion-title>
     <ion-buttons slot="end">

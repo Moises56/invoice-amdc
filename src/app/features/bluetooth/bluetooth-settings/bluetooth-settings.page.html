@@ -1,9 +1,9 @@
-<ion-header [translucent]="true" class="custom-header">
-  <ion-toolbar color="primary">
+<ion-header class="custom-header" style="background:#5ccedf;">
+  <ion-toolbar style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/tab3"></ion-back-button>
     </ion-buttons>
-    <ion-title>Configurar Impresora</ion-title>
+    <ion-title style="color:#fff; font-weight:bold;">Configurar Impresora</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -160,24 +160,7 @@
           </div>
         </div>
         <div class="setting-control">
-          <ion-toggle class="glass-toggle"></ion-toggle>
-        </div>
-      </div>
-
-      <div class="setting-item">
-        <div class="setting-info">
-          <div class="setting-icon">
-            <ion-icon name="cog"></ion-icon>
-          </div>
-          <div>
-            <h4 class="setting-title">Configuración Avanzada</h4>
-            <p class="setting-description">Ajustes adicionales de impresión</p>
-          </div>
-        </div>
-        <div class="setting-control">
-          <button class="glass-button config-button">
-            <ion-icon name="chevron-forward"></ion-icon>
-          </button>
+          <ion-toggle class="glass-toggle" [checked]="autoReconnect" (ionChange)="onAutoReconnectToggle($event)"></ion-toggle>
         </div>
       </div>
     </div>

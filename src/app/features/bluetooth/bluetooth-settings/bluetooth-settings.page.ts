@@ -56,6 +56,7 @@ import {
 export class BluetoothSettingsPage implements OnInit {
   defaultPrinter: BluetoothDevice | null = null;
   connectionStatus$: Observable<boolean>;
+  autoReconnect = false;
 
   constructor(
     private bluetoothService: BluetoothService,
@@ -64,7 +65,6 @@ export class BluetoothSettingsPage implements OnInit {
     private toastCtrl: ToastController
   ) {
     this.connectionStatus$ = this.bluetoothService.checkConnectionStatus();
-    
     // Add icons
     addIcons({
       printOutline,
@@ -83,7 +83,14 @@ export class BluetoothSettingsPage implements OnInit {
   }
 
   async ngOnInit() {
+    // Cargar preferencia de reconexión automática
+    const saved = localStorage.getItem('auto_reconnect_printer');
+    this.autoReconnect = saved === 'true';
     this.defaultPrinter = await this.bluetoothService.getDefaultPrinter();
+    // Si está activada la reconexión automática y hay impresora guardada, reconectar
+    if (this.autoReconnect && this.defaultPrinter) {
+      this.connectAndTest(this.defaultPrinter);
+    }
   }
 
   async openDeviceList() {
@@ -149,5 +156,10 @@ export class BluetoothSettingsPage implements OnInit {
       position: 'bottom',
     });
     toast.present();
+  }
+
+  onAutoReconnectToggle(event: CustomEvent) {
+    this.autoReconnect = event.detail.checked;
+    localStorage.setItem('auto_reconnect_printer', this.autoReconnect ? 'true' : 'false');
   }
 }

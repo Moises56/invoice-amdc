@@ -9,7 +9,7 @@ import{u as o}from"./chunk-WYTV4Y2I.js";var h=(()=>{let a=class a{constructor(){
 `,r+=`Clave Catastral: ${t.claveCatastral}
 
 `,r+=this.normalizeText("Fecha y Ubicaci\xF3n")+`
-`,r+=`Colonia: ${t.colonia}
+`,r+=`Colonia: ${t.nombreColonia}
 `,r+=`Fecha: ${t.fecha} ${t.hora}
 
 `,r+=this.createLine()+`
@@ -25,7 +25,7 @@ import{u as o}from"./chunk-WYTV4Y2I.js";var h=(()=>{let a=class a{constructor(){
 `,r+=this.normalizeText("Para mayor informaci\xF3n llamar al 2220-6088")+`
 `,r+=`RECUERDA QUE EL PAGO DE BIENES INMUEBLES
 `,r+=`VENCE EL 31 DE AGOSTO DEL 2025
-`,r}normalizeText(t){let r={\u00E1:"\xA0",\u00E9:"\x82",\u00ED:"\xA1",\u00F3:"\xA2",\u00FA:"\xA3",\u00C1:"\xB5",\u00C9:"\x90",\u00CD:"\xD6",\u00D3:"\xE0",\u00DA:"\xE9",\u00F1:"\xA4",\u00D1:"\xA5",\u00FC:"\x81",\u00DC:"\x9A"};return t.replace(/[áéíóúÁÉÍÓÚñÑüÜ]/g,e=>r[e]||e)}removeAccents(t){let r={\u00E1:"a",\u00E9:"e",\u00ED:"i",\u00F3:"o",\u00FA:"u",\u00C1:"A",\u00C9:"E",\u00CD:"I",\u00D3:"O",\u00DA:"U",\u00F1:"n",\u00D1:"N",\u00FC:"u",\u00DC:"U"};return t.replace(/[áéíóúÁÉÍÓÚñÑüÜ]/g,e=>r[e]||e)}formatCurrencyWithSeparators(t){return t.toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2})}centerText(t,r=48){let e=Math.floor((r-t.length)/2);return" ".repeat(e)+t}createLine(t=48){return"-".repeat(t)}createRow(t,r=[5,11,10,10,12]){let e="";return t.forEach((i,c)=>{e+=i.padEnd(r[c])}),e}alignRight(t,r=48){return t.padStart(r)}formatCurrency(t){return t.toFixed(2)}formatInvoiceForPrinting(t){let r="";return r+=this.centerText("RECIBO DE FACTURA")+`
+`,r}normalizeText(t){let r={\u00E1:"\xA0",\u00E9:"\x82",\u00ED:"\xA1",\u00F3:"\xA2",\u00FA:"\xA3",\u00C1:"\xB5",\u00C9:"\x90",\u00CD:"\xD6",\u00D3:"\xE0",\u00DA:"\xE9",\u00F1:"\xA4",\u00D1:"\xA5",\u00FC:"\x81",\u00DC:"\x9A"};return t.replace(/[áéíóúÁÉÍÓÚñÑüÜ]/g,e=>r[e]||e)}removeAccents(t){let r={\u00E1:"a",\u00E9:"e",\u00ED:"i",\u00F3:"o",\u00FA:"u",\u00C1:"A",\u00C9:"E",\u00CD:"I",\u00D3:"O",\u00DA:"U",\u00F1:"n",\u00D1:"N",\u00FC:"u",\u00DC:"U"};return t.replace(/[áéíóúÁÉÍÓÚñÑüÜ]/g,e=>r[e]||e)}formatCurrencyWithSeparators(t){return t.toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2})}centerText(t,r=48){let e=Math.floor((r-t.length)/2);return" ".repeat(e)+t}createLine(t=48){return"-".repeat(t)}createRow(t,r=[5,11,10,10,12]){let e="";return t.forEach((i,s)=>{e+=i.padEnd(r[s])}),e}alignRight(t,r=48){return t.padStart(r)}formatCurrency(t){return t.toFixed(2)}formatInvoiceForPrinting(t){let r="";return r+=this.centerText("RECIBO DE FACTURA")+`
 `,r+=`Cliente: ${t.cliente||""}
 `,r+=`Fecha: ${t.fecha||""}
 `,r+=this.createLine()+`

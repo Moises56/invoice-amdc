@@ -1,9 +1,9 @@
-<ion-header>
-  <ion-toolbar color="primary">
+<ion-header style="background:#5ccedf;">
+  <ion-toolbar style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);" color="primary">
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="'/mercados/' + mercadoId()"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ local()?.numero_local ? `Local ${local()?.numero_local}` : 'Detalle Local' }}</ion-title>    <ion-buttons slot="end">
+    <ion-title style="color:#fff; font-weight:bold;">{{ local()?.numero_local ? `Local ${local()?.numero_local}` : 'Detalle Local' }}</ion-title>    <ion-buttons slot="end">
       <ion-button (click)="verDetalleCompleto()">
         <ion-icon name="eye-outline"></ion-icon>
         Ver

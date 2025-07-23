@@ -1,10 +1,10 @@
-<ion-header [translucent]="true">
-  <ion-toolbar class="reports-toolbar">
+<ion-header style="background:#5ccedf;">
+  <ion-toolbar class="reports-toolbar" style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
     <ion-buttons slot="start">
       <ion-back-button color="dark" defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
 
-    <ion-title class="text-white font-semibold"> Centro de Reportes </ion-title>
+    <ion-title class="text-white font-semibold" style="color:#fff; font-weight:bold;"> Centro de Reportes </ion-title>
 
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="refresh()" [disabled]="isLoading()">
