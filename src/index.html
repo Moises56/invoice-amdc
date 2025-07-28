@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Fact-AMDC</title>
+  <title>Factus-AMDC</title>
 
   <base href="/" />
 
@@ -12,15 +12,29 @@
   <meta name="format-detection" content="telephone=no" />
   <meta name="msapplication-tap-highlight" content="no" />
 
-  <link rel="icon" type="image/png" href="assets/icon/favicon.ico" />
+  <link rel="icon" type="image/png" href="assets/icon/favicon.png" />
 
   <!-- add to homescreen for ios -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 </head>
 
-<body>
+
+  <!-- Splash Screen Web (se oculta al cargar Angular) -->
+  <div id="web-splash" style="position:fixed;z-index:99999;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;transition:opacity 0.4s;">
+    <img src="assets/icon/splash.png" alt="Splash" style="max-width:60vw;max-height:60vh;border-radius:16px;box-shadow:0 4px 24px #0002;" />
+  </div>
   <app-root></app-root>
+  <script>
+    // Oculta el splash cuando Angular termina de cargar
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        var splash = document.getElementById('web-splash');
+        if(splash) splash.style.opacity = '0';
+        setTimeout(function(){ if(splash) splash.remove(); }, 400);
+      }, 400); // Puedes ajustar el tiempo si lo ves muy rápido o lento
+    });
+  </script>
 </body>
 
 </html>

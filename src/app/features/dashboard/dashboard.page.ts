@@ -474,7 +474,7 @@ export class DashboardPage implements OnInit {
         icon: 'storefront-outline',
         color: 'secondary',
         route: '/locales',
-        roles: [Role.ADMIN, Role.MARKET, Role.USER]
+        roles: [Role.ADMIN, Role.MARKET]
       },
       {
         title: 'Facturas',
@@ -483,7 +483,7 @@ export class DashboardPage implements OnInit {
         icon: 'receipt-outline',
         color: 'warning',
         route: '/facturas',
-        roles: [Role.ADMIN, Role.MARKET, Role.USER]
+        roles: [Role.ADMIN, Role.MARKET]
       },
       {
         title: 'Usuarios',

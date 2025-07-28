@@ -1,19 +1,418 @@
 /* Estilos para la página de Estado de Cuenta con Amnistía */
 
+// Fondo principal
+.estado-cuenta-amnistia-bg {
+  background: linear-gradient(135deg, #f8fcfd 0%, #e8f7f9 50%, #d4f1f5 100%);
+  min-height: 100vh;
+  padding: 25px;
+}
+
+// Contenedor principal
+.estado-cuenta-container {
+  padding: 25px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Tarjeta principal con efecto glass
+.glass-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(25px);
+  border-radius: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 15px 45px rgba(92, 206, 223, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+  padding: 35px;
+  margin-bottom: 25px;
+  transition: all 0.4s ease;
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 60px rgba(92, 206, 223, 0.15), 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: rgba(92, 206, 223, 0.4);
+  }
+}
+
+// Estilos para el componente de búsqueda
+.search-form {
+  .search-summary {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    
+    ion-chip {
+      --background: rgba(92, 206, 223, 0.25);
+      --color: #2c3e50;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 12px 20px;
+      border-radius: 25px;
+      border: 2px solid rgba(92, 206, 223, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      
+      &:hover {
+        --background: rgba(92, 206, 223, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(92, 206, 223, 0.2);
+      }
+      
+      ion-icon {
+        margin-right: 10px;
+        font-weight: 900;
+        font-size: 1.2rem;
+        color: #5ccedf;
+      }
+    }
+  }
+}
+
+.search-error {
+  margin-top: 20px;
+  
+  ion-item {
+    --background: rgba(231, 76, 60, 0.2);
+    --border-radius: 18px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    margin-bottom: 0;
+    border: 3px solid rgba(231, 76, 60, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    
+    &:hover {
+      --background: rgba(231, 76, 60, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(231, 76, 60, 0.2);
+    }
+    
+    ion-icon {
+      margin-right: 12px;
+      color: #e74c3c;
+      font-size: 1.3rem;
+      font-weight: 900;
+    }
+    
+    ion-label {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      font-weight: 900;
+      color: #2c3e50;
+    }
+  }
+}
+
 ion-card {
-  margin: 16px;
-  padding: 16px;
+  margin: 25px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  border: 3px solid rgba(92, 206, 223, 0.3);
+  box-shadow: 0 10px 35px rgba(92, 206, 223, 0.15);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 45px rgba(92, 206, 223, 0.2);
+    border-color: rgba(92, 206, 223, 0.5);
+  }
 }
 
 ion-card-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--ion-color-primary);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .amnesty-info {
-  background-color: var(--ion-color-tertiary-tint);
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 16px;
+  background: rgba(92, 206, 223, 0.2);
+  border-radius: 20px;
+  padding: 25px;
+  margin-top: 25px;
+  border: 3px solid rgba(92, 206, 223, 0.4);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(92, 206, 223, 0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(92, 206, 223, 0.2);
+  }
+  
+  h3 {
+    color: #2c3e50;
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+  }
+  
+  p {
+    color: #5ccedf;
+    font-weight: 900;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(92, 206, 223, 0.3);
+  }
+  
+  ion-icon {
+    color: #5ccedf;
+    font-size: 1.7rem;
+    font-weight: 900;
+    filter: drop-shadow(0 2px 4px rgba(92, 206, 223, 0.3));
+  }
+}
+
+// Estilos para la tarjeta de detalle (igual que el estándar)
+.detail-card {
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #2c3e50;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    ion-button {
+      --border-width: 2px;
+      --border-color: #5ccedf;
+      --color: #5ccedf;
+      --background: rgba(92, 206, 223, 0.1);
+      font-weight: 900;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        --background: rgba(92, 206, 223, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(92, 206, 223, 0.3);
+      }
+      
+      ion-icon {
+        font-weight: 900;
+      }
+    }
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(92, 206, 223, 0.1);
+    
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      
+      th {
+        background: linear-gradient(135deg, #5ccedf 0%, #4fb3c7 100%);
+        color: white;
+        padding: 15px 12px;
+        text-align: left;
+        font-weight: 900;
+        font-size: 0.95rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        
+        &:first-child {
+          border-top-left-radius: 15px;
+        }
+        
+        &:last-child {
+          border-top-right-radius: 15px;
+        }
+      }
+      
+      .detail-row {
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(92, 206, 223, 0.1);
+          transform: scale(1.01);
+        }
+        
+        td {
+          padding: 12px;
+          border-bottom: 1px solid rgba(92, 206, 223, 0.2);
+          font-weight: 600;
+          color: #2c3e50;
+          
+          &.year-cell {
+            font-weight: 900;
+            color: #5ccedf;
+            text-shadow: 0 1px 2px rgba(92, 206, 223, 0.3);
+          }
+          
+          &.total-cell {
+            font-weight: 900;
+            color: #2c3e50;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+      
+      .total-row {
+        background: linear-gradient(135deg, rgba(92, 206, 223, 0.2) 0%, rgba(92, 206, 223, 0.1) 100%);
+        
+        td {
+          padding: 15px 12px;
+          font-weight: 900;
+          color: #2c3e50;
+          border-bottom: none;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          
+          &:first-child {
+            border-bottom-left-radius: 15px;
+          }
+          
+          &:last-child {
+            border-bottom-right-radius: 15px;
+            color: #5ccedf;
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .estado-cuenta-amnistia-bg {
+    padding: 20px;
+  }
+  
+  .estado-cuenta-container {
+    padding: 20px;
+  }
+  
+  .glass-card {
+    padding: 25px;
+    margin-bottom: 20px;
+  }
+  
+  .search-form {
+    .search-summary {
+      ion-chip {
+        font-size: 1rem;
+        font-weight: 900;
+        padding: 10px 16px;
+        
+        ion-icon {
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+  
+  .search-error {
+    ion-item {
+      ion-label {
+        font-size: 1rem;
+        font-weight: 900;
+      }
+      
+      ion-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+  
+  .detail-card {
+    .detail-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 15px;
+      
+      h3 {
+        font-size: 1.4rem;
+        text-align: center;
+      }
+      
+      ion-button {
+        width: 100%;
+        margin: 0;
+      }
+    }
+    
+    .table-container {
+      .detail-table {
+        font-size: 0.85rem;
+        
+        th {
+          padding: 10px 8px;
+          font-size: 0.8rem;
+        }
+        
+        .detail-row td {
+          padding: 8px 6px;
+        }
+        
+        .total-row td {
+          padding: 12px 8px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-card {
+    .table-container {
+      .detail-table {
+        font-size: 0.75rem;
+        
+        th {
+          padding: 8px 4px;
+          font-size: 0.7rem;
+        }
+        
+        .detail-row td {
+          padding: 6px 4px;
+        }
+        
+        .total-row td {
+          padding: 10px 6px;
+          
+          &:last-child {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+  
+  ion-card {
+    margin: 16px;
+    padding: 20px;
+  }
+  
+  ion-card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .amnesty-info {
+    padding: 16px;
+    
+    h3 {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    
+    p {
+       font-size: 0.9rem;
+       font-weight: bold;
+     }
+   }
 }

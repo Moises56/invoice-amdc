@@ -1,0 +1,241 @@
+.search-container {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.search-type-selector {
+  margin-bottom: 1rem;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(92, 206, 223, 0.2);
+  border: 2px solid rgba(92, 206, 223, 0.3);
+  
+  ion-segment-button {
+    --color: #5ccedf;
+    --color-checked: #ffffff;
+    --background: rgba(255, 255, 255, 0.1);
+    --background-checked: #5ccedf;
+    --border-radius: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    
+    &:hover {
+      --background: rgba(92, 206, 223, 0.1);
+    }
+    
+    &.segment-button-checked {
+      --background-checked: #5ccedf;
+      --color-checked: #ffffff;
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(92, 206, 223, 0.3);
+      
+      ion-label {
+        color: #ffffff !important;
+        font-weight: 900;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      
+      ion-icon {
+        color: #ffffff !important;
+        font-weight: 900;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        transform: scale(1.1);
+      }
+    }
+    
+    ion-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #5ccedf;
+      transition: all 0.3s ease;
+    }
+    
+    ion-icon {
+      margin-top: 6px;
+      font-size: 1.3rem;
+      color: #5ccedf;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 4px rgba(92, 206, 223, 0.3));
+    }
+  }
+}
+
+.search-input-container {
+  position: relative;
+}
+
+.search-item {
+  --background: var(--ion-color-light);
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 60px;
+  border: 2px solid transparent;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  
+  &:not(.error) {
+    &:hover {
+      --background: var(--ion-color-light-shade);
+      border-color: var(--ion-color-primary-tint);
+    }
+    
+    &.item-has-focus {
+      border-color: var(--ion-color-primary);
+      box-shadow: 0 0 0 3px rgba(var(--ion-color-primary-rgb), 0.1);
+    }
+  }
+  
+  &.error {
+    border-color: var(--ion-color-danger);
+    --background: rgba(var(--ion-color-danger-rgb), 0.05);
+    
+    ion-label {
+      color: var(--ion-color-danger);
+    }
+  }
+  
+  ion-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: var(--ion-color-dark);
+  }
+  
+  ion-input {
+    --color: var(--ion-color-dark);
+    font-size: 1rem;
+    
+    &.error-input {
+      --color: var(--ion-color-danger);
+    }
+  }
+  
+  ion-button {
+    --color: var(--ion-color-medium);
+    
+    &:hover {
+      --color: var(--ion-color-danger);
+    }
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  
+  ion-icon {
+    color: var(--ion-color-danger);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  
+  span {
+    color: var(--ion-color-danger);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+}
+
+.help-info {
+  padding: 8px 16px;
+  
+  ion-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    
+    ion-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    
+    span {
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .search-type-selector {
+    margin-bottom: 1.2rem;
+    border-radius: 12px;
+    
+    ion-segment-button {
+      &.segment-button-checked {
+        transform: scale(1.01);
+        
+        ion-label {
+          font-weight: 900;
+        }
+        
+        ion-icon {
+          transform: scale(1.05);
+        }
+      }
+      
+      ion-label {
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+      
+      ion-icon {
+        font-size: 1.2rem;
+        margin-top: 4px;
+      }
+    }
+  }
+  
+  .search-item {
+    --min-height: 58px;
+    --padding-start: 14px;
+    --padding-end: 14px;
+    --border-radius: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-type-selector {
+    ion-segment-button {
+      ion-label {
+        font-size: 0.85rem;
+      }
+      
+      ion-icon {
+        font-size: 1.1rem;
+        margin-top: 3px;
+      }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .search-item {
+    --background: var(--ion-color-dark-tint);
+    
+    &:not(.error):hover {
+      --background: var(--ion-color-dark-shade);
+    }
+    
+    ion-label {
+      color: var(--ion-color-light);
+    }
+    
+    ion-input {
+      --color: var(--ion-color-light);
+    }
+  }
+  
+  .error-message {
+    background: rgba(var(--ion-color-danger-rgb), 0.2);
+  }
+}

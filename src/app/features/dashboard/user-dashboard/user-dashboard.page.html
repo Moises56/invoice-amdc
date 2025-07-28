@@ -1,55 +1,54 @@
-<ion-header style="background:#5ccedf;">
-  <ion-toolbar style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
+
+<ion-header class="modern-header">
+  <ion-toolbar class="modern-toolbar">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title style="color:#fff; font-weight:bold;">Mi Dashboard</ion-title>
+    <ion-title class="modern-title">Mi Dashboard</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Bienvenido</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="dashboard-bg">
+  <div class="dashboard-hero glass-card">
+    <div class="dashboard-hero-inner">
+      <img src="assets/logos/logoAmdc.png" alt="Logo" class="dashboard-avatar" />
+      <div class="dashboard-hero-text">
+        <h2 class="dashboard-saludo">¡Bienvenido!</h2>
+        <p class="dashboard-nombre ">{{ userName || 'Usuario' }}</p>
+      </div>
+    </div>
+  </div>
 
-  <ion-grid>
-    <ion-row>
-      <ion-col size="6">
-        <ion-card button="true" (click)="goTo('/estado-cuenta')">
-          <ion-card-header>
-            <ion-icon name="document-text-outline" size="large" color="primary"></ion-icon>
-            <ion-card-title>Estado de Cuenta</ion-card-title>
-          </ion-card-header>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6">
-        <ion-card button="true" (click)="goTo('/estado-cuenta-amnistia')">
-          <ion-card-header>
-            <ion-icon name="shield-checkmark-outline" size="large" color="secondary"></ion-icon>
-            <ion-card-title>Cuenta con Amnistía</ion-card-title>
-          </ion-card-header>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col size="6">
-        <ion-card button="true" (click)="goTo('/bluetooth')">
-          <ion-card-header>
-            <ion-icon name="bluetooth-outline" size="large" color="tertiary"></ion-icon>
-            <ion-card-title>Bluetooth</ion-card-title>
-          </ion-card-header>
-        </ion-card>
-      </ion-col>
-      <ion-col size="6">
-        <ion-card button="true" (click)="goTo('/perfil')">
-          <ion-card-header>
-            <ion-icon name="person-circle-outline" size="large" color="success"></ion-icon>
-            <ion-card-title>Mi Perfil</ion-card-title>
-          </ion-card-header>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div class="dashboard-cards dashboard-cards-compact">
+    <div class="dashboard-card glass-card" (click)="goTo('/estado-cuenta')">
+      <ion-icon name="document-text-outline" size="large" color="primary"></ion-icon>
+      <div>
+        <div class="dashboard-card-title">Estado de Cuenta</div>
+        <div class="dashboard-card-desc">Consulta tu estado de cuenta actualizado.</div>
+      </div>
+    </div>
+    <div class="dashboard-card glass-card" (click)="goTo('/estado-cuenta-amnistia')">
+      <ion-icon name="shield-checkmark-outline" size="large" color="secondary"></ion-icon>
+      <div>
+        <div class="dashboard-card-title">Cuenta con Amnistía</div>
+        <div class="dashboard-card-desc">Verifica si tienes amnistía disponible.</div>
+      </div>
+    </div>
+    <div class="dashboard-card glass-card" (click)="goTo('/bluetooth')">
+      <ion-icon name="bluetooth-outline" size="large" color="tertiary"></ion-icon>
+      <div>
+        <div class="dashboard-card-title">Bluetooth</div>
+        <div class="dashboard-card-desc">Configura tu impresora Bluetooth.</div>
+      </div>
+    </div>
+    <div class="dashboard-card glass-card" (click)="goTo('/perfil')">
+      <ion-icon name="person-outline" size="large" color="success"></ion-icon>
+      <div>
+        <div class="dashboard-card-title">Mi Perfil</div>
+        <div class="dashboard-card-desc">Edita tus datos personales y de acceso.</div>
+      </div>
+    </div>
+  </div>
 </ion-content>
+
+

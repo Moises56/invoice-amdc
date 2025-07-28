@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.example.invoiceamdc',
-  appName: 'Invoice-amdc',
+  appId: 'com.example.factusamdc',
+  appName: 'Factus-Amdc',
   webDir: 'www',
   server: {
     androidScheme: 'https'

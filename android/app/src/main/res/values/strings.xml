@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Invoice-amdc</string>
-    <string name="title_activity_main">Invoice-amdc</string>
-    <string name="package_name">com.example.invoiceamdc</string>
-    <string name="custom_url_scheme">com.example.invoiceamdc</string>
+    <string name="app_name">Factus-amdc</string>
+    <string name="title_activity_main">Factus-amdc</string>
+    <string name="package_name">com.example.factusamdc</string>
+    <string name="custom_url_scheme">com.example.factusamdc</string>
 </resources>

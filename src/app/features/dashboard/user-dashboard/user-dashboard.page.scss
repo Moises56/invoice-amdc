@@ -15,3 +15,124 @@ ion-card-title {
 ion-icon {
   font-size: 48px;
 }
+
+// <style>
+.dashboard-bg {
+  --background: linear-gradient(135deg, #e0f7fa 0%, #f8fafc 100%) !important;
+  background: linear-gradient(135deg, #e0f7fa 0%, #f8fafc 100%) !important;
+}
+.modern-header, .modern-toolbar {
+  background: linear-gradient(90deg, #5ccedf 60%, #A4C9F5 100%) !important;
+  box-shadow: 0 2px 12px #5ccedf33;
+}
+.modern-title {
+  color: #222;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+.dashboard-hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+  border-radius: 1.2rem;
+  margin: 1.2rem auto 1.2rem auto;
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 4px 24px #5ccedf22;
+  max-width: 420px;
+}
+.dashboard-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.dashboard-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  border: 2.5px solid #5ccedf;
+  box-shadow: 0 2px 8px #5ccedf33;
+  margin-bottom: 0.7rem;
+}
+.dashboard-hero-text {
+  text-align: center;
+}
+.dashboard-saludo {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #2ca0b8;
+}
+.dashboard-nombre {
+  margin: 0;
+  font-size: 0.98rem;
+  color: #08090a;
+  font-weight: 500;
+}
+.dashboard-cards-compact {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.7rem;
+  padding: 0 1.2rem 2rem 1.2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 0.3rem 0.7rem 0.3rem;
+  border-radius: 1rem;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 2px 12px #5ccedf22;
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  min-height: 110px;
+  text-align: center;
+  max-width: 220px;
+  margin: 0 auto;
+}
+.dashboard-card:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 32px #5ccedf33;
+}
+.dashboard-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2ca0b8;
+}
+.dashboard-card-desc {
+  font-size: 0.88rem;
+  color: #495057;
+  opacity: 0.85;
+}
+@media (max-width: 900px) {
+  .dashboard-cards-compact {
+    grid-template-columns: 1fr 1fr;
+    max-width: 600px;
+  }
+}
+@media (max-width: 600px) {
+  .dashboard-hero {
+    max-width: 98vw;
+    padding: 1rem 0.2rem 1rem 0.2rem;
+    margin: 1rem 0.2rem 1rem 0.2rem;
+  }
+  .dashboard-cards-compact {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 0.5rem 1.5rem 0.5rem;
+    max-width: 98vw;
+  }
+  .dashboard-card {
+    min-height: 110px;
+    max-width: 98vw;
+  }
+}
+// </style>

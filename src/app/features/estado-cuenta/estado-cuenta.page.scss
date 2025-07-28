@@ -1,23 +1,691 @@
 /* Estilos para la página de Estado de Cuenta */
 
-ion-card {
-  margin: 16px;
-  padding: 16px;
+.estado-cuenta-bg {
+  --background: linear-gradient(135deg, #f8fdfe 0%, #e8f8fb 100%);
+  background: linear-gradient(135deg, #f8fdfe 0%, #e8f8fb 100%);
+  min-height: 100vh;
 }
 
-ion-card-title {
-  font-size: 1.2rem;
-  font-weight: bold;
+.estado-cuenta-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.summary-item {
+// Estilos para las tarjetas con efecto glass
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 25px;
+  border: 3px solid rgba(92, 206, 223, 0.4);
+  box-shadow: 0 15px 50px rgba(92, 206, 223, 0.15), 0 5px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 25px;
+  padding: 30px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 70px rgba(92, 206, 223, 0.25), 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-color: rgba(92, 206, 223, 0.7);
+    background: rgba(255, 255, 255, 0.98);
+  }
+}
+
+// Estilos para el componente de búsqueda
+.search-form {
+  .search-summary {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    
+    ion-chip {
+      --background: rgba(92, 206, 223, 0.2);
+      --color: #2c3e50;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 12px 20px;
+      border: 3px solid rgba(92, 206, 223, 0.5);
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      
+      &:hover {
+        --background: rgba(92, 206, 223, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(92, 206, 223, 0.3);
+        border-color: rgba(92, 206, 223, 0.8);
+      }
+      
+      ion-icon {
+        margin-right: 10px;
+        font-weight: 900;
+        font-size: 1.2rem;
+        color: #5ccedf;
+      }
+      
+      ion-label {
+        font-weight: 900;
+        color: #2c3e50;
+      }
+    }
+  }
+  
+  .search-error {
+    margin-top: 20px;
+    
+    ion-item {
+      --background: rgba(231, 76, 60, 0.15);
+      --border-radius: 15px;
+      --padding-start: 20px;
+      --padding-end: 20px;
+      margin-bottom: 0;
+      border: 3px solid rgba(231, 76, 60, 0.4);
+      transition: all 0.3s ease;
+      
+      &:hover {
+        --background: rgba(231, 76, 60, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(231, 76, 60, 0.2);
+      }
+      
+      ion-icon {
+        margin-right: 12px;
+        color: #e74c3c;
+        font-size: 1.3rem;
+        font-weight: 900;
+      }
+      
+      ion-label {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        font-weight: 900;
+        color: #2c3e50;
+      }
+    }
+  }
+}
+
+// Loading container
+.loading-container {
+  padding: 60px 25px;
+  
+  ion-spinner {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 25px;
+    --color: #5ccedf;
+  }
+  
+  p {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    margin: 0;
+    font-weight: 900;
+  }
+}
+
+// Tarjeta de información personal
+.info-card {
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    
+    .avatar {
+      margin-right: 25px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.1) rotate(5deg);
+      }
+      
+      ion-icon {
+        font-size: 4rem;
+        color: #5ccedf;
+        font-weight: 900;
+        filter: drop-shadow(0 4px 8px rgba(92, 206, 223, 0.3));
+      }
+    }
+    
+    .info {
+      flex: 1;
+      
+      h2 {
+        margin: 0 0 8px 0;
+        font-size: 1.7rem;
+        font-weight: 900;
+        color: #2c3e50;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      p {
+        margin: 0;
+        color: #5ccedf;
+        font-size: 1.2rem;
+        font-weight: 900;
+      }
+    }
+  }
+  
+  .card-content {
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      
+      .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+        padding: 18px;
+        background: rgba(92, 206, 223, 0.08);
+        border-radius: 18px;
+        border: 2px solid rgba(92, 206, 223, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        
+        &:hover {
+          background: rgba(92, 206, 223, 0.15);
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(92, 206, 223, 0.2);
+          border-color: rgba(92, 206, 223, 0.5);
+        }
+        
+        ion-icon {
+          font-size: 1.6rem;
+          margin-top: 4px;
+          flex-shrink: 0;
+          font-weight: 900;
+          color: #5ccedf;
+          filter: drop-shadow(0 2px 4px rgba(92, 206, 223, 0.3));
+        }
+        
+        div {
+          strong {
+            display: block;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-weight: 900;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          }
+          
+          p {
+            margin: 0;
+            color: #5ccedf;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-shadow: 0 1px 2px rgba(92, 206, 223, 0.3);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Tarjeta de resumen
+.summary-card {
+  .summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #2c3e50;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .total-amount {
+      text-align: right;
+      padding: 18px 25px;
+      background: rgba(92, 206, 223, 0.15);
+      border-radius: 20px;
+      border: 3px solid rgba(92, 206, 223, 0.4);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      
+      &:hover {
+        background: rgba(92, 206, 223, 0.25);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(92, 206, 223, 0.3);
+        border-color: rgba(92, 206, 223, 0.6);
+      }
+      
+      .label {
+        display: block;
+        font-size: 1rem;
+        color: #5ccedf;
+        margin-bottom: 8px;
+        font-weight: 900;
+        text-shadow: 0 1px 2px rgba(92, 206, 223, 0.3);
+      }
+      
+      .amount {
+        display: block;
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #2c3e50;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+  
+  .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 20px;
+      background: rgba(92, 206, 223, 0.1);
+      border-radius: 20px;
+      border: 3px solid rgba(92, 206, 223, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      
+      &:hover {
+        background: rgba(92, 206, 223, 0.18);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(92, 206, 223, 0.2);
+        border-color: rgba(92, 206, 223, 0.5);
+      }
+      
+      ion-icon {
+        font-size: 1.8rem;
+        color: #5ccedf;
+        font-weight: 900;
+        filter: drop-shadow(0 3px 6px rgba(92, 206, 223, 0.3));
+      }
+      
+      div {
+        .number {
+          display: block;
+          font-size: 1.4rem;
+          font-weight: 900;
+          color: #2c3e50;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .label {
+          display: block;
+          font-size: 1rem;
+          color: #5ccedf;
+          font-weight: 900;
+          text-shadow: 0 1px 2px rgba(92, 206, 223, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// Tarjeta de detalle
+.detail-card {
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #2c3e50;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    ion-button {
+      --border-width: 2px;
+      --border-color: #5ccedf;
+      --color: #5ccedf;
+      --background: rgba(92, 206, 223, 0.1);
+      font-weight: 900;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        --background: rgba(92, 206, 223, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(92, 206, 223, 0.3);
+      }
+      
+      ion-icon {
+        font-weight: 900;
+      }
+    }
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(92, 206, 223, 0.1);
+    
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      
+      th {
+        background: linear-gradient(135deg, #5ccedf 0%, #4fb3c7 100%);
+        color: white;
+        padding: 15px 12px;
+        text-align: left;
+        font-weight: 900;
+        font-size: 0.95rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        
+        &:first-child {
+          border-top-left-radius: 15px;
+        }
+        
+        &:last-child {
+          border-top-right-radius: 15px;
+        }
+      }
+      
+      .detail-row {
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(92, 206, 223, 0.1);
+          transform: scale(1.01);
+        }
+        
+        td {
+          padding: 12px;
+          border-bottom: 1px solid rgba(92, 206, 223, 0.2);
+          font-weight: 600;
+          color: #2c3e50;
+          
+          &.year-cell {
+            font-weight: 900;
+            color: #5ccedf;
+            text-shadow: 0 1px 2px rgba(92, 206, 223, 0.3);
+          }
+            
+            &.total-cell {
+             font-weight: 900;
+             color: #2c3e50;
+             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+           }
+         }
+       }
+       
+       .total-row {
+         background: linear-gradient(135deg, rgba(92, 206, 223, 0.2) 0%, rgba(92, 206, 223, 0.1) 100%);
+         
+         td {
+           padding: 15px 12px;
+           font-weight: 900;
+           color: #2c3e50;
+           border-bottom: none;
+           text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+           
+           &:first-child {
+             border-bottom-left-radius: 15px;
+           }
+           
+           &:last-child {
+             border-bottom-right-radius: 15px;
+             color: #5ccedf;
+             font-size: 1.1rem;
+           }
+         }
+       }
+    }
+  }
+}
+
+// Footer de información
+.info-footer {
+  ion-text {
+    p {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.5;
+      font-weight: bold;
+      color: #5ccedf;
+      
+      ion-icon {
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        color: #5ccedf;
+      }
+    }
+  }
+}
+
+// Estado vacío
+.empty-state {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--ion-color-step-150, #d7d8da);
+  min-height: 350px;
+  
+  .empty-content {
+    text-align: center;
+    max-width: 450px;
+    padding: 30px;
+    background: rgba(92, 206, 223, 0.05);
+    border-radius: 20px;
+    border: 2px solid rgba(92, 206, 223, 0.2);
+    
+    ion-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      color: #5ccedf;
+    }
+    
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    
+    p {
+      margin: 0;
+      color: #5ccedf;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-weight: bold;
+    }
+  }
 }
 
-.summary-item:last-child {
-  border-bottom: none;
+// Responsive design
+@media (max-width: 768px) {
+  .estado-cuenta-container {
+    padding: 16px;
+  }
+  
+  .glass-card {
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .info-card {
+    .card-header {
+      .info {
+        h2 {
+          font-size: 1.3rem;
+          font-weight: bold;
+        }
+      }
+    }
+    
+    .card-content {
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+  }
+  
+  .summary-card {
+    .summary-header {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      .total-amount {
+        text-align: left;
+        width: 100%;
+        font-weight: bold;
+      }
+    }
+    
+    .summary-stats {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .detail-card {
+    .detail-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 15px;
+      
+      h3 {
+        font-size: 1.4rem;
+        text-align: center;
+      }
+      
+      ion-button {
+        width: 100%;
+        margin: 0;
+      }
+    }
+    
+    .table-container {
+      .detail-table {
+        font-size: 0.85rem;
+        
+        th {
+          padding: 10px 8px;
+          font-size: 0.8rem;
+        }
+        
+        .detail-row td {
+          padding: 8px 6px;
+        }
+        
+        .total-row td {
+          padding: 12px 8px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-card {
+    .table-container {
+      .detail-table {
+        font-size: 0.75rem;
+        
+        th {
+          padding: 8px 4px;
+          font-size: 0.7rem;
+        }
+        
+        .detail-row td {
+          padding: 6px 4px;
+        }
+        
+        .total-row td {
+          padding: 10px 6px;
+          
+          &:last-child {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+  
+  .empty-state {
+    .empty-content {
+      padding: 20px;
+      
+      ion-icon {
+        font-size: 4rem;
+      }
+      
+      h3 {
+        font-size: 1.3rem;
+      }
+      
+      p {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .glass-card {
+    background: rgba(30, 30, 30, 0.95);
+    border: 2px solid rgba(92, 206, 223, 0.3);
+  }
+  
+  .info-card {
+    .card-header {
+      .info {
+        h2 {
+          color: #5ccedf;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  
+  .summary-card, .detail-card {
+    h3 {
+      color: #5ccedf;
+      font-weight: bold;
+    }
+  }
+  
+  .detail-card {
+    .table-container {
+      border-color: rgba(92, 206, 223, 0.3);
+      
+      .detail-table {
+        tbody {
+          .detail-row {
+            border-bottom-color: rgba(92, 206, 223, 0.2);
+            
+            &:hover {
+              background: rgba(92, 206, 223, 0.1);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .empty-state {
+    .empty-content {
+      h3 {
+        color: var(--ion-color-light);
+      }
+    }
+  }
 }

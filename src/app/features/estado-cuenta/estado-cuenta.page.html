@@ -7,15 +7,136 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="estado-cuenta-bg">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Estado de Cuenta</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div class="ion-padding">
-    <p>Aquí se mostrará el estado de cuenta del usuario.</p>
-    <!-- El contenido detallado se implementará más adelante -->
+  <div class="estado-cuenta-container">
+    <!-- Formulario de búsqueda -->
+    <div class="search-form glass-card">
+      <app-search-input
+        (search)="onSearch($event)"
+        (clear)="onClearSearch()"
+        [disabled]="isLoading()"
+        placeholder="Buscar estado de cuenta...">
+      </app-search-input>
+      
+      <!-- Mostrar resumen de búsqueda -->
+      <div *ngIf="lastSearchParams" class="search-summary">
+        <ion-chip color="primary" outline="true">
+          <ion-icon name="search-outline"></ion-icon>
+          <ion-label>{{ getSearchSummary() }}</ion-label>
+        </ion-chip>
+      </div>
+      
+      <!-- Mostrar errores de búsqueda -->
+      <div *ngIf="searchError()" class="search-error">
+        <ion-item color="danger" lines="none">
+          <ion-icon name="alert-circle" slot="start"></ion-icon>
+          <ion-label class="ion-text-wrap">{{ searchError() }}</ion-label>
+        </ion-item>
+      </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading()" class="ion-text-center loading-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Consultando estado de cuenta...</p>
+    </div>
+
+    <!-- Resultados del estado de cuenta -->
+    <div *ngIf="!isLoading() && estadoCuenta() as data">
+      <!-- Tarjeta principal con toda la información -->
+      <div class="info-card glass-card unified-info-card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem 2rem;">
+        <div style="flex-shrink:0;">
+          <div style="width:56px;height:56px;background:#6ee0f7;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <ion-icon name="person-circle-outline" style="font-size:2.5rem;color:#fff;"></ion-icon>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:1.3rem;font-weight:700;color:#3ec6e0;line-height:1.1;">{{ data.nombre }}</div>
+          <div style="font-size:1rem;color:#3ec6e0;font-weight:600;">{{ data.identidad }}</div>
+          <div style="margin-top:1rem;">
+            <span style="font-weight:600;color:#222;">Clave Catastral:</span> <span style="color:#3ec6e0;font-weight:600;">{{ data.claveCatastral }}</span>
+            <br>
+            <span style="font-weight:600;color:#222;">Colonia:</span> <span style="color:#3ec6e0;font-weight:600;">{{ data.nombreColonia }}</span>
+            <br>
+            <span style="font-weight:600;color:#222;">Fecha:</span> <span style="color:#3ec6e0;font-weight:600;">{{ data.fecha }} - {{ data.hora }}</span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Detalle de mora -->
+      <div class="detail-card glass-card">
+        <div class="detail-header">
+          <h3>Detalle de Mora</h3>
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="imprimirRecibo()"
+            [disabled]="isLoading()">
+            <ion-icon name="print-outline" slot="start"></ion-icon>
+            Imprimir
+          </ion-button>
+        </div>
+        
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="detail-table">
+              <thead>
+                <tr>
+                  <th>Año</th>
+                  <th>Impuesto</th>
+                  <th>T. Aseo</th>
+                  <th>Bomberos</th>
+                  <th>Recargo</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let detalle of data.detallesMora" class="detail-row">
+                  <td class="year-cell">{{ detalle.year }}</td>
+                  <td>{{ formatCurrency(detalle.impuestoNumerico) }}</td>
+                  <td>{{ formatCurrency(detalle.trenDeAseoNumerico) }}</td>
+                  <td>{{ formatCurrency(detalle.tasaBomberosNumerico) }}</td>
+                  <td>{{ formatCurrency(detalle.recargoNumerico) }}</td>
+                  <td class="total-cell">{{ formatCurrency(detalle.totalNumerico) }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="5"><strong>TOTAL GENERAL</strong></td>
+                  <td class="total-cell"><strong>{{ formatCurrency(data.totalGeneralNumerico) }}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="info-footer glass-card">
+        <ion-text color="medium">
+          <p class="ion-text-center">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Los datos mostrados están actualizados al momento de la consulta.
+            Para mayor información, contacte a la Gerencia de Recaudación.
+          </p>
+        </ion-text>
+      </div>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!isLoading() && !estadoCuenta() && !searchError()" class="empty-state">
+      <div class="empty-content">
+        <ion-icon name="search-outline" color="medium"></ion-icon>
+        <h3>Consultar Estado de Cuenta</h3>
+        <p>Utilice el formulario de búsqueda para consultar el estado de cuenta por Clave Catastral o DNI.</p>
+      </div>
+    </div>
   </div>
 </ion-content>

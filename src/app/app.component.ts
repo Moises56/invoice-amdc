@@ -78,15 +78,20 @@ export class AppComponent implements OnInit {
     { title: 'Dashboard', url: '/dashboard', icon: 'stats-chart-outline' },
     { title: 'Usuarios', url: '/usuarios', icon: 'people-outline' },
     { title: 'Mercados', url: '/mercados', icon: 'business-outline' },
+    { title: 'Locales', url: '/locales', icon: 'storefront-outline' },
+    { title: 'Facturas', url: '/facturas', icon: 'receipt-outline' },
     { title: 'Reportes', url: '/reportes', icon: 'document-attach-outline' },
     { title: 'Auditoría', url: '/auditoria', icon: 'analytics-outline' },
+    { title: 'Config. Bluetooth', url: '/bluetooth', icon: 'bluetooth-outline' },
   ];
 
   private marketMenu: MenuItem[] = [
     { title: 'Dashboard', url: '/dashboard', icon: 'stats-chart-outline' },
+    { title: 'Mercados', url: '/mercados', icon: 'business-outline' },
     { title: 'Locales', url: '/locales', icon: 'storefront-outline' },
     { title: 'Facturas', url: '/facturas', icon: 'receipt-outline' },
     { title: 'Reportes', url: '/reportes', icon: 'document-attach-outline' },
+    { title: 'Config. Bluetooth', url: '/bluetooth', icon: 'bluetooth-outline' },
   ];
 
   private userMenu: MenuItem[] = [

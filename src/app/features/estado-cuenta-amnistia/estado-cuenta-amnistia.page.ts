@@ -1,19 +1,20 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ToastController } from '@ionic/angular';
-import { EstadoCuentaService } from '../estado-cuenta/estado-cuenta.service';
+import { EstadoCuentaService, SearchParams } from '../estado-cuenta/estado-cuenta.service';
 import { EstadoCuentaResponse } from 'src/app/shared/interfaces/estado-cuenta.interface';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { PrintingService } from 'src/app/shared/services/printing.service';
 import { BluetoothService } from '../bluetooth/bluetooth.service';
+import { SearchInputComponent } from 'src/app/shared/components/search-input/search-input.component';
 
 @Component({
   selector: 'app-estado-cuenta-amnistia',
   templateUrl: './estado-cuenta-amnistia.page.html',
   styleUrls: ['./estado-cuenta-amnistia.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, SearchInputComponent]
 })
 export class EstadoCuentaAmnistiaPage implements OnInit {
   private estadoCuentaService = inject(EstadoCuentaService);
@@ -22,39 +23,62 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
   private printingService = inject(PrintingService);
   private bluetoothService = inject(BluetoothService);
 
+// Signals
   estadoCuenta = signal<EstadoCuentaResponse | null>(null);
   isLoading = signal<boolean>(false);
-  claveCatastral = signal<string>('');
+  lastSearchParams: SearchParams | undefined = undefined;
+  searchError = signal<string>('');
 
   constructor() { }
 
   ngOnInit() {
-    const user = this.authService.user();
-    if (user && user.claveCatastral) {
-      this.claveCatastral.set(user.claveCatastral);
-      this.consultarEstadoCuenta();
-    }
+    // Inicialización automática removida para permitir búsqueda manual
+    // El usuario ahora debe usar el componente de búsqueda
   }
 
-  consultarEstadoCuenta() {
-    const clave = this.claveCatastral();
-    if (!clave) {
-      this.presentToast('Por favor, ingrese una clave catastral.', 'warning');
+  onSearch(searchParams: SearchParams) {
+    if (!searchParams.claveCatastral && !searchParams.dni) {
+      this.presentToast('Por favor, ingrese un valor de búsqueda.', 'warning');
       return;
     }
 
     this.isLoading.set(true);
-    this.estadoCuentaService.getEstadoDeCuentaConAmnistia(clave).subscribe({
+    this.searchError.set('');
+    this.lastSearchParams = searchParams;
+
+    this.estadoCuentaService.getEstadoDeCuentaConAmnistiaBySearch(searchParams).subscribe({
       next: (data) => {
         this.estadoCuenta.set(data);
         this.isLoading.set(false);
+        this.presentToast('Estado de cuenta consultado exitosamente.', 'success');
       },
       error: (err) => {
-        console.error(err);
+        console.error('Error al consultar estado de cuenta:', err);
         this.isLoading.set(false);
-        this.presentToast('Error al consultar el estado de cuenta.', 'danger');
+        this.estadoCuenta.set(null);
+        
+        // Manejo específico de errores
+        if (err.status === 404) {
+          this.searchError.set('No se encontraron datos para los parámetros de búsqueda proporcionados.');
+          this.presentToast('No se encontraron datos.', 'warning');
+        } else if (err.status === 400) {
+          this.searchError.set('Parámetros de búsqueda inválidos. Verifique los datos ingresados.');
+          this.presentToast('Datos de búsqueda inválidos.', 'danger');
+        } else if (err.status === 500) {
+          this.searchError.set('Error interno del servidor. Intente nuevamente más tarde.');
+          this.presentToast('Error del servidor. Intente más tarde.', 'danger');
+        } else {
+          this.searchError.set('Error al consultar el estado de cuenta. Verifique su conexión.');
+          this.presentToast('Error al consultar el estado de cuenta.', 'danger');
+        }
       }
     });
+  }
+
+  onClearSearch() {
+    this.estadoCuenta.set(null);
+    this.searchError.set('');
+    this.lastSearchParams = undefined;
   }
 
   async presentToast(message: string, color: 'success' | 'danger' | 'warning') {
@@ -76,16 +100,34 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
 
     const isConnected = await this.bluetoothService.isConnected();
     if (!isConnected) {
-      this.presentToast('No hay ninguna impresora conectada.', 'danger');
+      this.presentToast('No hay ninguna impresora conectada. Configure la impresora en Configuración > Bluetooth.', 'danger');
       return;
     }
 
     try {
-      const receiptText = this.printingService.formatEstadoCuenta(data);
+      this.presentToast('Preparando impresión...', 'success');
+      const receiptText = this.printingService.formatEstadoCuenta(
+        data, 
+        this.lastSearchParams, 
+        true // isAmnesty = true para estado-cuenta-amnistia
+      );
       await this.bluetoothService.print(receiptText);
-      this.presentToast('Imprimiendo recibo...', 'success');
+      this.presentToast('Recibo con amnistía enviado a la impresora exitosamente.', 'success');
     } catch (error) {
-      this.presentToast('Error al imprimir el recibo.', 'danger');
+      console.error('Error al imprimir:', error);
+      this.presentToast('Error al imprimir el recibo. Verifique la conexión de la impresora.', 'danger');
     }
+  }
+
+  getSearchSummary(): string {
+    const params = this.lastSearchParams;
+    if (!params) return '';
+    
+    if (params.claveCatastral) {
+      return `Clave Catastral: ${params.claveCatastral}`;
+    } else if (params.dni) {
+      return `DNI: ${params.dni}`;
+    }
+    return '';
   }
 }

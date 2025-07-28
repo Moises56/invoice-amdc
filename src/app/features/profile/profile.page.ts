@@ -32,8 +32,7 @@ import {
   phonePortraitOutline,
   locationOutline,
   keyOutline,
-  arrowBackOutline
-} from 'ionicons/icons';
+  arrowBackOutline, createOutline, closeOutline } from 'ionicons/icons';
 
 import { AuthService } from '../../core/services/auth.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
@@ -53,10 +52,6 @@ import { User } from '../../core/interfaces';
     IonButtons,
     IonButton,
     IonIcon,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonItem,
     IonLabel,    IonInput,
     IonTextarea,
@@ -67,6 +62,7 @@ import { User } from '../../core/interfaces';
   ]
 })
 export class ProfilePage implements OnInit {
+  editMode = false;
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
   private usuariosService = inject(UsuariosService);
@@ -82,15 +78,7 @@ export class ProfilePage implements OnInit {
   passwordForm: FormGroup;
 
   constructor() {
-    addIcons({
-      saveOutline,
-      personOutline,
-      mailOutline,
-      phonePortraitOutline,
-      locationOutline,
-      keyOutline,
-      arrowBackOutline
-    });
+    addIcons({createOutline,closeOutline,personOutline,saveOutline,keyOutline,mailOutline,phonePortraitOutline,locationOutline,arrowBackOutline});
 
     this.profileForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -106,6 +94,32 @@ export class ProfilePage implements OnInit {
 
   ngOnInit() {
     this.loadProfile();
+    // Forzar que el formulario siempre muestre los datos actuales del usuario
+    const user = this.currentUser();
+    if (user) {
+      this.profileForm.patchValue({
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        address: user.address || ''
+      });
+    }
+  }
+
+  cancelEdit() {
+    this.editMode = false;
+    // Restaurar los valores originales del usuario en el formulario
+    const user = this.currentUser();
+    if (user) {
+      this.profileForm.patchValue({
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        address: user.address || ''
+      });
+    }
+    this.profileForm.markAsPristine();
+    this.profileForm.markAsUntouched();
   }
 
   /**
@@ -113,16 +127,23 @@ export class ProfilePage implements OnInit {
    */
   async loadProfile() {
     this.isLoading.set(true);
-    
     try {
       const user = this.authService.user();
       if (user) {
-        this.currentUser.set(user);
+        // Map backend fields to UI fields if needed
+        const mappedUser = {
+          ...user,
+          name: user.name || (user.nombre ? `${user.nombre} ${user.apellido || ''}`.trim() : ''),
+          email: user.email || user.correo || '',
+          phone: user.phone || user.telefono || '',
+          address: user.address || '',
+        };
+        this.currentUser.set(mappedUser);
         this.profileForm.patchValue({
-          name: user.name,
-          email: user.email,
-          phone: user.phone || '',
-          address: user.address || ''
+          name: mappedUser.name,
+          email: mappedUser.email,
+          phone: mappedUser.phone,
+          address: mappedUser.address
         });
       }
     } catch (error) {
@@ -137,6 +158,7 @@ export class ProfilePage implements OnInit {
    */
   async updateProfile() {
     if (this.profileForm.valid) {
+      this.editMode = false;
       const loading = await this.loadingController.create({
         message: 'Actualizando perfil...'
       });
