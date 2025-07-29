@@ -1,8 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { EstadoCuentaService, SearchParams } from './estado-cuenta.service';
-import { EstadoCuentaResponse } from 'src/app/shared/interfaces/estado-cuenta.interface';
+import { 
+  EstadoCuentaResponse, 
+  ConsultaECResponseNueva, 
+  ConsultaParams,
+  OpcionesImpresion,
+  PropiedadDto 
+} from 'src/app/shared/interfaces/estado-cuenta.interface';
 import { FormsModule } from '@angular/forms';
 import { PrintingService } from 'src/app/shared/services/printing.service';
 import { BluetoothService } from '../bluetooth/bluetooth.service';
@@ -18,13 +24,25 @@ import { SearchInputComponent } from 'src/app/shared/components/search-input/sea
 export class EstadoCuentaPage implements OnInit {
   private estadoCuentaService = inject(EstadoCuentaService);
   private toastController = inject(ToastController);
+  private alertController = inject(AlertController);
   private printingService = inject(PrintingService);
   private bluetoothService = inject(BluetoothService);
 
+  // Datos de respuesta unificada
+  consultaResponse = signal<ConsultaECResponseNueva | null>(null);
+  
+  // Compatibilidad con formato legacy
   estadoCuenta = signal<EstadoCuentaResponse | null>(null);
+  
+  // Estados de la aplicación
   isLoading = signal<boolean>(false);
   lastSearchParams: SearchParams | undefined = undefined;
   searchError = signal<string>('');
+  
+  // Configuración de vista
+  mostrarMultiplesPropiedades = signal<boolean>(false);
+  propiedadSeleccionada = signal<PropiedadDto | null>(null);
+  indicePropiedadSeleccionada = signal<number>(0);
 
   constructor() { }
 
@@ -41,17 +59,28 @@ export class EstadoCuentaPage implements OnInit {
     this.isLoading.set(true);
     this.searchError.set('');
     this.lastSearchParams = searchParams;
+    this.limpiarDatos();
 
-    this.estadoCuentaService.getEstadoDeCuentaBySearch(searchParams).subscribe({
-      next: (data) => {
-        this.estadoCuenta.set(data);
+    const consultaParams: ConsultaParams = {
+      conAmnistia: false
+    };
+
+    if (searchParams.claveCatastral) {
+      consultaParams.claveCatastral = searchParams.claveCatastral;
+    } else if (searchParams.dni) {
+      consultaParams.dni = searchParams.dni;
+    }
+
+    this.estadoCuentaService.consultarEstadoCuenta(consultaParams).subscribe({
+      next: (response) => {
+        this.procesarRespuestaConsulta(response);
         this.isLoading.set(false);
         this.presentToast('Estado de cuenta consultado exitosamente.', 'success');
       },
       error: (err) => {
         console.error('Error al consultar estado de cuenta:', err);
         this.isLoading.set(false);
-        this.estadoCuenta.set(null);
+        this.limpiarDatos();
         
         // Manejo específico de errores
         if (err.status === 404) {
@@ -71,10 +100,49 @@ export class EstadoCuentaPage implements OnInit {
     });
   }
 
-  onClearSearch() {
+  private procesarRespuestaConsulta(response: ConsultaECResponseNueva) {
+    this.consultaResponse.set(response);
+    
+    if (response.tipoConsulta === 'dni' && response.propiedades && response.propiedades.length > 0) {
+      // Consulta por DNI - múltiples propiedades
+      this.mostrarMultiplesPropiedades.set(true);
+      this.propiedadSeleccionada.set(response.propiedades[0]);
+      this.indicePropiedadSeleccionada.set(0);
+      
+      // Generar formato legacy para la primera propiedad
+      this.estadoCuenta.set(this.estadoCuentaService.convertirAFormatoLegacy(response, 0));
+    } else {
+      // Consulta por clave catastral - individual
+      this.mostrarMultiplesPropiedades.set(false);
+      this.propiedadSeleccionada.set(null);
+      
+      // Generar formato legacy
+      this.estadoCuenta.set(this.estadoCuentaService.convertirAFormatoLegacy(response));
+    }
+  }
+
+  private limpiarDatos() {
+    this.consultaResponse.set(null);
     this.estadoCuenta.set(null);
+    this.mostrarMultiplesPropiedades.set(false);
+    this.propiedadSeleccionada.set(null);
+    this.indicePropiedadSeleccionada.set(0);
+  }
+
+  onClearSearch() {
+    this.limpiarDatos();
     this.searchError.set('');
     this.lastSearchParams = undefined;
+  }
+
+  seleccionarPropiedad(propiedad: PropiedadDto, index: number) {
+    this.propiedadSeleccionada.set(propiedad);
+    this.indicePropiedadSeleccionada.set(index);
+    
+    const response = this.consultaResponse();
+    if (response) {
+      this.estadoCuenta.set(this.estadoCuentaService.convertirAFormatoLegacy(response, index));
+    }
   }
 
   async presentToast(message: string, color: 'success' | 'danger' | 'warning') {
@@ -85,6 +153,107 @@ export class EstadoCuentaPage implements OnInit {
       position: 'top'
     });
     toast.present();
+  }
+
+  async mostrarOpcionesImpresion() {
+    const response = this.consultaResponse();
+    if (!response) return;
+
+    if (response.tipoConsulta === 'dni' && response.propiedades) {
+      // Para consultas por DNI, mostrar opciones de impresión
+      const alert = await this.alertController.create({
+        header: 'Opciones de Impresión',
+        message: 'Seleccione el tipo de impresión que desea realizar:',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Imprimir Individual',
+            handler: () => {
+              this.imprimirIndividual();
+            }
+          },
+          {
+            text: 'Imprimir Grupal',
+            handler: () => {
+              this.imprimirGrupal();
+            }
+          }
+        ]
+      });
+      await alert.present();
+    } else {
+      // Para consultas por clave catastral, imprimir directamente
+      this.imprimirRecibo();
+    }
+  }
+
+  async imprimirIndividual() {
+    const data = this.estadoCuenta();
+    const propiedad = this.propiedadSeleccionada();
+    
+    if (!data) {
+      this.presentToast('No hay datos para imprimir.', 'warning');
+      return;
+    }
+
+    const isConnected = await this.bluetoothService.isConnected();
+    if (!isConnected) {
+      this.presentToast('No hay ninguna impresora conectada. Configure la impresora en Configuración > Bluetooth.', 'danger');
+      return;
+    }
+
+    try {
+      this.presentToast('Preparando impresión individual...', 'success');
+      const receiptText = this.printingService.formatEstadoCuenta(
+        data, 
+        this.lastSearchParams, 
+        false // isAmnesty = false para estado-cuenta normal
+      );
+      await this.bluetoothService.print(receiptText);
+      this.presentToast('Recibo individual enviado a la impresora exitosamente.', 'success');
+    } catch (error) {
+      console.error('Error al imprimir:', error);
+      this.presentToast('Error al imprimir el recibo. Verifique la conexión de la impresora.', 'danger');
+    }
+  }
+
+  async imprimirGrupal() {
+    const response = this.consultaResponse();
+    
+    if (!response || !response.propiedades) {
+      this.presentToast('No hay datos para imprimir.', 'warning');
+      return;
+    }
+
+    const isConnected = await this.bluetoothService.isConnected();
+    if (!isConnected) {
+      this.presentToast('No hay ninguna impresora conectada. Configure la impresora en Configuración > Bluetooth.', 'danger');
+      return;
+    }
+
+    try {
+      this.presentToast('Preparando impresión grupal...', 'success');
+      
+      // Convertir todas las propiedades al formato legacy para impresión
+      const estadosCuenta: EstadoCuentaResponse[] = response.propiedades.map(
+        (_, index) => this.estadoCuentaService.convertirAFormatoLegacy(response, index)
+      );
+      
+      const receiptText = this.printingService.formatEstadoCuentaGrupal(
+        estadosCuenta, 
+        response,
+        this.lastSearchParams
+      );
+      
+      await this.bluetoothService.print(receiptText);
+      this.presentToast('Recibo grupal enviado a la impresora exitosamente.', 'success');
+    } catch (error) {
+      console.error('Error al imprimir:', error);
+      this.presentToast('Error al imprimir el recibo grupal. Verifique la conexión de la impresora.', 'danger');
+    }
   }
 
   async imprimirRecibo() {
@@ -143,5 +312,31 @@ export class EstadoCuentaPage implements OnInit {
   getCantidadPeriodos(): number {
     const data = this.estadoCuenta();
     return data ? data.detallesMora.length : 0;
+  }
+
+  // Getters para la vista
+  get esDNI(): boolean {
+    const response = this.consultaResponse();
+    return response?.tipoConsulta === 'dni';
+  }
+
+  get tienePropiedades(): boolean {
+    const response = this.consultaResponse();
+    return this.esDNI && !!response?.propiedades && response.propiedades.length > 0;
+  }
+
+  get numeroPropiedades(): number {
+    const response = this.consultaResponse();
+    return response?.propiedades?.length || 0;
+  }
+
+  get totalGeneralGrupal(): string {
+    const response = this.consultaResponse();
+    return response?.totalGeneral || '0.00';
+  }
+
+  get propiedades() {
+    const response = this.consultaResponse();
+    return response?.propiedades || [];
   }
 }

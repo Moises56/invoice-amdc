@@ -49,6 +49,40 @@
 
     <!-- Resultados del estado de cuenta -->
     <div *ngIf="!isLoading() && estadoCuenta() as data">
+      
+      <!-- Mostrar múltiples propiedades para consultas por DNI -->
+      <div *ngIf="esDNI && tienePropiedades" class="propiedades-container glass-card">
+        <div class="propiedades-header">
+          <h3>Propiedades Encontradas ({{ numeroPropiedades }})</h3>
+          <ion-chip color="primary" outline="true">
+            <ion-icon name="home-outline"></ion-icon>
+            <ion-label>Total: {{ totalGeneralGrupal }}</ion-label>
+          </ion-chip>
+        </div>
+        
+        <div class="propiedades-list">
+          <ion-item 
+            *ngFor="let propiedad of propiedades; let i = index" 
+            button="true"
+            (click)="seleccionarPropiedad(propiedad, i)"
+            [class.selected]="indicePropiedadSeleccionada() === i"
+            class="propiedad-item">
+            <ion-icon name="home" slot="start" [color]="indicePropiedadSeleccionada() === i ? 'primary' : 'medium'"></ion-icon>
+            <ion-label>
+              <h3>{{ propiedad.claveCatastral }}</h3>
+              <p>{{ propiedad.nombreColonia }}</p>
+              <p class="total-propiedad">Total: {{ formatCurrency(propiedad.totalPropiedadNumerico) }}</p>
+            </ion-label>
+            <ion-icon 
+              *ngIf="indicePropiedadSeleccionada() === i" 
+              name="checkmark-circle" 
+              color="primary" 
+              slot="end">
+            </ion-icon>
+          </ion-item>
+        </div>
+      </div>
+
       <!-- Tarjeta principal con toda la información -->
       <div class="info-card glass-card unified-info-card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem 2rem;">
         <div style="flex-shrink:0;">
@@ -69,7 +103,6 @@
         </div>
       </div>
 
-
       <!-- Detalle de mora -->
       <div class="detail-card glass-card">
         <div class="detail-header">
@@ -77,10 +110,10 @@
           <ion-button 
             fill="outline" 
             size="small" 
-            (click)="imprimirRecibo()"
+            (click)="esDNI ? mostrarOpcionesImpresion() : imprimirRecibo()"
             [disabled]="isLoading()">
             <ion-icon name="print-outline" slot="start"></ion-icon>
-            Imprimir
+            {{ esDNI ? 'Opciones de Impresión' : 'Imprimir' }}
           </ion-button>
         </div>
         
@@ -119,7 +152,7 @@
       </div>
 
       <!-- Información adicional -->
-      <div class="info-footer glass-card">
+      <div class="info-footer glass-card" style="margin-bottom: 4rem;">
         <ion-text color="medium">
           <p class="ion-text-center">
             <ion-icon name="information-circle-outline"></ion-icon>

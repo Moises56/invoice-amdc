@@ -39,6 +39,46 @@
       <ion-spinner name="crescent"></ion-spinner>
     </div>
 
+    <!-- Sección para múltiples propiedades (consultas por DNI) -->
+    <div *ngIf="!isLoading() && mostrarMultiplesPropiedades() && propiedades.length > 0" class="propiedades-container glass-card">
+      <div class="propiedades-header">
+        <h3>Propiedades Encontradas</h3>
+        <ion-chip>
+          <ion-icon name="home-outline"></ion-icon>
+          <ion-label>{{ numeroPropiedades }} {{ numeroPropiedades === 1 ? 'propiedad' : 'propiedades' }}</ion-label>
+        </ion-chip>
+      </div>
+      
+      <div class="propiedades-list">
+        <ion-item 
+          *ngFor="let propiedad of propiedades; let i = index" 
+          class="propiedad-item"
+          [class.selected]="indicePropiedadSeleccionada() === i"
+          (click)="seleccionarPropiedad(propiedad, i)"
+          button>
+          <ion-icon name="home" slot="start" [color]="indicePropiedadSeleccionada() === i ? 'primary' : 'medium'"></ion-icon>
+          <ion-label>
+            <h3>{{ propiedad.claveCatastral }}</h3>
+            <p><strong>Colonia:</strong> {{ propiedad.colonia }}</p>
+            <p><strong>Ruta:</strong> {{ propiedad.ruta }}</p>
+            <p class="total-propiedad"><strong>Total:</strong> {{ propiedad.totalPropiedad }}</p>
+          </ion-label>
+          <ion-icon 
+            name="checkmark-circle" 
+            slot="end" 
+            color="primary" 
+            *ngIf="indicePropiedadSeleccionada() === i">
+          </ion-icon>
+          <ion-icon 
+            name="chevron-forward" 
+            slot="end" 
+            color="medium" 
+            *ngIf="indicePropiedadSeleccionada() !== i">
+          </ion-icon>
+        </ion-item>
+      </div>
+    </div>
+
     <div *ngIf="!isLoading() && estadoCuenta() as data">
       <div class="amnistia-card glass-card">
         <div class="amnistia-card-header">
@@ -71,10 +111,10 @@
           <ion-button 
             fill="outline" 
             size="small" 
-            (click)="imprimirRecibo()"
+            (click)="esDNI ? mostrarOpcionesImpresion() : imprimirRecibo()"
             [disabled]="isLoading() || !estadoCuenta()">
             <ion-icon name="print-outline" slot="start"></ion-icon>
-            Imprimir
+            {{ esDNI ? 'Opciones de Impresión' : 'Imprimir' }}
           </ion-button>
         </div>
         

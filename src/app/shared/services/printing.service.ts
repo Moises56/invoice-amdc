@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EstadoCuentaResponse } from '../interfaces/estado-cuenta.interface';
+import { EstadoCuentaResponse, ConsultaECResponseNueva } from '../interfaces/estado-cuenta.interface';
 import { SearchParams } from '../../features/estado-cuenta/estado-cuenta.service';
 
 @Injectable({
@@ -141,8 +141,8 @@ export class PrintingService {
     return ' '.repeat(Math.max(0, padding)) + text;
   }
 
-  private createLine(width: number = 48): string {
-    return '-'.repeat(width);
+  private createLine(char: string = '-', width: number = 48): string {
+    return char.repeat(width);
   }
 
   private createRow(columns: string[], colWidths: number[] = [5, 11, 10, 10, 12]): string {
@@ -218,4 +218,165 @@ export class PrintingService {
     
     return receipt;
   }
+
+  // ========== MÉTODOS PARA IMPRESIÓN GRUPAL ==========
+  
+  /**
+   * Formatea múltiples estados de cuenta para impresión grupal (sin amnistía)
+   */
+  formatEstadoCuentaGrupal(
+    estadosCuenta: EstadoCuentaResponse[], 
+    consultaResponse: ConsultaECResponseNueva,
+    searchParams?: SearchParams
+  ): string {
+    let receipt = '';
+    
+    // Encabezado principal
+    receipt += this.centerText(this.normalizeText('ALCALDIA MUNICIPAL DEL DISTRITO CENTRAL')) + '\n';
+    receipt += this.centerText('TEGUCIGALPA, HONDURAS, C.A.') + '\n';
+    receipt += this.centerText(this.normalizeText('GERENCIA DE RECAUDACION Y CONTROL FINANCIERO')) + '\n';
+    receipt += this.centerText('ESTADO DE CUENTA GRUPAL') + '\n\n';
+    
+    // Información de búsqueda
+    if (searchParams?.dni) {
+      receipt += this.normalizeText('-- Parametros de Busqueda --') + '\n';
+      receipt += `Busqueda por DNI: ${searchParams.dni}\n`;
+      receipt += `Propiedades encontradas: ${estadosCuenta.length}\n\n`;
+    }
+    
+    // Procesar cada propiedad
+    estadosCuenta.forEach((estadoCuenta, index) => {
+      receipt += this.createLine() + '\n';
+      receipt += this.centerText(`PROPIEDAD ${index + 1} DE ${estadosCuenta.length}`) + '\n';
+      receipt += this.createLine() + '\n\n';
+      
+      // Información de la propiedad
+      receipt += this.normalizeText('-- Informacion Personal --') + '\n';
+      receipt += `Nombre: ${estadoCuenta.nombre}\n`;
+      receipt += `Identidad: ${estadoCuenta.identidad}\n`;
+      receipt += `Clave Catastral: ${estadoCuenta.claveCatastral}\n\n`;
+      receipt += this.normalizeText('-- Fecha y Ubicacion --') + '\n';
+      receipt += `Colonia: ${estadoCuenta.nombreColonia}\n`;
+      receipt += `Fecha: ${estadoCuenta.fecha} ${estadoCuenta.hora}\n\n`;
+      
+      // Tabla de mora para esta propiedad
+      receipt += this.createLine() + '\n';
+      receipt += this.createRow([this.normalizeText('Año'), 'Impto', 'T.Aseo', 'Bomberos', 'Recargo', 'Total']) + '\n';
+      receipt += this.createLine() + '\n';
+      
+      estadoCuenta.detallesMora.forEach(detalle => {
+        receipt += this.createRow([
+          detalle.year,
+          this.formatCurrencyWithSeparators(detalle.impuestoNumerico),
+          this.formatCurrencyWithSeparators(detalle.trenDeAseoNumerico),
+          this.formatCurrencyWithSeparators(detalle.tasaBomberosNumerico),
+          this.formatCurrencyWithSeparators(detalle.recargoNumerico),
+          this.formatCurrencyWithSeparators(detalle.totalNumerico)
+        ]) + '\n';
+      });
+      
+      receipt += this.createLine() + '\n';
+      receipt += this.alignRight(`Subtotal Propiedad: ${this.formatCurrencyWithSeparators(estadoCuenta.totalGeneralNumerico)}`) + '\n\n';
+    });
+    
+    // Total general grupal
+    const totalGrupal = estadosCuenta.reduce((sum, estado) => sum + estado.totalGeneralNumerico, 0);
+    
+    receipt += this.createLine('=') + '\n';
+    receipt += this.setBold(true);
+    receipt += this.centerText(`TOTAL GENERAL: ${this.formatCurrencyWithSeparators(totalGrupal)} LPS`) + '\n';
+    receipt += this.setBold(false);
+    receipt += this.createLine('=') + '\n\n';
+    
+    // Pie de página
+    receipt += this.centerText('Datos actualizados al 15 de junio del 2025.') + '\n';
+    receipt += this.centerText(this.normalizeText('Para mayor información llamar al 2220-6088')) + '\n';
+    receipt += this.centerText('RECUERDA QUE EL PAGO DE BIENES INMUEBLES') + '\n';
+    receipt += this.centerText('VENCE EL 31 DE AGOSTO DEL 2025') + '\n';
+    
+    return receipt;
+  }
+  
+  /**
+   * Formatea múltiples estados de cuenta para impresión grupal con amnistía
+   */
+  formatEstadoCuentaGrupalAmnistia(
+    estadosCuenta: EstadoCuentaResponse[], 
+    consultaResponse: ConsultaECResponseNueva,
+    searchParams?: SearchParams
+  ): string {
+    let receipt = '';
+    
+    // Encabezado principal
+    receipt += this.centerText(this.normalizeText('ALCALDIA MUNICIPAL DEL DISTRITO CENTRAL')) + '\n';
+    receipt += this.centerText('TEGUCIGALPA, HONDURAS, C.A.') + '\n';
+    receipt += this.centerText(this.normalizeText('GERENCIA DE RECAUDACION Y CONTROL FINANCIERO')) + '\n';
+    receipt += this.centerText(this.normalizeText('ESTADO DE CUENTA GRUPAL CON AMNISTIA')) + '\n\n';
+    
+    // Información de búsqueda
+    if (searchParams?.dni) {
+      receipt += this.normalizeText('-- Parametros de Busqueda --') + '\n';
+      receipt += `Busqueda por DNI: ${searchParams.dni}\n`;
+      receipt += `Propiedades encontradas: ${estadosCuenta.length}\n\n`;
+    }
+    
+    // Procesar cada propiedad
+    estadosCuenta.forEach((estadoCuenta, index) => {
+      receipt += this.createLine() + '\n';
+      receipt += this.centerText(`PROPIEDAD ${index + 1} DE ${estadosCuenta.length}`) + '\n';
+      receipt += this.createLine() + '\n\n';
+      
+      // Información de la propiedad
+      receipt += this.normalizeText('-- Informacion Personal --') + '\n';
+      receipt += `Nombre: ${estadoCuenta.nombre}\n`;
+      receipt += `Identidad: ${estadoCuenta.identidad}\n`;
+      receipt += `Clave Catastral: ${estadoCuenta.claveCatastral}\n\n`;
+      receipt += this.normalizeText('-- Fecha y Ubicacion --') + '\n';
+      receipt += `Colonia: ${estadoCuenta.nombreColonia}\n`;
+      receipt += `Fecha: ${estadoCuenta.fecha} ${estadoCuenta.hora}\n\n`;
+      
+      // Indicador de amnistía
+      receipt += this.createLine() + '\n';
+      receipt += this.centerText(this.normalizeText('*** AMNISTIA APLICADA ***')) + '\n';
+      receipt += this.createLine() + '\n\n';
+      
+      // Tabla de mora para esta propiedad
+      receipt += this.createLine() + '\n';
+      receipt += this.createRow([this.normalizeText('Año'), 'Impto', 'T.Aseo', 'Bomberos', 'Recargo', 'Total']) + '\n';
+      receipt += this.createLine() + '\n';
+      
+      estadoCuenta.detallesMora.forEach(detalle => {
+        receipt += this.createRow([
+          detalle.year,
+          this.formatCurrencyWithSeparators(detalle.impuestoNumerico),
+          this.formatCurrencyWithSeparators(detalle.trenDeAseoNumerico),
+          this.formatCurrencyWithSeparators(detalle.tasaBomberosNumerico),
+          this.formatCurrencyWithSeparators(detalle.recargoNumerico),
+          this.formatCurrencyWithSeparators(detalle.totalNumerico)
+        ]) + '\n';
+      });
+      
+      receipt += this.createLine() + '\n';
+      receipt += this.alignRight(`Subtotal Propiedad: ${this.formatCurrencyWithSeparators(estadoCuenta.totalGeneralNumerico)}`) + '\n\n';
+    });
+    
+    // Total general grupal
+    const totalGrupal = estadosCuenta.reduce((sum, estado) => sum + estado.totalGeneralNumerico, 0);
+    
+    receipt += this.createLine('=') + '\n';
+    receipt += this.setBold(true);
+    receipt += this.centerText(`TOTAL GENERAL CON AMNISTIA: ${this.formatCurrencyWithSeparators(totalGrupal)} LPS`) + '\n';
+    receipt += this.setBold(false);
+    receipt += this.createLine('=') + '\n\n';
+    
+    // Pie de página
+    receipt += this.centerText('Datos actualizados al 15 de junio del 2025.') + '\n';
+    receipt += this.centerText(this.normalizeText('Para mayor información llamar al 2220-6088')) + '\n';
+    receipt += this.centerText('RECUERDA QUE EL PAGO DE BIENES INMUEBLES') + '\n';
+    receipt += this.centerText('VENCE EL 31 DE AGOSTO DEL 2025') + '\n';
+    
+    return receipt;
+  }
+  
+
 }

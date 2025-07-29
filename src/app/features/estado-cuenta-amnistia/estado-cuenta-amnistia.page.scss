@@ -471,3 +471,101 @@ ion-card-title {
      }
    }
 }
+
+// Estilos para múltiples propiedades (consultas por DNI)
+.propiedades-container {
+  margin-bottom: 25px;
+  
+  .propiedades-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    h3 {
+      color: #5ccedf;
+      font-weight: bold;
+      font-size: 1.4rem;
+      margin: 0;
+    }
+    
+    ion-chip {
+      --background: rgba(92, 206, 223, 0.2);
+      --color: #2c3e50;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 8px 16px;
+      border: 2px solid rgba(92, 206, 223, 0.5);
+      border-radius: 20px;
+      
+      ion-icon {
+        margin-right: 8px;
+        color: #5ccedf;
+        font-size: 1.1rem;
+      }
+      
+      ion-label {
+        font-weight: 700;
+        color: #2c3e50;
+      }
+    }
+  }
+  
+  .propiedades-list {
+    .propiedad-item {
+      --background: rgba(255, 255, 255, 0.8);
+      --border-radius: 15px;
+      --padding-start: 20px;
+      --padding-end: 20px;
+      margin-bottom: 12px;
+      border: 2px solid rgba(92, 206, 223, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      
+      &:hover {
+        --background: rgba(92, 206, 223, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(92, 206, 223, 0.2);
+        border-color: rgba(92, 206, 223, 0.6);
+      }
+      
+      &.selected {
+        --background: rgba(92, 206, 223, 0.15);
+        border-color: #5ccedf;
+        border-width: 3px;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(92, 206, 223, 0.3);
+      }
+      
+      ion-label {
+        h3 {
+          color: #5ccedf;
+          font-weight: bold;
+          font-size: 1.2rem;
+          margin-bottom: 5px;
+        }
+        
+        p {
+          color: #666;
+          font-size: 0.95rem;
+          margin: 2px 0;
+          
+          &.total-propiedad {
+            color: #5ccedf;
+            font-weight: 600;
+            font-size: 1rem;
+          }
+        }
+      }
+      
+      ion-icon[slot="start"] {
+        font-size: 1.5rem;
+        margin-right: 15px;
+      }
+      
+      ion-icon[slot="end"] {
+        font-size: 1.8rem;
+      }
+    }
+  }
+}
