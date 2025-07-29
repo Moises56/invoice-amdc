@@ -31,15 +31,15 @@ export class PrintingService {
     }
 
     // Información de búsqueda
-    if (searchParams) {
-      receipt += this.normalizeText('-- Parametros de Busqueda --') + '\n';
-      if (searchParams.dni) {
-        receipt += `Busqueda por DNI: ${searchParams.dni}\n`;
-      } else if (searchParams.claveCatastral) {
-        receipt += `Busqueda por Clave Catastral: ${searchParams.claveCatastral}\n`;
-      }
-      receipt += '\n';
-    }
+    // if (searchParams) {
+    //   receipt += this.normalizeText('-- Parametros de Busqueda --') + '\n';
+    //   if (searchParams.dni) {
+    //     receipt += `Busqueda por DNI: ${searchParams.dni}\n`;
+    //   } else if (searchParams.claveCatastral) {
+    //     receipt += `Busqueda por Clave Catastral: ${searchParams.claveCatastral}\n`;
+    //   }
+    //   receipt += '\n';
+    // }
 
     // Información Personal y Fecha
     receipt += this.normalizeText('-- Informacion Personal --') + '\n';
@@ -54,7 +54,7 @@ export class PrintingService {
     if (isAmnesty) {
       receipt += this.createLine() + '\n';
       receipt += this.centerText(this.normalizeText('*** AMNISTIA APLICADA ***')) + '\n';
-      receipt += this.centerText(this.normalizeText('Recargos reducidos segun programa')) + '\n';
+      // receipt += this.centerText(this.normalizeText('Recargos reducidos segun articulo')) + '\n';
       receipt += this.createLine() + '\n\n';
     }
 

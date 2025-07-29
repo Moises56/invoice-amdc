@@ -34,6 +34,9 @@ log.txt
 npm-debug.log
 yarn-error.log
 
+#no subir la carpeta www
+/www
+
 # IDEs and editors
 .idea/
 .project
