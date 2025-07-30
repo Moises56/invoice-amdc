@@ -626,3 +626,38 @@ ion-checkbox {
     padding: 0 1rem;
   }
 }
+
+// Estilos para el indicador de carga inicial
+.initial-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  margin: 2rem 0;
+  
+  .loading-content {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-glass-strong);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-glass);
+    animation: fadeInUp 0.6s ease-out;
+    
+    .loading-spinner {
+      --color: var(--primary);
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1rem;
+    }
+    
+    .loading-text {
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 500;
+      margin: 0;
+      opacity: 0.8;
+    }
+  }
+}

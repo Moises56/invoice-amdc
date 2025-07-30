@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Persistencia de Sesión</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #5ccedf;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4bb8c9;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Test de Persistencia de Sesión con HTTP-Only Cookies</h1>
+        
+        <div class="test-section">
+            <h3>1. Login Test</h3>
+            <input type="email" id="email" placeholder="Email" value="mougrind@amdc.hn">
+            <input type="password" id="password" placeholder="Password" value="123456">
+            <button onclick="testLogin()">🔑 Login</button>
+            <div id="loginResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Verificar Perfil (con cookies)</h3>
+            <button onclick="testProfile()">👤 Verificar Perfil</button>
+            <div id="profileResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Verificar Cookies</h3>
+            <button onclick="checkCookies()">🍪 Ver Cookies</button>
+            <div id="cookiesResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Test de Recarga</h3>
+            <button onclick="testReload()">🔄 Simular Recarga</button>
+            <div id="reloadResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Logout Test</h3>
+            <button onclick="testLogout()">🚪 Logout</button>
+            <div id="logoutResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function testLogin() {
+            try {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                log('loginResult', 'Intentando login...', 'info');
+
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // Importante para cookies
+                    body: JSON.stringify({ correo: email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('loginResult', `✅ Login exitoso!\nUsuario: ${data.user.nombre} ${data.user.apellido}\nRole: ${data.user.role}`, 'success');
+                } else {
+                    log('loginResult', `❌ Error en login: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log('loginResult', `❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        async function testProfile() {
+            try {
+                log('profileResult', 'Verificando perfil...', 'info');
+
+                const response = await fetch(`${API_BASE}/auth/profile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include' // Importante para enviar cookies
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('profileResult', `✅ Perfil obtenido!\nUsuario: ${data.user.nombre} ${data.user.apellido}\nEmail: ${data.user.correo}\nRole: ${data.user.role}`, 'success');
+                } else {
+                    log('profileResult', `❌ Error al obtener perfil: ${data.message || 'No autorizado'}`, 'error');
+                }
+            } catch (error) {
+                log('profileResult', `❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        function checkCookies() {
+            try {
+                const cookies = document.cookie;
+                log('cookiesResult', `Cookies visibles en JavaScript:\n${cookies || 'No hay cookies visibles'}\n\nNota: Las cookies HTTP-only NO son visibles aquí (esto es correcto por seguridad)`, 'info');
+            } catch (error) {
+                log('cookiesResult', `❌ Error al verificar cookies: ${error.message}`, 'error');
+            }
+        }
+
+        async function testReload() {
+            try {
+                log('reloadResult', 'Simulando recarga de página...', 'info');
+                
+                // Simular lo que hace initializeAuth
+                const response = await fetch(`${API_BASE}/auth/profile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('reloadResult', `✅ Sesión persistente después de recarga!\nUsuario: ${data.user.nombre} ${data.user.apellido}\nEsto significa que las cookies HTTP-only están funcionando correctamente.`, 'success');
+                } else {
+                    log('reloadResult', `❌ Sesión perdida después de recarga\nCódigo: ${response.status}\nMensaje: ${data.message || 'No autorizado'}\nEsto indica un problema con las cookies HTTP-only.`, 'error');
+                }
+            } catch (error) {
+                log('reloadResult', `❌ Error en test de recarga: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogout() {
+            try {
+                log('logoutResult', 'Cerrando sesión...', 'info');
+
+                const response = await fetch(`${API_BASE}/auth/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log('logoutResult', `✅ Logout exitoso!\nMensaje: ${data.message}`, 'success');
+                } else {
+                    log('logoutResult', `❌ Error en logout: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                log('logoutResult', `❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-verificar al cargar la página
+        window.onload = function() {
+            console.log('🔧 Test de persistencia de sesión cargado');
+            console.log('📍 Backend URL:', API_BASE);
+        };
+    </script>
+</body>
+</html>

@@ -11,8 +11,16 @@
         <!-- <p class="welcome-subtitle">Iniciar Sesión</p> -->
       </div>
 
+      <!-- Indicador de carga inicial -->
+      <div *ngIf="isInitializing()" class="initial-loading">
+        <div class="loading-content">
+          <ion-spinner name="dots" class="loading-spinner"></ion-spinner>
+          <p class="loading-text">Verificando autenticación...</p>
+        </div>
+      </div>
+
       <!-- Formulario de login con glass effect -->
-      <div class="login-card-glass">
+      <div *ngIf="!isInitializing()" class="login-card-glass">
         <div class="card-header-glass">
           <h2 class="card-title">Iniciar Sesión</h2>
           <div class="title-divider"></div>
@@ -110,7 +118,7 @@
       </div>
 
       <!-- Footer con información adicional -->
-      <div class="footer-section">
+      <div *ngIf="!isInitializing()" class="footer-section">
         <div class="help-text">
           <ion-icon name="help-circle-outline"></ion-icon>
           <span>¿Problemas para acceder?</span>

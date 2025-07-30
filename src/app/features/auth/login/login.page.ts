@@ -49,6 +49,7 @@ export class LoginPage {
   // Signals computados
   isLoading = this.authService.isLoading;
   isAuthenticated = this.authService.isAuthenticated;
+  isInitializing = signal<boolean>(true); // Para mostrar loading inicial
 
   constructor() {
     addIcons({personOutline,alertCircleOutline,lockClosedOutline,logInOutline,helpCircleOutline,businessOutline,eyeOutline,eyeOffOutline});
@@ -81,50 +82,37 @@ export class LoginPage {
   }
 
   /**
-   * Verificar estado de autenticación de manera robusta
+   * Verificar estado de autenticación de manera rápida
    */
   private async checkAuthenticationStatus(): Promise<void> {
     console.log('🔍 LoginPage: Verificando estado de autenticación...');
     
+    // Mostrar indicador de carga inicial
+    this.isInitializing.set(true);
+    
     // Resetear formulario al verificar autenticación
     this.resetForm();
     
-    // Esperar a que se complete la verificación de autenticación con timeout
+    // Esperar máximo 500ms para la verificación inicial
     let attempts = 0;
-    const maxAttempts = 30; // 3 segundos máximo (más rápido para UX)
+    const maxAttempts = 5; // 500ms máximo (5 * 100ms)
 
     while (!this.authService.authCheckComplete() && attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 100));
       attempts++;
     }
 
-    // Verificar de manera robusta si ya está autenticado
+    // Verificar si ya está autenticado
     if (this.authService.isAuthenticated()) {
       console.log('✅ Usuario ya autenticado, redirigiendo al dashboard');
+      this.isInitializing.set(false);
       this.router.navigate(['/dashboard'], { replaceUrl: true });
       return;
     }
 
-    // Si no está autenticado y completó la verificación, mostrar form
-    if (this.authService.authCheckComplete()) {
-      console.log('ℹ️ Usuario no autenticado, mostrando formulario de login');
-      return;
-    }
-
-    // Si hay timeout, intentar verificación manual una vez
-    if (attempts >= maxAttempts) {
-      console.log('⚠️ Timeout en verificación, intentando verificación manual...');
-      try {
-        const isAuth = await this.authService.checkAuthStatus();
-        if (isAuth) {
-          console.log('✅ Usuario autenticado en verificación manual');
-          this.router.navigate(['/dashboard'], { replaceUrl: true });
-        }
-      } catch (error) {
-        console.log('❌ Error en verificación manual:', error);
-        // Continuar mostrando el formulario de login
-      }
-    }
+    // Mostrar formulario de login inmediatamente
+    console.log('ℹ️ Mostrando formulario de login');
+    this.isInitializing.set(false);
   }
 
   /**

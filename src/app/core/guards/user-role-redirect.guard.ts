@@ -9,19 +9,13 @@ export const userRoleRedirectGuard: CanActivateFn = async (route, state) => {
   
   console.log('🔄 UserRoleRedirectGuard: Verificando redirección para:', state.url);
   
-  // Esperar a que la inicialización de auth esté completa
+  // Esperar máximo 500ms para la inicialización
   let attempts = 0;
-  const maxAttempts = 50; // 5 segundos máximo
+  const maxAttempts = 5; // 500ms máximo (5 * 100ms)
   
   while (!authService.authCheckComplete() && attempts < maxAttempts) {
     await new Promise(resolve => setTimeout(resolve, 100));
     attempts++;
-  }
-  
-  // Si no se completó la inicialización, permitir acceso (el AuthGuard se encargará)
-  if (attempts >= maxAttempts) {
-    console.log('⚠️ UserRoleRedirectGuard: Timeout esperando inicialización, permitiendo acceso');
-    return true;
   }
   
   const user = authService.user();

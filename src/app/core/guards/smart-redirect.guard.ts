@@ -13,19 +13,13 @@ export const smartRedirectGuard: CanActivateFn = async (route, state) => {
   
   console.log('🧠 SmartRedirectGuard: Manejando redirección inteligente para:', state.url);
   
-  // Esperar a que la inicialización de auth esté completa
+  // Esperar máximo 500ms para la inicialización
   let attempts = 0;
-  const maxAttempts = 50; // 5 segundos máximo
+  const maxAttempts = 5; // 500ms máximo (5 * 100ms)
   
   while (!authService.authCheckComplete() && attempts < maxAttempts) {
     await new Promise(resolve => setTimeout(resolve, 100));
     attempts++;
-  }
-  
-  // Si no se completó la inicialización, usar redirección por defecto
-  if (attempts >= maxAttempts) {
-    console.log('⚠️ SmartRedirectGuard: Timeout esperando inicialización, usando redirección por defecto');
-    return true; // Permitir la redirección por defecto
   }
   
   const user = authService.user();

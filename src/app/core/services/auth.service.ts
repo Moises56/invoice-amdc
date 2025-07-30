@@ -26,8 +26,6 @@ export class AuthService {
   private refreshInProgress = false;
   private tokenRefreshTimer?: any;
   private readonly REFRESH_INTERVAL = 13 * 60 * 1000; // 13 minutos
-  private readonly MAX_RETRY_ATTEMPTS = 3;
-  private retryAttempts = 0;
 
   // Computed signals
   readonly user = this._user.asReadonly();
@@ -51,83 +49,53 @@ export class AuthService {
    */
   private async initializeAuth(): Promise<void> {
     console.log('🔧 AuthService: Iniciando verificación de autenticación...');
+    console.log('🔧 AuthService: API URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PROFILE}`);
     this._initializationState.set('checking');
     this._isLoading.set(true);
-    this.retryAttempts = 0;
 
     try {
-      await this.attemptAuthInitialization();
-    } catch (error) {
-      console.error('❌ AuthService: Error crítico en inicialización:', error);
-      this._initializationState.set('failed');
-      this.clearAuthState();
-    }
-  }
-
-  /**
-   * Intentar inicialización con retry automático
-   */
-  private async attemptAuthInitialization(): Promise<void> {
-    while (this.retryAttempts < this.MAX_RETRY_ATTEMPTS) {
-      try {
-        console.log(`🔄 AuthService: Intento ${this.retryAttempts + 1}/${this.MAX_RETRY_ATTEMPTS} de verificación...`);
-        
-        // Verificar si hay cookies de autenticación válidas
-        const profile = await this.getProfile().toPromise();
-        
-        if (profile?.user) {
-          // ✅ Usuario autenticado exitosamente
-          this._user.set(profile.user);
-          this._isAuthenticated.set(true);
-          this._initializationState.set('success');
-          this.startTokenRefreshTimer();
-          console.log('✅ Usuario autenticado automáticamente:', profile.user);
-          break;
-        } else {
-          // No hay sesión válida
-          console.log('ℹ️ No hay sesión activa válida');
-          this.clearAuthState();
-          break;
-        }
-      } catch (error: any) {
-        this.retryAttempts++;
-        console.log(`❌ Intento ${this.retryAttempts} falló:`, error.message);
-        
-        if (this.retryAttempts >= this.MAX_RETRY_ATTEMPTS) {
-          console.log('❌ No hay sesión activa o token expirado después de todos los intentos');
-          this.clearAuthState();
-          break;
-        }
-        
-        // Esperar antes del siguiente intento (backoff exponencial)
-        const delay = Math.pow(2, this.retryAttempts) * 1000;
-        console.log(`⏳ Esperando ${delay}ms antes del siguiente intento...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+      console.log('🔧 AuthService: Enviando petición getProfile...');
+      // Intentar verificación única sin retry para evitar múltiples llamadas
+      const profile = await this.getProfile().toPromise();
+      console.log('🔧 AuthService: Respuesta getProfile recibida:', profile);
+      
+      if (profile?.user) {
+        // ✅ Usuario autenticado exitosamente
+        this._user.set(profile.user);
+        this._isAuthenticated.set(true);
+        this._initializationState.set('success');
+        this.startTokenRefreshTimer();
+        console.log('✅ Usuario autenticado automáticamente:', profile.user);
+      } else {
+        console.log('ℹ️ No hay sesión activa válida - respuesta sin usuario');
+        this.clearAuthState();
       }
+    } catch (error: any) {
+      console.log('❌ Error en initializeAuth:');
+      console.log('   - Status:', error.status);
+      console.log('   - Message:', error.message);
+      console.log('   - Error completo:', error);
+      
+      if (error.status === 401) {
+        console.log('ℹ️ Token expirado o no válido (401)');
+      } else if (error.status === 0) {
+        console.log('❌ Error de conexión - backend no disponible');
+      } else {
+        console.log('❌ Error inesperado en verificación de sesión');
+      }
+      
+      this.clearAuthState();
     }
 
     this._isLoading.set(false);
     this._authCheckComplete.set(true);
     console.log('🏁 AuthService: Inicialización completada');
+    console.log('🏁 AuthService: Estado final - isAuthenticated:', this._isAuthenticated(), 'user:', this._user());
   }
 
-  /**
-   * Verificar el estado de autenticación
-   */
-  async checkAuthStatus(): Promise<boolean> {
-    try {
-      const profile = await this.getProfile().toPromise();
-      if (profile?.user) {
-        this._user.set(profile.user);
-        this._isAuthenticated.set(true);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      this.clearAuthState();
-      return false;
-    }
-  }
+
+
+
 
   /**
    * Iniciar sesión con manejo robusto
@@ -192,6 +160,28 @@ export class AuthService {
     return this.http.post<{ user: User }>(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PROFILE}`, {}, {
       withCredentials: true
     });
+  }
+
+  /**
+   * Verificar estado de autenticación manualmente
+   */
+  async checkAuthStatus(): Promise<boolean> {
+    console.log('🔍 AuthService: Verificación manual de estado de autenticación...');
+    try {
+      const profile = await this.getProfile().toPromise();
+      if (profile?.user) {
+        this._user.set(profile.user);
+        this._isAuthenticated.set(true);
+        this._initializationState.set('success');
+        this.startTokenRefreshTimer();
+        console.log('✅ Verificación manual exitosa:', profile.user);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.log('❌ Verificación manual falló:', error);
+      return false;
+    }
   }
 
   /**
@@ -287,7 +277,6 @@ export class AuthService {
     this._authCheckComplete.set(true); // Importante: marcar como completado
     this.stopTokenRefreshTimer();
     this.refreshInProgress = false;
-    this.retryAttempts = 0;
     
     // Limpiar cualquier almacenamiento local residual
     try {

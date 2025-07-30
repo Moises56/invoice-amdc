@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
@@ -13,10 +13,11 @@ export type SearchType = 'claveCatastral' | 'dni';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule]
 })
-export class SearchInputComponent {
+export class SearchInputComponent implements OnDestroy {
   @Input() placeholder: string = 'Ingrese el valor...';
   @Input() disabled: boolean = false;
   @Input() clearOnSearch: boolean = false;
+  @Input() debounceTime: number = 800; // Tiempo de debounce en ms
   @Output() search = new EventEmitter<SearchParams>();
   @Output() clear = new EventEmitter<void>();
 
@@ -24,6 +25,8 @@ export class SearchInputComponent {
   searchValue = signal<string>('');
   isValid = signal<boolean>(true);
   errorMessage = signal<string>('');
+  
+  private debounceTimer: any = null;
 
   onSearchTypeChange(type: any) {
     const searchType = type as SearchType;
@@ -38,10 +41,25 @@ export class SearchInputComponent {
     this.searchValue.set(value);
     this.validateInput(value);
     
+    // Limpiar el timer anterior
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    
     if (value.trim() && this.isValid()) {
-      this.performSearch();
+      // Aplicar debounce solo para búsquedas válidas
+      this.debounceTimer = setTimeout(() => {
+        this.performSearch();
+      }, this.debounceTime);
     } else if (!value.trim()) {
+      // Limpiar inmediatamente si el campo está vacío
       this.clear.emit();
+    }
+  }
+  
+  ngOnDestroy(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
     }
   }
 
@@ -102,6 +120,11 @@ export class SearchInputComponent {
   }
 
   clearSearch(): void {
+    // Limpiar el timer de debounce
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    
     this.searchValue.set('');
     this.isValid.set(true);
     this.errorMessage.set('');
