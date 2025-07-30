@@ -3,6 +3,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 import { Role } from './shared/enums';
 import { userRoleRedirectGuard } from './core/guards/user-role-redirect.guard';
+import { smartRedirectGuard } from './core/guards/smart-redirect.guard';
 
 export const routes: Routes = [
   {
@@ -16,7 +17,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    canActivate: [AuthGuard, userRoleRedirectGuard],
+    canActivate: [AuthGuard, smartRedirectGuard],
     children: [
       {
         path: '',

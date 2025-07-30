@@ -1,5 +1,17 @@
 /* Estilos para la página de Estado de Cuenta */
 
+.ec-header, .ec-toolbar {
+  background: linear-gradient(90deg, #5ccedf 60%, #A4C9F5 100%) !important;
+  box-shadow: 0 2px 12px #5ccedf33;
+}
+.ec-title {
+  color: #222;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Estilos generales para la página de Estado de Cuenta */
+
 .estado-cuenta-bg {
   --background: linear-gradient(135deg, #f8fdfe 0%, #e8f8fb 100%);
   background: linear-gradient(135deg, #f8fdfe 0%, #e8f8fb 100%);

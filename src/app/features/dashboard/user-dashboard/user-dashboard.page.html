@@ -1,51 +1,125 @@
 
-<ion-header class="modern-header">
-  <ion-toolbar class="modern-toolbar">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+<ion-header [translucent]="true" class="modern-header">
+  <ion-toolbar class="header-toolbar">
+    <ion-buttons slot="start" style="color:#5ccedf;font-size:2rem;">
+      <ion-menu-button ></ion-menu-button>
     </ion-buttons>
-    <ion-title class="modern-title">Mi Dashboard</ion-title>
+<ion-title class="header-title" style="color:#5ccedf;font-weight:700;">Mi Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" class="profile-btn">
+        <ion-icon name="person-outline" style="color:#5ccedf;font-size:2rem;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="dashboard-bg">
-  <div class="dashboard-hero glass-card">
-    <div class="dashboard-hero-inner">
-      <img src="assets/logos/logoAmdc.png" alt="Logo" class="dashboard-avatar" />
-      <div class="dashboard-hero-text">
-        <h2 class="dashboard-saludo">¡Bienvenido!</h2>
-        <p class="dashboard-nombre ">{{ userName || 'Usuario' }}</p>
+<ion-content [fullscreen]="true" class="dashboard-content">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-background">
+      <div class="gradient-overlay"></div>
+      <div class="pattern-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="logo-container">
+        <div class="logo-wrapper">
+          <img src="assets/logos/logoAmdc.png" alt="AMDC Logo" class="hero-logo">
+        </div>
+      </div>
+      <div class="welcome-text">
+        <h1 class="welcome-title">¡Bienvenido!</h1>
+        <p class="user-name" >{{ userName || 'Usuario' }}</p>
+        <div class="welcome-subtitle" style="color: #94a3b8;">Genera estados de cuenta fácil y rápido</div>
       </div>
     </div>
   </div>
 
-  <div class="dashboard-cards dashboard-cards-compact">
-    <div class="dashboard-card glass-card" (click)="goTo('/estado-cuenta')">
-      <ion-icon name="document-text-outline" size="large" color="primary"></ion-icon>
-      <div>
-        <div class="dashboard-card-title">Estado de Cuenta</div>
-        <div class="dashboard-card-desc">Consulta tu estado de cuenta actualizado.</div>
-      </div>
+  <!-- Dashboard Cards -->
+  <div class="dashboard-container">
+    <div class="section-header">
+      <h2 class="section-title">Servicios Disponibles</h2>
+      <p class="section-subtitle">Accede a todas las funcionalidades desde aquí</p>
     </div>
-    <div class="dashboard-card glass-card" (click)="goTo('/estado-cuenta-amnistia')">
-      <ion-icon name="shield-checkmark-outline" size="large" color="secondary"></ion-icon>
-      <div>
-        <div class="dashboard-card-title">Cuenta con Amnistía</div>
-        <div class="dashboard-card-desc">Verifica si tienes amnistía disponible.</div>
+    
+    <div class="dashboard-grid">
+      <div class="dashboard-card estado-cuenta" (click)="goTo('/estado-cuenta')">
+        <div class="card-background">
+          <div class="card-gradient"></div>
+        </div>
+        <div class="card-content">
+          <div class="card-icon-wrapper">
+            <div class="card-icon blue">
+              <ion-icon name="document-text-outline" size="large" style="color:#5ccedf;"></ion-icon>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Estado de Cuenta</h3>
+            <p class="card-description">Consulta tu estado de cuenta actualizado.</p>
+          </div>
+          <div class="card-arrow">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="dashboard-card glass-card" (click)="goTo('/bluetooth')">
-      <ion-icon name="bluetooth-outline" size="large" color="tertiary"></ion-icon>
-      <div>
-        <div class="dashboard-card-title">Bluetooth</div>
-        <div class="dashboard-card-desc">Configura tu impresora Bluetooth.</div>
+
+      <div class="dashboard-card amnistia" (click)="goTo('/estado-cuenta-amnistia')">
+        <div class="card-background">
+          <div class="card-gradient"></div>
+        </div>
+        <div class="card-content">
+          <div class="card-icon-wrapper">
+            <div class="card-icon green">
+              <ion-icon name="shield-checkmark-outline" size="large" style="color:#10b981;"></ion-icon>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Cuenta con Amnistía</h3>
+            <p class="card-description">Verifica si tienes amnistía disponible.</p>
+          </div>
+          <div class="card-arrow">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="dashboard-card glass-card" (click)="goTo('/perfil')">
-      <ion-icon name="person-outline" size="large" color="success"></ion-icon>
-      <div>
-        <div class="dashboard-card-title">Mi Perfil</div>
-        <div class="dashboard-card-desc">Edita tus datos personales y de acceso.</div>
+
+      <div class="dashboard-card bluetooth" (click)="goTo('/bluetooth')">
+        <div class="card-background">
+          <div class="card-gradient"></div>
+        </div>
+        <div class="card-content">
+          <div class="card-icon-wrapper">
+            <div class="card-icon purple">
+              <ion-icon name="bluetooth-outline" size="large" style="color:#8b5cf6;"></ion-icon>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Bluetooth</h3>
+            <p class="card-description">Configura tu impresora Bluetooth.</p>
+          </div>
+          <div class="card-arrow">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-card perfil" (click)="goTo('/perfil')">
+        <div class="card-background">
+          <div class="card-gradient"></div>
+        </div>
+        <div class="card-content">
+          <div class="card-icon-wrapper">
+            <div class="card-icon teal">
+              <ion-icon name="person-outline" size="large" style="color:#14b8a6;"></ion-icon>
+            </div>
+          </div>
+          <div class="card-info">
+            <h3 class="card-title">Mi Perfil</h3>
+            <p class="card-description">Edita tus datos personales y de acceso.</p>
+          </div>
+          <div class="card-arrow">
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+        </div>
       </div>
     </div>
   </div>
