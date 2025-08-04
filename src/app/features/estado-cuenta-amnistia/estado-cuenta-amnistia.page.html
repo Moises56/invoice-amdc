@@ -126,6 +126,7 @@
                 <th>Impuesto</th>
                 <th>T. Aseo</th>
                 <th>Bomberos</th>
+                <th>Otros</th>
                 <th>Recargo</th>
                 <th>Total</th>
               </tr>
@@ -136,13 +137,14 @@
                 <td>{{ detalle.impuesto }}</td>
                 <td>{{ detalle.trenDeAseo }}</td>
                 <td>{{ detalle.tasaBomberos }}</td>
+                <td>{{ detalle.otros }}</td>
                 <td>{{ detalle.recargo }}</td>
                 <td class="total-cell"><strong>{{ detalle.total }}</strong></td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="total-row">
-                <td colspan="5"><strong>TOTAL GENERAL</strong></td>
+                <td colspan="6"><strong>TOTAL GENERAL</strong></td>
                 <td class="total-cell"><strong>{{ data.totalGeneral }}</strong></td>
               </tr>
             </tfoot>

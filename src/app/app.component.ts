@@ -31,7 +31,8 @@ import {
   documentTextOutline,
   shieldCheckmarkOutline,
   statsChartOutline,
-  documentAttachOutline
+  documentAttachOutline,
+  ribbonOutline
 } from 'ionicons/icons';
 import { AuthService } from './core/services/auth.service';
 import { Role } from './shared/enums';
@@ -98,6 +99,8 @@ export class AppComponent implements OnInit {
     { title: 'Mi Dashboard', url: '/dashboard/user', icon: 'home-outline' },
     { title: 'Estado de Cuenta', url: '/estado-cuenta', icon: 'document-text-outline' },
     { title: 'Cuenta con Amnistía', url: '/estado-cuenta-amnistia', icon: 'shield-checkmark-outline' },
+    { title: 'Consulta ICS', url: '/consulta-ics', icon: 'business-outline' },
+    { title: 'ICS con Amnistía', url: '/consulta-ics-amnistia', icon: 'ribbon-outline' },
     { title: 'Config. Bluetooth', url: '/bluetooth', icon: 'bluetooth-outline' },
   ];
 
@@ -120,7 +123,7 @@ export class AppComponent implements OnInit {
       homeOutline, businessOutline, storefrontOutline, receiptOutline, 
       peopleOutline, analyticsOutline, bluetoothOutline, personOutline, 
       logOutOutline, settingsOutline, documentTextOutline, shieldCheckmarkOutline,
-      statsChartOutline, documentAttachOutline
+      statsChartOutline, documentAttachOutline, ribbonOutline
     });
   }
 

@@ -2,28 +2,26 @@ import { Component, EventEmitter, Input, Output, signal, OnDestroy } from '@angu
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { SearchParams } from 'src/app/features/estado-cuenta/estado-cuenta.service';
-import { SearchICSParams } from 'src/app/shared/interfaces/consulta-ics.interface';
+import { SearchICSParams, ICS_VALIDATION } from 'src/app/shared/interfaces/consulta-ics.interface';
 
-export type SearchType = 'claveCatastral' | 'dni' | 'rtn' | 'ics';
-export type SearchParamsUnion = SearchParams | SearchICSParams;
+export type SearchICSType = 'dni' | 'rtn' | 'ics';
 
 @Component({
-  selector: 'app-search-input',
-  templateUrl: './search-input.component.html',
-  styleUrls: ['./search-input.component.scss'],
+  selector: 'app-search-ics-input',
+  templateUrl: './search-ics-input.component.html',
+  styleUrls: ['./search-ics-input.component.scss'],
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule]
 })
-export class SearchInputComponent implements OnDestroy {
+export class SearchIcsInputComponent implements OnDestroy {
   @Input() placeholder: string = 'Ingrese el valor...';
   @Input() disabled: boolean = false;
   @Input() clearOnSearch: boolean = false;
-  @Input() debounceTime: number = 800; // Tiempo de debounce en ms
-  @Output() search = new EventEmitter<SearchParamsUnion>();
+  @Input() debounceTime: number = 300; // Tiempo de debounce en ms
+  @Output() search = new EventEmitter<SearchICSParams>();
   @Output() clear = new EventEmitter<void>();
 
-  searchType = signal<SearchType>('claveCatastral');
+  searchType = signal<SearchICSType>('dni');
   searchValue = signal<string>('');
   isValid = signal<boolean>(true);
   errorMessage = signal<string>('');
@@ -31,7 +29,7 @@ export class SearchInputComponent implements OnDestroy {
   private debounceTimer: any = null;
 
   onSearchTypeChange(type: any) {
-    const searchType = type as SearchType;
+    const searchType = type as SearchICSType;
     this.searchType.set(searchType);
     this.searchValue.set('');
     this.isValid.set(true);
@@ -54,11 +52,11 @@ export class SearchInputComponent implements OnDestroy {
         this.performSearch();
       }, this.debounceTime);
     } else if (!value.trim()) {
-      // Limpiar inmediatamente si el campo está vacío
+      // Si el campo está vacío, limpiar resultados inmediatamente
       this.clear.emit();
     }
   }
-  
+
   ngOnDestroy(): void {
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
@@ -74,42 +72,26 @@ export class SearchInputComponent implements OnDestroy {
       return;
     }
 
-    if (this.searchType() === 'claveCatastral') {
-      // Validación para clave catastral (formato: números y guiones)
-      const claveCatastralPattern = /^[0-9-]+$/;
-      if (!claveCatastralPattern.test(trimmedValue)) {
-        this.isValid.set(false);
-        this.errorMessage.set('La clave catastral solo debe contener números y guiones');
-        return;
-      }
-      
-      if (trimmedValue.length < 5) {
-        this.isValid.set(false);
-        this.errorMessage.set('La clave catastral debe tener al menos 5 caracteres');
-        return;
-      }
-    } else if (this.searchType() === 'dni') {
+    if (this.searchType() === 'dni') {
       // Validación para DNI hondureño (13 dígitos)
-      const dniPattern = /^[0-9]{13}$/;
-      if (!dniPattern.test(trimmedValue)) {
+      if (!ICS_VALIDATION.DNI.PATTERN.test(trimmedValue)) {
         this.isValid.set(false);
-        this.errorMessage.set('El DNI debe contener exactamente 13 dígitos');
+        this.errorMessage.set(ICS_VALIDATION.DNI.MESSAGE);
         return;
       }
     } else if (this.searchType() === 'rtn') {
       // Validación para RTN hondureño (14 dígitos)
-      const rtnPattern = /^[0-9]{14}$/;
-      if (!rtnPattern.test(trimmedValue)) {
+      if (!ICS_VALIDATION.RTN.PATTERN.test(trimmedValue)) {
         this.isValid.set(false);
-        this.errorMessage.set('El RTN debe contener exactamente 14 dígitos');
+        this.errorMessage.set(ICS_VALIDATION.RTN.MESSAGE);
         return;
       }
     } else if (this.searchType() === 'ics') {
       // Validación para código ICS (formato: ICS-XXXXXX)
-      const icsPattern = /^ICS-[0-9]{6}$/i;
-      if (!icsPattern.test(trimmedValue)) {
+      const normalizedValue = trimmedValue.toUpperCase();
+      if (!ICS_VALIDATION.ICS.PATTERN.test(normalizedValue)) {
         this.isValid.set(false);
-        this.errorMessage.set('El código ICS debe tener el formato ICS-XXXXXX (ej: ICS-006454)');
+        this.errorMessage.set(ICS_VALIDATION.ICS.MESSAGE);
         return;
       }
     }
@@ -120,24 +102,19 @@ export class SearchInputComponent implements OnDestroy {
 
   private performSearch(): void {
     const value = this.searchValue().trim();
-    if (!value || !this.isValid()) return;
-
-    let searchParams: SearchParamsUnion = {};
     
-    if (this.searchType() === 'claveCatastral') {
-      searchParams = { claveCatastral: value } as SearchParams;
-    } else if (this.searchType() === 'dni') {
-      // Para estado de cuenta tradicional
-      if ('claveCatastral' in searchParams || Object.keys(searchParams).length === 0) {
-        searchParams = { dni: value } as SearchParams;
-      } else {
-        // Para consulta ICS
-        searchParams = { dni: value } as SearchICSParams;
-      }
+    if (!value || !this.isValid()) {
+      return;
+    }
+
+    const searchParams: SearchICSParams = {};
+    
+    if (this.searchType() === 'dni') {
+      searchParams.dni = value;
     } else if (this.searchType() === 'rtn') {
-      searchParams = { rtn: value } as SearchICSParams;
+      searchParams.rtn = value;
     } else if (this.searchType() === 'ics') {
-      searchParams = { ics: value.toUpperCase() } as SearchICSParams;
+      searchParams.ics = value.toUpperCase();
     }
 
     this.search.emit(searchParams);
@@ -161,14 +138,12 @@ export class SearchInputComponent implements OnDestroy {
 
   getPlaceholder(): string {
     switch (this.searchType()) {
-      case 'claveCatastral':
-        return 'Ej: 12345-67890';
       case 'dni':
-        return 'Ej: 1234567890123';
+        return 'Escriba aquí el DNI (13 dígitos)';
       case 'rtn':
-        return 'Ej: 12345678901234';
+        return 'Escriba aquí el RTN (14 dígitos)';
       case 'ics':
-        return 'Ej: ICS-006454';
+        return 'Escriba aquí el código ICS (ICS-XXXXXX)';
       default:
         return 'Ingrese el valor...';
     }
@@ -176,8 +151,6 @@ export class SearchInputComponent implements OnDestroy {
 
   getSearchTypeLabel(): string {
     switch (this.searchType()) {
-      case 'claveCatastral':
-        return 'Clave Catastral';
       case 'dni':
         return 'DNI';
       case 'rtn':
@@ -186,6 +159,32 @@ export class SearchInputComponent implements OnDestroy {
         return 'Código ICS';
       default:
         return 'Búsqueda';
+    }
+  }
+
+  getHelpText(): string {
+    switch (this.searchType()) {
+      case 'dni':
+        return 'Ingrese el DNI hondureño (13 dígitos consecutivos, ej: 0801199012345)';
+      case 'rtn':
+        return 'Ingrese el RTN hondureño (14 dígitos consecutivos, ej: 08011990123456)';
+      case 'ics':
+        return 'Ingrese el código ICS completo (formato: ICS-XXXXXX, ej: ICS-006454)';
+      default:
+        return '';
+    }
+  }
+
+  getIcon(): string {
+    switch (this.searchType()) {
+      case 'dni':
+        return 'card-outline';
+      case 'rtn':
+        return 'business-outline';
+      case 'ics':
+        return 'home-outline';
+      default:
+        return 'search-outline';
     }
   }
 }

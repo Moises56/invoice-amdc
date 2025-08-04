@@ -44,6 +44,18 @@ export const routes: Routes = [
     data: { roles: [Role.USER] }
   },
   {
+    path: 'consulta-ics',
+    loadComponent: () => import('./features/consulta-ics/consulta-ics.page').then(m => m.ConsultaIcsPage),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role.USER] }
+  },
+  {
+    path: 'consulta-ics-amnistia',
+    loadComponent: () => import('./features/consulta-ics-amnistia/consulta-ics-amnistia.page').then(m => m.ConsultaIcsAmnistiaPage),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role.USER] }
+  },
+  {
     path: 'reportes',
     loadComponent: () => import('./features/reportes/reportes.page').then(m => m.ReportesPage),
     canActivate: [AuthGuard]

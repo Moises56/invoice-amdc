@@ -126,6 +126,7 @@
                   <th>Impuesto</th>
                   <th>T. Aseo</th>
                   <th>Bomberos</th>
+                  <th>Otros</th>
                   <th>Recargo</th>
                   <th>Total</th>
                 </tr>
@@ -136,13 +137,14 @@
                   <td>{{ formatCurrency(detalle.impuestoNumerico) }}</td>
                   <td>{{ formatCurrency(detalle.trenDeAseoNumerico) }}</td>
                   <td>{{ formatCurrency(detalle.tasaBomberosNumerico) }}</td>
+                  <td>{{ formatCurrency(detalle.otrosNumerico) }}</td>
                   <td>{{ formatCurrency(detalle.recargoNumerico) }}</td>
                   <td class="total-cell">{{ formatCurrency(detalle.totalNumerico) }}</td>
                 </tr>
               </tbody>
               <tfoot>
                 <tr class="total-row">
-                  <td colspan="5"><strong>TOTAL GENERAL</strong></td>
+                  <td colspan="6"><strong>TOTAL GENERAL</strong></td>
                   <td class="total-cell"><strong>{{ formatCurrency(data.totalGeneralNumerico) }}</strong></td>
                 </tr>
               </tfoot>

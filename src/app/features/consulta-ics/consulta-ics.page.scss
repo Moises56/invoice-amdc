@@ -1,0 +1,994 @@
+.container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Loading state
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+
+  ion-spinner {
+    margin-bottom: 16px;
+    --color: var(--ion-color-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+// Error card
+.error-card {
+  margin: 16px 0;
+  border-left: 4px solid var(--ion-color-danger);
+
+  .error-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    ion-icon {
+      font-size: 1.5rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      margin: 0 0 8px 0;
+      color: var(--ion-color-danger);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: var(--ion-color-dark);
+      line-height: 1.4;
+    }
+  }
+}
+
+// Results container
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+// Card styles
+ion-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  ion-card-header {
+    padding-bottom: 8px;
+
+    ion-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+
+      ion-icon {
+        color: var(--ion-color-primary);
+        font-size: 1.3rem;
+      }
+    }
+  }
+
+  ion-card-content {
+    padding-top: 8px;
+  }
+}
+
+// Owner card
+.owner-card {
+  border-left: 4px solid var(--ion-color-primary);
+
+  .owner-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+// Property selector card
+.property-selector-card {
+  border-left: 4px solid var(--ion-color-secondary);
+
+  ion-segment {
+    --background: var(--ion-color-light);
+    border-radius: 8px;
+    overflow: hidden;
+
+    ion-segment-button {
+      --color: var(--ion-color-medium);
+      --color-checked: var(--ion-color-secondary);
+      --background-checked: var(--ion-color-secondary-tint);
+      min-height: 60px;
+      text-align: left;
+
+      ion-label {
+        h3 {
+          margin: 0 0 4px 0;
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.8rem;
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+}
+
+// Property card
+.property-card {
+  border-left: 4px solid var(--ion-color-tertiary);
+
+  .property-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+// Glass card effect
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+// Summary card
+.summary-card {
+  .summary-header {
+    background: linear-gradient(135deg, var(--ion-color-success), var(--ion-color-success-shade));
+    color: white;
+    padding: 20px;
+    margin: -1px -1px 0 -1px;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+
+  .summary-content {
+    padding: 20px;
+  }
+
+  .summary-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.total {
+      background: linear-gradient(135deg, rgba(var(--ion-color-success-rgb), 0.1), rgba(var(--ion-color-success-rgb), 0.05));
+      padding: 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(var(--ion-color-success-rgb), 0.2);
+      margin-top: 8px;
+
+      .label {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--ion-color-success-shade);
+      }
+
+      .total-value {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: var(--ion-color-success);
+      }
+    }
+
+    &.discount {
+      .discount-value {
+        color: var(--ion-color-tertiary);
+        font-weight: 600;
+      }
+    }
+
+    .label {
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      flex: 1;
+    }
+
+    .value {
+      font-weight: 600;
+      text-align: right;
+      color: var(--ion-color-success);
+      font-size: 1.1rem;
+    }
+  }
+
+  .amnesty-info {
+    margin-top: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(var(--ion-color-success-rgb), 0.1), rgba(var(--ion-color-success-rgb), 0.05));
+    border-radius: 12px;
+    border: 1px solid rgba(var(--ion-color-success-rgb), 0.2);
+
+    ion-chip {
+      margin: 0 0 8px 0;
+    }
+
+    .amnesty-date {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ion-color-success-shade);
+      font-weight: 500;
+    }
+  }
+}
+
+// Detail card for empresa information
+.detail-card {
+  .detail-header {
+    background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+    color: white;
+    padding: 20px;
+    margin: -1px -1px 0 -1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    ion-button {
+      --color: white;
+      --border-color: rgba(255, 255, 255, 0.3);
+      
+      &:hover {
+        --background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  .table-container {
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .table-wrapper {
+    min-width: 100%;
+    overflow-x: auto;
+  }
+
+  .detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    thead {
+      background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-primary-shade));
+      
+      th {
+        color: white;
+        font-weight: 700;
+        padding: 16px 12px;
+        text-align: center;
+        font-size: 0.95rem;
+        border: none;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        
+        &:first-child {
+          text-align: left;
+        }
+        
+        &:last-child {
+          text-align: right;
+        }
+      }
+    }
+
+    tbody {
+      .detail-row {
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background: rgba(var(--ion-color-primary-rgb), 0.08);
+          transform: scale(1.01);
+        }
+        
+        &:nth-child(even) {
+          background: rgba(0, 0, 0, 0.03);
+        }
+        
+        td {
+          padding: 14px 12px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          text-align: center;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: var(--ion-color-dark);
+          
+          &.year-cell {
+            text-align: left;
+            font-weight: 700;
+            color: var(--ion-color-primary);
+            background: rgba(var(--ion-color-primary-rgb), 0.1);
+          }
+          
+          &.total-cell {
+            text-align: right;
+            font-weight: 700;
+            color: var(--ion-color-success);
+            background: rgba(var(--ion-color-success-rgb), 0.1);
+          }
+        }
+      }
+    }
+
+    tfoot {
+      .total-row {
+        background: linear-gradient(135deg, rgba(var(--ion-color-success-rgb), 0.15), rgba(var(--ion-color-success-rgb), 0.08));
+        
+        td {
+          padding: 16px 12px;
+          border: none;
+          font-weight: 700;
+          color: var(--ion-color-success-shade);
+          font-size: 1rem;
+          
+          &.total-cell {
+            color: var(--ion-color-success);
+            font-size: 1.1rem;
+          }
+        }
+      }
+      
+      .grand-total-row {
+        background: linear-gradient(135deg, #2c5aa0 0%, #1e3d6f 100%);
+        color: white;
+        border-top: 3px solid #5ccedf;
+        
+        td {
+          font-weight: 800;
+          color: white;
+          font-size: 1.1rem;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          padding: 16px 12px;
+          border: none;
+          
+          &.grand-total {
+            font-size: 1.3rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            font-weight: 900;
+            color: white;
+            background: var(--ion-color-primary);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Company selector card
+.company-selector-card {
+  .company-header {
+    background: linear-gradient(135deg, var(--ion-color-secondary), var(--ion-color-secondary-shade));
+    color: white;
+    padding: 20px;
+    margin: -1px -1px 0 -1px;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+
+  .company-content {
+    padding: 20px;
+  }
+
+  .company-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .company-item {
+    background: white;
+    border: 2px solid rgba(var(--ion-color-secondary-rgb), 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: var(--ion-color-secondary);
+      box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.2);
+      transform: translateY(-2px);
+    }
+    
+    &.selected {
+      border-color: var(--ion-color-secondary);
+      background: linear-gradient(135deg, rgba(var(--ion-color-secondary-rgb), 0.1), rgba(var(--ion-color-secondary-rgb), 0.05));
+      box-shadow: 0 4px 12px rgba(var(--ion-color-secondary-rgb), 0.2);
+    }
+    
+    .company-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .company-details {
+        flex: 1;
+        
+        .company-number {
+          font-weight: 600;
+          color: var(--ion-color-secondary);
+          font-size: 1rem;
+          margin-bottom: 4px;
+        }
+        
+        .company-period {
+          color: var(--ion-color-medium);
+          font-size: 0.9rem;
+        }
+      }
+      
+      .company-total {
+        text-align: right;
+        
+        .total-amount {
+          font-weight: 700;
+          color: var(--ion-color-success);
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+}
+
+// Company info card
+.company-info-card {
+  .company-info-header {
+    background: linear-gradient(135deg, var(--ion-color-tertiary), var(--ion-color-tertiary-shade));
+    color: white;
+    padding: 20px;
+    margin: -1px -1px 0 -1px;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+
+  .company-info-content {
+    padding: 20px;
+  }
+
+  .company-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  .info-item {
+    background: rgba(var(--ion-color-tertiary-rgb), 0.05);
+    border: 1px solid rgba(var(--ion-color-tertiary-rgb), 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    
+    .info-label {
+      font-size: 0.85rem;
+      color: var(--ion-color-medium);
+      font-weight: 500;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+      
+      &.highlight {
+        color: var(--ion-color-tertiary);
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+// Legacy mora card (keeping for compatibility)
+.mora-card {
+  border-left: 4px solid var(--ion-color-warning);
+
+  .mora-table {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--ion-color-light-shade);
+    border-radius: 8px;
+    overflow: hidden;
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--ion-color-primary);
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+
+      .col {
+        padding: 12px 8px;
+        background: var(--ion-color-primary);
+        text-align: center;
+
+        &:first-child {
+          text-align: left;
+        }
+      }
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--ion-color-light);
+
+      &.vencido {
+        background: rgba(var(--ion-color-danger-rgb), 0.1);
+
+        .col {
+          background: rgba(var(--ion-color-danger-rgb), 0.05);
+        }
+      }
+
+      &.pendiente {
+        background: rgba(var(--ion-color-warning-rgb), 0.1);
+
+        .col {
+          background: rgba(var(--ion-color-warning-rgb), 0.05);
+        }
+      }
+
+      &.pagado {
+        background: rgba(var(--ion-color-success-rgb), 0.1);
+
+        .col {
+          background: rgba(var(--ion-color-success-rgb), 0.05);
+        }
+      }
+
+      .col {
+        padding: 12px 8px;
+        background: var(--ion-color-light);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 0.85rem;
+
+        &:first-child {
+          align-items: flex-start;
+          text-align: left;
+        }
+
+        strong {
+          font-weight: 600;
+          margin-bottom: 2px;
+        }
+
+        small {
+          font-size: 0.75rem;
+          opacity: 0.7;
+          margin-top: 2px;
+        }
+
+        ion-badge {
+          font-size: 0.7rem;
+          margin-bottom: 2px;
+        }
+      }
+    }
+  }
+}
+
+// Search info card
+.search-info-card {
+  border-left: 4px solid var(--ion-color-medium);
+
+  .search-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+
+    ion-icon {
+      font-size: 1.1rem;
+    }
+
+    .date {
+      margin-left: auto;
+      font-weight: 500;
+    }
+  }
+}
+
+// Info rows (shared)
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    font-weight: 600;
+    color: var(--ion-color-dark);
+    flex: 1;
+  }
+
+  .value {
+    font-weight: 500;
+    text-align: right;
+    flex: 1;
+
+    &.highlight {
+      color: var(--ion-color-primary);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+  }
+
+  ion-badge {
+    font-size: 0.8rem;
+  }
+}
+
+// Empty state
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 12px 0;
+    color: var(--ion-color-dark);
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.5;
+    max-width: 400px;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  // Glass cards responsive
+  .glass-card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+  }
+
+  // Detail table responsive
+  .detail-card {
+    .detail-header {
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+      
+      h3 {
+        font-size: 1.1rem;
+      }
+    }
+
+    .table-container {
+      padding: 16px;
+    }
+
+    .detail-table {
+      font-size: 0.8rem;
+      
+      thead th {
+        padding: 12px 8px;
+        font-size: 0.8rem;
+      }
+      
+      tbody td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+      }
+      
+      tfoot td {
+        padding: 12px 8px;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  // Summary card responsive
+  .summary-card {
+    .summary-header {
+      padding: 16px;
+      
+      h3 {
+        font-size: 1.1rem;
+      }
+    }
+
+    .summary-content {
+      padding: 16px;
+    }
+
+    .summary-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      padding: 12px 0;
+
+      .value {
+        text-align: left;
+        font-size: 1rem;
+      }
+
+      &.total {
+        .total-value {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+
+  // Company cards responsive
+  .company-selector-card,
+  .company-info-card {
+    .company-header,
+    .company-info-header {
+      padding: 16px;
+      
+      h3 {
+        font-size: 1.1rem;
+      }
+    }
+
+    .company-content,
+    .company-info-content {
+      padding: 16px;
+    }
+  }
+
+  .company-info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .company-item {
+    padding: 12px;
+    
+    .company-info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      
+      .company-total {
+        text-align: left;
+        
+        .total-amount {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  // Legacy responsive styles
+  .mora-table {
+    .table-header,
+    .table-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+
+      .col {
+        border-bottom: 1px solid var(--ion-color-light-shade);
+        text-align: left !important;
+        align-items: flex-start !important;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+
+    .table-header {
+      display: none; // Hide header on mobile
+    }
+
+    .table-row {
+      .col {
+        padding: 8px 12px;
+
+        &:before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: var(--ion-color-medium);
+          font-size: 0.75rem;
+          display: block;
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+
+    .value {
+      text-align: left;
+    }
+  }
+}
+
+// Extra small screens
+@media (max-width: 480px) {
+  .detail-table {
+    // Stack table cells vertically on very small screens
+    thead {
+      display: none;
+    }
+    
+    tbody {
+      .detail-row {
+        display: block;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        padding: 12px;
+        
+        td {
+          display: block;
+          text-align: left !important;
+          padding: 6px 0;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          
+          &:last-child {
+            border-bottom: none;
+          }
+          
+          &:before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--ion-color-medium);
+            font-size: 0.75rem;
+            display: block;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          &.year-cell:before {
+            content: "Año:";
+          }
+          
+          &.total-cell:before {
+            content: "Total:";
+          }
+        }
+      }
+    }
+    
+    tfoot {
+      .total-row {
+        display: block;
+        background: linear-gradient(135deg, rgba(var(--ion-color-success-rgb), 0.1), rgba(var(--ion-color-success-rgb), 0.05));
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 12px;
+        
+        td {
+          display: inline;
+          padding: 0;
+          
+          &:first-child:after {
+            content: ": ";
+          }
+        }
+      }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .mora-table {
+    .table-header {
+      .col {
+        background: var(--ion-color-primary-shade);
+      }
+    }
+
+    .table-row {
+      .col {
+        background: var(--ion-color-dark-tint);
+      }
+
+      &.vencido .col {
+        background: rgba(var(--ion-color-danger-rgb), 0.2);
+      }
+
+      &.pendiente .col {
+        background: rgba(var(--ion-color-warning-rgb), 0.2);
+      }
+
+      &.pagado .col {
+        background: rgba(var(--ion-color-success-rgb), 0.2);
+      }
+    }
+  }
+}

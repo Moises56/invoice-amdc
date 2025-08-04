@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test RTN Search</title>
+</head>
+<body>
+    <h1>Test RTN Search</h1>
+    <button onclick="testRTNSearch()">Test RTN Search (08019016853852)</button>
+    <button onclick="testDirectFetch()">Test Direct Fetch</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testDirectFetch() {
+            console.log('=== TEST DIRECT FETCH ===');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing direct fetch...';
+            
+            try {
+                const response = await fetch('http://localhost:3000/consultaICS/amnistia?dni=08019016853852', {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'include'
+                });
+                
+                console.log('Response received:', response);
+                const data = await response.json();
+                console.log('Data:', data);
+                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                console.error('Direct fetch error:', error);
+                resultDiv.innerHTML = `Direct fetch error: ${error.message}`;
+            }
+        }
+        
+        async function testRTNSearch() {
+            console.log('=== INICIANDO TEST RTN ===');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Iniciando búsqueda...';
+            
+            try {
+                const url = 'http://localhost:3000/consultaICS/amnistia?dni=08019016853852';
+                console.log('URL:', url);
+                
+                const startTime = Date.now();
+                console.log('Timestamp inicio:', new Date().toISOString());
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const endTime = Date.now();
+                console.log('Timestamp fin:', new Date().toISOString());
+                console.log('Tiempo transcurrido:', endTime - startTime, 'ms');
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    const errorText = await response.text();
+                    console.log('Error response:', errorText);
+                    resultDiv.innerHTML = `Error: ${response.status} - ${errorText}`;
+                }
+                
+            } catch (error) {
+                console.error('Error en fetch:', error);
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

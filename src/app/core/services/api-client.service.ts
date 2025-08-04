@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { timeout, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -12,7 +14,14 @@ export class ApiClientService {
   constructor(private http: HttpClient) { }
 
   get<T>(path: string, params: HttpParams = new HttpParams()): Observable<T> {
-    return this.http.get<T>(`${this.apiUrlE}${path}`, { params, withCredentials: true });
+    return this.http.get<T>(`${this.apiUrlE}${path}`, { params, withCredentials: true })
+      .pipe(
+        timeout(35000), // 35 segundos timeout
+        catchError(error => {
+          console.error('Error en API Client:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   post<T>(path: string, body: object = {}): Observable<T> {

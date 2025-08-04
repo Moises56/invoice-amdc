@@ -3,12 +3,14 @@ export interface DetalleMora {
   impuesto: string;
   trenDeAseo: string;
   tasaBomberos: string;
+  otros: string;
   recargo: string;
   total: string;
   dias: number;
   impuestoNumerico: number;
   trenDeAseoNumerico: number;
   tasaBomberosNumerico: number;
+  otrosNumerico: number;
   recargoNumerico: number;
   totalNumerico: number;
   amnistiaAplicada: boolean;

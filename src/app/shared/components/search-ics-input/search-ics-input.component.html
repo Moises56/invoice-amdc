@@ -1,0 +1,90 @@
+<div class="search-ics-container">
+  <!-- Selector de tipo de búsqueda ICS -->
+  <ion-segment 
+    [value]="searchType()" 
+    (ionChange)="onSearchTypeChange($event.detail.value)"
+    class="search-type-selector">
+    <ion-segment-button value="dni">
+      <ion-label>DNI</ion-label>
+      <ion-icon name="card-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="rtn">
+      <ion-label>RTN</ion-label>
+      <ion-icon name="business-outline"></ion-icon>
+    </ion-segment-button>
+    <ion-segment-button value="ics">
+      <ion-label>Código ICS</ion-label>
+      <ion-icon name="home-outline"></ion-icon>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Campo de búsqueda -->
+  <div class="search-input-container">
+    <ion-item 
+      lines="none" 
+      [class.error]="!isValid()"
+      class="search-item">
+      <ion-label position="stacked">{{ getSearchTypeLabel() }}</ion-label>
+      <ion-input
+        [value]="searchValue()"
+        (ionInput)="onInputChange($event.detail.value!)"
+        [placeholder]="getPlaceholder()"
+        [disabled]="disabled"
+        [class.error-input]="!isValid()"
+        type="text"
+        autocomplete="off"
+        spellcheck="false">
+      </ion-input>
+      
+      <!-- Icono del tipo de búsqueda -->
+      <ion-icon 
+        [name]="getIcon()" 
+        slot="start" 
+        color="medium">
+      </ion-icon>
+      
+      <!-- Botón de limpiar -->
+      <ion-button 
+        *ngIf="searchValue()"
+        fill="clear" 
+        slot="end" 
+        size="small"
+        (click)="clearSearch()">
+        <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <!-- Mensaje de error -->
+    <div *ngIf="!isValid() && errorMessage()" class="error-message">
+      <ion-icon name="alert-circle" color="danger"></ion-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  </div>
+
+  <!-- Información de ayuda -->
+  <div class="help-info">
+    <ion-text color="medium">
+      <small>
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <span>{{ getHelpText() }}</span>
+      </small>
+    </ion-text>
+  </div>
+
+  <!-- Indicador de búsqueda activa -->
+  <div *ngIf="searchValue() && isValid()" class="search-indicator">
+    <ion-chip color="primary" outline="true">
+      <ion-icon name="search-outline"></ion-icon>
+      <ion-label>Buscando: {{ searchValue() }}</ion-label>
+    </ion-chip>
+  </div>
+
+  <!-- Ejemplos de formato -->
+  <div class="format-examples" *ngIf="searchType() === 'ics'">
+    <ion-text color="medium">
+      <small>
+        <strong>Ejemplos válidos:</strong> ICS-006454, ICS-123456, ICS-789012
+      </small>
+    </ion-text>
+  </div>
+</div>

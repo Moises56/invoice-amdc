@@ -1,0 +1,267 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard/user"></ion-back-button>
+    </ion-buttons>
+    <ion-title>ICS con Amnistía</ion-title>
+    <ion-buttons slot="end">
+      <ion-button 
+        *ngIf="tieneResultados" 
+        fill="clear" 
+        (click)="imprimirICS()">
+        <ion-icon name="print-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">ICS con Amnistía</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="container">
+    <!-- Archivo eliminado para regeneración del módulo -->
+    <app-search-ics-input
+      [disabled]="isLoading()"
+      [clearOnSearch]="false"
+      (search)="onSearch($event)"
+      (clear)="onClear()">
+    </app-search-ics-input>
+
+    <!-- Indicador de carga -->
+    <div *ngIf="isLoading()" class="loading-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <ion-text color="medium">
+        <p>Consultando información ICS con amnistía...</p>
+      </ion-text>
+    </div>
+
+    <!-- Mensaje de error -->
+    <ion-card *ngIf="searchError()" class="error-card">
+      <ion-card-content>
+        <div class="error-content">
+          <ion-icon name="alert-circle" color="danger"></ion-icon>
+          <div>
+            <h3>Error en la consulta</h3>
+            <p>{{ searchError() }}</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Resultados de la consulta -->
+    <div *ngIf="tieneResultados && !isLoading()" class="results-container">
+      
+      <!-- Información del propietario -->
+      <ion-card class="owner-card glass-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="person-outline" color="primary"></ion-icon>
+            Información del Propietario
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="owner-info">
+            <div class="info-row">
+              <span class="label">Nombre:</span>
+              <span class="value">{{ propietario?.nombre }}</span>
+            </div>
+            <div class="info-row" *ngIf="propietario?.dni">
+              <span class="label">DNI:</span>
+              <span class="value">{{ propietario?.dni }}</span>
+            </div>
+            <div class="info-row" *ngIf="propietario?.rtn">
+              <span class="label">RTN:</span>
+              <span class="value">{{ propietario?.rtn }}</span>
+            </div>
+            <div class="info-row" *ngIf="lastSearchParams?.ics">
+              <span class="label">Código ICS:</span>
+              <span class="value">{{ lastSearchParams?.ics }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Fecha de Consulta:</span>
+              <span class="value">{{ getFechaConsulta() }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Información de la empresa seleccionada -->
+      <ion-card *ngIf="empresaSeleccionada()" class="info-card glass-card unified-info-card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem 2rem;background:linear-gradient(90deg,#e0f7fa 0%,#f5fafd 100%);box-shadow:0 2px 8px rgba(62,198,224,0.08);">
+        <div style="flex-shrink:0;">
+          <div style="width:56px;height:56px;background:#3ec6e0;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <ion-icon name="business-outline" style="font-size:2.5rem;color:#fff;"></ion-icon>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:1.3rem;font-weight:700;color:#3ec6e0;line-height:1.1;letter-spacing:0.5px;">{{ empresaSeleccionada()?.numeroEmpresa }}</div>
+          <div style="font-size:1rem;color:#0097a7;font-weight:600;">{{ empresaSeleccionada()?.mes }}</div>
+          <div style="margin-top:1rem;">
+            <span style="font-weight:600;color:#222;">Total Empresa:</span> <span style="color:#0097a7;font-weight:700;font-size:1.1rem;">{{ formatCurrency(empresaSeleccionada()?.totalPropiedadNumerico || 0) }}</span>
+            <br>
+            <span style="font-weight:600;color:#222;">Fecha:</span> <span style="color:#0097a7;font-weight:600;">{{ getFechaConsulta() }}</span>
+          </div>
+        </div>
+      </ion-card>
+
+      <!-- Resumen financiero -->
+      <div *ngIf="consultaResponse()" class="summary-card glass-card" style="background:linear-gradient(90deg,#e0f7fa 0%,#f5fafd 100%);box-shadow:0 2px 8px rgba(62,198,224,0.08);margin-bottom:18px;">
+        <div class="summary-header" style="padding:1.2rem 1.5rem 0.5rem 1.5rem;">
+          <h3 style="font-size:1.15rem;font-weight:700;color:#0097a7;margin:0 0 0.5rem 0;letter-spacing:0.5px;">Resumen Financiero con Amnistía</h3>
+        </div>
+        <div class="summary-content" style="padding:0 1.5rem 1.2rem 1.5rem;">
+          <div class="summary-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 2rem;align-items:center;">
+            <div class="summary-item" style="font-size:1rem;color:#222;">
+              <span class="label" style="font-weight:600;">Total Deuda Original:</span>
+              <span class="value" style="font-weight:700;color:#0097a7;">{{ formatCurrency(getResumenActual()?.totalGeneral || 0) }}</span>
+            </div>
+            <div class="summary-item" style="font-size:1rem;color:#222;">
+              <span class="label" style="font-weight:600;">Total Interés Original:</span>
+              <span class="value" style="font-weight:700;color:#0097a7;">{{ formatCurrency(getResumenActual()?.totalRecargo || 0) }}</span>
+            </div>
+            <div class="summary-item discount" style="font-size:1rem;color:#222;">
+              <span class="label" style="font-weight:600;">Descuento por pronto pago:</span>
+              <span class="value discount-value" style="font-weight:700;color:#ff9800;">-{{ formatCurrency(getResumenActual()?.descuentoProntoPago || 0) }}</span>
+            </div>
+            <div class="summary-item total" style="font-size:1rem;color:#222;">
+              <span class="label" style="font-weight:600;">Total con Amnistía:</span>
+              <span class="value total-value" style="font-weight:700;color:#43a047;font-size:1.1rem;">{{ formatCurrency(getResumenActual()?.totalAPagar || 0) }}</span>
+            </div>
+            <div class="summary-item savings" style="font-size:1rem;color:#222;grid-column:1/3;">
+              <span class="label" style="font-weight:600;">Ahorro Total:</span>
+              <span class="value savings-value" style="font-weight:700;color:#43a047;font-size:1.1rem;">{{ formatCurrency(ahorroConAmnistia) }}</span>
+            </div>
+          </div>
+          <div *ngIf="consultaResponse()?.amnistiaVigente" class="amnesty-info" style="margin-top:1rem;">
+            <ion-chip color="success">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              <ion-label>Amnistía Vigente</ion-label>
+            </ion-chip>
+            <p class="amnesty-date" style="color:#e53935;font-weight:600;margin:0 0 0 0.5rem;display:inline;">Válida hasta: <span style="color:#e53935;font-weight:700;">{{ consultaResponse()?.fechaFinAmnistia }}</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado de cuenta Volumen de Ventas Anuales -->
+      <div *ngIf="empresaSeleccionada()" class="detail-card glass-card">
+        <div class="detail-header">
+          <h3 style="font-size:1.15rem;font-weight:700;color:#f7f7f7;margin:0 0 0.5rem 0;letter-spacing:0.5px;">Estado de cuenta Volumen de Ventas Anuales</h3>
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="imprimirICS()"
+            [disabled]="isLoading()">
+            <ion-icon name="print-outline" slot="start"></ion-icon>
+            Imprimir
+          </ion-button>
+        </div>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table class="detail-table responsive-table">
+              <thead>
+                <tr>
+                  <th>Año</th>
+                  <th>Impuesto</th>
+                  <th>T. Aseo</th>
+                  <th>Bomberos</th>
+                  <th>Otros</th>
+                  <th>Recargo</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let detalle of empresaSeleccionada()?.detallesMora" class="detail-row">
+                  <td class="year-cell">{{ detalle.year }}</td>
+                  <td>{{ formatCurrency(detalle.impuestoNumerico ?? 0) }}</td>
+                  <td>{{ formatCurrency(detalle.trenDeAseoNumerico ?? 0) }}</td>
+                  <td>{{ formatCurrency(detalle.tasaBomberosNumerico ?? 0) }}</td>
+                  <td>{{ formatCurrency(detalle.otrosNumerico ?? 0) }}</td>
+                  <td>{{ formatCurrency(detalle.recargoNumerico ?? 0) }}</td>
+                  <td class="total-cell">{{ formatCurrency(detalle.totalNumerico ?? 0) }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="6"><strong>TOTAL EMPRESA</strong></td>
+                  <td class="total-cell"><strong>{{ formatCurrency(empresaSeleccionada()?.totalPropiedadNumerico || 0) }}</strong></td>
+                </tr>
+                <tr class="grand-total-row" *ngIf="consultaResponse()?.totalGeneralNumerico">
+                  <td colspan="6"><strong>TOTAL GENERAL</strong></td>
+                  <td class="total-cell grand-total"><strong>{{ formatCurrency(consultaResponse()?.totalGeneralNumerico || 0) }}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detalle de mora con amnistía -->
+      <!-- <ion-card *ngIf="getDetallesMoraActual().length > 0" class="mora-card">
+        <ion-card-header>
+          <ion-card-title>
+            <ion-icon name="list-outline"></ion-icon>
+            Estado de cuenta Volumen de Ventas Anuales
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="mora-table">
+            <div class="table-header">
+              <div class="col">Período</div>
+              <div class="col">Monto Original</div>
+              <div class="col">Con Amnistía</div>
+              <div class="col">Ahorro</div>
+              <div class="col">Estado</div>
+            </div>
+            <div 
+              *ngFor="let detalle of getDetallesMoraActual()" 
+              class="table-row"
+              [class.vencido]="detalle.estado === 'VENCIDO'"
+              [class.pendiente]="detalle.estado === 'PENDIENTE'"
+              [class.pagado]="detalle.estado === 'PAGADO'">
+              <div class="col">
+                <strong>{{ detalle.mes }} {{ detalle.anio }}</strong>
+                <small *ngIf="detalle.fechaVencimiento">
+                  Vence: {{ formatDate(detalle.fechaVencimiento) }}
+                </small>
+              </div>
+              <div class="col">{{ formatCurrency(detalle.monto) }}</div>
+              <div class="col">{{ formatCurrency(detalle.montoConAmnistia || detalle.monto) }}</div>
+              <div class="col savings">{{ formatCurrency(detalle.monto - (detalle.montoConAmnistia || detalle.monto)) }}</div>
+              <div class="col">
+                <ion-badge 
+                  [color]="detalle.estado === 'PAGADO' ? 'success' : 
+                           detalle.estado === 'PENDIENTE' ? 'warning' : 'danger'">
+                  {{ detalle.estado }}
+                </ion-badge>
+                <small *ngIf="detalle.diasVencido && detalle.diasVencido > 0">
+                  {{ detalle.diasVencido }} días vencido
+                </small>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card> -->
+
+      <!-- Información de búsqueda -->
+      <ion-card class="search-info-card">
+        <ion-card-content>
+          <div class="search-summary">
+            <ion-icon name="search-outline"></ion-icon>
+            <span>Búsqueda: {{ getSearchSummary() }}</span>
+            <span class="date">{{ formatDate(getCurrentDate()) }}</span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!tieneResultados && !isLoading() && !searchError()" class="empty-state">
+      <ion-icon name="search-outline" color="medium"></ion-icon>
+      <h3>Consulta ICS con Amnistía</h3>
+      <p>Ingrese un DNI, RTN o código ICS para consultar el estado de cuenta del Volumen de Ventas Anuales.</p>
+    </div>
+  </div>
+</ion-content>
