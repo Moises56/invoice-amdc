@@ -1,3 +1,13 @@
+/* Mejora contraste de los botones activos en el buscador ICS */
+.search-modern-card .search-ics-tabs .tab-button.active,
+.search-modern-card .search-ics-tabs .tab-button.selected {
+  background: #0097a7 !important;
+  color: #fff !important;
+}
+.search-modern-card .search-ics-tabs .tab-button.active ion-icon,
+.search-modern-card .search-ics-tabs .tab-button.selected ion-icon {
+  color: #fff !important;
+}
 .container {
   padding: 16px;
   max-width: 1200px;

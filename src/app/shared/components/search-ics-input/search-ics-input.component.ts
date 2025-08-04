@@ -169,7 +169,7 @@ export class SearchIcsInputComponent implements OnDestroy {
       case 'rtn':
         return 'Ingrese el RTN hondureño (14 dígitos consecutivos, ej: 08011990123456)';
       case 'ics':
-        return 'Ingrese el código ICS completo (formato: ICS-XXXXXX, ej: ICS-006454)';
+        return 'Ingrese el código ICS completo (formato: ICS-XXXXXX, ej:  ICS-789012)';
       default:
         return '';
     }

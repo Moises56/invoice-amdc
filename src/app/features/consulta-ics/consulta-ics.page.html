@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/dashboard/user"></ion-back-button>
     </ion-buttons>
-    <ion-title>Consulta ICS</ion-title>
+    <ion-title>EC Volumen Ventas</ion-title>
     <ion-buttons slot="end">
       <ion-button 
         *ngIf="tieneResultados" 
@@ -23,13 +23,37 @@
   </ion-header>
 
   <div class="container">
-    <!-- Componente de búsqueda ICS -->
-    <app-search-ics-input
-      [disabled]="isLoading()"
-      [clearOnSearch]="false"
-      (search)="onSearch($event)"
-      (clear)="onClear()">
-    </app-search-ics-input>
+
+    <!-- Buscador Moderno -->
+    <div class="search-modern-card" style="background:linear-gradient(135deg,#f8fdff 0%,#e8f8ff 100%);box-shadow:0 2px 12px rgba(62,198,224,0.10);border-radius:18px;padding:2rem 1.5rem 1.5rem 1.5rem;margin-bottom:2.2rem;max-width:600px;margin-left:auto;margin-right:auto;">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;">
+        <ion-icon name="search-outline" style="font-size:2rem;color:#3ec6e0;"></ion-icon>
+        <span style="font-size:1.25rem;font-weight:700;color:#0097a7;letter-spacing:0.5px;">Buscar Estado de Cuenta ICS</span>
+      </div>
+      <app-search-ics-input
+        [disabled]="isLoading()"
+        [clearOnSearch]="false"
+        (search)="onSearch($event)"
+        (clear)="onClear()">
+      </app-search-ics-input>
+      <div style="margin-top:1.2rem;display:grid;gap:0.7rem;">
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <ion-icon name="card-outline" style="font-size:1.2rem;color:#0097a7;"></ion-icon>
+          <span style="font-size:1rem;color:#222;font-weight:500;">DNI hondureño</span>
+          <span style="font-size:0.95rem;color:#888;">(13 dígitos, ej: 0801199012345)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <ion-icon name="business-outline" style="font-size:1.2rem;color:#0097a7;"></ion-icon>
+          <span style="font-size:1rem;color:#222;font-weight:500;">RTN</span>
+          <span style="font-size:0.95rem;color:#888;">(14 dígitos, ej: 08011990123456)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.6rem;">
+          <ion-icon name="barcode-outline" style="font-size:1.2rem;color:#0097a7;"></ion-icon>
+          <span style="font-size:1rem;color:#222;font-weight:500;">Código ICS</span>
+          <!-- <span style="font-size:0.95rem;color:#888;">(ej: ICS-006454)</span> -->
+        </div>
+      </div>
+    </div>
 
     <!-- Indicador de carga -->
     <div *ngIf="isLoading()" class="loading-container">
@@ -69,22 +93,18 @@
               <span class="label">Nombre:</span>
               <span class="value">{{ propietario?.nombre }}</span>
             </div>
-            <div class="info-row" *ngIf="propietario?.dni">
-              <span class="label">DNI:</span>
-              <span class="value">{{ propietario?.dni }}</span>
+            <div class="info-row" *ngIf="consultaResponse()?.identidad">
+              <span class="label">DNI / RTN:</span>
+              <span class="value">{{ consultaResponse()?.identidad }}</span>
             </div>
-            <div class="info-row" *ngIf="propietario?.rtn">
-              <span class="label">RTN:</span>
-              <span class="value">{{ propietario?.rtn }}</span>
-            </div>
-            <div class="info-row" *ngIf="lastSearchParams?.ics">
+            <!-- <div class="info-row" *ngIf="lastSearchParams?.ics">
               <span class="label">Código ICS:</span>
               <span class="value">{{ lastSearchParams?.ics }}</span>
-            </div>
-            <div class="info-row">
+            </div> -->
+            <!-- <div class="info-row">
               <span class="label">Fecha de Consulta:</span>
               <span class="value">{{ getFechaConsulta() }}</span>
-            </div>
+            </div> -->
           </div>
         </ion-card-content>
       </ion-card>
@@ -163,7 +183,50 @@
         </div>
       </div>
 
-      <!-- Detalle de mora eliminado -->
+      <!-- Detalle de mora -->
+      <div *ngIf="empresaSeleccionada()?.detallesMora?.length > 0" class="detail-card glass-card" style="margin-bottom:2.2rem;box-shadow:0 4px 16px rgba(62,198,224,0.10);border-radius:16px;background:#fff;">
+        <div class="detail-header" style="padding:1.5rem 1.5rem 1rem 1.5rem;border-bottom:1px solid rgba(62,198,224,0.1);background:linear-gradient(135deg,#0097a7,#3ec6e0);border-radius:16px 16px 0 0;">
+          <h3 style="font-size:1.15rem;font-weight:700;color:#fff;margin:0 0 0.5rem 0;letter-spacing:0.5px;">Detalle de Mora</h3>
+        </div>
+        <div class="table-container" style="padding:1.5rem;overflow-x:auto;">
+          <div class="table-wrapper">
+            <table class="detail-table responsive-table" style="width:100%;min-width:700px;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+              <thead>
+                <tr style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2);">
+                  <th style="padding:1rem 0.75rem;text-align:left;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Año</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Impuesto</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">T. Aseo</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Bomberos</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Otros</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Recargo</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let detalle of empresaSeleccionada()?.detallesMora; let i = index" class="detail-row" [style.background]="i % 2 === 0 ? '#fafafa' : '#fff'">
+                  <td class="year-cell" style="padding:0.75rem;font-weight:600;color:#333;border-bottom:1px solid #e0e0e0;">{{ detalle.year || detalle.anio }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.impuestoNumerico ?? detalle.impuesto ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.trenDeAseoNumerico ?? detalle.trenDeAseo ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.tasaBomberosNumerico ?? detalle.tasaBomberos ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.otrosNumerico ?? detalle.otros ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.recargoNumerico ?? detalle.recargo ?? 0) }}</td>
+                  <td class="total-cell" style="padding:0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.totalNumerico ?? detalle.total ?? 0) }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="total-row" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2);">
+                  <td colspan="6" style="padding:1rem 0.75rem;font-weight:700;color:#0097a7;border-top:2px solid #3ec6e0;"><strong>TOTAL EMPRESA</strong></td>
+                  <td class="total-cell" style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-top:2px solid #3ec6e0;"><strong>{{ formatCurrency(empresaSeleccionada()?.totalPropiedadNumerico || 0) }}</strong></td>
+                </tr>
+                <tr class="grand-total-row" *ngIf="consultaResponse()?.totalGeneralNumerico" style="background:linear-gradient(135deg,#3ec6e0,#0097a7);">
+                  <td colspan="6" style="padding:1rem 0.75rem;font-weight:700;color:#fff;"><strong>TOTAL GENERAL</strong></td>
+                  <td class="total-cell grand-total" style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#fff;"><strong>{{ formatCurrency(consultaResponse()?.totalGeneralNumerico || 0) }}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
 
       <!-- Información de búsqueda -->
       <ion-card class="search-info-card">
@@ -180,8 +243,8 @@
     <!-- Estado vacío -->
     <div *ngIf="!tieneResultados && !isLoading() && !searchError()" class="empty-state">
       <ion-icon name="search-outline" color="medium"></ion-icon>
-      <h3>Consulta ICS</h3>
-      <p>Ingrese un DNI, RTN o código ICS para consultar el estado de cuenta del Impuesto de Construcción y Solvencia.</p>
+      <h3>Estado de cuenta Volumen de Ventas Anuales</h3>
+      <p>Ingrese un DNI, RTN o código ICS para consultar el estado de cuenta de Volumen de Ventas Anuales</p>
     </div>
   </div>
 </ion-content>

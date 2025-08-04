@@ -22,14 +22,16 @@
     </ion-toolbar>
   </ion-header>
 
-  <div class="container">
+  <div class="container" style="padding:1rem;max-width:1200px;margin:0 auto;">
     <!-- Archivo eliminado para regeneración del módulo -->
-    <app-search-ics-input
-      [disabled]="isLoading()"
-      [clearOnSearch]="false"
-      (search)="onSearch($event)"
-      (clear)="onClear()">
-    </app-search-ics-input>
+    <div style="margin-bottom:2rem;">
+      <app-search-ics-input
+        [disabled]="isLoading()"
+        [clearOnSearch]="false"
+        (search)="onSearch($event)"
+        (clear)="onClear()">
+      </app-search-ics-input>
+    </div>
 
     <!-- Indicador de carga -->
     <div *ngIf="isLoading()" class="loading-container">
@@ -56,41 +58,37 @@
     <div *ngIf="tieneResultados && !isLoading()" class="results-container">
       
       <!-- Información del propietario -->
-      <ion-card class="owner-card glass-card">
-        <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="person-outline" color="primary"></ion-icon>
+      <ion-card class="owner-card glass-card" style="margin-bottom:2.2rem;box-shadow:0 4px 16px rgba(62,198,224,0.12);border-radius:16px;background:linear-gradient(135deg,#f8fdff 0%,#e8f8ff 100%);">
+        <ion-card-header style="padding:1.5rem 1.5rem 1rem 1.5rem;border-bottom:1px solid rgba(62,198,224,0.1);">
+          <ion-card-title style="font-size:1.3rem;font-weight:700;color:#0097a7;display:flex;align-items:center;gap:0.75rem;margin:0;">
+            <ion-icon name="person-outline" style="font-size:1.5rem;color:#3ec6e0;"></ion-icon>
             Información del Propietario
           </ion-card-title>
         </ion-card-header>
-        <ion-card-content>
-          <div class="owner-info">
-            <div class="info-row">
-              <span class="label">Nombre:</span>
-              <span class="value">{{ propietario?.nombre }}</span>
+        <ion-card-content style="padding:1.5rem;">
+          <div class="owner-info" style="display:grid;gap:1rem;">
+            <div class="info-row" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid rgba(224,247,250,0.6);">
+              <span class="label" style="font-weight:600;color:#555;font-size:1rem;">Nombre:</span>
+              <span class="value" style="font-weight:700;color:#0097a7;font-size:1rem;text-align:right;">{{ propietario?.nombre }}</span>
             </div>
-            <div class="info-row" *ngIf="propietario?.dni">
-              <span class="label">DNI:</span>
-              <span class="value">{{ propietario?.dni }}</span>
+            <div class="info-row" *ngIf="propietario?.identidad" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid rgba(224,247,250,0.6);">
+              <span class="label" style="font-weight:600;color:#555;font-size:1rem;">DNI/RTN:</span>
+              <span class="value" style="font-weight:700;color:#0097a7;font-size:1rem;text-align:right;">{{ propietario?.identidad }}</span>
             </div>
-            <div class="info-row" *ngIf="propietario?.rtn">
-              <span class="label">RTN:</span>
-              <span class="value">{{ propietario?.rtn }}</span>
+            <div class="info-row" *ngIf="lastSearchParams?.ics" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid rgba(224,247,250,0.6);">
+              <span class="label" style="font-weight:600;color:#555;font-size:1rem;">Código ICS:</span>
+              <span class="value" style="font-weight:700;color:#0097a7;font-size:1rem;text-align:right;">{{ lastSearchParams?.ics }}</span>
             </div>
-            <div class="info-row" *ngIf="lastSearchParams?.ics">
-              <span class="label">Código ICS:</span>
-              <span class="value">{{ lastSearchParams?.ics }}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Fecha de Consulta:</span>
-              <span class="value">{{ getFechaConsulta() }}</span>
+            <div class="info-row" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;">
+              <span class="label" style="font-weight:600;color:#555;font-size:1rem;">Fecha de Consulta:</span>
+              <span class="value" style="font-weight:700;color:#0097a7;font-size:1rem;text-align:right;">{{ getFechaConsulta() }}</span>
             </div>
           </div>
         </ion-card-content>
       </ion-card>
 
       <!-- Información de la empresa seleccionada -->
-      <ion-card *ngIf="empresaSeleccionada()" class="info-card glass-card unified-info-card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem 2rem;background:linear-gradient(90deg,#e0f7fa 0%,#f5fafd 100%);box-shadow:0 2px 8px rgba(62,198,224,0.08);">
+      <ion-card *ngIf="empresaSeleccionada()" class="info-card glass-card unified-info-card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem 2rem;background:linear-gradient(90deg,#e0f7fa 0%,#f5fafd 100%);box-shadow:0 4px 16px rgba(62,198,224,0.10);margin-bottom:2.2rem;border-radius:16px;">
         <div style="flex-shrink:0;">
           <div style="width:56px;height:56px;background:#3ec6e0;border-radius:50%;display:flex;align-items:center;justify-content:center;">
             <ion-icon name="business-outline" style="font-size:2.5rem;color:#fff;"></ion-icon>
@@ -100,97 +98,101 @@
           <div style="font-size:1.3rem;font-weight:700;color:#3ec6e0;line-height:1.1;letter-spacing:0.5px;">{{ empresaSeleccionada()?.numeroEmpresa }}</div>
           <div style="font-size:1rem;color:#0097a7;font-weight:600;">{{ empresaSeleccionada()?.mes }}</div>
           <div style="margin-top:1rem;">
-            <span style="font-weight:600;color:#222;">Total Empresa:</span> <span style="color:#0097a7;font-weight:700;font-size:1.1rem;">{{ formatCurrency(empresaSeleccionada()?.totalPropiedadNumerico || 0) }}</span>
-            <br>
-            <span style="font-weight:600;color:#222;">Fecha:</span> <span style="color:#0097a7;font-weight:600;">{{ getFechaConsulta() }}</span>
+            <span style="font-weight:600;color:#222;">Total A pagar:</span> <span style="color:#0097a7;font-weight:700;font-size:1.1rem;">{{ formatCurrency(getResumenActual()?.totalAPagar || 0) }}</span>
           </div>
         </div>
       </ion-card>
 
       <!-- Resumen financiero -->
-      <div *ngIf="consultaResponse()" class="summary-card glass-card" style="background:linear-gradient(90deg,#e0f7fa 0%,#f5fafd 100%);box-shadow:0 2px 8px rgba(62,198,224,0.08);margin-bottom:18px;">
+      <div *ngIf="consultaResponse()" class="summary-card glass-card" style="background:#fff;box-shadow:0 4px 16px rgba(62,198,224,0.10);margin-bottom:2.2rem;border-radius:16px;">
         <div class="summary-header" style="padding:1.2rem 1.5rem 0.5rem 1.5rem;">
-          <h3 style="font-size:1.15rem;font-weight:700;color:#0097a7;margin:0 0 0.5rem 0;letter-spacing:0.5px;">Resumen Financiero con Amnistía</h3>
+          <h3 style="font-size:1.15rem;font-weight:700;color:#222;margin:0 0 0.5rem 0;letter-spacing:0.5px;">Resumen Financiero con Amnistía</h3>
         </div>
         <div class="summary-content" style="padding:0 1.5rem 1.2rem 1.5rem;">
-          <div class="summary-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 2rem;align-items:center;">
-            <div class="summary-item" style="font-size:1rem;color:#222;">
-              <span class="label" style="font-weight:600;">Total Deuda Original:</span>
-              <span class="value" style="font-weight:700;color:#0097a7;">{{ formatCurrency(getResumenActual()?.totalGeneral || 0) }}</span>
+          <!-- Totales principales -->
+          <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:space-between;margin-bottom:0.5rem;">
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.98rem;font-weight:600;color:#555;">Total Deuda Original:</div>
+              <div style="font-size:1.15rem;font-weight:700;color:#222;">{{ formatCurrency(getResumenActual()?.totalGeneral || 0) }}</div>
             </div>
-            <div class="summary-item" style="font-size:1rem;color:#222;">
-              <span class="label" style="font-weight:600;">Total Interés Original:</span>
-              <span class="value" style="font-weight:700;color:#0097a7;">{{ formatCurrency(getResumenActual()?.totalRecargo || 0) }}</span>
-            </div>
-            <div class="summary-item discount" style="font-size:1rem;color:#222;">
-              <span class="label" style="font-weight:600;">Descuento por pronto pago:</span>
-              <span class="value discount-value" style="font-weight:700;color:#ff9800;">-{{ formatCurrency(getResumenActual()?.descuentoProntoPago || 0) }}</span>
-            </div>
-            <div class="summary-item total" style="font-size:1rem;color:#222;">
-              <span class="label" style="font-weight:600;">Total con Amnistía:</span>
-              <span class="value total-value" style="font-weight:700;color:#43a047;font-size:1.1rem;">{{ formatCurrency(getResumenActual()?.totalAPagar || 0) }}</span>
-            </div>
-            <div class="summary-item savings" style="font-size:1rem;color:#222;grid-column:1/3;">
-              <span class="label" style="font-weight:600;">Ahorro Total:</span>
-              <span class="value savings-value" style="font-weight:700;color:#43a047;font-size:1.1rem;">{{ formatCurrency(ahorroConAmnistia) }}</span>
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.98rem;font-weight:600;color:#555;">Recargo:</div>
+              <div style="font-size:1.15rem;font-weight:700;color:#222;">{{ formatCurrency(getResumenActual()?.totalRecargo || 0) }}</div>
             </div>
           </div>
-          <div *ngIf="consultaResponse()?.amnistiaVigente" class="amnesty-info" style="margin-top:1rem;">
-            <ion-chip color="success">
-              <ion-icon name="shield-checkmark-outline"></ion-icon>
-              <ion-label>Amnistía Vigente</ion-label>
-            </ion-chip>
-            <p class="amnesty-date" style="color:#e53935;font-weight:600;margin:0 0 0 0.5rem;display:inline;">Válida hasta: <span style="color:#e53935;font-weight:700;">{{ consultaResponse()?.fechaFinAmnistia }}</span></p>
+          <!-- Descuento y total con amnistía -->
+          <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:space-between;margin-bottom:0.5rem;">
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.98rem;font-weight:600;color:#555;">Descuento por pronto pago:</div>
+              <div style="font-size:1.15rem;font-weight:700;color:#ff9800;">-{{ formatCurrency(getResumenActual()?.descuentoProntoPago || 0) }}</div>
+            </div>
+            <div style="flex:1;min-width:180px;">
+              <div style="font-size:0.98rem;font-weight:600;color:#555;">Total a Pagar con Amnistía:</div>
+              <div style="font-size:1.15rem;font-weight:700;color:#43a047;">{{ formatCurrency(getResumenActual()?.totalAPagar || 0) }}</div>
+            </div>
+          </div>
+          <!-- Separador visual -->
+          <hr style="border:none;border-top:1px dashed #e0e0e0;margin:1rem 0 1.2rem 0;">
+          <!-- Ahorro total destacado -->
+          <div style="background:#e8fbee;padding:1rem 1.5rem;border-radius:8px;display:flex;align-items:center;gap:1.5rem;margin-bottom:1.2rem;">
+            <span style="font-weight:700;font-size:1.1rem;color:#188038;">Ahorro Total:</span>
+            <span style="font-weight:700;font-size:1.1rem;color:#188038;">{{ formatCurrency(ahorroConAmnistia) }}</span>
+          </div>
+          <!-- Amnistía vigente -->
+          <div *ngIf="consultaResponse()?.amnistiaVigente" style="display:flex;align-items:center;gap:0.5rem;background:#e6f9ed;padding:0.7rem 1rem;border-radius:8px;width:max-content;">
+            <ion-icon name="location-outline" style="color:#188038;font-size:1.2rem;"></ion-icon>
+            <span style="color:#188038;font-weight:600;">Amnistía Vigente. Válida hasta: <span style="font-weight:700;">{{ consultaResponse()?.fechaFinAmnistia }}</span></span>
           </div>
         </div>
       </div>
 
       <!-- Estado de cuenta Volumen de Ventas Anuales -->
-      <div *ngIf="empresaSeleccionada()" class="detail-card glass-card">
-        <div class="detail-header">
-          <h3 style="font-size:1.15rem;font-weight:700;color:#f7f7f7;margin:0 0 0.5rem 0;letter-spacing:0.5px;">Estado de cuenta Volumen de Ventas Anuales</h3>
+      <div *ngIf="empresaSeleccionada()" class="detail-card glass-card" style="margin-bottom:2.2rem;box-shadow:0 4px 16px rgba(62,198,224,0.10);border-radius:16px;background:#fff;">
+        <div class="detail-header" style="padding:1.5rem 1.5rem 1rem 1.5rem;border-bottom:1px solid rgba(62,198,224,0.1);background:linear-gradient(135deg,#0097a7,#3ec6e0);border-radius:16px 16px 0 0;">
+          <h3 style="font-size:1.15rem;font-weight:700;color:#fff;margin:0 0 0.5rem 0;letter-spacing:0.5px;">Estado de cuenta Volumen de Ventas Anuales</h3>
           <ion-button 
             fill="outline" 
             size="small" 
             (click)="imprimirICS()"
-            [disabled]="isLoading()">
+            [disabled]="isLoading()"
+            style="--color:#fff;--border-color:#fff;">
             <ion-icon name="print-outline" slot="start"></ion-icon>
             Imprimir
           </ion-button>
         </div>
-        <div class="table-container">
+        <div class="table-container" style="padding:1.5rem;overflow-x:auto;">
           <div class="table-wrapper">
-            <table class="detail-table responsive-table">
+            <table class="detail-table responsive-table" style="width:100%;min-width:700px;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
               <thead>
-                <tr>
-                  <th>Año</th>
-                  <th>Impuesto</th>
-                  <th>T. Aseo</th>
-                  <th>Bomberos</th>
-                  <th>Otros</th>
-                  <th>Recargo</th>
-                  <th>Total</th>
+                <tr style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2);">
+                  <th style="padding:1rem 0.75rem;text-align:left;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Año</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Impuesto</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">T. Aseo</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Bomberos</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Otros</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Recargo</th>
+                  <th style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:2px solid #3ec6e0;font-size:0.9rem;">Total</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let detalle of empresaSeleccionada()?.detallesMora" class="detail-row">
-                  <td class="year-cell">{{ detalle.year }}</td>
-                  <td>{{ formatCurrency(detalle.impuestoNumerico ?? 0) }}</td>
-                  <td>{{ formatCurrency(detalle.trenDeAseoNumerico ?? 0) }}</td>
-                  <td>{{ formatCurrency(detalle.tasaBomberosNumerico ?? 0) }}</td>
-                  <td>{{ formatCurrency(detalle.otrosNumerico ?? 0) }}</td>
-                  <td>{{ formatCurrency(detalle.recargoNumerico ?? 0) }}</td>
-                  <td class="total-cell">{{ formatCurrency(detalle.totalNumerico ?? 0) }}</td>
+                <tr *ngFor="let detalle of empresaSeleccionada()?.detallesMora; let i = index" class="detail-row" [style.background]="i % 2 === 0 ? '#fafafa' : '#fff'">
+                  <td class="year-cell" style="padding:0.75rem;font-weight:600;color:#333;border-bottom:1px solid #e0e0e0;">{{ detalle.year }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.impuestoNumerico ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.trenDeAseoNumerico ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.tasaBomberosNumerico ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.otrosNumerico ?? 0) }}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#555;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.recargoNumerico ?? 0) }}</td>
+                  <td class="total-cell" style="padding:0.75rem;text-align:right;font-weight:700;color:#0097a7;border-bottom:1px solid #e0e0e0;">{{ formatCurrency(detalle.totalNumerico ?? 0) }}</td>
                 </tr>
               </tbody>
               <tfoot>
-                <tr class="total-row">
-                  <td colspan="6"><strong>TOTAL EMPRESA</strong></td>
-                  <td class="total-cell"><strong>{{ formatCurrency(empresaSeleccionada()?.totalPropiedadNumerico || 0) }}</strong></td>
+                <tr class="total-row" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2);">
+                  <td colspan="6" style="padding:1rem 0.75rem;font-weight:700;color:#0097a7;border-top:2px solid #3ec6e0;"><strong>TOTAL EMPRESA</strong></td>
+                  <td class="total-cell" style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#0097a7;border-top:2px solid #3ec6e0;"><strong>{{ formatCurrency(empresaSeleccionada()?.totalPropiedadNumerico || 0) }}</strong></td>
                 </tr>
-                <tr class="grand-total-row" *ngIf="consultaResponse()?.totalGeneralNumerico">
-                  <td colspan="6"><strong>TOTAL GENERAL</strong></td>
-                  <td class="total-cell grand-total"><strong>{{ formatCurrency(consultaResponse()?.totalGeneralNumerico || 0) }}</strong></td>
+                <tr class="grand-total-row" *ngIf="consultaResponse()?.totalGeneralNumerico" style="background:linear-gradient(135deg,#3ec6e0,#0097a7);">
+                  <td colspan="6" style="padding:1rem 0.75rem;font-weight:700;color:#fff;"><strong>TOTAL GENERAL</strong></td>
+                  <td class="total-cell grand-total" style="padding:1rem 0.75rem;text-align:right;font-weight:700;color:#fff;"><strong>{{ formatCurrency(consultaResponse()?.totalGeneralNumerico || 0) }}</strong></td>
                 </tr>
               </tfoot>
             </table>
@@ -246,22 +248,29 @@
       </ion-card> -->
 
       <!-- Información de búsqueda -->
-      <ion-card class="search-info-card">
-        <ion-card-content>
-          <div class="search-summary">
-            <ion-icon name="search-outline"></ion-icon>
-            <span>Búsqueda: {{ getSearchSummary() }}</span>
-            <span class="date">{{ formatDate(getCurrentDate()) }}</span>
+      <ion-card class="search-info-card" style="margin-bottom:2.2rem;box-shadow:0 4px 16px rgba(62,198,224,0.10);border-radius:16px;background:linear-gradient(135deg,#f8fdff 0%,#e8f8ff 100%);border:1px solid rgba(62,198,224,0.2);">
+        <ion-card-content style="padding:1.5rem;">
+          <div class="search-summary" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:0.5rem;color:#0097a7;font-weight:600;">
+              <ion-icon name="search-outline" style="font-size:1.2rem;color:#3ec6e0;"></ion-icon>
+              <span style="font-size:1rem;">Búsqueda:</span>
+              <span style="font-weight:700;color:#0097a7;">{{ getSearchSummary() }}</span>
+            </div>
+            <div style="margin-left:auto;color:#666;font-size:0.9rem;font-weight:500;">
+              <span class="date">{{ formatDate(getCurrentDate()) }}</span>
+            </div>
           </div>
         </ion-card-content>
       </ion-card>
     </div>
 
     <!-- Estado vacío -->
-    <div *ngIf="!tieneResultados && !isLoading() && !searchError()" class="empty-state">
-      <ion-icon name="search-outline" color="medium"></ion-icon>
-      <h3>Consulta ICS con Amnistía</h3>
-      <p>Ingrese un DNI, RTN o código ICS para consultar el estado de cuenta del Volumen de Ventas Anuales.</p>
+    <div *ngIf="!tieneResultados && !isLoading() && !searchError()" class="empty-state" style="text-align:center;padding:3rem 1.5rem;margin:2rem 0;">
+      <div style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2);width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem auto;">
+        <ion-icon name="search-outline" style="font-size:2.5rem;color:#0097a7;"></ion-icon>
+      </div>
+      <h3 style="font-size:1.5rem;font-weight:700;color:#0097a7;margin:0 0 1rem 0;">Consulta Estado de cuenta Volumen de Ventas Anuales con Amnistía</h3>
+      <p style="color:#666;font-size:1.1rem;line-height:1.5;max-width:500px;margin:0 auto;">Ingrese un DNI, RTN o código ICS para consultar el estado de cuenta del Volumen de Ventas Anuales.</p>
     </div>
   </div>
 </ion-content>

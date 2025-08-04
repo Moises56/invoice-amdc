@@ -155,12 +155,24 @@ export class ConsultaIcsAmnistiaPage implements OnInit {
   get propietario() {
     const response = this.consultaResponse();
     if (!response) return null;
+    
+    // Determinar el valor de identidad según el tipo de búsqueda realizada
+    let identidad: string | undefined;
+    if (this.lastSearchParams?.rtn) {
+      identidad = this.lastSearchParams.rtn;
+    } else if (this.lastSearchParams?.dni) {
+      identidad = this.lastSearchParams.dni;
+    } else {
+      identidad = response.identidad;
+    }
+    
     const rtn = this.lastSearchParams?.rtn || undefined;
     const dni = this.lastSearchParams?.dni || response.identidad;
     return {
       nombre: response.nombre,
       dni: dni,
       rtn: rtn,
+      identidad: identidad,
       telefono: undefined,
       email: undefined,
       direccion: undefined
