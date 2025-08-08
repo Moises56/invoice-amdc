@@ -387,7 +387,7 @@
       border-bottom: 2px solid rgba(56, 128, 255, 0.1);
       padding: 1.25rem 2rem; // Más padding horizontal y vertical
       display: grid;
-      grid-template-columns: 60px 1.8fr 1.6fr 1fr 0.9fr 0.9fr 1.1fr 1fr;
+      grid-template-columns: 60px 1.8fr 1.6fr 1fr 0.9fr 0.9fr 1.1fr 1.2fr 1fr;
       gap: 1.5rem; // Más espacio entre columnas
       align-items: center;
       font-weight: 600;
@@ -450,7 +450,7 @@
     .table-body {
       .table-row {
         display: grid;
-        grid-template-columns: 60px 1.8fr 1.6fr 1fr 0.9fr 0.9fr 1.1fr 1fr;
+        grid-template-columns: 60px 1.8fr 1.6fr 1fr 0.9fr 0.9fr 1.1fr 1.2fr 1fr;
         gap: 1.5rem; // Más espacio entre columnas
         align-items: center;
         padding: 1.25rem 2rem; // Más padding horizontal y vertical
@@ -672,6 +672,11 @@
                   background: rgba(107, 114, 128, 0.15);
                   color: #6b7280; // Gris más definido
                 }
+
+                &.location-btn:hover {
+                  background: rgba(139, 92, 246, 0.15);
+                  color: #8b5cf6; // Púrpura para ubicación
+                }
                 
                 &.toggle-btn {
                   &.activate:hover {
@@ -841,6 +846,11 @@
           &.password:hover {
             background: rgba(107, 114, 128, 0.15);
             color: #6b7280; // Gris más definido
+          }
+
+          &.location:hover {
+            background: rgba(139, 92, 246, 0.15);
+            color: #8b5cf6; // Púrpura para ubicación
           }
           
           &.toggle {
@@ -1066,7 +1076,7 @@ ion-fab-button {
 @media (max-width: 1200px) {
   .table-header,
   .table-row {
-    grid-template-columns: 50px 1.5fr 1.3fr 0.8fr 0.8fr 0.8fr 1fr 0.9fr !important;
+    grid-template-columns: 50px 1.5fr 1.3fr 0.8fr 0.8fr 0.8fr 1fr 1fr 0.9fr !important;
     gap: 1.25rem !important; // Mantener buen espaciado
     padding: 1rem 1.5rem !important; // Padding reducido pero generoso
   }
@@ -1186,7 +1196,7 @@ ion-fab-button {
   .modern-table-wrapper {
     .table-header,
     .table-row {
-      grid-template-columns: 50px 1.4fr 1.6fr 0.9fr 0.7fr 0.7fr 0.9fr 0.7fr !important;
+      grid-template-columns: 50px 1.4fr 1.6fr 0.9fr 0.7fr 0.7fr 0.9fr 0.8fr 0.7fr !important;
       padding: 0.3rem 0.5rem !important;
       min-height: 45px !important;
     }
@@ -1216,5 +1226,87 @@ ion-fab-button {
   // Espaciado adicional para evitar problemas visuales
   .sticky-header {
     padding-bottom: 1rem; // Espacio adicional en la parte inferior
+  }
+}
+
+// ==========================================================================
+// ESTILOS PARA UBICACIÓN DE USUARIOS
+// ==========================================================================
+
+// Columna de ubicación en desktop
+.location-col {
+  .location-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    .location-text {
+      font-size: 0.875rem;
+      color: var(--usuarios-dark);
+      font-weight: 500;
+      
+      &:empty::before {
+        content: 'Sin ubicación';
+        color: var(--usuarios-medium);
+        font-style: italic;
+      }
+    }
+    
+    .location-icon {
+      font-size: 1rem;
+      
+      &.assigned {
+        color: var(--usuarios-success);
+      }
+      
+      &.unassigned {
+        color: var(--usuarios-medium);
+      }
+    }
+  }
+}
+
+// Ubicación en cards móviles
+.location-mobile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  .value {
+    flex: 1;
+    font-size: 0.875rem;
+    
+    &:empty::before {
+      content: 'Sin ubicación';
+      color: var(--usuarios-medium);
+      font-style: italic;
+    }
+  }
+  
+  .location-icon {
+    font-size: 1rem;
+    
+    &.assigned {
+      color: var(--usuarios-success);
+    }
+    
+    &.unassigned {
+      color: var(--usuarios-medium);
+    }
+  }
+}
+
+// Estilos responsivos para ubicación
+@media (max-width: 768px) {
+  // En móvil, las ubicaciones se muestran en las cards
+  .location-col {
+    display: none;
+  }
+}
+
+@media (min-width: 769px) {
+  // En desktop, mostrar la columna de ubicación
+  .location-mobile {
+    display: flex;
   }
 }

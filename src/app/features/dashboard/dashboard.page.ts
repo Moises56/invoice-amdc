@@ -67,6 +67,7 @@ import {
   InvoiceMetrics,
   EntityMetrics
 } from '../../shared/interfaces';
+// import { LocationStatsWidgetComponent } from '../../components/location-stats-widget/location-stats-widget.component';
 
 interface DashboardCard {
   title: string;
@@ -107,7 +108,8 @@ interface QuickStat {
     IonButtons,
     IonMenuButton,
     IonBadge,
-    IonSkeletonText
+    IonSkeletonText,
+    
   ]
 })
 export class DashboardPage implements OnInit {
@@ -705,5 +707,12 @@ export class DashboardPage implements OnInit {
    */
   onTopLocalClick(local: TopItem): void {
     this.navigateToLocal(local.id);
+  }
+
+  /**
+   * Verificar si el usuario actual es ADMIN
+   */
+  isAdmin(): boolean {
+    return this.authService.hasAnyRole(['ADMIN']);
   }
 }

@@ -8,11 +8,13 @@ import { AppComponent } from './app/app.component';
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 import { BluetoothSerial } from '@awesome-cordova-plugins/bluetooth-serial/ngx';
 import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions/ngx';
+import { PrintingService } from './app/shared/services/printing.service';
 
 bootstrapApplication(AppComponent, {
   providers: [
     BluetoothSerial,
     AndroidPermissions,
+    PrintingService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),

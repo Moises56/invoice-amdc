@@ -11,7 +11,7 @@ import {
 } from 'src/app/shared/interfaces/estado-cuenta.interface';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { PrintingService } from 'src/app/shared/services/printing.service';
+import { EstadoCuentaPrinterService } from 'src/app/shared/services/estado-cuenta-printer.service';
 import { BluetoothService } from '../bluetooth/bluetooth.service';
 import { SearchInputComponent } from 'src/app/shared/components/search-input/search-input.component';
 
@@ -27,7 +27,7 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
   private authService = inject(AuthService);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
-  private printingService = inject(PrintingService);
+  private estadoCuentaPrinterService = inject(EstadoCuentaPrinterService);
   private bluetoothService = inject(BluetoothService);
 
   // Datos de respuesta unificada
@@ -183,14 +183,55 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
             handler: () => {
               this.imprimirGrupal();
             }
+          },
+          // PDF temporalmente deshabilitado
+          /*
+          {
+            text: 'Vista Previa (PDF)',
+            handler: () => {
+              this.imprimirNavegador();
+            }
           }
+          */
         ]
       });
       await alert.present();
     } else {
-      // Para consultas por clave catastral, imprimir directamente
-      this.imprimirRecibo();
+      // Para consultas por clave catastral, mostrar opciones
+      const alert = await this.alertController.create({
+        header: 'Opciones de Impresión',
+        message: 'Seleccione el tipo de impresión:',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Ticket Térmico',
+            handler: () => {
+              this.imprimirRecibo();
+            }
+          }
+          // PDF temporalmente deshabilitado
+          /*
+          ,{
+            text: 'Vista Previa (PDF)',
+            handler: () => {
+              this.imprimirNavegador();
+            }
+          }
+          */
+        ]
+      });
+      await alert.present();
     }
+  }
+
+  /**
+   * Imprime usando el navegador (PDF/impresora)
+   */
+  imprimirNavegador() {
+    window.print();
   }
 
   async imprimirIndividual() {
@@ -210,10 +251,9 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
 
     try {
       this.presentToast('Preparando impresión individual...', 'success');
-      const receiptText = this.printingService.formatEstadoCuenta(
+      const receiptText = this.estadoCuentaPrinterService.formatEstadoCuentaConAmnistia(
         data, 
-        this.lastSearchParams, 
-        true // isAmnesty = true para estado-cuenta-amnistia
+        this.lastSearchParams
       );
       await this.bluetoothService.print(receiptText);
       this.presentToast('Recibo individual con amnistía enviado a la impresora exitosamente.', 'success');
@@ -240,13 +280,7 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
     try {
       this.presentToast('Preparando impresión grupal...', 'success');
       
-      // Convertir todas las propiedades al formato legacy para impresión
-      const estadosCuenta: EstadoCuentaResponse[] = response.propiedades.map(
-        (_, index) => this.estadoCuentaService.convertirAFormatoLegacy(response, index)
-      );
-      
-      const receiptText = this.printingService.formatEstadoCuentaGrupalAmnistia(
-        estadosCuenta, 
+      const receiptText = this.estadoCuentaPrinterService.formatEstadoCuentaGrupalConAmnistia(
         response,
         this.lastSearchParams
       );
@@ -274,10 +308,9 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
 
     try {
       this.presentToast('Preparando impresión...', 'success');
-      const receiptText = this.printingService.formatEstadoCuenta(
+      const receiptText = this.estadoCuentaPrinterService.formatEstadoCuentaConAmnistia(
         data, 
-        this.lastSearchParams, 
-        true // isAmnesty = true para estado-cuenta-amnistia
+        this.lastSearchParams
       );
       await this.bluetoothService.print(receiptText);
       this.presentToast('Recibo con amnistía enviado a la impresora exitosamente.', 'success');

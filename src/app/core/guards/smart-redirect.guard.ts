@@ -33,12 +33,12 @@ export const smartRedirectGuard: CanActivateFn = async (route, state) => {
   console.log('👤 SmartRedirectGuard: Usuario encontrado con rol:', user.role);
   
   // Verificar si ya está en la ruta correcta para evitar bucles
-  if (user.role === Role.USER) {
+  if (user.role === Role.USER || user.role === Role['USER-ADMIN']) {
     if (state.url === '/dashboard/user' || state.url.startsWith('/dashboard/user/')) {
-      console.log('✅ SmartRedirectGuard: Usuario USER ya está en la ruta correcta');
+      console.log('✅ SmartRedirectGuard: Usuario', user.role, 'ya está en la ruta correcta');
       return true;
     }
-    console.log('🔄 SmartRedirectGuard: Redirigiendo USER a /dashboard/user');
+    console.log('🔄 SmartRedirectGuard: Redirigiendo', user.role, 'a /dashboard/user');
     router.navigate(['/dashboard/user'], { replaceUrl: true });
     return false;
   } else if (user.role === Role.ADMIN || user.role === Role.MARKET) {

@@ -381,7 +381,8 @@ export class UsuarioFormPage implements OnInit {
     const texts: Record<Role, string> = {
       [Role.ADMIN]: 'Administrador',
       [Role.MARKET]: 'Mercado',
-      [Role.USER]: 'Usuario'
+      [Role.USER]: 'Usuario',
+      [Role['USER-ADMIN']]: 'Super Usuario'
     };
     return texts[role] || role;
   }

@@ -1,5 +1,6 @@
 
 @use "tailwindcss";
+@use "theme/print";
 /* Fix: Forzar fondo blanco para evitar pantalla negra entre splash y login */
 body, ion-app, .ion-page {
   background: #fff !important;
@@ -377,3 +378,5 @@ ion-content.users-page .sticky-header,
     --border-radius: 0;
   }
 }
+
+/* Importar estilos de impresión */

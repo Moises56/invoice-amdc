@@ -104,6 +104,17 @@ export class AppComponent implements OnInit {
     { title: 'Config. Bluetooth', url: '/bluetooth', icon: 'bluetooth-outline' },
   ];
 
+  private userAdminMenu: MenuItem[] = [
+    { title: 'Mi Dashboard', url: '/dashboard/user', icon: 'home-outline' },
+    { title: 'Estado de Cuenta', url: '/estado-cuenta', icon: 'document-text-outline' },
+    { title: 'Cuenta con Amnistía', url: '/estado-cuenta-amnistia', icon: 'shield-checkmark-outline' },
+    { title: 'Consulta ICS', url: '/consulta-ics', icon: 'business-outline' },
+    { title: 'ICS con Amnistía', url: '/consulta-ics-amnistia', icon: 'ribbon-outline' },
+    { title: 'Estadísticas Generales', url: '/general-stats', icon: 'analytics-outline' },
+    { title: 'Logs de Actividad', url: '/activity-logs', icon: 'document-attach-outline' },
+    { title: 'Config. Bluetooth', url: '/bluetooth', icon: 'bluetooth-outline' },
+  ];
+
   visibleMenuItems = computed(() => {
     const role = this.authService.userRole();
     switch (role) {
@@ -113,6 +124,8 @@ export class AppComponent implements OnInit {
         return this.marketMenu;
       case Role.USER:
         return this.userMenu;
+      case Role['USER-ADMIN']:
+        return this.userAdminMenu;
       default:
         return [];
     }

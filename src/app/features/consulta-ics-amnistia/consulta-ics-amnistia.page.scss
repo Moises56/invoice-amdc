@@ -1,5 +1,232 @@
 /* Estilos mejorados para ICS con Amnistía */
 
+/* Mostrar elementos de impresión solo al imprimir */
+@media print {
+  .print-header,
+  .contributor-info,
+  .amnesty-notice,
+  .financial-summary,
+  .print-footer {
+    display: block !important;
+  }
+}
+
+/* Responsive design para móviles */
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none !important;
+  }
+  
+  .mobile-cards {
+    display: block !important;
+  }
+  
+  /* Información del propietario - móvil compacto */
+  .owner-card-responsive {
+    .owner-header-mobile {
+      display: flex !important;
+    }
+    
+    .owner-header-desktop {
+      display: none !important;
+    }
+    
+    .owner-info-mobile {
+      display: flex !important;
+    }
+    
+    .owner-info-desktop {
+      display: none !important;
+    }
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-table {
+    display: block !important;
+  }
+  
+  .mobile-cards {
+    display: none !important;
+  }
+  
+  /* Información del propietario - desktop */
+  .owner-card-responsive {
+    .owner-header-mobile {
+      display: none !important;
+    }
+    
+    .owner-header-desktop {
+      display: block !important;
+      padding: 1rem 1.5rem 0.5rem 1.5rem;
+      
+      ion-card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #0097a7;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin: 0;
+        
+        ion-icon {
+          font-size: 1.3rem;
+        }
+      }
+    }
+    
+    .owner-info-mobile {
+      display: none !important;
+    }
+    
+    .owner-info-desktop {
+      display: grid !important;
+    }
+  }
+  
+  /* Mejoras adicionales para desktop */
+  .owner-card {
+    .owner-info-compact .owner-summary {
+      @media (max-width: 1200px) {
+        gap: 1.5rem;
+        
+        .main-info .owner-details {
+          gap: 1rem;
+          
+          .detail-item {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.5rem;
+          }
+        }
+        
+        .financial-summary {
+          .total-amount .amount-value {
+            font-size: 1.3rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Estilos para la información del propietario en móvil */
+.owner-header-mobile {
+  display: none;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(135deg, #3ec6e0, #0097a7);
+  border-radius: 16px 16px 0 0;
+  
+  .owner-icon-container {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    
+    ion-icon {
+      font-size: 1.8rem;
+      color: #fff;
+    }
+  }
+  
+  .owner-header-text {
+    flex: 1;
+    
+    h3 {
+      margin: 0 0 0.2rem 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+    }
+  }
+}
+
+.owner-info-mobile {
+  display: none;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  
+  .info-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(62, 198, 224, 0.1);
+    border: 1px solid rgba(62, 198, 224, 0.3);
+    border-radius: 20px;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0097a7;
+    
+    ion-icon {
+      font-size: 1rem;
+      color: #3ec6e0;
+    }
+  }
+}
+
+/* Responsive improvements for mobile */
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem !important;
+  }
+  
+  .owner-card-responsive {
+    margin-bottom: 1rem !important;
+    
+    .owner-header-mobile {
+      padding: 0.8rem 1rem;
+      
+      .owner-icon-container {
+        width: 40px;
+        height: 40px;
+        margin-right: 0.8rem;
+        
+        ion-icon {
+          font-size: 1.5rem;
+        }
+      }
+      
+      .owner-header-text {
+        h3 {
+          font-size: 1rem;
+        }
+        
+        p {
+          font-size: 0.85rem;
+        }
+      }
+    }
+    
+    .owner-content {
+      padding: 1rem !important;
+    }
+    
+    .owner-info-mobile {
+      .info-chip {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
+        
+        ion-icon {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
 // Contenedor principal
 .container {
   padding: 1rem;
@@ -12,6 +239,38 @@
   
   @media (max-width: 480px) {
     padding: 0.5rem;
+  }
+}
+
+// Mobile-specific styles
+.mobile-detail-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
+  }
+}
+
+// Responsive improvements for mobile
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem !important;
+  }
+  
+  .mobile-detail-card {
+    padding: 1rem !important;
+    margin-bottom: 0.8rem !important;
+  }
+  
+  .mobile-totals > div {
+    padding: 1rem !important;
+  }
+  
+  .unified-info-card {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 1rem !important;
   }
 }
 
@@ -31,6 +290,8 @@
 .detail-card,
 .search-info-card {
   margin-bottom: 2.2rem;
+  box-shadow: 0 4px 16px rgba(62,198,224,0.10);
+  border-radius: 16px;
   
   @media (max-width: 768px) {
     margin-bottom: 1.5rem;
@@ -38,6 +299,112 @@
   
   @media (max-width: 480px) {
     margin-bottom: 1rem;
+  }
+
+  .owner-content {
+    padding: 1.2rem 1.5rem;
+  }
+
+  // Diseño compacto para desktop
+  .owner-info-compact {
+    .owner-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 0;
+      gap: 2rem;
+      min-height: 80px;
+
+      .main-info {
+        flex: 1;
+        min-width: 0;
+        padding-right: 1rem;
+
+        .owner-name {
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: #0097a7;
+          margin: 0 0 0.6rem 0;
+          line-height: 1.2;
+          letter-spacing: 0.3px;
+        }
+
+        .owner-details {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1.2rem;
+          margin-top: 0.4rem;
+
+          .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: #555;
+            font-weight: 500;
+            padding: 0.3rem 0.6rem;
+            background: rgba(62, 198, 224, 0.08);
+            border-radius: 8px;
+            border: 1px solid rgba(62, 198, 224, 0.15);
+
+            ion-icon {
+              font-size: 1.1rem;
+              color: #3ec6e0;
+            }
+          }
+        }
+      }
+
+      .financial-summary {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.6rem;
+        flex-shrink: 0;
+        padding: 0.5rem 0;
+
+        .total-amount {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          text-align: right;
+
+          .amount-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .amount-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #43a047;
+            line-height: 1;
+            letter-spacing: 0.3px;
+          }
+        }
+
+        .date-info {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.9rem;
+          color: #888;
+          font-weight: 500;
+          padding: 0.3rem 0.6rem;
+          background: rgba(158, 158, 158, 0.08);
+          border-radius: 6px;
+
+          ion-icon {
+            font-size: 1rem;
+            color: #3ec6e0;
+          }
+        }
+      }
+    }
   }
 }
 

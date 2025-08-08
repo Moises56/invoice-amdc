@@ -108,47 +108,98 @@
       <div class="detail-card glass-card" style="margin-bottom: 5rem;">
         <div class="detail-header">
           <h3>Detalle de Mora con Amnistía</h3>
-          <ion-button 
-            fill="outline" 
-            size="small" 
-            (click)="esDNI ? mostrarOpcionesImpresion() : imprimirRecibo()"
-            [disabled]="isLoading() || !estadoCuenta()">
-            <ion-icon name="print-outline" slot="start"></ion-icon>
-            {{ esDNI ? 'Opciones de Impresión' : 'Imprimir' }}
-          </ion-button>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <!-- PDF temporalmente deshabilitado
+            <ion-button 
+              fill="outline" 
+              size="small" 
+              (click)="imprimirNavegador()"
+              [disabled]="isLoading() || !estadoCuenta()"
+              class="no-print">
+              <ion-icon name="document-outline" slot="start"></ion-icon>
+              PDF
+            </ion-button>
+            -->
+            <ion-button 
+              fill="outline" 
+              size="small" 
+              (click)="esDNI ? mostrarOpcionesImpresion() : imprimirRecibo()"
+              [disabled]="isLoading() || !estadoCuenta()"
+              class="no-print">
+              <ion-icon name="print-outline" slot="start"></ion-icon>
+              {{ esDNI ? 'Opciones' : 'Ticket' }}
+            </ion-button>
+          </div>
         </div>
         
-        <div class="table-container">
-          <table class="detail-table">
+        <div class="table-container printable">
+          <!-- Encabezado de impresión -->
+          <div class="print-header" style="display: none;">
+            <div class="print-title">ALCALDÍA MUNICIPAL DEL DISTRITO CENTRAL</div>
+            <div class="print-subtitle">Estado de Cuenta con Amnistía</div>
+            <div class="print-info">Fecha: {{ data.fecha }} - {{ data.hora }}</div>
+          </div>
+          
+          <!-- Información del contribuyente para impresión -->
+          <div class="contributor-info" style="display: none;">
+            <div class="info-row">
+              <span class="label">Contribuyente:</span>
+              <span class="value">{{ data.nombre }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Identidad:</span>
+              <span class="value">{{ data.identidad }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Clave Catastral:</span>
+              <span class="value">{{ data.claveCatastral }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Colonia:</span>
+              <span class="value">{{ data.colonia }}</span>
+            </div>
+          </div>
+          
+          <!-- Aviso de amnistía para impresión -->
+          <div class="amnesty-notice" style="display: none;" *ngIf="data.amnistiaVigente">
+            <div class="amnesty-title">AMNISTÍA VIGENTE</div>
+            <div class="amnesty-date">Válida hasta: {{ data.fechaFinAmnistia }}</div>
+          </div>
+          
+          <table class="detail-table print-table estado-cuenta-table">
             <thead>
               <tr>
                 <th>Año</th>
-                <th>Impuesto</th>
-                <th>T. Aseo</th>
-                <th>Bomberos</th>
-                <th>Otros</th>
+                <th>Impto</th>
+                <th>T.Aseo</th>
+                <th>Bombero</th>
                 <th>Recargo</th>
                 <th>Total</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let detalle of data.detallesMora" class="detail-row">
+              <tr *ngFor="let detalle of data.detallesMora" class="detail-row avoid-break">
                 <td class="year-cell">{{ detalle.year }}</td>
                 <td>{{ detalle.impuesto }}</td>
                 <td>{{ detalle.trenDeAseo }}</td>
                 <td>{{ detalle.tasaBomberos }}</td>
-                <td>{{ detalle.otros }}</td>
                 <td>{{ detalle.recargo }}</td>
                 <td class="total-cell"><strong>{{ detalle.total }}</strong></td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="total-row">
-                <td colspan="6"><strong>TOTAL GENERAL</strong></td>
+                <td colspan="5"><strong>TOTAL GENERAL</strong></td>
                 <td class="total-cell"><strong>{{ data.totalGeneral }}</strong></td>
               </tr>
             </tfoot>
           </table>
+          
+          <!-- Pie de impresión -->
+          <div class="print-footer" style="display: none;">
+            <p>Este documento incluye beneficios de amnistía vigente.</p>
+            <p>Para pagos oficiales, diríjase a las oficinas municipales.</p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ToastController } from '@ionic/angular';
-import { PrintingService } from '../../services/printing.service';
+import { EstadoCuentaPrinterService } from '../../services/estado-cuenta-printer.service';
 import { BluetoothService } from 'src/app/features/bluetooth/bluetooth.service';
 import { EstadoCuentaResponse } from '../../interfaces/estado-cuenta.interface';
 
@@ -15,7 +15,7 @@ import { EstadoCuentaResponse } from '../../interfaces/estado-cuenta.interface';
 export class PrintReceiptComponent {
   @Input() data: EstadoCuentaResponse | null = null;
 
-  private printingService = inject(PrintingService);
+  private estadoCuentaPrinterService = inject(EstadoCuentaPrinterService);
   private bluetoothService = inject(BluetoothService);
   private toastController = inject(ToastController);
 
@@ -32,7 +32,7 @@ export class PrintReceiptComponent {
     }
 
     try {
-      const receiptText = this.printingService.formatEstadoCuenta(this.data);
+      const receiptText = this.estadoCuentaPrinterService.formatEstadoCuentaIndividual(this.data);
       await this.bluetoothService.print(receiptText);
       this.presentToast('Imprimiendo recibo...', 'success');
     } catch (error) {

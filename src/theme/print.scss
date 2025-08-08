@@ -1,0 +1,513 @@
+/* Estilos globales para impresión - Optimizado para impresoras térmicas */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 1mm;
+  }
+
+  * {
+    font-family: 'Courier New', monospace !important;
+    font-size: 1.0pt !important;
+    line-height: 0.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body {
+    width: 100%;
+    max-width: 80mm;
+    margin: 0;
+    padding: 1mm;
+    background: white;
+  }
+
+  .print-content, .thermal-receipt {
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    font-size: 1.0pt;
+    line-height: 0.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .thermal-table, table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+    
+    th, td {
+      border: 0.1px solid #333;
+      padding: 0.02mm;
+      font-size: 1.0pt;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 0.4;
+    }
+    
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+      padding: 0.02mm;
+      font-size: 1.0pt;
+    }
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+
+  /* Estilos específicos para tickets térmicos */
+  .thermal-header {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 2mm;
+  }
+
+  .thermal-footer {
+    text-align: center;
+    margin-top: 2mm;
+    font-size: 0.9pt;
+  }
+
+  .thermal-separator {
+    border-top: 1px solid #333;
+    margin: 1mm 0;
+  }
+
+  .thermal-total {
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .thermal-amnistia {
+    text-align: center;
+    font-weight: bold;
+    background-color: #f9f9f9;
+    padding: 1mm;
+    margin: 1mm 0;
+  }
+
+  /* Ocultar elementos de UI */
+  ion-header,
+  ion-toolbar,
+  ion-fab,
+  ion-button.no-print,
+  .search-form,
+  .search-summary,
+  .search-error {
+    display: none !important;
+  }
+
+  /* Configuración general */
+  html, body, ion-app, ion-content {
+    background: #fff !important;
+    color: #000 !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 1.0pt !important;
+    line-height: 0.4 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Contenedor principal de impresión */
+  .printable {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Encabezado de reporte */
+  .print-header {
+    text-align: center;
+    margin-bottom: 3mm;
+    padding-bottom: 1.5mm;
+    border-bottom: 1px solid #000;
+    
+    h1, h2, h3 {
+      margin: 0 0 1mm 0;
+      color: #000 !important;
+      font-weight: bold;
+    }
+    
+    .print-title {
+      font-size: 2.5pt;
+      font-weight: bold;
+      margin-bottom: 0.1mm;
+      letter-spacing: 0.02pt;
+    }
+    
+    .print-subtitle {
+      font-size: 2pt;
+      margin-bottom: 0.1mm;
+      font-weight: 600;
+    }
+    
+    .print-info {
+      font-size: 1.8pt;
+      margin: 0.05mm 0;
+      color: #333 !important;
+    }
+  }
+
+  /* Información del contribuyente */
+  .contributor-info {
+    margin-bottom: 2mm;
+    padding: 0.5mm;
+    border: 0.3px solid #000;
+    background: #f8f8f8 !important;
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2mm 0;
+      font-size: 2.5pt;
+      
+      .label {
+        font-weight: bold;
+        min-width: 35%;
+        color: #000 !important;
+      }
+      
+      .value {
+        text-align: right;
+        flex: 1;
+        color: #000 !important;
+      }
+    }
+  }
+
+  /* Tablas de impresión */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse !important;
+    margin: 1mm 0;
+    table-layout: fixed;
+    font-family: 'Courier New', monospace;
+    background: #fff !important;
+    
+    th, td {
+      border: 0.1px solid #333 !important;
+      padding: 0.03mm 0.02mm;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 1.0pt;
+      word-wrap: break-word;
+      overflow: hidden;
+      background: #fff !important;
+      line-height: 0.4;
+    }
+    
+    th {
+      background: #e8e8e8 !important;
+      font-weight: bold;
+      color: #000 !important;
+      text-transform: uppercase;
+      font-size: 1.0pt;
+      padding: 0.05mm 0.02mm;
+      text-align: center;
+      border: 0.2px solid #000 !important;
+    }
+    
+    /* Columnas específicas para estado-cuenta */
+    &.estado-cuenta-table {
+      th:nth-child(1), td:nth-child(1) { 
+        width: 11%; 
+        text-align: center !important;
+        font-weight: bold;
+        font-size: 1.5pt;
+      } /* Año */
+      th:nth-child(2), td:nth-child(2) { 
+        width: 18%; 
+        text-align: right !important;
+        padding-right: 0.2mm;
+        font-size: 1.5pt;
+      } /* Impto */
+      th:nth-child(3), td:nth-child(3) { 
+        width: 18%; 
+        text-align: right !important;
+        padding-right: 0.2mm;
+        font-size: 1.5pt;
+      } /* T.Aseo */
+      th:nth-child(4), td:nth-child(4) { 
+        width: 18%; 
+        text-align: right !important;
+        padding-right: 0.2mm;
+        font-size: 1.5pt;
+      } /* Bombero */
+      th:nth-child(5), td:nth-child(5) { 
+        width: 17%; 
+        text-align: right !important;
+        padding-right: 0.2mm;
+        font-size: 1.5pt;
+      } /* Recargo */
+      th:nth-child(6), td:nth-child(6) { 
+        width: 18%; 
+        text-align: right !important;
+        padding-right: 0.2mm;
+        font-weight: bold;
+        font-size: 1.5pt;
+      } /* Total */
+      
+      /* Fila de total forzando alineación */
+      tbody tr td, tfoot tr td {
+        border: 0.1px solid #333 !important;
+        padding: 0.1mm 0.05mm !important;
+        font-size: 1.5pt !important;
+        vertical-align: middle !important;
+      }
+      
+      /* Específicamente para el TOTAL GENERAL */
+      .total-row, tfoot tr {
+        td {
+          border: 0.1px solid #000 !important;
+          font-weight: bold !important;
+          font-size: 1.5pt !important;
+          padding: 0.1mm 0.05mm !important;
+        }
+        
+        td:first-child {
+          text-align: center !important;
+          padding-left: 0.2mm !important;
+        }
+        
+        td:last-child {
+          text-align: right !important;
+          padding-right: 0.5mm !important;
+        }
+      }
+    }
+    
+    /* Columnas específicas para consulta-ics */
+    &.consulta-ics-table {
+      font-size: 1.5pt;
+      margin: 0.3mm 0 !important;
+      
+      th, td {
+        padding: 0.1mm 0.05mm !important;
+        border: 0.1px solid #666 !important;
+        font-size: 1.5pt;
+      }
+      
+      th:nth-child(1), td:nth-child(1) { 
+        width: 8%; 
+        text-align: center !important;
+        font-weight: bold;
+        font-size: 1.5pt;
+      } /* Año */
+      th:nth-child(2), td:nth-child(2) { 
+        width: 14%; 
+        text-align: left !important;
+        padding-left: 0.1mm;
+        font-size: 1.5pt;
+      } /* Concepto */
+      th:nth-child(3), td:nth-child(3) { 
+        width: 13%; 
+        text-align: right !important;
+        padding-right: 0.1mm;
+        font-size: 1.5pt;
+      } /* Impto */
+      th:nth-child(4), td:nth-child(4) { 
+        width: 13%; 
+        text-align: right !important;
+        padding-right: 0.1mm;
+        font-size: 1.5pt;
+      } /* T.Aseo */
+      th:nth-child(5), td:nth-child(5) { 
+        width: 13%; 
+        text-align: right !important;
+        padding-right: 0.1mm;
+        font-size: 1.5pt;
+      } /* Bombero */
+      th:nth-child(6), td:nth-child(6) { 
+        width: 13%; 
+        text-align: right !important;
+        padding-right: 0.1mm;
+        font-size: 1.5pt;
+      } /* Recargo */
+      th:nth-child(7), td:nth-child(7) { 
+        width: 16%; 
+        text-align: right !important;
+        padding-right: 0.1mm;
+        font-weight: bold;
+        font-size: 1.5pt;
+      } /* Total */
+      
+      /* Mejor espaciado para ICS */
+      .total-row, .grand-total-row {
+        td:first-child {
+          text-align: center !important;
+          font-weight: bold !important;
+          font-size: 2pt;
+        }
+        
+        td:last-child {
+          text-align: right !important;
+          padding-right: 0.2mm !important;
+          font-weight: bold !important;
+          font-size: 2pt;
+        }
+      }
+    }
+    
+    /* Fila de año */
+    .year-cell {
+      font-weight: bold;
+      background: #f5f5f5 !important;
+      text-align: center !important;
+      font-size: 2pt;
+    }
+    
+    /* Filas de totales */
+    .total-row {
+      background: #d8d8d8 !important;
+      font-weight: bold;
+      
+      td {
+        border-top: 1px solid #000;
+        font-weight: bold;
+        font-size: 5pt;
+        padding: 1mm 0.5mm;
+        
+        &:last-child {
+          text-align: right !important;
+          padding-right: 1.5mm;
+        }
+        
+        &:first-child {
+          text-align: center !important;
+        }
+      }
+    }
+    
+    .grand-total-row {
+      background: #c0c0c0 !important;
+      font-weight: bold;
+      
+      td {
+        border-top: 2px solid #000;
+        font-weight: bold;
+        font-size: 5pt;
+        padding: 1mm 0.5mm;
+        
+        &:last-child {
+          text-align: right !important;
+          padding-right: 1.5mm;
+        }
+        
+        &:first-child {
+          text-align: center !important;
+        }
+      }
+    }
+    
+    /* Separadores de líneas para mejor legibilidad */
+    tbody tr:nth-child(even) {
+      background: #fafafa !important;
+    }
+    
+    tbody tr:nth-child(odd) {
+      background: #ffffff !important;
+    }
+  }
+
+  /* Evitar saltos de página */
+  .avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+  
+  /* Repetir encabezados de tabla */
+  .print-table thead {
+    display: table-header-group;
+  }
+  
+  .print-table tfoot {
+    display: table-footer-group;
+  }
+  
+  /* Información adicional */
+  .print-footer {
+    margin-top: 6mm;
+    padding-top: 3mm;
+    border-top: 1px solid #666;
+    font-size: 8pt;
+    text-align: center;
+    color: #666 !important;
+    
+    p {
+      margin: 1mm 0;
+      line-height: 1.2;
+    }
+  }
+  
+  /* Amnistía específico */
+  .amnesty-notice {
+    background: #e8f5e8 !important;
+    border: 0.3px solid #006600;
+    padding: 0.5mm;
+    margin: 1mm 0;
+    text-align: center;
+    font-weight: bold;
+    
+    .amnesty-title {
+      font-size: 4pt;
+      color: #006600 !important;
+      margin-bottom: 0.3mm;
+      font-weight: bold;
+    }
+    
+    .amnesty-date {
+      font-size: 3pt;
+      color: #000 !important;
+    }
+  }
+  
+  /* Resumen financiero */
+  .financial-summary {
+    margin: 1mm 0;
+    border: 0.3px solid #000;
+    padding: 0.5mm;
+    background: #f0f0f0 !important;
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2mm 0;
+      font-size: 3pt;
+      
+      &.highlight {
+        font-weight: bold;
+        border-top: 0.3px solid #000;
+        padding-top: 0.2mm;
+        margin-top: 0.3mm;
+        font-size: 3pt;
+      }
+      
+      .label {
+        font-weight: bold;
+        color: #000 !important;
+      }
+      
+      .value {
+        text-align: right;
+        min-width: 25%;
+        font-weight: bold;
+        color: #000 !important;
+      }
+    }
+  }
+}

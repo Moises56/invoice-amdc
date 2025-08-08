@@ -61,13 +61,18 @@ import {
   closeOutline, 
   chevronUpOutline, 
   chevronDownOutline,
-  checkmarkCircle
+  checkmarkCircle,
+  locationOutline
 } from 'ionicons/icons';
 import { UsuariosService } from '../usuarios.service';
 import { User, Role } from '../../../shared/interfaces';
 import { ViewEncapsulation } from '@angular/core';
 import { UsuarioFormPage } from '../usuario-form/usuario-form.page';
 import { ChangePasswordPage } from '../change-password/change-password.page';
+import { AssignLocationModalComponent } from '../../../components/assign-location-modal/assign-location-modal.component';
+import { LocationService } from '../../../shared/services/location.service';
+import { UserLocation } from '../../../shared/interfaces/user.interface';
+import { AuthService } from '../../../core/services/auth.service';
 
 export interface UserFilters {
   page?: number;
@@ -134,6 +139,8 @@ export class UsuariosListPage implements OnInit {
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private modalController = inject(ModalController);
+  private locationService = inject(LocationService);
+  private authService = inject(AuthService);
 
   // Signals
   usuarios = signal<User[]>([]);
@@ -153,6 +160,7 @@ export class UsuariosListPage implements OnInit {
   currentSort = signal<SortConfig>({ field: 'name', direction: 'asc' });
   bulkActionsLoading = signal(false);
   userActionLoading = signal<Set<string>>(new Set());
+  userLocations = signal<Map<string, UserLocation>>(new Map());
 
   // Computed properties
   filteredByRole = computed(() => {
@@ -272,7 +280,8 @@ export class UsuariosListPage implements OnInit {
     const roleNames: Record<Role, string> = {
       [Role.ADMIN]: 'Administrador',
       [Role.MARKET]: 'Mercado',
-      [Role.USER]: 'Usuario'
+      [Role.USER]: 'Usuario',
+      [Role['USER-ADMIN']]: 'Super Usuario'
     };
     return roleNames[role] || role;
   }
@@ -327,7 +336,8 @@ export class UsuariosListPage implements OnInit {
       ellipsisVerticalOutline,
       statsChartOutline,
       toggleOutline,
-      warningOutline
+      warningOutline,
+      locationOutline
     });
   }
 
@@ -375,6 +385,10 @@ export class UsuariosListPage implements OnInit {
         this.totalPages.set(response.pagination.total_pages);
         this.totalItems.set(response.pagination.total);
         this.currentPage.set(response.pagination.current_page);
+        
+        // Ya no necesitamos cargar ubicaciones por separado
+        // porque vienen en la respuesta de la API users como campo 'ubicacion'
+        console.log('✅ Usuarios cargados con ubicaciones incluidas');
       }
     } catch (error) {
       console.error('Error loading usuarios:', error);
@@ -961,5 +975,56 @@ export class UsuariosListPage implements OnInit {
       position: 'top'
     });
     await toast.present();
+  }
+
+  /**
+   * Verificar si el usuario actual es ADMIN
+   */
+  isAdmin(): boolean {
+    return this.authService.hasAnyRole(['ADMIN']);
+  }
+
+  /**
+   * Obtener ubicación de un usuario - actualizado para usar campo ubicacion de la API
+   */
+  getUserLocation(userId: string): string | null {
+    const user = this.usuarios().find(u => u.id === userId);
+    return user?.ubicacion || null;
+  }
+
+  /**
+   * Formatear ubicación para mostrar - actualizado para usar campo ubicacion
+   */
+  formatUserLocation(userId: string): string {
+    const user = this.usuarios().find(u => u.id === userId);
+    return user?.ubicacion || 'Sin ubicación';
+  }
+
+  /**
+   * Abrir modal para asignar ubicación
+   */
+  async assignLocation(user: User): Promise<void> {
+    if (!this.isAdmin()) {
+      await this.showToast('No tienes permisos para asignar ubicaciones', 'danger');
+      return;
+    }
+
+    const modal = await this.modalController.create({
+      component: AssignLocationModalComponent,
+      componentProps: {
+        preselectedUser: user
+      },
+      breakpoints: [0, 0.5, 0.8, 1],
+      initialBreakpoint: 0.8
+    });
+
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      // Recargar la lista de usuarios para reflejar la ubicación actualizada
+      await this.loadUsuarios(true);
+      await this.showToast(`Ubicación "${data.locationName}" asignada exitosamente a ${user.nombre}`, 'success');
+    }
   }
 }

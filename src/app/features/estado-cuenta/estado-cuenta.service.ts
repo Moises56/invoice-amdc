@@ -25,12 +25,14 @@ export class EstadoCuentaService {
   
   getEstadoDeCuenta(claveCatastral: string): Observable<EstadoCuentaResponse> {
     const params = new HttpParams().set('claveCatastral', claveCatastral);
-    return this.apiClient.get<EstadoCuentaResponse>('/estado-cuenta', params);
+    // Ahora requiere autenticación
+    return this.apiClient.get<EstadoCuentaResponse>('/estado-cuenta', params, true);
   }
 
   getEstadoDeCuentaConAmnistia(claveCatastral: string): Observable<EstadoCuentaResponse> {
     const params = new HttpParams().set('claveCatastral', claveCatastral);
-    return this.apiClient.get<EstadoCuentaResponse>('/estado-cuenta/con-amnistia', params);
+    // Ahora requiere autenticación
+    return this.apiClient.get<EstadoCuentaResponse>('/estado-cuenta/con-amnistia', params, true);
   }
 
   getEstadoDeCuentaBySearch(searchParams: SearchParams): Observable<EstadoCuentaResponse> {
@@ -44,7 +46,7 @@ export class EstadoCuentaService {
       params = params.set('dni', searchParams.dni);
     }
     
-    return this.apiClient.get<EstadoCuentaResponse>('/RecEC', params);
+    return this.apiClient.get<EstadoCuentaResponse>('/RecEC', params, true);
   }
 
   getEstadoDeCuentaConAmnistiaBySearch(searchParams: SearchParams): Observable<EstadoCuentaResponse> {
@@ -58,7 +60,7 @@ export class EstadoCuentaService {
       params = params.set('dni', searchParams.dni);
     }
     
-    return this.apiClient.get<EstadoCuentaResponse>('/RecECA', params);
+    return this.apiClient.get<EstadoCuentaResponse>('/RecECA', params, true);
   }
 
   // ========== NUEVOS MÉTODOS PARA ENDPOINTS ACTUALIZADOS ==========
@@ -80,7 +82,8 @@ export class EstadoCuentaService {
 
     const endpoint = consultaParams.conAmnistia ? '/consultaEC/amnistia' : '/consultaEC';
     
-    return this.apiClient.get<any>(endpoint, params).pipe(
+    // Ahora requiere autenticación
+    return this.apiClient.get<any>(endpoint, params, true).pipe(
       map(response => this.mapearRespuestaConsulta(response, consultaParams))
     );
   }

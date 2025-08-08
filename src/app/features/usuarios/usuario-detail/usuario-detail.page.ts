@@ -114,7 +114,8 @@ export class UsuarioDetailPage implements OnInit {
     const roleTexts = {
       [Role.ADMIN]: 'Administrador',
       [Role.MARKET]: 'Gerente de Mercado',
-      [Role.USER]: 'Usuario'
+      [Role.USER]: 'Usuario',
+      [Role['USER-ADMIN']]: 'Super Usuario'
     };
     return roleTexts[role] || role;
   }
@@ -126,7 +127,8 @@ export class UsuarioDetailPage implements OnInit {
     const roleColors = {
       [Role.ADMIN]: 'danger',
       [Role.MARKET]: 'warning',
-      [Role.USER]: 'primary'
+      [Role.USER]: 'primary',
+      [Role['USER-ADMIN']]: 'success'
     };
     return roleColors[role] || 'medium';
   }

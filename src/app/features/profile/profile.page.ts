@@ -10,15 +10,7 @@ import {
   IonButtons,
   IonButton,
   IonIcon,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonItem,
-  IonLabel,
-  IonInput,  IonTextarea,
-  IonAvatar,
-  IonChip,
+  IonInput,
   IonBackButton,
   IonSpinner,
   ToastController,
@@ -32,7 +24,7 @@ import {
   phonePortraitOutline,
   locationOutline,
   keyOutline,
-  arrowBackOutline, createOutline, closeOutline } from 'ionicons/icons';
+  arrowBackOutline, createOutline, closeOutline, refreshOutline, shieldOutline, logOutOutline } from 'ionicons/icons';
 
 import { AuthService } from '../../core/services/auth.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
@@ -52,11 +44,7 @@ import { User } from '../../core/interfaces';
     IonButtons,
     IonButton,
     IonIcon,
-    IonItem,
-    IonLabel,    IonInput,
-    IonTextarea,
-    IonAvatar,
-    IonChip,
+    IonInput,
     IonBackButton,
     IonSpinner
   ]
@@ -78,11 +66,14 @@ export class ProfilePage implements OnInit {
   passwordForm: FormGroup;
 
   constructor() {
-    addIcons({createOutline,closeOutline,personOutline,saveOutline,keyOutline,mailOutline,phonePortraitOutline,locationOutline,arrowBackOutline});
+    addIcons({refreshOutline,shieldOutline,createOutline,saveOutline,logOutOutline,keyOutline,closeOutline,personOutline,mailOutline,phonePortraitOutline,locationOutline,arrowBackOutline});
 
     this.profileForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      name: ['', [Validators.required, Validators.minLength(2)]],
       phone: [''],
       address: ['']
     });    this.passwordForm = this.formBuilder.group({
@@ -128,26 +119,45 @@ export class ProfilePage implements OnInit {
   async loadProfile() {
     this.isLoading.set(true);
     try {
-      const user = this.authService.user();
-      if (user) {
-        // Map backend fields to UI fields if needed
+      console.log('🔧 Profile: Cargando perfil del usuario...');
+      
+      // Usar el método getProfile() del AuthService que consume /api/auth/profile
+      const profileResponse = await this.authService.getProfile().toPromise();
+      
+      if (profileResponse?.user) {
+        const user = profileResponse.user;
+        console.log('✅ Profile: Datos del usuario recibidos:', user);
+        
+        // Mapear los campos de la API a los campos del formulario
         const mappedUser = {
           ...user,
-          name: user.name || (user.nombre ? `${user.nombre} ${user.apellido || ''}`.trim() : ''),
-          email: user.email || user.correo || '',
-          phone: user.phone || user.telefono || '',
-          address: user.address || '',
+          name: user.nombre && user.apellido ? `${user.nombre} ${user.apellido}`.trim() : user.username || '',
+          email: user.correo || '',
+          phone: user.telefono || '',
+          address: '',  // Campo no disponible en la API actual
         };
+        
         this.currentUser.set(mappedUser);
+        
+        // Actualizar el formulario con los datos reales del usuario
         this.profileForm.patchValue({
+          username: user.username || '',
+          email: user.correo || '',
+          firstName: user.nombre || '',
+          lastName: user.apellido || '',
           name: mappedUser.name,
-          email: mappedUser.email,
           phone: mappedUser.phone,
           address: mappedUser.address
         });
+        
+        console.log('✅ Profile: Formulario actualizado con datos del usuario');
+      } else {
+        console.warn('⚠️ Profile: Respuesta sin datos de usuario');
+        await this.showToast('No se pudieron cargar los datos del perfil', 'warning');
       }
-    } catch (error) {
-      await this.showToast('Error al cargar perfil', 'danger');
+    } catch (error: any) {
+      console.error('❌ Profile: Error al cargar perfil:', error);
+      await this.showToast('Error al cargar perfil del usuario', 'danger');
     } finally {
       this.isLoading.set(false);
     }
@@ -284,6 +294,53 @@ export class ProfilePage implements OnInit {
    */
   goBack() {
     this.router.navigate(['/dashboard']);
+  }
+
+  /**
+   * Obtener nombre del rol para mostrar
+   */
+  getRoleDisplay(role: string | undefined): string {
+    switch (role) {
+      case 'ADMIN':
+      case 'USER-ADMIN':
+        return 'Administrator';
+      case 'USER':
+        return 'User';
+      default:
+        return 'User';
+    }
+  }
+
+  /**
+   * Alternar modo de edición
+   */
+  toggleEditMode() {
+    this.editMode = !this.editMode;
+    if (!this.editMode) {
+      // Cancelar edición - restaurar valores originales
+      this.loadProfile();
+    }
+  }
+
+  /**
+   * Refrescar perfil
+   */
+  async refreshProfile() {
+    await this.loadProfile();
+    this.showToast('Profile refreshed successfully', 'success');
+  }
+
+  /**
+   * Cerrar sesión
+   */
+  async logout() {
+    try {
+      await this.authService.logout();
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      this.showToast('Error logging out', 'danger');
+    }
   }
 
   /**

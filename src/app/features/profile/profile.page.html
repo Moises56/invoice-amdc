@@ -1,184 +1,204 @@
-<ion-header>
-  <ion-toolbar class="municipal-toolbar">
+<ion-header [translucent]="true" class="profile-header">
+  <ion-toolbar class="profile-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+      <ion-back-button defaultHref="/dashboard" icon="arrow-back-outline"></ion-back-button>
     </ion-buttons>
-    <ion-title class="text-white font-semibold">Mi Perfil</ion-title>
+    <ion-title class="profile-title">Profile Settings</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="refreshProfile()" [disabled]="isLoading()">
+        <ion-icon name="refresh-outline" [class.rotating]="isLoading()"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg-gray-50">
+<ion-content [fullscreen]="true" class="profile-content">
   <div class="profile-container">
-    <!-- Modern user info card -->
-    <div class="profile-header" style="position:relative;">
-      <ion-avatar class="avatar mb-3">
-        <div class="w-full h-full bg-primary rounded-full flex items-center justify-center" style="width:100px;height:100px;">
-          <span class="text-black text-2xl font-bold">
+    
+    <!-- Profile Info Section -->
+    <div class="profile-info-section">
+      <div class="profile-avatar-container">
+        <div class="profile-avatar">
+          <span class="avatar-text">
             {{ currentUser() ? getInitials(currentUser()!.name || currentUser()!.nombre || 'U') : 'U' }}
           </span>
         </div>
-      </ion-avatar>
-      <div class="user-name">{{ currentUser()?.name || 'Usuario' }}</div>
-      <div class="user-email">{{ currentUser()?.email || '-' }}</div>
-      <ion-chip class="user-role" [color]="currentUser()?.role === 'ADMIN' ? 'danger' : 'primary'" outline>
-        <ion-label>{{ currentUser()?.role || 'USUARIO' }}</ion-label>
-      </ion-chip>
-      <ion-button fill="clear" size="small" (click)="editMode = true" *ngIf="!editMode" style="position:absolute;top:12px;right:12px;z-index:2;">
+      </div>
+      
+      <div class="profile-details">
+        <h2 class="profile-name">{{ currentUser()?.name || currentUser()?.nombre || 'Sara Anderson' }}</h2>
+        <p class="profile-email">{{ currentUser()?.email || 'sara.anderson@example.com' }}</p>
+        <div class="profile-role-badge">
+          <ion-icon name="shield-outline"></ion-icon>
+          <span>{{ getRoleDisplay(currentUser()?.role) }}</span>
+        </div>
+      </div>
+      
+      <ion-button 
+        fill="clear" 
+        class="edit-profile-btn"
+        (click)="toggleEditMode()"
+        [disabled]="isLoading()">
         <ion-icon name="create-outline"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear" size="small" color="medium" (click)="cancelEdit()" *ngIf="editMode" style="position:absolute;top:12px;right:12px;z-index:2;">
-        <ion-icon name="close-outline"></ion-icon>
+        Edit Profile
       </ion-button>
     </div>
 
-    <!-- Formulario de perfil -->
-    <div class="profile-section">
-      <div class="section-header">
-        <h3><ion-icon name="person-outline" class="mr-2 text-primary"></ion-icon> Información Personal</h3>
-      </div>
-      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" style="padding: 16px;">
-        <!-- Nombre -->
-        <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-          <ion-label position="stacked" class="text-sm font-medium text-gray-700">
-            Nombre Completo *
-          </ion-label>
-          <ion-input
-            formControlName="name"
-            placeholder="Ingrese su nombre completo"
-            [readonly]="!editMode"
-            [class.is-invalid]="hasError(profileForm, 'name')"
-            class="mt-1">
-          </ion-input>
-        </ion-item>
-        <div *ngIf="hasError(profileForm, 'name')" class="error-message">
-          {{ getErrorMessage(profileForm, 'name') }}
+    <!-- Profile Settings Form -->
+    <div class="profile-settings-section">
+      <h3 class="section-title">Profile Settings</h3>
+      
+      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
+        <div class="form-grid">
+          <!-- Username -->
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="form-input-container">
+              <ion-input
+                formControlName="username"
+                placeholder="Enter username"
+                [readonly]="!editMode"
+                class="profile-input">
+              </ion-input>
+            </div>
+          </div>
+
+          <!-- Email Address -->
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <div class="form-input-container">
+              <ion-input
+                formControlName="email"
+                type="email"
+                placeholder="Enter email address"
+                [readonly]="!editMode"
+                class="profile-input">
+              </ion-input>
+            </div>
+          </div>
+
+          <!-- First Name -->
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <div class="form-input-container">
+              <ion-input
+                formControlName="firstName"
+                placeholder="Enter first name"
+                [readonly]="!editMode"
+                class="profile-input">
+              </ion-input>
+            </div>
+          </div>
+
+          <!-- Last Name -->
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <div class="form-input-container">
+              <ion-input
+                formControlName="lastName"
+                placeholder="Enter last name"
+                [readonly]="!editMode"
+                class="profile-input">
+              </ion-input>
+            </div>
+          </div>
+
+          <!-- Role (Read-only) -->
+          <div class="form-group full-width">
+            <label class="form-label">Role</label>
+            <div class="form-input-container">
+              <ion-input
+                [value]="getRoleDisplay(currentUser()?.role)"
+                readonly="true"
+                class="profile-input readonly">
+              </ion-input>
+            </div>
+          </div>
         </div>
 
-        <!-- Email -->
-        <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-          <ion-label position="stacked" class="text-sm font-medium text-gray-700">
-            Correo Electrónico *
-          </ion-label>
-          <ion-input
-            formControlName="email"
-            type="email"
-            placeholder="su-email@ejemplo.com"
-            [readonly]="!editMode"
-            [class.is-invalid]="hasError(profileForm, 'email')"
-            class="mt-1">
-          </ion-input>
-        </ion-item>
-        <div *ngIf="hasError(profileForm, 'email')" class="error-message">
-          {{ getErrorMessage(profileForm, 'email') }}
-        </div>
-
-        <!-- Teléfono -->
-        <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-          <ion-label position="stacked" class="text-sm font-medium text-gray-700">
-            Teléfono
-          </ion-label>
-          <ion-input
-            formControlName="phone"
-            type="tel"
-            placeholder="Número de teléfono"
-            [readonly]="!editMode"
-            class="mt-1">
-          </ion-input>
-        </ion-item>
-
-        <!-- Dirección -->
-        <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-          <ion-label position="stacked" class="text-sm font-medium text-gray-700">
-            Dirección
-          </ion-label>
-          <ion-textarea
-            formControlName="address"
-            placeholder="Dirección completa"
-            rows="3"
-            [readonly]="!editMode"
-            class="mt-1">
-          </ion-textarea>
-        </ion-item>
-
-        <!-- Botón actualizar perfil -->
-        <ion-button 
-          expand="block" 
-          type="submit"
-          *ngIf="editMode"
-          [disabled]="profileForm.invalid || isLoading()"
-          class="mt-4">
-          <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
-          <ion-icon *ngIf="!isLoading()" name="save-outline" slot="start"></ion-icon>
-          Guardar Cambios
-        </ion-button>
-      </form>
-    </div>
-
-    <!-- Cambiar contraseña -->
-    <div class="password-form">
-      <div class="form-header">
-        <h3><ion-icon name="key-outline" class="mr-2 text-primary"></ion-icon> Cambiar Contraseña</h3>
-      </div>
-      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-        <!-- Contraseña actual -->
-        <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-          <ion-label position="stacked" class="text-sm font-medium text-gray-700">
-            Contraseña Actual *
-          </ion-label>
-          <ion-input
-            formControlName="currentPassword"
-            type="password"
-            placeholder="Ingrese su contraseña actual"
-            [class.is-invalid]="hasError(passwordForm, 'currentPassword')"
-            class="mt-1">
-          </ion-input>
-        </ion-item>
-        <div *ngIf="hasError(passwordForm, 'currentPassword')" class="error-message">
-          {{ getErrorMessage(passwordForm, 'currentPassword') }}
-        </div>
-
-        <!-- Nueva contraseña -->
-        <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-          <ion-label position="stacked" class="text-sm font-medium text-gray-700">
-            Nueva Contraseña *
-          </ion-label>
-          <ion-input
-            formControlName="newPassword"
-            type="password"
-            placeholder="Ingrese la nueva contraseña"
-            [class.is-invalid]="hasError(passwordForm, 'newPassword')"
-            class="mt-1">
-          </ion-input>
-        </ion-item>
-        <div *ngIf="hasError(passwordForm, 'newPassword')" class="error-message">
-          {{ getErrorMessage(passwordForm, 'newPassword') }}
-        </div>
-
-        <!-- Confirmar nueva contraseña -->
-        <ion-item class="mb-3 rounded-lg custom-input" lines="none">
-          <ion-label position="stacked" class="text-sm font-medium text-gray-700">
-            Confirmar Nueva Contraseña *
-          </ion-label>
-          <ion-input
-            formControlName="confirmPassword"
-            type="password"
-            placeholder="Confirme la nueva contraseña"
-            [class.is-invalid]="hasError(passwordForm, 'confirmPassword')"
-            class="mt-1">
-          </ion-input>
-        </ion-item>
-        <div *ngIf="hasError(passwordForm, 'confirmPassword')" class="error-message">
-          {{ getErrorMessage(passwordForm, 'confirmPassword') }}
-        </div>
-
-        <!-- Botón cambiar contraseña -->
-        <div class="form-buttons">
+        <!-- Save Button -->
+        <div class="form-actions" *ngIf="editMode">
           <ion-button 
             type="submit"
-            class="save-button"
-            [disabled]="passwordForm.invalid">
-            <ion-icon name="key-outline" slot="start"></ion-icon>
-            Cambiar Contraseña
+            expand="block"
+            class="save-btn"
+            [disabled]="profileForm.invalid || isLoading()">
+            <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
+            <ion-icon *ngIf="!isLoading()" name="save-outline" slot="start"></ion-icon>
+            Save Changes
+          </ion-button>
+        </div>
+      </form>
+
+      <!-- Logout Button -->
+      <div class="logout-section">
+        <ion-button 
+          fill="outline" 
+          color="medium"
+          expand="block"
+          class="logout-btn"
+          (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Log out
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Change Password Section -->
+    <div class="password-section">
+      <h3 class="section-title">Change Password</h3>
+      
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
+        <!-- Current Password -->
+        <div class="form-group full-width">
+          <label class="form-label">Current Password</label>
+          <div class="form-input-container">
+            <ion-input
+              formControlName="currentPassword"
+              type="password"
+              placeholder="••••••••"
+              class="profile-input">
+            </ion-input>
+          </div>
+        </div>
+
+        <div class="password-grid">
+          <!-- New Password -->
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <div class="form-input-container">
+              <ion-input
+                formControlName="newPassword"
+                type="password"
+                placeholder="••••••••"
+                class="profile-input">
+              </ion-input>
+            </div>
+          </div>
+
+          <!-- Confirm New Password -->
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <div class="form-input-container">
+              <ion-input
+                formControlName="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                class="profile-input">
+              </ion-input>
+            </div>
+          </div>
+        </div>
+
+        <!-- Update Password Button -->
+        <div class="form-actions">
+          <ion-button 
+            type="submit"
+            class="update-password-btn"
+            [disabled]="passwordForm.invalid || isLoading()">
+            <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
+            <ion-icon *ngIf="!isLoading()" name="key-outline" slot="start"></ion-icon>
+            Update Password
           </ion-button>
         </div>
       </form>

@@ -32,6 +32,7 @@ import {
 } from 'ionicons/icons';
 
 import { UsuariosService } from '../usuarios.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../shared/interfaces';
 
 @Component({
@@ -65,6 +66,7 @@ export class ChangePasswordPage implements OnInit {
 
   private formBuilder = inject(FormBuilder);
   private usuariosService = inject(UsuariosService);
+  private authService = inject(AuthService);
   private toastController = inject(ToastController);
   private loadingController = inject(LoadingController);
   private modalController = inject(ModalController);
@@ -125,12 +127,12 @@ export class ChangePasswordPage implements OnInit {
         const formData = this.form.value;
         
         if (this.isAdmin && this.user) {
-          // Admin resetea contraseña de otro usuario - ENDPOINT CORREGIDO
+          // Admin resetea contraseña de otro usuario
           await firstValueFrom(this.usuariosService.changeUserPassword(this.user.id, formData.newPassword));
           await this.showToast(`Contraseña de ${this.user.nombre || this.user.username} restablecida correctamente`, 'success');
         } else {
-          // Usuario cambia su propia contraseña
-          await firstValueFrom(this.usuariosService.changePassword(formData.currentPassword, formData.newPassword));
+          // Usuario cambia su propia contraseña - usar AuthService con endpoint correcto
+          await firstValueFrom(this.authService.changePassword(formData.currentPassword, formData.newPassword));
           await this.showToast('Su contraseña ha sido cambiada correctamente', 'success');
         }
 

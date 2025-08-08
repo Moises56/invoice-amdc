@@ -10,7 +10,7 @@ import {
   PropiedadDto 
 } from 'src/app/shared/interfaces/estado-cuenta.interface';
 import { FormsModule } from '@angular/forms';
-import { PrintingService } from 'src/app/shared/services/printing.service';
+import { EstadoCuentaPrinterService } from 'src/app/shared/services/estado-cuenta-printer.service';
 import { BluetoothService } from '../bluetooth/bluetooth.service';
 import { SearchInputComponent } from 'src/app/shared/components/search-input/search-input.component';
 
@@ -25,7 +25,7 @@ export class EstadoCuentaPage implements OnInit {
   private estadoCuentaService = inject(EstadoCuentaService);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
-  private printingService = inject(PrintingService);
+  private estadoCuentaPrinterService = inject(EstadoCuentaPrinterService);
   private bluetoothService = inject(BluetoothService);
 
   // Datos de respuesta unificada
@@ -181,13 +181,51 @@ export class EstadoCuentaPage implements OnInit {
               this.imprimirGrupal();
             }
           }
+          // PDF temporalmente deshabilitado
+          /*
+          ,{
+            text: 'Vista Previa (PDF)',
+            handler: () => {
+              this.imprimirNavegador();
+            }
+          }
+          */
         ]
       });
       await alert.present();
     } else {
-      // Para consultas por clave catastral, imprimir directamente
-      this.imprimirRecibo();
+      // Para consultas por clave catastral, mostrar opciones
+      const alert = await this.alertController.create({
+        header: 'Opciones de Impresión',
+        message: 'Seleccione el tipo de impresión:',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Ticket Térmico',
+            handler: () => {
+              this.imprimirRecibo();
+            }
+          },
+          {
+            text: 'Vista Previa (PDF)',
+            handler: () => {
+              this.imprimirNavegador();
+            }
+          }
+        ]
+      });
+      await alert.present();
     }
+  }
+
+  /**
+   * Imprime usando el navegador (PDF/impresora)
+   */
+  imprimirNavegador() {
+    window.print();
   }
 
   async imprimirIndividual() {
@@ -207,10 +245,9 @@ export class EstadoCuentaPage implements OnInit {
 
     try {
       this.presentToast('Preparando impresión individual...', 'success');
-      const receiptText = this.printingService.formatEstadoCuenta(
+      const receiptText = this.estadoCuentaPrinterService.formatEstadoCuentaIndividual(
         data, 
-        this.lastSearchParams, 
-        false // isAmnesty = false para estado-cuenta normal
+        this.lastSearchParams
       );
       await this.bluetoothService.print(receiptText);
       this.presentToast('Recibo individual enviado a la impresora exitosamente.', 'success');
@@ -237,13 +274,7 @@ export class EstadoCuentaPage implements OnInit {
     try {
       this.presentToast('Preparando impresión grupal...', 'success');
       
-      // Convertir todas las propiedades al formato legacy para impresión
-      const estadosCuenta: EstadoCuentaResponse[] = response.propiedades.map(
-        (_, index) => this.estadoCuentaService.convertirAFormatoLegacy(response, index)
-      );
-      
-      const receiptText = this.printingService.formatEstadoCuentaGrupal(
-        estadosCuenta, 
+      const receiptText = this.estadoCuentaPrinterService.formatEstadoCuentaGrupal(
         response,
         this.lastSearchParams
       );
@@ -271,10 +302,9 @@ export class EstadoCuentaPage implements OnInit {
 
     try {
       this.presentToast('Preparando impresión...', 'success');
-      const receiptText = this.printingService.formatEstadoCuenta(
+      const receiptText = this.estadoCuentaPrinterService.formatEstadoCuentaIndividual(
         data, 
-        this.lastSearchParams, 
-        false // isAmnesty = false para estado-cuenta normal
+        this.lastSearchParams
       );
       await this.bluetoothService.print(receiptText);
       this.presentToast('Recibo enviado a la impresora exitosamente.', 'success');

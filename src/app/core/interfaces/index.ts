@@ -14,6 +14,7 @@ export interface User {
   username: string;
   isActive: boolean;
   claveCatastral?: string;
+  ubicacion?: string; // Nueva ubicación para USER-ADMIN
   // UI compatibility properties
   name?: string;
   email?: string;

@@ -27,7 +27,7 @@ export const routes: Routes = [
       {
         path: 'user',
         loadComponent: () => import('./features/dashboard/user-dashboard/user-dashboard.page').then(m => m.UserDashboardPage),
-        data: { roles: [Role.USER] }
+        data: { roles: [Role.USER, Role['USER-ADMIN']] }
       }
     ]
   },
@@ -35,25 +35,25 @@ export const routes: Routes = [
     path: 'estado-cuenta',
     loadChildren: () => import('./features/estado-cuenta/estado-cuenta.routes').then(m => m.routes),
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: [Role.USER] }
+    data: { roles: [Role.USER, Role['USER-ADMIN']] }
   },
   {
     path: 'estado-cuenta-amnistia',
     loadChildren: () => import('./features/estado-cuenta-amnistia/estado-cuenta-amnistia.routes').then(m => m.routes),
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: [Role.USER] }
+    data: { roles: [Role.USER, Role['USER-ADMIN']] }
   },
   {
     path: 'consulta-ics',
     loadComponent: () => import('./features/consulta-ics/consulta-ics.page').then(m => m.ConsultaIcsPage),
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: [Role.USER] }
+    data: { roles: [Role.USER, Role['USER-ADMIN']] }
   },
   {
     path: 'consulta-ics-amnistia',
     loadComponent: () => import('./features/consulta-ics-amnistia/consulta-ics-amnistia.page').then(m => m.ConsultaIcsAmnistiaPage),
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: [Role.USER] }
+    data: { roles: [Role.USER, Role['USER-ADMIN']] }
   },
   {
     path: 'reportes',
@@ -99,6 +99,18 @@ export const routes: Routes = [
     path: 'perfil',
     loadComponent: () => import('./features/profile/profile.page').then(m => m.ProfilePage),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'general-stats',
+    loadComponent: () => import('./features/stats/general-stats/general-stats.page').then(m => m.GeneralStatsPage),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role['USER-ADMIN']] }
+  },
+  {
+    path: 'activity-logs',
+    loadComponent: () => import('./features/stats/activity-logs/activity-logs.page').then(m => m.ActivityLogsPage),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role['USER-ADMIN']] }
   },
   {
     path: '**',

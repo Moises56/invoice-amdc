@@ -391,6 +391,8 @@
             </div>
           </div>
           
+          <div *ngIf="isAdmin()" class="header-cell location-col">Ubicación</div>
+          
           <div class="header-cell actions-col">Acciones</div>
         </div>
         
@@ -459,6 +461,23 @@
               <span class="cell-text">{{ formatLastLogin(user.lastLogin) }}</span>
             </div>
 
+            <!-- Ubicación -->
+            <div *ngIf="isAdmin()" class="table-cell location-col">
+              <div class="location-info">
+                <span class="location-text">{{ formatUserLocation(user.id) }}</span>
+                <ion-icon 
+                  *ngIf="getUserLocation(user.id)" 
+                  name="checkmark-circle-outline" 
+                  class="location-icon assigned">
+                </ion-icon>
+                <ion-icon 
+                  *ngIf="!getUserLocation(user.id)" 
+                  name="location-outline" 
+                  class="location-icon unassigned">
+                </ion-icon>
+              </div>
+            </div>
+
             <!-- Acciones -->
             <div class="table-cell actions-col" (click)="$event.stopPropagation()">
               <div class="action-buttons">
@@ -479,6 +498,13 @@
                   (click)="resetPassword(user)"
                   title="Cambiar contraseña">
                   <ion-icon name="key-outline"></ion-icon>
+                </button>
+                <button 
+                  *ngIf="isAdmin()"
+                  class="action-btn location-btn"
+                  (click)="assignLocation(user)"
+                  title="Asignar ubicación">
+                  <ion-icon name="location-outline"></ion-icon>
                 </button>
                 <button 
                   class="action-btn toggle-btn"
@@ -535,6 +561,23 @@
             <span class="label">Teléfono:</span>
             <span class="value">{{ user.telefono || user.phone }}</span>
           </div>
+
+          <div class="info-row" *ngIf="isAdmin()">
+            <span class="label">Ubicación:</span>
+            <div class="location-mobile">
+              <span class="value">{{ formatUserLocation(user.id) }}</span>
+              <ion-icon 
+                *ngIf="getUserLocation(user.id)" 
+                name="checkmark-circle-outline" 
+                class="location-icon assigned">
+              </ion-icon>
+              <ion-icon 
+                *ngIf="!getUserLocation(user.id)" 
+                name="location-outline" 
+                class="location-icon unassigned">
+              </ion-icon>
+            </div>
+          </div>
         </div>
 
         <div class="card-actions" (click)="$event.stopPropagation()">
@@ -547,6 +590,12 @@
             class="mobile-action-btn password"
             (click)="resetPassword(user)">
             <ion-icon name="key-outline"></ion-icon>
+          </button>
+          <button 
+            *ngIf="isAdmin()"
+            class="mobile-action-btn location"
+            (click)="assignLocation(user)">
+            <ion-icon name="location-outline"></ion-icon>
           </button>
           <button 
             class="mobile-action-btn toggle"

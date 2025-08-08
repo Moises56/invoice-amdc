@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Auth - Activity Logs</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Prueba de Autenticación - Activity Logs</h1>
+    
+    <div>
+        <h3>1. Login primero:</h3>
+        <input type="text" id="username" placeholder="Usuario" value="moises">
+        <input type="password" id="password" placeholder="Contraseña" value="123456">
+        <button onclick="login()">Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div>
+        <h3>2. Probar endpoints:</h3>
+        <button onclick="testMyStats()">Test My Stats</button>
+        <button onclick="testGeneralStats()">Test General Stats</button>
+        <button onclick="testActivityLogs()">Test Activity Logs</button>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        async function login() {
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // Importante para cookies
+                    body: JSON.stringify({
+                        email: document.getElementById('username').value,
+                        password: document.getElementById('password').value
+                    })
+                });
+
+                const result = await response.json();
+                document.getElementById('loginResult').innerHTML = 
+                    `<p>Status: ${response.status}</p>
+                     <p>Response: ${JSON.stringify(result, null, 2)}</p>`;
+                
+                if (response.ok) {
+                    console.log('Login exitoso, usuario:', result.user);
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = 
+                    `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testMyStats() {
+            await testEndpoint('/api/user-stats/my-stats', 'My Stats');
+        }
+
+        async function testGeneralStats() {
+            await testEndpoint('/api/user-stats/general', 'General Stats');
+        }
+
+        async function testActivityLogs() {
+            await testEndpoint('/api/user-stats/logs', 'Activity Logs');
+        }
+
+        async function testEndpoint(endpoint, name) {
+            try {
+                console.log(`Testing ${name}:`, `${API_BASE}${endpoint}`);
+                
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include' // Importante para incluir cookies
+                });
+
+                const result = await response.text();
+                let parsedResult;
+                
+                try {
+                    parsedResult = JSON.parse(result);
+                } catch (e) {
+                    parsedResult = result;
+                }
+
+                const resultDiv = document.getElementById('testResults');
+                resultDiv.innerHTML += 
+                    `<div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                        <h4>${name}</h4>
+                        <p><strong>Status:</strong> ${response.status} ${response.statusText}</p>
+                        <p><strong>URL:</strong> ${API_BASE}${endpoint}</p>
+                        <p><strong>Headers:</strong> ${JSON.stringify(Object.fromEntries(response.headers), null, 2)}</p>
+                        <p><strong>Response:</strong></p>
+                        <pre>${JSON.stringify(parsedResult, null, 2)}</pre>
+                    </div>`;
+
+                console.log(`${name} response:`, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers),
+                    data: parsedResult
+                });
+
+            } catch (error) {
+                console.error(`Error testing ${name}:`, error);
+                const resultDiv = document.getElementById('testResults');
+                resultDiv.innerHTML += 
+                    `<div style="border: 1px solid red; margin: 10px; padding: 10px;">
+                        <h4>${name} - ERROR</h4>
+                        <p style="color: red;">Error: ${error.message}</p>
+                    </div>`;
+            }
+        }
+    </script>
+</body>
+</html>

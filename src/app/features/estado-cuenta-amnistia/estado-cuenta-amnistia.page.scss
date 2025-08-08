@@ -1,5 +1,15 @@
 /* Estilos para la página de Estado de Cuenta con Amnistía */
 
+/* Mostrar elementos de impresión solo al imprimir */
+@media print {
+  .print-header,
+  .contributor-info,
+  .amnesty-notice,
+  .print-footer {
+    display: block !important;
+  }
+}
+
 // Fondo principal
 .estado-cuenta-amnistia-bg {
   background: linear-gradient(135deg, #f8fcfd 0%, #e8f7f9 50%, #d4f1f5 100%);

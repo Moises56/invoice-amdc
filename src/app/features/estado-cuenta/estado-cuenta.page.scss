@@ -10,6 +10,15 @@
   letter-spacing: 0.5px;
 }
 
+/* Mostrar elementos de impresión solo al imprimir */
+@media print {
+  .print-header,
+  .contributor-info,
+  .print-footer {
+    display: block !important;
+  }
+}
+
 /* Estilos generales para la página de Estado de Cuenta */
 
 .estado-cuenta-bg {

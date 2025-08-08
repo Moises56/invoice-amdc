@@ -18,6 +18,7 @@ export interface User {
   dni: string;
   gerencia?: string;
   numero_empleado?: number;
+  ubicacion?: string;  // Nueva ubicación del usuario
   isActive: boolean;
   lastLogin?: Date;
   createdAt: Date;

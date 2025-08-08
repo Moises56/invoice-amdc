@@ -42,7 +42,8 @@ export class ConsultaIcsService {
     // Determinar endpoint según si incluye amnistía
     const endpoint = consultaParams.conAmnistia ? '/consultaICS/amnistia' : '/consultaICS';
     
-    return this.apiClient.get<ConsultaICSResponseReal>(endpoint, params);
+    // Ahora requiere autenticación
+    return this.apiClient.get<ConsultaICSResponseReal>(endpoint, params, true);
   }
 
   /**
@@ -67,7 +68,8 @@ export class ConsultaIcsService {
       params = params.set('ics', searchParams.ics);
     }
     
-    return this.apiClient.get<ConsultaICSResponseReal>('/consultaICS', params);
+    // Ahora requiere autenticación
+    return this.apiClient.get<ConsultaICSResponseReal>('/consultaICS', params, true);
   }
 
   /**
@@ -92,7 +94,8 @@ export class ConsultaIcsService {
       params = params.set('ics', searchParams.ics);
     }
     
-    return this.apiClient.get<ConsultaICSResponseReal>('/consultaICS/amnistia', params);
+    // Ahora requiere autenticación
+    return this.apiClient.get<ConsultaICSResponseReal>('/consultaICS/amnistia', params, true);
   }
 
   /**

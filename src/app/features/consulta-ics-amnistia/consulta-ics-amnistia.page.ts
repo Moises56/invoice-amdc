@@ -1,9 +1,11 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { SearchIcsInputComponent } from 'src/app/shared/components/search-ics-input/search-ics-input.component';
 import { ConsultaIcsService } from '../consulta-ics/consulta-ics.service';
-import { PrintingService } from 'src/app/shared/services/printing.service';
+
+import { ConsultaICSPrinterService } from 'src/app/shared/services/consulta-ics-printer.service';
+import { BluetoothService } from '../bluetooth/bluetooth.service';
 import {
   SearchICSParams,
   ConsultaICSResponseReal,
@@ -28,8 +30,10 @@ export class ConsultaIcsAmnistiaPage implements OnInit {
 
   constructor(
     private consultaIcsService: ConsultaIcsService,
-    private printingService: PrintingService,
-    private toastController: ToastController
+    private consultaICSPrinterService: ConsultaICSPrinterService,
+    private bluetoothService: BluetoothService,
+    private toastController: ToastController,
+    private alertController: AlertController
   ) { }
 
   ngOnInit() {}
@@ -229,8 +233,172 @@ export class ConsultaIcsAmnistiaPage implements OnInit {
     return response.descuentoProntoPagoNumerico;
   }
 
+  // ========== MÉTODOS DE IMPRESIÓN ==========
+
+  /**
+   * Muestra opciones de impresión según el tipo de consulta
+   */
+  async mostrarOpcionesImpresion() {
+    const response = this.consultaResponse();
+    if (!response) return;
+
+    if (response.empresas && response.empresas.length > 1) {
+      // Para consultas con múltiples empresas, mostrar opciones de impresión
+      const alert = await this.alertController.create({
+        header: 'Opciones de Impresión',
+        message: 'Seleccione el tipo de impresión que desea realizar:',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel'
+          },
+          {
+            text: 'Imprimir Individual',
+            handler: () => {
+              this.imprimirIndividual();
+            }
+          },
+          {
+            text: 'Imprimir Grupal',
+            handler: () => {
+              this.imprimirGrupal();
+            }
+          }
+        ]
+      });
+      await alert.present();
+    } else {
+      // Para consultas individuales, imprimir directamente
+      this.imprimirRecibo();
+    }
+  }
+
+  /**
+   * Imprime recibo individual (empresa única)
+   */
+  async imprimirRecibo() {
+    const data = this.consultaResponse();
+    if (!data) {
+      this.presentToast('No hay datos para imprimir.', 'warning');
+      return;
+    }
+
+    const isConnected = await this.bluetoothService.isConnected();
+    if (!isConnected) {
+      this.presentToast('No hay ninguna impresora conectada. Configure la impresora en Configuración > Bluetooth.', 'danger');
+      return;
+    }
+
+    try {
+      this.presentToast('Preparando impresión...', 'success');
+      const receiptText = this.consultaICSPrinterService.formatConsultaICSConAmnistia(
+        data, 
+        this.indiceEmpresaSeleccionada(),
+        this.lastSearchParams || undefined
+      );
+      await this.bluetoothService.print(receiptText);
+      this.presentToast('Recibo ICS con amnistía enviado a la impresora exitosamente.', 'success');
+    } catch (error) {
+      console.error('Error al imprimir:', error);
+      this.presentToast('Error al imprimir el recibo. Verifique la conexión de la impresora.', 'danger');
+    }
+  }
+
+  /**
+   * Imprime recibo individual de una empresa específica
+   */
+  async imprimirIndividual() {
+    const data = this.consultaResponse();
+    const empresaSeleccionada = this.empresaSeleccionada();
+    
+    if (!data || !empresaSeleccionada) {
+      this.presentToast('No hay datos para imprimir.', 'warning');
+      return;
+    }
+
+    const isConnected = await this.bluetoothService.isConnected();
+    if (!isConnected) {
+      this.presentToast('No hay ninguna impresora conectada. Configure la impresora en Configuración > Bluetooth.', 'danger');
+      return;
+    }
+
+    try {
+      this.presentToast('Preparando impresión individual...', 'success');
+      
+      // Crear datos con solo la empresa seleccionada
+      const dataIndividual: ConsultaICSResponseReal = {
+        ...data,
+        empresas: [empresaSeleccionada],
+        totalGeneralNumerico: empresaSeleccionada.totalPropiedadNumerico,
+        totalGeneral: empresaSeleccionada.totalPropiedad,
+        totalAPagarNumerico: data.totalAPagarNumerico,
+        totalAPagar: data.totalAPagar
+      };
+      
+      const receiptText = this.consultaICSPrinterService.formatConsultaICSConAmnistia(
+        dataIndividual, 
+        0, // índice 0 porque dataIndividual solo tiene una empresa
+        this.lastSearchParams || undefined
+      );
+      await this.bluetoothService.print(receiptText);
+      this.presentToast('Recibo individual ICS con amnistía enviado a la impresora exitosamente.', 'success');
+    } catch (error) {
+      console.error('Error al imprimir:', error);
+      this.presentToast('Error al imprimir el recibo. Verifique la conexión de la impresora.', 'danger');
+    }
+  }
+
+  /**
+   * Imprime recibo grupal de todas las empresas
+   */
+  async imprimirGrupal() {
+    const response = this.consultaResponse();
+    
+    if (!response || !response.empresas) {
+      this.presentToast('No hay datos para imprimir.', 'warning');
+      return;
+    }
+
+    const isConnected = await this.bluetoothService.isConnected();
+    if (!isConnected) {
+      this.presentToast('No hay ninguna impresora conectada. Configure la impresora en Configuración > Bluetooth.', 'danger');
+      return;
+    }
+
+    try {
+      this.presentToast('Preparando impresión grupal...', 'success');
+      
+      const receiptText = this.consultaICSPrinterService.formatConsultaICSGrupalConAmnistia(
+        response,
+        this.lastSearchParams || undefined
+      );
+      
+      await this.bluetoothService.print(receiptText);
+      this.presentToast('Recibo grupal ICS con amnistía enviado a la impresora exitosamente.', 'success');
+    } catch (error) {
+      console.error('Error al imprimir:', error);
+      this.presentToast('Error al imprimir el recibo grupal. Verifique la conexión de la impresora.', 'danger');
+    }
+  }
+
   imprimirICS() {
-    this.presentToast('Función de impresión en desarrollo.', 'warning');
+    // Validar que hay datos para imprimir
+    const response = this.consultaResponse();
+    if (!response || !response.empresas || response.empresas.length === 0) {
+      this.presentToast('No hay datos para imprimir', 'warning');
+      return;
+    }
+
+    // Usar window.print() que aprovecha los estilos @media print
+    try {
+      // Pequeña pausa para asegurar que el DOM esté listo
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    } catch (error) {
+      console.error('Error al imprimir:', error);
+      this.presentToast('Error al imprimir. Intente nuevamente.', 'danger');
+    }
   }
 
   getDetallesMoraActual() {
@@ -271,5 +439,12 @@ export class ConsultaIcsAmnistiaPage implements OnInit {
       color
     });
     toast.present();
+  }
+
+  /**
+   * Imprime usando el navegador (PDF/impresora)
+   */
+  imprimirNavegador(): void {
+    window.print();
   }
 }

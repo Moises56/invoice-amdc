@@ -13,8 +13,14 @@ export class ApiClientService {
 
   constructor(private http: HttpClient) { }
 
-  get<T>(path: string, params: HttpParams = new HttpParams()): Observable<T> {
-    return this.http.get<T>(`${this.apiUrlE}${path}`, { params, withCredentials: true })
+  get<T>(path: string, params: HttpParams = new HttpParams(), requiresAuth: boolean = false): Observable<T> {
+    const headers = requiresAuth ? this.getAuthHeaders() : this.getHeaders();
+    
+    return this.http.get<T>(`${this.apiUrlE}${path}`, { 
+      params, 
+      headers, 
+      withCredentials: true 
+    })
       .pipe(
         timeout(35000), // 35 segundos timeout
         catchError(error => {
@@ -24,27 +30,45 @@ export class ApiClientService {
       );
   }
 
-  post<T>(path: string, body: object = {}): Observable<T> {
+  post<T>(path: string, body: object = {}, requiresAuth: boolean = false): Observable<T> {
+    const headers = requiresAuth ? this.getAuthHeaders() : this.getHeaders();
+    
     return this.http.post<T>(
       `${this.apiUrlE}${path}`,
       JSON.stringify(body),
-      { headers: this.getHeaders(), withCredentials: true }
+      { headers, withCredentials: true }
     );
   }
 
-  put<T>(path: string, body: object = {}): Observable<T> {
+  put<T>(path: string, body: object = {}, requiresAuth: boolean = false): Observable<T> {
+    const headers = requiresAuth ? this.getAuthHeaders() : this.getHeaders();
+    
     return this.http.put<T>(
       `${this.apiUrlE}${path}`,
       JSON.stringify(body),
-      { headers: this.getHeaders(), withCredentials: true }
+      { headers, withCredentials: true }
     );
   }
 
-  delete<T>(path: string): Observable<T> {
-    return this.http.delete<T>(`${this.apiUrlE}${path}`, { headers: this.getHeaders(), withCredentials: true });
+  delete<T>(path: string, requiresAuth: boolean = false): Observable<T> {
+    const headers = requiresAuth ? this.getAuthHeaders() : this.getHeaders();
+    
+    return this.http.delete<T>(`${this.apiUrlE}${path}`, { 
+      headers, 
+      withCredentials: true 
+    });
   }
 
   private getHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    // Para autenticación basada en cookies HTTP-only,
+    // no necesitamos agregar Authorization header manualmente
+    // Las cookies se envían automáticamente con withCredentials: true
     return new HttpHeaders({
       'Content-Type': 'application/json'
     });

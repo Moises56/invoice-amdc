@@ -196,7 +196,7 @@ export class LocalDetailPage implements OnInit, OnDestroy {
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
   private loadingController = inject(LoadingController);
-  private printingService = inject(PrintingService);
+  private printingService: PrintingService = inject(PrintingService);
   private bluetoothService = inject(BluetoothService);
 
   // Signals

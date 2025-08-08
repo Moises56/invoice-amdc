@@ -1,0 +1,182 @@
+<ion-header [translucent]="true" class="stats-header">
+  <ion-toolbar class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard/user" icon="arrow-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="header-title">Estadísticas Generales</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="refreshStats()" [disabled]="isLoading()">
+        <ion-icon name="refresh-outline" [class.rotating]="isLoading()"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="stats-content">
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="refreshStats($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading() && !generalStats()">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando estadísticas generales...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="hasError() && !isLoading()">
+    <div class="error-content">
+      <ion-icon name="warning-outline" class="error-icon"></ion-icon>
+      <h3>No se pudieron cargar las estadísticas</h3>
+      <p>{{ errorMessage() }}</p>
+      <ion-button fill="solid" size="default" (click)="refreshStats()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Stats Content -->
+  <div class="stats-container" *ngIf="generalStats() && !isLoading()">
+    
+    <!-- Resumen General -->
+    <div class="section-header">
+      <h2 class="section-title">Resumen General</h2>
+    </div>
+    
+    <div class="summary-cards">
+      <!-- Total Usuarios -->
+      <div class="summary-card">
+        <div class="card-icon blue">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div class="card-content">
+          <h3 class="card-number">{{ generalStats()?.totalUsuarios || 0 }}</h3>
+          <p class="card-label">Total Usuarios</p>
+        </div>
+      </div>
+
+      <!-- Usuarios Activos -->
+      <div class="summary-card">
+        <div class="card-icon green">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <div class="card-content">
+          <h3 class="card-number">{{ generalStats()?.usuariosActivos || 0 }}</h3>
+          <p class="card-label">Usuarios Activos</p>
+        </div>
+      </div>
+
+      <!-- Total Consultas -->
+      <div class="summary-card">
+        <div class="card-icon orange">
+          <ion-icon name="stats-chart-outline"></ion-icon>
+        </div>
+        <div class="card-content">
+          <h3 class="card-number">{{ generalStats()?.totalConsultas || 0 }}</h3>
+          <p class="card-label">Total Consultas</p>
+        </div>
+      </div>
+
+      <!-- Consultas Exitosas -->
+      <div class="summary-card">
+        <div class="card-icon purple">
+          <ion-icon name="trending-up-outline"></ion-icon>
+        </div>
+        <div class="card-content">
+          <h3 class="card-number">{{ generalStats()?.consultasPorResultado?.SUCCESS || 0 }}</h3>
+          <p class="card-label">Consultas Exitosas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consultas por Módulo -->
+    <div class="section-header">
+      <h2 class="section-title">Consultas por Módulo</h2>
+    </div>
+
+    <div class="modules-cards">
+      <div class="module-card">
+        <div class="module-icon orange">
+          <ion-icon name="business-outline"></ion-icon>
+        </div>
+        <div class="module-content">
+          <h4>ICS</h4>
+          <span class="module-number">{{ generalStats()?.consultasPorTipo?.ICS || 0 }}</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-icon blue">
+          <ion-icon name="document-text-outline"></ion-icon>
+        </div>
+        <div class="module-content">
+          <h4>Estado Cuenta</h4>
+          <span class="module-number">{{ generalStats()?.consultasPorTipo?.EC || 0 }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usuarios Más Activos -->
+    <div class="section-header">
+      <h2 class="section-title">Usuarios Más Activos</h2>
+    </div>
+
+    <div class="users-list">
+      <div class="user-row" *ngFor="let user of generalStats()?.topUsuarios?.slice(0, 5)">
+        <div class="user-info">
+          <span class="user-name">{{ user.username }}</span>
+          <span class="user-detail">{{ user.totalConsultas }} consultas{{ user.userLocation ? ' - ' + user.userLocation : '' }}</span>
+          <span class="user-time">{{ formatDate(user.ultimaConsulta) }}</span>
+        </div>
+        <span class="user-count">{{ user.totalConsultas }}</span>
+      </div>
+    </div>
+
+    <!-- Información del Sistema -->
+    <div class="section-header">
+      <h2 class="section-title">Información del Sistema</h2>
+    </div>
+
+    <div class="system-info">
+      <div class="info-item">
+        <span class="info-label">Estado del Sistema:</span>
+        <span class="info-value">Operativo</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Última Actualización:</span>
+        <span class="info-value">{{ formatDate(lastUpdated()) }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Tasa de Éxito Global:</span>
+        <span class="info-value">{{ getTasaExito() }}%</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Total Consultas Exitosas:</span>
+        <span class="info-value">{{ generalStats()?.consultasPorResultado?.SUCCESS || 0 }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Total Consultas con Error:</span>
+        <span class="info-value">{{ generalStats()?.consultasPorResultado?.ERROR || 0 }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Consultas No Encontradas:</span>
+        <span class="info-value">{{ generalStats()?.consultasPorResultado?.NOT_FOUND || 0 }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!generalStats() && !isLoading() && !hasError()">
+    <ion-icon name="analytics-outline"></ion-icon>
+    <h3>No hay datos disponibles</h3>
+    <p>No se pudieron cargar las estadísticas generales</p>
+    <ion-button fill="outline" (click)="refreshStats()">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+
+</ion-content>

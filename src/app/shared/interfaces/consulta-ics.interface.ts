@@ -128,6 +128,8 @@ export interface ConsultaICSResponseReal {
   totalGeneralNumerico: number;
   descuentoProntoPago?: string;
   descuentoProntoPagoNumerico?: number;
+  descuentoAmnistia?: string;
+  descuentoAmnistiaNumerico?: number;
   totalAPagar: string;
   totalAPagarNumerico: number;
   amnistiaVigente: boolean;
@@ -184,11 +186,21 @@ export interface ConsultaICSResponseMultiple {
 }
 
 export interface OpcionesImpresionICS {
+  tipo: 'individual' | 'grupal';
+  empresaIndex?: number; // Para impresión individual de una empresa específica
+  incluirAmnistia: boolean;
   incluirDetalleMora: boolean;
-  incluirInformacionAmnistia: boolean;
   formatoTermico: boolean;
-  incluirCodigoQR: boolean;
   mostrarResumenConsolidado: boolean;
+}
+
+// Interfaz para datos de impresión ICS
+export interface ICSPrintData {
+  consultaResponse: ConsultaICSResponseReal;
+  empresaSeleccionada?: EmpresaICS;
+  searchParams?: SearchICSParams;
+  tipoImpresion: 'individual' | 'grupal';
+  conAmnistia: boolean;
 }
 
 // Tipos de error específicos para ICS

@@ -28,14 +28,14 @@ export const userRoleRedirectGuard: CanActivateFn = async (route, state) => {
   
   console.log('👤 UserRoleRedirectGuard: Usuario encontrado con rol:', user.role);
   
-  if (user.role === Role.USER) {
-    // Si el usuario es USER y no está ya en su dashboard, redirigir
+  if (user.role === Role.USER || user.role === Role['USER-ADMIN']) {
+    // Si el usuario es USER o USER-ADMIN y no está ya en su dashboard, redirigir
     if (state.url !== '/dashboard/user') {
-      console.log('🔄 Redirigiendo USER a /dashboard/user desde:', state.url);
+      console.log('🔄 Redirigiendo', user.role, 'a /dashboard/user desde:', state.url);
       router.navigate(['/dashboard/user'], { replaceUrl: true });
       return false;
     }
-    console.log('✅ USER ya está en su dashboard correcto');
+    console.log('✅', user.role, 'ya está en su dashboard correcto');
   } else {
     // Si el usuario es ADMIN o MARKET y está intentando acceder al dashboard de user, redirigir
     if (state.url === '/dashboard/user') {
