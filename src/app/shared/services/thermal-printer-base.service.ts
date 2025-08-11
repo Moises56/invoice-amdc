@@ -64,12 +64,13 @@ export abstract class ThermalPrinterBaseService {
   }
 
   /**
-   * Formatea un número como moneda para tablas (números completos como en las imágenes)
+   * Formatea un número como moneda para tablas (números completos con separadores de miles)
    */
   protected formatCurrency(value: number): string {
     return new Intl.NumberFormat('es-HN', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
+      useGrouping: true
     }).format(value);
   }
 
@@ -103,22 +104,16 @@ export abstract class ThermalPrinterBaseService {
    */
   protected createHeader(title: string, subtitle?: string): string {
     let header = '';
-    
-    // Título principal centrado
-    header += this.centerText('ALCALDIA MUNICIPAL DEL') + '\n';
-    header += this.centerText('DISTRITO CENTRAL') + '\n';
-    header += this.centerText('TEGUCIGALPA, HONDURAS, C.A.') + '\n';
-    header += this.centerText('GERENCIA DE INGRESOS Y CONTROL') + '\n';
-    header += this.centerText('FINANCIERO') + '\n';
-    header += this.createLine('=') + '\n';
-    
-    // Título del documento
+    // Encabezado institucional con espaciado compacto y líneas centradas
+    header += this.centerText('ALCALDIA MUNICIPAL DEL DISTRITO CENTRAL') + '\n';
+    header += this.centerText('TEGUCIGALPA, HONDURAS, CA.') + '\n';
+    header += this.centerText('GERENCIA DE RECAUDACION Y ') + '\n';
+    header += this.centerText('CONTROL FINANCIERO') + '\n';
     header += this.centerText(title) + '\n';
     if (subtitle) {
       header += this.centerText(subtitle) + '\n';
     }
-    header += this.createLine('=') + '\n';
-    
+    header += '\n'; // Un espacio antes de la información personal
     return header;
   }
 
@@ -147,14 +142,16 @@ export abstract class ThermalPrinterBaseService {
   /**
    * Crea información personal del contribuyente
    */
-  protected createPersonalInfo(nombre: string, identidad: string, fecha: string, hora: string): string {
+  protected createPersonalInfo(nombre: string, identidad: string, fecha: string, hora: string, claveCatastral?: string): string {
     let info = '';
     
     info += `Nombre: ${this.normalizeText(nombre)}\n`;
     info += `Identidad: ${identidad}\n`;
-    info += `Fecha: ${fecha}\n`;
-    info += `Hora: ${hora}\n`;
-    info += this.createLine('-') + '\n';
+    if (claveCatastral) {
+      info += `Clave Catastral: ${claveCatastral}\n`;
+    }
+    info += `Fecha y hora: ${fecha} ${hora}\n`;
+    info += '\n'; // Espacio antes de la tabla
     
     return info;
   }

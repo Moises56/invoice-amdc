@@ -28,10 +28,14 @@ export class PrintingService {
   formatInvoiceForPrinting(invoice: Invoice): string {
     let receipt = '';
     
-    // Encabezado
-    receipt += this.centerText('ALCALDIA MUNICIPAL DEL') + '\n';
-    receipt += this.centerText('DISTRITO CENTRAL') + '\n';
-    receipt += this.centerText('FACTURA') + '\n';
+    // Encabezado profesional centrado
+    receipt += this.centerText([
+      'ALCALDIA MUNICIPAL DEL DISTRITO CENTRAL',
+      'TEGUCIGALPA HONDURAS C.A.',
+      'GERENCIA DE RECAUDACION Y',
+      'CONTROL FINANCIERO',
+      'ESTADO DE CUENTA'
+    ]) + '\n';
     receipt += this.createLine('=') + '\n';
     
     // Información de la factura
@@ -65,9 +69,21 @@ export class PrintingService {
   /**
    * Centra el texto en el ancho del papel
    */
-  private centerText(text: string): string {
-    const padding = Math.max(0, Math.floor((this.PAPER_WIDTH - text.length) / 2));
-    return ' '.repeat(padding) + text;
+  /**
+   * Centra una o varias líneas de texto en el ancho del papel
+   * Si el texto es más largo que PAPER_WIDTH, lo recorta.
+   * Si es multilinea, centra cada línea.
+   */
+  private centerText(text: string | string[]): string {
+    const lines = Array.isArray(text) ? text : text.split('\n');
+    return lines.map(line => {
+      let l = line.trim();
+      if (l.length > this.PAPER_WIDTH) {
+        l = l.slice(0, this.PAPER_WIDTH);
+      }
+      const padding = Math.max(0, Math.floor((this.PAPER_WIDTH - l.length) / 2));
+      return ' '.repeat(padding) + l;
+    }).join('\n');
   }
 
   /**

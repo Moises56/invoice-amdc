@@ -131,26 +131,33 @@
     margin-bottom: 3mm;
     padding-bottom: 1.5mm;
     border-bottom: 1px solid #000;
-    
+
+    h1, h2, h3, .print-title, .print-subtitle, .print-info {
+      text-align: center !important;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     h1, h2, h3 {
       margin: 0 0 1mm 0;
       color: #000 !important;
       font-weight: bold;
     }
-    
+
     .print-title {
       font-size: 2.5pt;
       font-weight: bold;
       margin-bottom: 0.1mm;
       letter-spacing: 0.02pt;
     }
-    
+
     .print-subtitle {
       font-size: 2pt;
       margin-bottom: 0.1mm;
       font-weight: 600;
     }
-    
+
     .print-info {
       font-size: 1.8pt;
       margin: 0.05mm 0;

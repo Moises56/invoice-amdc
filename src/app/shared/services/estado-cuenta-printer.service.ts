@@ -28,17 +28,9 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
       data.nombre || 'N/A',
       data.identidad || 'N/A',
       data.fecha || this.formatDate(new Date()),
-      data.hora || this.formatTime(new Date())
+      data.hora || this.formatTime(new Date()),
+      data.claveCatastral
     );
-    
-    // Información de la propiedad
-    if (data.claveCatastral) {
-      ticket += `Clave Catastral: ${data.claveCatastral}\n`;
-    }
-    if (data.colonia) {
-      ticket += `Colonia: ${this.truncateText(data.colonia, 25)}\n`;
-    }
-    ticket += this.createLine('-') + '\n';
     
     // Tabla de detalles
     ticket += this.createECTable(data.detallesMora || []);
@@ -46,13 +38,8 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
     // Total general
     ticket += this.createECTotal(data.totalGeneralNumerico || 0);
     
-    // Información de amnistía si aplica
-    if (data.amnistiaVigente) {
-      ticket += this.createAmnistiaNotice();
-    }
-    
-    // Pie de página
-    ticket += this.createFooter('RECUERDE QUE EL PAGO DE VUELTAS\nVENCE EL 31 DE AGOSTO DEL 2025');
+    // Mensaje final
+    ticket += this.centerText('Datos Actualizados a la fecha de consulta.') + '\n';
     
     return ticket;
   }
@@ -113,19 +100,30 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
    * Formatea Estado de Cuenta Individual con Amnistía
    */
   formatEstadoCuentaConAmnistia(data: EstadoCuentaResponse, params?: ConsultaParams): string {
-    let ticket = this.formatEstadoCuentaIndividual(data, params);
+    let ticket = '';
     
-    // Agregar información específica de amnistía
-    if (data.amnistiaVigente) {
-      const amnistiaInfo = this.createAmnistiaDetails(data);
-      // Insertar antes del pie de página
-      const footerIndex = ticket.lastIndexOf('Datos actualizados');
-      if (footerIndex > -1) {
-        ticket = ticket.substring(0, footerIndex) + amnistiaInfo + ticket.substring(footerIndex);
-      } else {
-        ticket += amnistiaInfo;
-      }
-    }
+    // Encabezado
+    ticket += this.createHeader('ESTADO DE CUENTA');
+    
+    // Información personal
+    ticket += this.createPersonalInfo(
+      data.nombre || 'N/A',
+      data.identidad || 'N/A',
+      data.fecha || this.formatDate(new Date()),
+      data.hora || this.formatTime(new Date()),
+      data.claveCatastral
+    );
+    
+    // Tabla de detalles
+    ticket += this.createECTable(data.detallesMora || []);
+    
+    // Total general
+    ticket += this.createECTotal(data.totalGeneralNumerico || 0);
+    
+    // Mensaje final con amnistía
+     ticket += this.centerText('Amnistia aplicada') + '\n';
+     ticket += this.centerText('Amnistia vence el 31 de agosto del 2025') + '\n';
+     ticket += this.centerText('Datos Actualizados a la fecha de consulta.') + '\n';
     
     return ticket;
   }
@@ -226,8 +224,13 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
     let totalSection = '';
     
     totalSection += this.createLine('-', this.EC_CONFIG.TABLE_WIDTH) + '\n';
-    totalSection += this.alignRight(`Total: ${this.formatFullCurrency(total)}`, this.EC_CONFIG.TABLE_WIDTH) + '\n';
-    totalSection += this.createLine('=', this.EC_CONFIG.TABLE_WIDTH) + '\n';
+    const formattedTotal = new Intl.NumberFormat('es-HN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      useGrouping: true
+    }).format(total);
+    totalSection += this.alignRight(`Total a pagar L. ${formattedTotal}`, this.EC_CONFIG.TABLE_WIDTH) + '\n';
+    totalSection += '\n';
     
     return totalSection;
   }
