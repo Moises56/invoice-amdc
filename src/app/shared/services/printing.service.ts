@@ -32,9 +32,9 @@ export class PrintingService {
     receipt += this.centerText([
       'ALCALDIA MUNICIPAL DEL DISTRITO CENTRAL',
       'TEGUCIGALPA HONDURAS C.A.',
-      'GERENCIA DE RECAUDACION Y',
+      'GERENCIA DE RECAUDACION Y CONTROL FINANCIERO',
       'CONTROL FINANCIERO',
-      'ESTADO DE CUENTA'
+      'ESTADO DE CUENTA TES'
     ]) + '\n';
     receipt += this.createLine('=') + '\n';
     
