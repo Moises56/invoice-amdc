@@ -1,33 +1,38 @@
 import { Injectable } from '@angular/core';
 import { ThermalPrinterBaseService } from './thermal-printer-base.service';
-import { 
-  ConsultaICSResponseReal, 
-  EmpresaICS, 
-  DetalleMoraReal, 
-  SearchICSParams 
+import {
+  ConsultaICSResponseReal,
+  EmpresaICS,
+  DetalleMoraReal,
+  SearchICSParams,
 } from '../interfaces/consulta-ics.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
-
-  // Configuración específica para Consulta ICS
+  // Configuración específica para Consulta ICS - Optimizada para legibilidad
   private readonly ICS_CONFIG = {
-    TABLE_COLUMNS: [4, 8, 8, 8, 8, 8, 10], // Total: 54 caracteres para números completos
-    TABLE_HEADERS: ['Año', 'Impto.', 'T.Aseo', 'Bombero', 'Otros', 'Recargo', 'Total'],
-    TABLE_WIDTH: 54
+    // Configuración COMPACTA para evitar que el Total se vaya abajo
+    TABLE_COLUMNS: [4, 6, 6, 6, 6, 6, 7],
+    // Encabezados ultra-cortos para que todo quepa en una línea
+    TABLE_HEADERS: ['Año', 'Impto', 'Aseo', 'Bomb', 'Otros', 'Rec', 'Total'],
+    TABLE_WIDTH: 41, // Reducido para que el Total no se desborde
   };
 
   /**
    * Formatea Consulta ICS Individual (una empresa específica)
    */
-  formatConsultaICSIndividual(data: ConsultaICSResponseReal, empresaIndex: number, params?: SearchICSParams): string {
+  formatConsultaICSIndividual(
+    data: ConsultaICSResponseReal,
+    empresaIndex: number,
+    params?: SearchICSParams
+  ): string {
     let ticket = '';
-    
+
     // Encabezado
-    ticket += this.createHeader('CONSULTA ICS', 'INDIVIDUAL');
-    
+    ticket += this.createHeader('ESTADO DE CUENTA', 'VOLUMEN DE VENTA ANUAL');
+
     // Información personal
     ticket += this.createPersonalInfo(
       data.nombre || 'N/A',
@@ -35,45 +40,56 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
       data.fecha || this.formatDate(new Date()),
       data.hora || this.formatTime(new Date())
     );
-    
+
     // Información de la empresa específica
     const empresa = data.empresas?.[empresaIndex];
     if (empresa) {
       ticket += `Empresa No: ${empresa.numeroEmpresa || 'N/A'}\n`;
       ticket += this.createLine('-') + '\n';
-      
+
       // Tabla de detalles de la empresa
       ticket += this.createICSTable(empresa);
-      
+
       // Subtotal de la empresa
       ticket += this.createICSSubtotal(empresa);
     }
-    
+
     // Información de descuentos si aplica
-    if (data.descuentoProntoPagoNumerico && data.descuentoProntoPagoNumerico > 0) {
-      ticket += this.createDiscountInfo(data.descuentoProntoPagoNumerico, data.totalAPagarNumerico);
+    if (
+      data.descuentoProntoPagoNumerico &&
+      data.descuentoProntoPagoNumerico > 0
+    ) {
+      ticket += this.createDiscountInfo(
+        data.descuentoProntoPagoNumerico,
+        data.totalAPagarNumerico
+      );
     }
-    
+
     // Información de amnistía si aplica
     if (data.amnistiaVigente) {
       ticket += this.createAmnistiaNotice();
     }
-    
+
     // Pie de página
-    ticket += this.createFooter('RECUERDE QUE EL PAGO DE VUELTAS\nVENCE EL 31 DE AGOSTO DEL 2025');
-    
+    // ticket += this.createFooter(
+    //   'AMNISTIA VIGENTE\nVENCE EL 31 DE AGOSTO DEL 2025'
+    // );
+
     return ticket;
   }
 
   /**
    * Formatea Consulta ICS Grupal (todas las empresas)
    */
-  formatConsultaICSGrupal(data: ConsultaICSResponseReal, params?: SearchICSParams): string {
+  formatConsultaICSGrupal(
+    data: ConsultaICSResponseReal,
+    params?: SearchICSParams
+  ): string {
     let ticket = '';
-    
+
     // Encabezado
-    ticket += this.createHeader('CONSULTA ICS', 'GRUPAL');
-    
+    ticket += this.createHeader('ESTADO DE CUENTA', 'VOLUMEN DE VENTA ANUAL');
+
     // Información personal
     ticket += this.createPersonalInfo(
       data.nombre || 'N/A',
@@ -81,136 +97,200 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
       data.fecha || this.formatDate(new Date()),
       data.hora || this.formatTime(new Date())
     );
-    
+
     // Procesar cada empresa
     data.empresas?.forEach((empresa, index) => {
-      ticket += `\n${this.centerText(`EMPRESA ${index + 1}`, this.ICS_CONFIG.TABLE_WIDTH)}\n`;
+      ticket += `\n${this.centerText(`EMPRESA ${index + 1}`)}\n`;
       ticket += `No: ${empresa.numeroEmpresa || 'N/A'}\n`;
-      ticket += this.createLine('-', this.ICS_CONFIG.TABLE_WIDTH) + '\n';
-      
+      ticket += this.createLine('-') + '\n';
+
       // Tabla de detalles de la empresa
       ticket += this.createICSTable(empresa);
-      
+
       // Subtotal de la empresa
       ticket += this.createICSSubtotal(empresa);
     });
-    
+
     // Total general
     ticket += this.createICSGrandTotal(data.totalGeneralNumerico || 0);
-    
+
     // Información de descuentos si aplica
-    if (data.descuentoProntoPagoNumerico && data.descuentoProntoPagoNumerico > 0) {
-      ticket += this.createDiscountInfo(data.descuentoProntoPagoNumerico, data.totalAPagarNumerico);
+    if (
+      data.descuentoProntoPagoNumerico &&
+      data.descuentoProntoPagoNumerico > 0
+    ) {
+      ticket += this.createDiscountInfo(
+        data.descuentoProntoPagoNumerico,
+        data.totalAPagarNumerico
+      );
     }
-    
+
     // Información de amnistía si aplica
     if (data.amnistiaVigente) {
       ticket += this.createAmnistiaNotice();
     }
-    
+
     // Pie de página
-    ticket += this.createFooter('RECUERDE QUE EL PAGO DE VUELTAS\nVENCE EL 31 DE AGOSTO DEL 2025');
-    
+    // ticket += this.createFooter(
+    //   'AMNISTIA VIGENTE\nVENCE EL 31 DE AGOSTO DEL 2025'
+    // );
+
     return ticket;
   }
 
   /**
    * Formatea Consulta ICS Individual con Amnistía
    */
-  formatConsultaICSConAmnistia(data: ConsultaICSResponseReal, empresaIndex: number, params?: SearchICSParams): string {
+  formatConsultaICSConAmnistia(
+    data: ConsultaICSResponseReal,
+    empresaIndex: number,
+    params?: SearchICSParams
+  ): string {
     let ticket = this.formatConsultaICSIndividual(data, empresaIndex, params);
-    
+
     // Agregar información específica de amnistía
     if (data.amnistiaVigente) {
       const amnistiaInfo = this.createAmnistiaDetails(data);
       // Insertar antes del pie de página
       const footerIndex = ticket.lastIndexOf('Datos actualizados');
       if (footerIndex > -1) {
-        ticket = ticket.substring(0, footerIndex) + amnistiaInfo + ticket.substring(footerIndex);
+        ticket =
+          ticket.substring(0, footerIndex) +
+          amnistiaInfo +
+          ticket.substring(footerIndex);
       } else {
         ticket += amnistiaInfo;
       }
     }
-    
+
     return ticket;
   }
 
   /**
    * Formatea Consulta ICS Grupal con Amnistía
    */
-  formatConsultaICSGrupalConAmnistia(data: ConsultaICSResponseReal, params?: SearchICSParams): string {
+  formatConsultaICSGrupalConAmnistia(
+    data: ConsultaICSResponseReal,
+    params?: SearchICSParams
+  ): string {
     let ticket = this.formatConsultaICSGrupal(data, params);
-    
+
     // Agregar información específica de amnistía
     if (data.amnistiaVigente) {
       const amnistiaInfo = this.createAmnistiaDetails(data);
       // Insertar antes del pie de página
       const footerIndex = ticket.lastIndexOf('Datos actualizados');
       if (footerIndex > -1) {
-        ticket = ticket.substring(0, footerIndex) + amnistiaInfo + ticket.substring(footerIndex);
+        ticket =
+          ticket.substring(0, footerIndex) +
+          amnistiaInfo +
+          ticket.substring(footerIndex);
       } else {
         ticket += amnistiaInfo;
       }
     }
-    
+
     return ticket;
   }
 
   /**
    * Crea la tabla de ICS para una empresa
+   * Aplicando fuente condensada a toda la tabla como en la imagen
    */
   private createICSTable(empresa: EmpresaICS): string {
     let table = '';
-    
-    // Encabezado de la tabla
+
+    // Activar fuente condensada para toda la tabla (como en la imagen)
+    table += this.escCondensedFont();
+
+    // Encabezado con fuente condensada
     table += this.createICSHeader();
     table += this.createTableSeparator(this.ICS_CONFIG.TABLE_COLUMNS) + '\n';
-    
-    // Filas de datos
-    empresa.detallesMora?.forEach(detalle => {
+
+    // Filas de datos con fuente condensada
+    empresa.detallesMora?.forEach((detalle) => {
       table += this.createICSRow(detalle) + '\n';
     });
-    
+
     table += this.createTableSeparator(this.ICS_CONFIG.TABLE_COLUMNS) + '\n';
-    
+
+    // Restaurar fuente normal después de la tabla
+    table += this.escNormalWidth();
+
     return table;
   }
 
   /**
-   * Crea el encabezado de la tabla ICS con espaciado adecuado
+   * Crea el encabezado de la tabla ICS COMPACTO
+   * Optimizado para que TODO quepa en una sola línea
    */
   private createICSHeader(): string {
     let header = '';
-    header += this.alignLeft(this.ICS_CONFIG.TABLE_HEADERS[0], this.ICS_CONFIG.TABLE_COLUMNS[0]); // Año
+    // Usar métodos que preservan acentos y ñ del servicio base
+    header += this.alignLeftPreserved(
+      this.ICS_CONFIG.TABLE_HEADERS[0],
+      this.ICS_CONFIG.TABLE_COLUMNS[0]
+    ); // Año
     header += ' '; // Espacio separador
-    header += this.alignRight(this.ICS_CONFIG.TABLE_HEADERS[1], this.ICS_CONFIG.TABLE_COLUMNS[1]); // Impto.
+    header += this.alignRightPreserved(
+      this.ICS_CONFIG.TABLE_HEADERS[1],
+      this.ICS_CONFIG.TABLE_COLUMNS[1]
+    ); // Impto
     header += ' '; // Espacio separador
-    header += this.alignRight(this.ICS_CONFIG.TABLE_HEADERS[2], this.ICS_CONFIG.TABLE_COLUMNS[2]); // T.Aseo
+    header += this.alignRightPreserved(
+      this.ICS_CONFIG.TABLE_HEADERS[2],
+      this.ICS_CONFIG.TABLE_COLUMNS[2]
+    ); // Aseo
     header += ' '; // Espacio separador
-    header += this.alignRight(this.ICS_CONFIG.TABLE_HEADERS[3], this.ICS_CONFIG.TABLE_COLUMNS[3]); // Bombero
+    header += this.alignRightPreserved(
+      this.ICS_CONFIG.TABLE_HEADERS[3],
+      this.ICS_CONFIG.TABLE_COLUMNS[3]
+    ); // Bomb
     header += ' '; // Espacio separador
-    header += this.alignRight(this.ICS_CONFIG.TABLE_HEADERS[4], this.ICS_CONFIG.TABLE_COLUMNS[4]); // Otros
+    header += this.alignRightPreserved(
+      this.ICS_CONFIG.TABLE_HEADERS[4],
+      this.ICS_CONFIG.TABLE_COLUMNS[4]
+    ); // Otros
     header += ' '; // Espacio separador
-    header += this.alignRight(this.ICS_CONFIG.TABLE_HEADERS[5], this.ICS_CONFIG.TABLE_COLUMNS[5]); // Recargo
+    header += this.alignRightPreserved(
+      this.ICS_CONFIG.TABLE_HEADERS[5],
+      this.ICS_CONFIG.TABLE_COLUMNS[5]
+    ); // Rec
     header += ' '; // Espacio separador
-    header += this.alignRight(this.ICS_CONFIG.TABLE_HEADERS[6], this.ICS_CONFIG.TABLE_COLUMNS[6]); // Total
-    
-    return header;
+    header += this.alignRightPreserved(
+      this.ICS_CONFIG.TABLE_HEADERS[6],
+      this.ICS_CONFIG.TABLE_COLUMNS[6]
+    ); // Total
+
+    return header + '\n';
   }
 
   /**
-   * Crea una fila de la tabla ICS con espaciado adecuado
+   * Crea una fila de la tabla ICS con formato compacto
+   * Optimizada para caber exactamente en 40 caracteres
    */
   private createICSRow(detalle: DetalleMoraReal): string {
-    const year = detalle.anio?.toString() || '????';
-    const impuesto = this.formatCurrency(detalle.impuestoNumerico || 0);
-    const aseo = this.formatCurrency(detalle.trenDeAseoNumerico || 0);
-    const bomberos = this.formatCurrency(detalle.tasaBomberosNumerico || 0);
-    const otros = this.formatCurrency(detalle.otrosNumerico || 0);
-    const recargo = this.formatCurrency(detalle.recargoNumerico || 0);
-    const total = this.formatCurrency(detalle.totalNumerico || 0);
-    
-    // Crear fila con espaciado entre columnas como en las imágenes
+    // Asegurar que el año se muestre completo (4 dígitos)
+    let year = detalle.year || detalle.anio?.toString() || '????';
+    // Si el año viene truncado, intentar completarlo
+    if (year.length === 2 && !isNaN(Number(year))) {
+      const yearNum = Number(year);
+      year = yearNum > 50 ? `19${year}` : `20${year}`;
+    }
+    // Truncar a 4 caracteres máximo
+    year = year.substring(0, 4);
+
+    // Usar formato compacto para que quepa en las columnas
+    const impuesto = this.formatCompactCurrency(detalle.impuestoNumerico || 0);
+    const aseo = this.formatCompactCurrency(detalle.trenDeAseoNumerico || 0);
+    const bomberos = this.formatCompactCurrency(
+      detalle.tasaBomberosNumerico || 0
+    );
+    const otros = this.formatCompactCurrency(detalle.otrosNumerico || 0);
+    const recargo = this.formatCompactCurrency(detalle.recargoNumerico || 0);
+    const total = this.formatCompactCurrency(detalle.totalNumerico || 0);
+
+    // Crear fila con espaciado optimizado para legibilidad
     let row = '';
     row += this.alignLeft(year, this.ICS_CONFIG.TABLE_COLUMNS[0]);
     row += ' '; // Espacio separador
@@ -225,8 +305,40 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
     row += this.alignRight(recargo, this.ICS_CONFIG.TABLE_COLUMNS[5]);
     row += ' '; // Espacio separador
     row += this.alignRight(total, this.ICS_CONFIG.TABLE_COLUMNS[6]);
-    
+
     return row;
+  }
+
+  /**
+   * Formatea moneda ULTRA COMPACTA para columnas de 6-7 caracteres
+   * Específicamente para evitar que el Total se desborde en consulta ICS
+   */
+  private formatCompactCurrency(value: number): string {
+    if (value === 0) return '0.00';
+
+    // Para valores muy grandes, usar formato sin comas y sin decimales si es entero
+    if (value >= 100000) {
+      return value % 1 === 0 ? Math.round(value).toString() : value.toFixed(2);
+    }
+    // Para valores grandes, formato sin comas
+    else if (value >= 10000) {
+      return value.toFixed(2);
+    }
+    // Para valores medianos, con comas solo si cabe en 6 caracteres
+    else if (value >= 1000) {
+      const withCommas = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true,
+      }).format(value);
+
+      // Si cabe en 6 caracteres, usar comas, sino sin comas
+      return withCommas.length <= 6 ? withCommas : value.toFixed(2);
+    }
+    // Para valores pequeños, formato normal
+    else {
+      return value.toFixed(2);
+    }
   }
 
   /**
@@ -234,11 +346,17 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
    */
   private createICSSubtotal(empresa: EmpresaICS): string {
     let subtotal = '';
-    
-    subtotal += this.createLine('-', this.ICS_CONFIG.TABLE_WIDTH) + '\n';
-    subtotal += this.alignRight(`Subtotal: ${this.formatFullCurrency(empresa.totalPropiedadNumerico || 0)}`, this.ICS_CONFIG.TABLE_WIDTH) + '\n';
-    subtotal += this.createLine('-', this.ICS_CONFIG.TABLE_WIDTH) + '\n';
-    
+
+    subtotal += this.createLine('-') + '\n';
+    subtotal +=
+      this.alignRight(
+        `Subtotal: ${this.formatCurrencyForPrint(
+          empresa.totalPropiedadNumerico || 0
+        )}`,
+        this.CONFIG.PAPER_WIDTH
+      ) + '\n';
+    subtotal += this.createLine('-') + '\n';
+
     return subtotal;
   }
 
@@ -247,11 +365,15 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
    */
   private createICSGrandTotal(total: number): string {
     let grandTotal = '';
-    
-    grandTotal += this.createLine('=', this.ICS_CONFIG.TABLE_WIDTH) + '\n';
-    grandTotal += this.alignRight(`TOTAL GENERAL: ${this.formatFullCurrency(total)}`, this.CONFIG.PAPER_WIDTH) + '\n';
-    grandTotal += this.createLine('=', this.ICS_CONFIG.TABLE_WIDTH) + '\n';
-    
+
+    grandTotal += this.createLine('=') + '\n';
+    grandTotal +=
+      this.alignRight(
+        `TOTAL GENERAL: ${this.formatCurrencyForPrint(total)}`,
+        this.CONFIG.PAPER_WIDTH
+      ) + '\n';
+    grandTotal += this.createLine('=') + '\n';
+
     return grandTotal;
   }
 
@@ -260,20 +382,28 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
    */
   private createDiscountInfo(descuento?: number, totalFinal?: number): string {
     let discountInfo = '';
-    
+
     if (descuento && descuento > 0) {
       discountInfo += this.createSpacing(1);
       discountInfo += this.centerText('DESCUENTO PRONTO PAGO') + '\n';
       discountInfo += this.createLine('*') + '\n';
-      discountInfo += this.alignRight(`Descuento: ${this.formatFullCurrency(descuento)}`, this.CONFIG.PAPER_WIDTH) + '\n';
-      
+      discountInfo +=
+        this.alignRight(
+          `Descuento: ${this.formatCurrencyForPrint(descuento)}`,
+          this.CONFIG.PAPER_WIDTH
+        ) + '\n';
+
       if (totalFinal) {
-        discountInfo += this.alignRight(`Total a Pagar: ${this.formatFullCurrency(totalFinal)}`, this.CONFIG.PAPER_WIDTH) + '\n';
+        discountInfo +=
+          this.alignRight(
+            `Total a Pagar: ${this.formatCurrencyForPrint(totalFinal)}`,
+            this.CONFIG.PAPER_WIDTH
+          ) + '\n';
       }
-      
+
       discountInfo += this.createLine('*') + '\n';
     }
-    
+
     return discountInfo;
   }
 
@@ -282,17 +412,17 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
    */
   private createAmnistiaNotice(fechaFin?: string): string {
     let notice = '';
-    
+
     notice += this.createSpacing(1);
     notice += this.centerText('*** AMNISTIA VIGENTE ***') + '\n';
-    notice += this.centerText('Aplican descuentos especiales') + '\n';
-    
+    notice += this.centerText('Vence el 31 de agosto de 2025') + '\n';
+
     if (fechaFin) {
       notice += this.centerText(`Vigente hasta: ${fechaFin}`) + '\n';
     }
-    
+
     notice += this.createLine('*') + '\n';
-    
+
     return notice;
   }
 
@@ -301,18 +431,18 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
    */
   private createAmnistiaDetails(data: ConsultaICSResponseReal): string {
     let details = '';
-    
+
     details += this.createSpacing(1);
-    details += this.centerText('DETALLES DE AMNISTIA') + '\n';
+    details += this.centerText('AMDC') + '\n';
     details += this.createLine('*') + '\n';
-    
+
     // Aquí se pueden agregar más detalles específicos de la amnistía
     // según los campos disponibles en la interfaz
-    
-    details += this.centerText('Consulte condiciones y') + '\n';
-    details += this.centerText('requisitos en ventanilla') + '\n';
+
+    details += this.centerText('Datos actualizados') + '\n';
+    details += this.centerText('a la fecha de la consulta') + '\n';
     details += this.createLine('*') + '\n';
-    
+
     return details;
   }
 }

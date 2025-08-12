@@ -80,24 +80,14 @@ export interface ConsultaICSResponse {
 // Interfaz para los detalles de mora en la respuesta real
 
 export interface DetalleMoraReal {
-  anio: number;
-  mes: string;
-  monto: number;
-  interes?: number;
-  total: number;
-  fechaVencimiento?: string;
-  estado: 'PENDIENTE' | 'PAGADO' | 'VENCIDO';
-  diasVencido?: number;
-  montoConAmnistia?: number;
-  descuentoAmnistia?: number;
-  // Propiedades antiguas para compatibilidad
+  // Campos principales según el endpoint real
   year?: string;
   impuesto?: string;
   trenDeAseo?: string;
   tasaBomberos?: string;
   otros?: string;
   recargo?: string;
-  totalString?: string;
+  total?: string;
   dias?: number;
   impuestoNumerico?: number;
   trenDeAseoNumerico?: number;
@@ -106,6 +96,17 @@ export interface DetalleMoraReal {
   recargoNumerico?: number;
   totalNumerico?: number;
   amnistiaAplicada?: boolean;
+  
+  // Campos alternativos para compatibilidad
+  anio?: number;
+  mes?: string;
+  monto?: number;
+  interes?: number;
+  fechaVencimiento?: string;
+  estado?: 'PENDIENTE' | 'PAGADO' | 'VENCIDO';
+  diasVencido?: number;
+  montoConAmnistia?: number;
+  descuentoAmnistia?: number;
 }
 
 // Interfaz para las empresas en la respuesta real

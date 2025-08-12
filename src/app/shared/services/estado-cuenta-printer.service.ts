@@ -7,11 +7,12 @@ import { EstadoCuentaResponse, DetalleMora, ConsultaECResponseNueva, ConsultaPar
 })
 export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
 
-  // Configuración específica para Estado de Cuenta
+  // Configuración basada en especificaciones reales: 72mm, fuente condensada ~48 chars
   private readonly EC_CONFIG = {
-    TABLE_COLUMNS: [4, 8, 7, 8, 7, 8], // Total: 42 caracteres para números completos
-    TABLE_HEADERS: ['Año', 'Impto', 'T.Aseo', 'Bomberos', 'Recargo', 'Total'],
-    TABLE_WIDTH: 42
+    // Distribución optimizada para 48 chars con fuente condensada: 4+7+7+7+7+8 = 40 + 5 espacios = 45 chars
+    TABLE_COLUMNS: [4, 7, 7, 7, 7, 8], 
+    TABLE_HEADERS: ['Año', 'Impto', 'T.Aseo', 'Bomber', 'Recar', 'Total'],
+    TABLE_WIDTH: 45 // Basado en 72mm con fuente condensada
   };
 
   /**
@@ -69,7 +70,7 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
         ticket += `Clave: ${propiedad.claveCatastral}\n`;
       }
       if (propiedad.colonia) {
-        ticket += `Colonia: ${this.truncateText(propiedad.colonia, 20)}\n`;
+        ticket += `Colonia: ${this.truncateTextPreserved(propiedad.colonia, 20)}\n`;
       }
       
       ticket += this.createLine('-', this.EC_CONFIG.TABLE_WIDTH) + '\n';
@@ -82,7 +83,7 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
       sum + (propiedad.totalPropiedadNumerico || 0), 0) || data.totalGeneralNumerico || 0;
     
     ticket += this.createLine('=', this.EC_CONFIG.TABLE_WIDTH) + '\n';
-    ticket += this.alignRight(`TOTAL GENERAL: ${this.formatFullCurrency(totalGeneral)}`, this.CONFIG.PAPER_WIDTH) + '\n';
+    ticket += this.alignRight(`TOTAL GENERAL: ${this.formatCurrencyForPrint(totalGeneral)}`, this.CONFIG.PAPER_WIDTH) + '\n';
     ticket += this.createLine('=', this.EC_CONFIG.TABLE_WIDTH) + '\n';
     
     // Información de amnistía si aplica
@@ -91,7 +92,7 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
     }
     
     // Pie de página
-    ticket += this.createFooter('RECUERDE QUE EL PAGO DE VUELTAS\nVENCE EL 31 DE AGOSTO DEL 2025');
+    ticket += this.createFooter('AMNISTIA VIGENTE\nVENCE EL 31 DE AGOSTO DEL 2025');
     
     return ticket;
   }
@@ -151,56 +152,72 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
 
   /**
    * Crea la tabla de Estado de Cuenta
+   * Aplicando fuente condensada a toda la tabla como en la imagen de referencia
    */
   private createECTable(detalles: DetalleMora[]): string {
     let table = '';
     
-    // Encabezado de la tabla
+    // Activar fuente condensada para toda la tabla (como en la imagen)
+    table += this.escCondensedFont();
+    
+    // Encabezado con fuente condensada
     table += this.createECHeader();
     table += this.createTableSeparator(this.EC_CONFIG.TABLE_COLUMNS) + '\n';
     
-    // Filas de datos
+    // Filas de datos con fuente condensada
     detalles.forEach(detalle => {
       table += this.createECRow(detalle) + '\n';
     });
     
     table += this.createTableSeparator(this.EC_CONFIG.TABLE_COLUMNS) + '\n';
     
+    // Restaurar fuente normal después de la tabla
+    table += this.escNormalWidth();
+    
     return table;
   }
 
   /**
    * Crea el encabezado de la tabla con espaciado adecuado
+   * Usa los métodos del servicio base que preservan acentos y caracteres especiales
    */
   private createECHeader(): string {
     let header = '';
-    header += this.alignLeft(this.EC_CONFIG.TABLE_HEADERS[0], this.EC_CONFIG.TABLE_COLUMNS[0]); // Año
-    header += ' '; // Espacio separador
-    header += this.alignRight(this.EC_CONFIG.TABLE_HEADERS[1], this.EC_CONFIG.TABLE_COLUMNS[1]); // Impto
-    header += ' '; // Espacio separador
-    header += this.alignRight(this.EC_CONFIG.TABLE_HEADERS[2], this.EC_CONFIG.TABLE_COLUMNS[2]); // T.Aseo
-    header += ' '; // Espacio separador
-    header += this.alignRight(this.EC_CONFIG.TABLE_HEADERS[3], this.EC_CONFIG.TABLE_COLUMNS[3]); // Bomberos
-    header += ' '; // Espacio separador
-    header += this.alignRight(this.EC_CONFIG.TABLE_HEADERS[4], this.EC_CONFIG.TABLE_COLUMNS[4]); // Recargo
-    header += ' '; // Espacio separador
-    header += this.alignRight(this.EC_CONFIG.TABLE_HEADERS[5], this.EC_CONFIG.TABLE_COLUMNS[5]); // Total
-    
-    return header;
+    // Usar los métodos que preservan acentos y ñ del servicio base
+    header += this.alignLeftPreserved(this.EC_CONFIG.TABLE_HEADERS[0], this.EC_CONFIG.TABLE_COLUMNS[0]); // Año
+    header += ' ';
+    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[1], this.EC_CONFIG.TABLE_COLUMNS[1]); // Impto
+    header += ' ';
+    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[2], this.EC_CONFIG.TABLE_COLUMNS[2]); // T.Aseo
+    header += ' ';
+    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[3], this.EC_CONFIG.TABLE_COLUMNS[3]); // Bomberos
+    header += ' ';
+    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[4], this.EC_CONFIG.TABLE_COLUMNS[4]); // Recargo
+    header += ' ';
+    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[5], this.EC_CONFIG.TABLE_COLUMNS[5]); // Total
+    return header + '\n';
   }
 
   /**
-   * Crea una fila de la tabla con espaciado adecuado
+   * Crea una fila de la tabla con formato compacto y legible
    */
   private createECRow(detalle: DetalleMora): string {
-    const year = detalle.year || '????';
-    const impuesto = this.formatCurrency(detalle.impuestoNumerico || 0);
-    const aseo = this.formatCurrency(detalle.trenDeAseoNumerico || 0);
-    const bomberos = this.formatCurrency(detalle.tasaBomberosNumerico || 0);
-    const recargo = this.formatCurrency(detalle.recargoNumerico || 0);
-    const total = this.formatCurrency(detalle.totalNumerico || 0);
+    // Asegurar que el año se muestre completo
+    let year = detalle.year || '????';
+    if (year.length === 2 && !isNaN(Number(year))) {
+      const yearNum = Number(year);
+      year = yearNum > 50 ? `19${year}` : `20${year}`;
+    }
+    year = year.substring(0, 4);
+
+    // Usar formato compacto para los números
+    const impuesto = this.formatCompactCurrency(detalle.impuestoNumerico || 0);
+    const aseo = this.formatCompactCurrency(detalle.trenDeAseoNumerico || 0);
+    const bomberos = this.formatCompactCurrency(detalle.tasaBomberosNumerico || 0);
+    const recargo = this.formatCompactCurrency(detalle.recargoNumerico || 0);
+    const total = this.formatCompactCurrency(detalle.totalNumerico || 0);
     
-    // Crear fila con espaciado entre columnas como en las imágenes
+    // Crear fila con espaciado optimizado
     let row = '';
     row += this.alignLeft(year, this.EC_CONFIG.TABLE_COLUMNS[0]);
     row += ' '; // Espacio separador
@@ -224,12 +241,7 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
     let totalSection = '';
     
     totalSection += this.createLine('-', this.EC_CONFIG.TABLE_WIDTH) + '\n';
-    const formattedTotal = new Intl.NumberFormat('es-HN', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      useGrouping: true
-    }).format(total);
-    totalSection += this.alignRight(`Total a pagar L. ${formattedTotal}`, this.EC_CONFIG.TABLE_WIDTH) + '\n';
+    totalSection += this.alignRight(`Total a pagar ${this.formatCurrencyForPrint(total)}`, this.EC_CONFIG.TABLE_WIDTH) + '\n';
     totalSection += '\n';
     
     return totalSection;
@@ -252,6 +264,30 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
     notice += this.createLine('*') + '\n';
     
     return notice;
+  }
+
+  /**
+   * Formatea moneda optimizada para columnas de 7-8 caracteres (72mm impresora)
+   * Basado en especificaciones reales de la impresora
+   */
+  private formatCompactCurrency(value: number): string {
+    if (value === 0) return '0.00';
+
+    // Con columnas de 7-8 chars, podemos mostrar más números con comas
+    const withCommas = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      useGrouping: true
+    }).format(value);
+
+    // Si cabe en la columna (7-8 chars), usar comas
+    if (withCommas.length <= 8) {
+      return withCommas;
+    }
+    // Si no cabe, usar formato sin comas
+    else {
+      return value.toFixed(2);
+    }
   }
 
   /**
