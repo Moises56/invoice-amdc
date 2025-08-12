@@ -846,13 +846,17 @@ export abstract class ThermalPrinterBaseService {
   ): string {
     let info = '';
 
+    // Limpiar fecha y hora de caracteres especiales
+    const cleanFecha = this.fixThermalPrinterChars(fecha);
+    const cleanHora = this.cleanTimeString(hora);
+
     // Usar método específico para impresoras térmicas en nombres
     info += `Nombre: ${this.fixThermalPrinterChars(nombre)}\n`;
     info += `Identidad: ${identidad}\n`;
     if (claveCatastral) {
       info += `Clave Catastral: ${claveCatastral}\n`;
     }
-    info += `Fecha y hora: ${fecha} ${hora}\n`;
+    info += `Fecha y hora: ${cleanFecha} ${cleanHora}\n`;
 
     // Sin salto extra grande — la tabla seguirá inmediatamente
     return info;
@@ -917,20 +921,70 @@ export abstract class ThermalPrinterBaseService {
 
   protected formatDate(date: string | Date): string {
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('es-HN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+
+    // Formatear fecha manualmente para consistencia en impresoras térmicas
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0'); // getMonth() es 0-indexado
+    const year = d.getFullYear();
+
+    return `${day}/${month}/${year}`;
   }
 
   protected formatTime(time: string | Date): string {
-    const t = typeof time === 'string' ? new Date(time) : time;
-    return t.toLocaleTimeString('es-HN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
+    // Si es string, podría venir ya formateado desde el backend
+    if (typeof time === 'string') {
+      // Limpiar formato de hora que viene del backend con caracteres especiales
+      const cleanedTime = this.cleanTimeString(time);
+      if (cleanedTime !== time) {
+        return cleanedTime; // Ya está limpio, devolverlo
+      }
+      
+      // Si no se pudo limpiar como string, intentar parsearlo como Date
+      const parsedDate = new Date(time);
+      if (!isNaN(parsedDate.getTime())) {
+        time = parsedDate;
+      } else {
+        // Si no se puede parsear, devolver el string limpio
+        return cleanedTime;
+      }
+    }
+
+    const t = time as Date;
+
+    // Formatear hora manualmente para evitar caracteres especiales en impresoras térmicas
+    const hours = t.getHours();
+    const minutes = t.getMinutes();
+    const seconds = t.getSeconds();
+
+    // Convertir a formato 12 horas
+    const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    // Formatear con ceros a la izquierda
+    const formattedHour = hour12.toString().padStart(2, '0');
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = seconds.toString().padStart(2, '0');
+
+    return `${formattedHour}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+  }
+
+  /**
+   * Limpia strings de hora que vienen del backend con caracteres especiales
+   */
+  protected cleanTimeString(timeString: string): string {
+    if (!timeString) return '';
+    let cleaned = timeString.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // quitar acentos
+    cleaned = cleaned
+      .replace(/\s+/g, ' ') // unificar espacios
+      .replace(/\b(p\.?\s*m\.?|p\.?\s*a\.?m\.?|p\.?\s*am\.?|p\.?\s*ám\.?|p\.?\s*am\.?|p\.?\s*ám\.?)/gi, 'PM')
+      .replace(/\b(a\.?\s*m\.?|a\.?\s*a\.?m\.?|a\.?\s*am\.?|a\.?\s*ám\.?|a\.?\s*am\.?|a\.?\s*ám\.?)/gi, 'AM')
+      .replace(/[^0-9: AMP]/gi, '') // solo números, :, espacio, AM/PM
+      .replace(/ +/g, ' ');
+    // Si termina con AM o PM, dejarlo, si no, devolver como está
+    cleaned = cleaned.trim();
+    if (/\b(AM|PM)\b$/.test(cleaned)) return cleaned;
+    // Si no tiene AM/PM, devolver solo la hora limpia
+    return cleaned;
   }
 
   protected truncateText(text: string, maxWidth: number): string {
