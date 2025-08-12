@@ -11,7 +11,7 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
   private readonly EC_CONFIG = {
     // Distribución optimizada para 48 chars con fuente condensada: 4+7+7+7+7+8 = 40 + 5 espacios = 45 chars
     TABLE_COLUMNS: [4, 7, 7, 7, 7, 8], 
-    TABLE_HEADERS: ['Año', 'Impto', 'T.Aseo', 'Bomber', 'Recar', 'Total'],
+    TABLE_HEADERS: ['Per.', 'Impto', 'T.Aseo', 'Bomber', 'Recar', 'Total'],
     TABLE_WIDTH: 45 // Basado en 72mm con fuente condensada
   };
 
@@ -32,6 +32,9 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
       data.hora || this.formatTime(new Date()),
       data.claveCatastral
     );
+    
+    // Línea de separación entre información personal y tabla
+    ticket += this.createLine('-') + '\n';
     
     // Tabla de detalles
     ticket += this.createECTable(data.detallesMora || []);
@@ -61,6 +64,9 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
       data.fecha || this.formatDate(new Date()),
       data.hora || this.formatTime(new Date())
     );
+    
+    // Línea de separación entre información personal y propiedades
+    ticket += this.createLine('-') + '\n';
     
     // Procesar cada propiedad
     data.propiedades?.forEach((propiedad, index) => {
@@ -114,6 +120,9 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
       data.hora || this.formatTime(new Date()),
       data.claveCatastral
     );
+    
+    // Línea de separación entre información personal y tabla
+    ticket += this.createLine('-') + '\n';
     
     // Tabla de detalles
     ticket += this.createECTable(data.detallesMora || []);
@@ -179,22 +188,22 @@ export class EstadoCuentaPrinterService extends ThermalPrinterBaseService {
 
   /**
    * Crea el encabezado de la tabla con espaciado adecuado
-   * Usa los métodos del servicio base que preservan acentos y caracteres especiales
+   * Optimizado para impresoras térmicas (ñ → n)
    */
   private createECHeader(): string {
     let header = '';
-    // Usar los métodos que preservan acentos y ñ del servicio base
-    header += this.alignLeftPreserved(this.EC_CONFIG.TABLE_HEADERS[0], this.EC_CONFIG.TABLE_COLUMNS[0]); // Año
+    // Usar métodos específicos para impresoras térmicas que convierten ñ → n
+    header += this.alignLeftThermal(this.EC_CONFIG.TABLE_HEADERS[0], this.EC_CONFIG.TABLE_COLUMNS[0]); // Año → Ano
     header += ' ';
-    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[1], this.EC_CONFIG.TABLE_COLUMNS[1]); // Impto
+    header += this.alignRightThermal(this.EC_CONFIG.TABLE_HEADERS[1], this.EC_CONFIG.TABLE_COLUMNS[1]); // Impto
     header += ' ';
-    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[2], this.EC_CONFIG.TABLE_COLUMNS[2]); // T.Aseo
+    header += this.alignRightThermal(this.EC_CONFIG.TABLE_HEADERS[2], this.EC_CONFIG.TABLE_COLUMNS[2]); // T.Aseo
     header += ' ';
-    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[3], this.EC_CONFIG.TABLE_COLUMNS[3]); // Bomberos
+    header += this.alignRightThermal(this.EC_CONFIG.TABLE_HEADERS[3], this.EC_CONFIG.TABLE_COLUMNS[3]); // Bomberos
     header += ' ';
-    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[4], this.EC_CONFIG.TABLE_COLUMNS[4]); // Recargo
+    header += this.alignRightThermal(this.EC_CONFIG.TABLE_HEADERS[4], this.EC_CONFIG.TABLE_COLUMNS[4]); // Recargo
     header += ' ';
-    header += this.alignRightPreserved(this.EC_CONFIG.TABLE_HEADERS[5], this.EC_CONFIG.TABLE_COLUMNS[5]); // Total
+    header += this.alignRightThermal(this.EC_CONFIG.TABLE_HEADERS[5], this.EC_CONFIG.TABLE_COLUMNS[5]); // Total
     return header + '\n';
   }
 

@@ -16,8 +16,10 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
     // Configuración COMPACTA para evitar que el Total se vaya abajo
     TABLE_COLUMNS: [4, 6, 6, 6, 6, 6, 7],
     // Encabezados ultra-cortos para que todo quepa en una línea
-    TABLE_HEADERS: ['Año', 'Impto', 'Aseo', 'Bomb', 'Otros', 'Rec', 'Total'],
+    TABLE_HEADERS: ['Per.', 'Impto', 'Aseo', 'Bomb', 'Otros', 'Rec', 'Total'],
     TABLE_WIDTH: 41, // Reducido para que el Total no se desborde
+    // Método térmico: usando 'default' ya que ahora usamos "Per." (sin caracteres especiales)
+    THERMAL_METHOD: 'default' as 'default' | 'utf8' | 'safe' | 'ascii' | 'strict' | 'professional' | 'esc_commands' | 'direct_bytes',
   };
 
   /**
@@ -71,9 +73,8 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
     }
 
     // Pie de página
-    // ticket += this.createFooter(
-    //   'AMNISTIA VIGENTE\nVENCE EL 31 DE AGOSTO DEL 2025'
-    // );
+    ticket +=
+      this.centerText('Datos actualizados a la fecha de la consulta') + '\n';
 
     return ticket;
   }
@@ -131,9 +132,8 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
     }
 
     // Pie de página
-    // ticket += this.createFooter(
-    //   'AMNISTIA VIGENTE\nVENCE EL 31 DE AGOSTO DEL 2025'
-    // );
+    ticket +=
+      this.centerText('Datos actualizados a la fecha de la consulta') + '\n';
 
     return ticket;
   }
@@ -222,42 +222,46 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
 
   /**
    * Crea el encabezado de la tabla ICS COMPACTO
-   * Optimizado para que TODO quepa en una sola línea
+   * Optimizado para impresoras térmicas con múltiples enfoques
    */
   private createICSHeader(): string {
     let header = '';
-    // Usar métodos que preservan acentos y ñ del servicio base
-    header += this.alignLeftPreserved(
+
+    // Seleccionar método según configuración
+    const alignLeftMethod = this.getAlignLeftMethod();
+    const alignRightMethod = this.getAlignRightMethod();
+
+    header += alignLeftMethod(
       this.ICS_CONFIG.TABLE_HEADERS[0],
       this.ICS_CONFIG.TABLE_COLUMNS[0]
     ); // Año
     header += ' '; // Espacio separador
-    header += this.alignRightPreserved(
+    header += alignRightMethod(
       this.ICS_CONFIG.TABLE_HEADERS[1],
       this.ICS_CONFIG.TABLE_COLUMNS[1]
     ); // Impto
     header += ' '; // Espacio separador
-    header += this.alignRightPreserved(
+    header += alignRightMethod(
       this.ICS_CONFIG.TABLE_HEADERS[2],
       this.ICS_CONFIG.TABLE_COLUMNS[2]
     ); // Aseo
     header += ' '; // Espacio separador
-    header += this.alignRightPreserved(
+    header += alignRightMethod(
       this.ICS_CONFIG.TABLE_HEADERS[3],
       this.ICS_CONFIG.TABLE_COLUMNS[3]
     ); // Bomb
     header += ' '; // Espacio separador
-    header += this.alignRightPreserved(
+    header += alignRightMethod(
       this.ICS_CONFIG.TABLE_HEADERS[4],
       this.ICS_CONFIG.TABLE_COLUMNS[4]
     ); // Otros
     header += ' '; // Espacio separador
-    header += this.alignRightPreserved(
+    header += alignRightMethod(
       this.ICS_CONFIG.TABLE_HEADERS[5],
       this.ICS_CONFIG.TABLE_COLUMNS[5]
     ); // Rec
     header += ' '; // Espacio separador
-    header += this.alignRightPreserved(
+    header += alignRightMethod(
       this.ICS_CONFIG.TABLE_HEADERS[6],
       this.ICS_CONFIG.TABLE_COLUMNS[6]
     ); // Total
@@ -342,7 +346,7 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
   }
 
   /**
-   * Crea el subtotal de una empresa
+   * Crea el total de una empresa
    */
   private createICSSubtotal(empresa: EmpresaICS): string {
     let subtotal = '';
@@ -350,7 +354,7 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
     subtotal += this.createLine('-') + '\n';
     subtotal +=
       this.alignRight(
-        `Subtotal: ${this.formatCurrencyForPrint(
+        `Total: ${this.formatCurrencyForPrint(
           empresa.totalPropiedadNumerico || 0
         )}`,
         this.CONFIG.PAPER_WIDTH
@@ -432,17 +436,70 @@ export class ConsultaICSPrinterService extends ThermalPrinterBaseService {
   private createAmnistiaDetails(data: ConsultaICSResponseReal): string {
     let details = '';
 
-    details += this.createSpacing(1);
+    // details += this.createSpacing(1);
     details += this.centerText('AMDC') + '\n';
     details += this.createLine('*') + '\n';
 
     // Aquí se pueden agregar más detalles específicos de la amnistía
     // según los campos disponibles en la interfaz
 
-    details += this.centerText('Datos actualizados') + '\n';
-    details += this.centerText('a la fecha de la consulta') + '\n';
-    details += this.createLine('*') + '\n';
+    // details += this.centerText('Datos actualizados') + '\n';
+    // details += this.centerText('a la fecha de la consulta') + '\n';
+    // details += this.createLine('*') + '\n';
 
     return details;
+  }
+
+  /**
+   * Métodos auxiliares para seleccionar el enfoque térmico
+   */
+  private getAlignLeftMethod(): (text: string, width: number) => string {
+    switch (this.ICS_CONFIG.THERMAL_METHOD) {
+      case 'esc_commands':
+        return (text, width) => this.alignLeftThermalESC(text, width);
+      case 'direct_bytes':
+        return (text, width) => this.alignLeftThermalBytes(text, width);
+      case 'professional':
+        return (text, width) => this.alignLeftThermalProfessional(text, width);
+      case 'ascii':
+        return (text, width) => this.alignLeftThermalASCII(text, width);
+      case 'strict':
+        return (text, width) => this.alignLeftThermalStrict(text, width);
+      case 'utf8':
+        return (text, width) => this.alignLeftThermalUTF8(text, width);
+      case 'safe':
+        return (text, width) => this.alignLeftThermalSafe(text, width);
+      default:
+        return (text, width) => this.alignLeftThermal(text, width);
+    }
+  }
+
+  private getAlignRightMethod(): (text: string, width: number) => string {
+    switch (this.ICS_CONFIG.THERMAL_METHOD) {
+      case 'esc_commands':
+        return (text, width) => this.alignRightThermalESC(text, width);
+      case 'direct_bytes':
+        return (text, width) => this.alignRightThermalBytes(text, width);
+      case 'professional':
+        return (text, width) => this.alignRightThermalProfessional(text, width);
+      case 'ascii':
+        return (text, width) => this.alignRightThermalASCII(text, width);
+      case 'strict':
+        return (text, width) => this.alignRightThermalStrict(text, width);
+      case 'utf8':
+        return (text, width) => this.alignRightThermalUTF8(text, width);
+      case 'safe':
+        return (text, width) => this.alignRightThermalSafe(text, width);
+      default:
+        return (text, width) => this.alignRightThermal(text, width);
+    }
+  }
+
+  /**
+   * Método para cambiar el enfoque térmico dinámicamente
+   * Útil para pruebas
+   */
+  public setThermalMethod(method: 'default' | 'utf8' | 'safe'): void {
+    (this.ICS_CONFIG as any).THERMAL_METHOD = method;
   }
 }
