@@ -114,18 +114,17 @@ export class ProfilePage implements OnInit {
   }
 
   /**
-   * Cargar perfil del usuario
+   * Cargar perfil del usuario usando el endpoint más seguro /api/users/me
    */
   async loadProfile() {
     this.isLoading.set(true);
     try {
       console.log('🔧 Profile: Cargando perfil del usuario...');
       
-      // Usar el método getProfile() del AuthService que consume /api/auth/profile
-      const profileResponse = await this.authService.getProfile().toPromise();
+      // Usar el nuevo método getMyProfile() que consume /api/users/me
+      const user = await this.usuariosService.getMyProfile().toPromise();
       
-      if (profileResponse?.user) {
-        const user = profileResponse.user;
+      if (user) {
         console.log('✅ Profile: Datos del usuario recibidos:', user);
         
         // Mapear los campos de la API a los campos del formulario
@@ -164,7 +163,7 @@ export class ProfilePage implements OnInit {
   }
 
   /**
-   * Actualizar perfil
+   * Actualizar perfil usando el endpoint más seguro /api/users/me
    */
   async updateProfile() {
     if (this.profileForm.valid) {
@@ -175,13 +174,42 @@ export class ProfilePage implements OnInit {
       await loading.present();
 
       try {
-        const user = this.currentUser();
-        if (!user) return;
-
         const formData = this.profileForm.value;
-        await this.usuariosService.updateUser(user.id, formData).toPromise();
-          // Actualizar el usuario en el servicio de auth
-        // Reload user data from service
+        
+        // Mapear los campos del formulario a los campos de la API
+        const updateData = {
+          nombre: formData.firstName,
+          apellido: formData.lastName,
+          correo: formData.email,
+          telefono: formData.phone
+        };
+        
+        // Usar el método más seguro updateMyProfile() que usa /api/users/me
+        const updatedUser = await this.usuariosService.updateMyProfile(updateData).toPromise();
+        
+        if (updatedUser) {
+          // Actualizar el estado local con los datos actualizados
+          const mappedUser = {
+            ...updatedUser,
+            name: updatedUser.nombre && updatedUser.apellido ? `${updatedUser.nombre} ${updatedUser.apellido}`.trim() : updatedUser.username || '',
+            email: updatedUser.correo || '',
+            phone: updatedUser.telefono || '',
+            address: '',
+          };
+          
+          this.currentUser.set(mappedUser);
+          
+          // Actualizar el formulario con los datos actualizados
+          this.profileForm.patchValue({
+            username: updatedUser.username || '',
+            email: updatedUser.correo || '',
+            firstName: updatedUser.nombre || '',
+            lastName: updatedUser.apellido || '',
+            name: mappedUser.name,
+            phone: mappedUser.phone,
+            address: mappedUser.address
+          });
+        }
         
         await this.showToast('Perfil actualizado correctamente', 'success');
       } catch (error: any) {

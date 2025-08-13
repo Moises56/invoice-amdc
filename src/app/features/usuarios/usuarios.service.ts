@@ -56,10 +56,24 @@ export class UsuariosService {
   }
 
   /**
-   * Actualizar usuario
+   * Obtener mi perfil (usuario autenticado)
+   */
+  getMyProfile(): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/me`);
+  }
+
+  /**
+   * Actualizar mi perfil (usuario autenticado) - Método más seguro
+   */
+  updateMyProfile(userData: Partial<UpdateUserDto>): Observable<User> {
+    return this.http.patch<User>(`${this.baseUrl}/me`, userData);
+  }
+
+  /**
+   * Actualizar usuario (para administradores o usuario propio)
    */
   updateUser(id: string, userData: UpdateUserDto): Observable<User> {
-    return this.http.put<User>(`${this.baseUrl}/${id}`, userData).pipe(
+    return this.http.patch<User>(`${this.baseUrl}/${id}`, userData).pipe(
       tap(updatedUser => {
         const currentUsers = this.usuariosSubject.value;
         const index = currentUsers.findIndex(u => u.id === id);

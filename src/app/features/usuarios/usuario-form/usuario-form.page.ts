@@ -41,6 +41,7 @@ import {
 } from 'ionicons/icons';
 
 import { UsuariosService } from '../usuarios.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { User, Role, CreateUserDto, UpdateUserDto } from '../../../shared/interfaces';
 
 @Component({
@@ -78,6 +79,7 @@ export class UsuarioFormPage implements OnInit {
 
   private formBuilder = inject(FormBuilder);
   private usuariosService = inject(UsuariosService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toastController = inject(ToastController);
@@ -215,8 +217,25 @@ export class UsuarioFormPage implements OnInit {
             updateData.contrasena = formData.password;
           }
 
-          await this.usuariosService.updateUser(this.currentUser()!.id, updateData).toPromise();
-          await this.showToast('Usuario actualizado correctamente', 'success');
+          // Verificar si el usuario está editando su propio perfil
+          const authenticatedUser = this.authService.user();
+          const isEditingOwnProfile = authenticatedUser && this.currentUser()?.id === authenticatedUser.id;
+          
+          if (isEditingOwnProfile) {
+            // Usar el método más seguro para auto-edición
+            const selfUpdateData = {
+              nombre: updateData.nombre,
+              apellido: updateData.apellido,
+              correo: updateData.correo,
+              telefono: updateData.telefono
+            };
+            await this.usuariosService.updateMyProfile(selfUpdateData).toPromise();
+            await this.showToast('Perfil actualizado correctamente', 'success');
+          } else {
+            // Usar el método administrativo para edición de otros usuarios
+            await this.usuariosService.updateUser(this.currentUser()!.id, updateData).toPromise();
+            await this.showToast('Usuario actualizado correctamente', 'success');
+          }
           
           // Cerrar modal si estamos en modo modal
           if (this.isEdit) {
