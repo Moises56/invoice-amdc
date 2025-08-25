@@ -19,7 +19,7 @@ export class SearchInputComponent implements OnDestroy {
   @Input() placeholder: string = 'Ingrese el valor...';
   @Input() disabled: boolean = false;
   @Input() clearOnSearch: boolean = false;
-  @Input() debounceTime: number = 800; // Tiempo de debounce en ms
+  @Input() debounceTime: number = 300; // Tiempo de debounce en ms - Igual que search-ics-input
   @Output() search = new EventEmitter<SearchParamsUnion>();
   @Output() clear = new EventEmitter<void>();
 
@@ -54,7 +54,7 @@ export class SearchInputComponent implements OnDestroy {
         this.performSearch();
       }, this.debounceTime);
     } else if (!value.trim()) {
-      // Limpiar inmediatamente si el campo está vacío
+      // Si el campo está vacío, limpiar resultados inmediatamente
       this.clear.emit();
     }
   }
@@ -75,21 +75,15 @@ export class SearchInputComponent implements OnDestroy {
     }
 
     if (this.searchType() === 'claveCatastral') {
-      // Validación para clave catastral (formato: números y guiones)
-      const claveCatastralPattern = /^[0-9-]+$/;
+      // Validación exacta para clave catastral (formato: XX-XXXX-XXX, exactamente 10 caracteres)
+      const claveCatastralPattern = /^[0-9]{2}-[0-9]{4}-[0-9]{3}$/;
       if (!claveCatastralPattern.test(trimmedValue)) {
         this.isValid.set(false);
-        this.errorMessage.set('La clave catastral solo debe contener números y guiones');
-        return;
-      }
-      
-      if (trimmedValue.length < 5) {
-        this.isValid.set(false);
-        this.errorMessage.set('La clave catastral debe tener al menos 5 caracteres');
+        this.errorMessage.set('La clave catastral debe tener el formato XX-XXXX-XXX (ej: xx-xxxx-xxx)');
         return;
       }
     } else if (this.searchType() === 'dni') {
-      // Validación para DNI hondureño (13 dígitos)
+      // Validación exacta para DNI hondureño (exactamente 13 dígitos)
       const dniPattern = /^[0-9]{13}$/;
       if (!dniPattern.test(trimmedValue)) {
         this.isValid.set(false);
@@ -97,7 +91,7 @@ export class SearchInputComponent implements OnDestroy {
         return;
       }
     } else if (this.searchType() === 'rtn') {
-      // Validación para RTN hondureño (14 dígitos)
+      // Validación exacta para RTN hondureño (exactamente 14 dígitos)
       const rtnPattern = /^[0-9]{14}$/;
       if (!rtnPattern.test(trimmedValue)) {
         this.isValid.set(false);
@@ -109,7 +103,7 @@ export class SearchInputComponent implements OnDestroy {
       const icsPattern = /^ICS-[0-9]{6}$/i;
       if (!icsPattern.test(trimmedValue)) {
         this.isValid.set(false);
-        this.errorMessage.set('El código ICS debe tener el formato ICS-XXXXXX (ej: ICS-006454)');
+        this.errorMessage.set('El código ICS debe tener el formato ICS-XXXXXX (ej: ICS-XXXXXX)');
         return;
       }
     }
@@ -162,13 +156,13 @@ export class SearchInputComponent implements OnDestroy {
   getPlaceholder(): string {
     switch (this.searchType()) {
       case 'claveCatastral':
-        return 'Ej: 12345-67890';
+        return 'Ej: xx-xxxx-xxx';
       case 'dni':
         return 'Ej: 1234567890123';
       case 'rtn':
         return 'Ej: 12345678901234';
       case 'ics':
-        return 'Ej: ICS-006454';
+        return 'Ej: ICS-XXXXXX';
       default:
         return 'Ingrese el valor...';
     }
