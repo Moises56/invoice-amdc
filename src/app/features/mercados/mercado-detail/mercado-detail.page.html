@@ -1,13 +1,14 @@
-<ion-header style="background:#5ccedf;">
-  <ion-toolbar style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
+<ion-header class="safe-area-header mercado-detail-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/mercados"></ion-back-button>
     </ion-buttons>
-    <ion-title style="color:#070101; font-weight:bold;">Detalle del Mercado</ion-title>
+    <ion-title class="header-title">Detalle del Mercado</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="safe-area-content mercado-detail-content">
   <!-- Loading spinner -->
   <div *ngIf="isLoading()" class="flex justify-center items-center h-full">
     <ion-spinner name="crescent" color="primary"></ion-spinner>

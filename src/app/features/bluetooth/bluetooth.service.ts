@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BluetoothSerial } from '@awesome-cordova-plugins/bluetooth-serial/ngx';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { BluetoothDevice } from '../../core/interfaces';
 import { ToastController } from '@ionic/angular';
@@ -27,19 +27,94 @@ export class BluetoothService {
 
   async scanForDevices(): Promise<BluetoothDevice[]> {
     try {
-      const hasPermission = await this.permissionsService.checkAndRequestBluetoothPermissions();
-      if (!hasPermission) {
-        this.showToast('Permisos necesarios no concedidos.');
-        return [];
+      console.log('🔍 Iniciando escaneo básico de dispositivos...');
+      
+      // Solicitar permisos primero (sin fallar si se deniegan)
+      try {
+        const hasPermissions = await this.permissionsService.checkAndRequestBluetoothPermissions();
+        console.log('🔐 Permisos concedidos:', hasPermissions);
+      } catch (permError) {
+        console.log('⚠️ Error en permisos, continuando:', permError);
       }
-
+      
+      // Verificación básica de Bluetooth
       await this.bluetoothSerial.isEnabled();
+      console.log('✅ Bluetooth habilitado');
+      
+      // Escaneo simple como funcionaba antes
       const devices = await this.bluetoothSerial.discoverUnpaired();
-      return devices;
+      console.log('📱 Dispositivos no emparejados encontrados:', devices?.length || 0);
+      
+      return devices || [];
     } catch (error) {
-      console.error('Error scanning for bluetooth devices', error);
+      console.error('❌ Error en escaneo:', error);
       this.showToast('Error al escanear. Verifique que el Bluetooth y la Localización estén activados.');
       return [];
+    }
+  }
+
+  /**
+   * Obtiene dispositivos Bluetooth emparejados
+   */
+  async getPairedDevices(): Promise<BluetoothDevice[]> {
+    try {
+      console.log('📋 Obteniendo dispositivos emparejados...');
+      
+      // Solicitar permisos primero (sin fallar si se deniegan)
+      try {
+        const hasPermissions = await this.permissionsService.checkAndRequestBluetoothPermissions();
+        console.log('🔐 Permisos concedidos:', hasPermissions);
+      } catch (permError) {
+        console.log('⚠️ Error en permisos, continuando:', permError);
+      }
+      
+      // Verificación básica de Bluetooth
+      await this.bluetoothSerial.isEnabled();
+      console.log('✅ Bluetooth habilitado');
+      
+      // Obtener lista simple como funcionaba antes
+      const pairedDevices = await this.bluetoothSerial.list();
+      console.log('📱 Dispositivos emparejados encontrados:', pairedDevices?.length || 0);
+      
+      return pairedDevices || [];
+    } catch (error) {
+      console.error('❌ Error obteniendo emparejados:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Obtiene todos los dispositivos: emparejados primero, luego nuevos
+   */
+  async getAllDevices(): Promise<{paired: BluetoothDevice[], unpaired: BluetoothDevice[], all: BluetoothDevice[]}> {
+    try {
+      // Obtener dispositivos emparejados primero
+      const pairedDevices = await this.getPairedDevices();
+      
+      // Obtener dispositivos no emparejados
+      const unpairedDevices = await this.scanForDevices();
+      
+      // Filtrar dispositivos no emparejados para evitar duplicados
+      const pairedAddresses = pairedDevices.map(device => device.address);
+      const filteredUnpaired = unpairedDevices.filter(
+        device => !pairedAddresses.includes(device.address)
+      );
+      
+      // Combinar: emparejados primero, luego no emparejados
+      const allDevices = [...pairedDevices, ...filteredUnpaired];
+      
+      return {
+        paired: pairedDevices,
+        unpaired: filteredUnpaired,
+        all: allDevices
+      };
+    } catch (error) {
+      console.error('Error getting all bluetooth devices', error);
+      return {
+        paired: [],
+        unpaired: [],
+        all: []
+      };
     }
   }
 

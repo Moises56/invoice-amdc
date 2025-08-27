@@ -1,13 +1,14 @@
-<ion-header style="background:#5ccedf;">
-  <ion-toolbar style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
+<ion-header class="safe-area-header mercado-form-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/mercados"></ion-back-button>
     </ion-buttons>
-    <ion-title style="color:#fff; font-weight:bold;">{{ isEditing() ? 'Editar Mercado' : 'Nuevo Mercado' }}</ion-title>
+    <ion-title class="header-title">{{ isEditing() ? 'Editar Mercado' : 'Nuevo Mercado' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="safe-area-content mercado-form-content">
   <div class="container mx-auto p-4">
     <ion-card>
       <ion-card-header>

@@ -1,23 +1,24 @@
-<ion-header style="background:#5ccedf;">
-  <ion-toolbar class="reports-toolbar" style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
+<ion-header class="safe-area-header reportes-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar reports-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button color="dark" defaultHref="/dashboard"></ion-back-button>
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
 
-    <ion-title class="text-white font-semibold" style="color:#fff; font-weight:bold;"> Centro de Reportes </ion-title>
+    <ion-title class="header-title">Centro de Reportes</ion-title>
 
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="refresh()" [disabled]="isLoading()">
-        <ion-icon *ngIf="!isLoading()" name="refresh-outline" color="light">
+        <ion-icon *ngIf="!isLoading()" name="refresh-outline">
         </ion-icon>
-        <ion-spinner *ngIf="isLoading()" name="crescent" color="light">
+        <ion-spinner *ngIf="isLoading()" name="crescent">
         </ion-spinner>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="reports-bg">
+<ion-content [fullscreen]="true" class="safe-area-content reportes-content reports-bg">
   <!-- Header principal -->
   <div class="reports-hero">
     <div class="hero-content">

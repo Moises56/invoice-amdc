@@ -1,0 +1,273 @@
+/* ===== SAFE AREA GLOBAL STYLES ===== */
+/* Estilos unificados para safe area en todas las páginas */
+
+// Variables globales para safe area
+:root {
+  --safe-area-color: #5ccedf;
+  --safe-area-gradient: linear-gradient(135deg, #5ccedf 0%, #4db6c7 100%);
+  --safe-area-top: env(safe-area-inset-top, 44px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --header-height: 56px;
+  --header-total-height: calc(var(--safe-area-top) + var(--header-height));
+}
+
+// Mixin para headers con safe area
+@mixin safe-area-header($background-color: var(--safe-area-color)) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: $background-color;
+  
+  &::after {
+    display: none; // Remover línea de separación
+  }
+  
+  // Safe area spacer
+  .safe-area-spacer {
+    height: var(--safe-area-top);
+    min-height: 44px;
+    background: inherit;
+    width: 100%;
+    
+    @supports (padding: max(0px)) {
+      height: max(44px, var(--safe-area-top));
+      min-height: max(44px, var(--safe-area-top));
+    }
+  }
+  
+  ion-toolbar {
+    --background: transparent;
+    --color: white;
+    --border-width: 0;
+    --min-height: var(--header-height);
+    --padding-start: max(var(--safe-area-left), 16px);
+    --padding-end: max(var(--safe-area-right), 16px);
+    
+    ion-title {
+      font-weight: 600;
+      font-size: 18px;
+      color: white !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      
+      @media (min-width: 768px) {
+        font-size: 20px;
+      }
+    }
+    
+    ion-back-button {
+      --color: white;
+      --icon-font-size: 24px;
+    }
+    
+    ion-button {
+      --color: white;
+      
+      &.notification-btn,
+      &.menu-btn {
+        --background: rgba(255, 255, 255, 0.15);
+        --border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        
+        &:hover {
+          --background: rgba(255, 255, 255, 0.25);
+        }
+      }
+    }
+  }
+}
+
+// Mixin para content con safe area
+@mixin safe-area-content($padding-top: 32px) {
+  --content-padding-top: calc(var(--header-total-height) + #{$padding-top});
+  
+  padding-top: max(calc(44px + 56px + #{$padding-top}), var(--content-padding-top)) !important;
+  padding-left: max(var(--safe-area-left), 20px) !important;
+  padding-right: max(var(--safe-area-right), 20px) !important;
+  padding-bottom: max(var(--safe-area-bottom), 24px) !important;
+  
+  @supports (padding: max(0px)) {
+    --safe-area-top-robust: max(44px, var(--safe-area-top));
+    --header-total-height-robust: calc(var(--safe-area-top-robust) + var(--header-height));
+    --content-padding-top-robust: calc(var(--header-total-height-robust) + #{$padding-top});
+    
+    padding-top: var(--content-padding-top-robust) !important;
+  }
+  
+  @media (min-width: 768px) {
+    padding-left: max(var(--safe-area-left), 32px) !important;
+    padding-right: max(var(--safe-area-right), 32px) !important;
+    padding-bottom: max(var(--safe-area-bottom), 32px) !important;
+  }
+  
+  // Primer elemento con margen superior adicional
+  > *:first-child {
+    margin-top: 8px;
+  }
+}
+
+// Clases utilitarias para aplicar safe area
+.safe-area-header {
+  @include safe-area-header();
+}
+
+.safe-area-header-custom {
+  @include safe-area-header(var(--safe-area-gradient));
+}
+
+.safe-area-content {
+  @include safe-area-content();
+}
+
+.safe-area-content-large {
+  @include safe-area-content(40px);
+}
+
+// Estilos específicos para diferentes tipos de páginas
+.dashboard-safe-area {
+  .dashboard-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  .dashboard-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.profile-safe-area {
+  .profile-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  .profile-content {
+    @include safe-area-content(32px);
+  }
+}
+
+.consulta-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.estado-cuenta-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.reportes-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.stats-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.bluetooth-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.facturas-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.mercados-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.locales-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.usuarios-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+.auditoria-safe-area {
+  ion-header {
+    @include safe-area-header(var(--safe-area-gradient));
+  }
+  
+  ion-content {
+    @include safe-area-content(24px);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .safe-area-content {
+    padding-left: max(var(--safe-area-left), 16px) !important;
+    padding-right: max(var(--safe-area-right), 16px) !important;
+  }
+}
+
+// Print styles - ocultar safe area spacers
+@media print {
+  .safe-area-spacer {
+    display: none !important;
+  }
+  
+  .safe-area-header {
+    position: static !important;
+    background: transparent !important;
+  }
+  
+  .safe-area-content {
+    padding-top: 0 !important;
+  }
+}

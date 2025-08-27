@@ -1,5 +1,6 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
+<ion-header class="safe-area-header consulta-ics-amnistia-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/dashboard/user"></ion-back-button>
     </ion-buttons>
@@ -15,7 +16,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="safe-area-content consulta-ics-amnistia-content">
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">ICS con Amnistía</ion-title>

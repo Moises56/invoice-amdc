@@ -1,13 +1,14 @@
-<ion-header class="custom-header" style="background:#5ccedf;">
-  <ion-toolbar style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
+<ion-header class="manual-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="manual-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/tab3"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/tab3" class="manual-back-button"></ion-back-button>
     </ion-buttons>
-    <ion-title style="color:#fff; font-weight:bold;">Configurar Impresora</ion-title>
+    <ion-title class="manual-title">Configurar Impresora</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="printer-settings-content" [fullscreen]="true">
+<ion-content class="printer-settings-content manual-content">
   <!-- Welcome Header -->
   <div class="welcome-header">
     <div class="welcome-content">
@@ -86,6 +87,15 @@
           <ion-icon name="close-circle"></ion-icon>
         </button>
         <span class="action-label">Desconectar</span>
+      </div>
+
+      <div class="mobile-action-container">
+        <button class="mobile-icon-btn info-btn" 
+                (click)="showDiagnostics()"
+                title="Diagnósticos">
+          <ion-icon name="information-circle-outline"></ion-icon>
+        </button>
+        <span class="action-label">Ayuda</span>
       </div>
     </div>
 

@@ -1,4 +1,5 @@
-<ion-header [translucent]="true" class="logs-header">
+<ion-header class="safe-area-header activity-logs-header">
+  <div class="safe-area-spacer"></div>
   <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/dashboard/user" icon="arrow-back-outline"></ion-back-button>
@@ -6,7 +7,7 @@
     <ion-title class="header-title">
       <div class="title-with-icon">
         <ion-icon name="analytics" class="header-icon"></ion-icon>
-        Logs del Systema
+        Logs del Sistema
       </div>
     </ion-title>
     <ion-buttons slot="end">
@@ -17,7 +18,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="logs-content">
+<ion-content [fullscreen]="true" class="safe-area-content activity-logs-content logs-content">
   <!-- Pull to refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="refreshLogs($event)">
     <ion-refresher-content></ion-refresher-content>

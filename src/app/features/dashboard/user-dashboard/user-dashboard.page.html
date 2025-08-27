@@ -1,4 +1,5 @@
-<ion-header [translucent]="true" class="dashboard-header">
+<ion-header class="dashboard-header safe-area-header">
+  <div class="safe-area-spacer"></div>
   <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
@@ -23,7 +24,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="dashboard-content">
+<ion-content class="dashboard-content safe-area-content">
   
   <!-- Refresher -->
   <ion-refresher slot="fixed" (ionRefresh)="refreshStats()">

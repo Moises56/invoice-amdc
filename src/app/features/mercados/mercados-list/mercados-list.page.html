@@ -1,14 +1,16 @@
-<ion-header style="background:#5ccedf;">  <ion-toolbar class="header-toolbar" style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
+<ion-header class="safe-area-header mercados-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
-      <ion-menu-button class="text-white menu-button"></ion-menu-button>
+      <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title class="text-white font-semibold header-title" style="color:#fff; font-weight:bold;">Mercados</ion-title>
+    <ion-title class="header-title">Mercados</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="showFilters.set(!showFilters())" class="action-button">
-        <ion-icon name="filter-outline" slot="icon-only" class="text-white"></ion-icon>
+        <ion-icon name="filter-outline" slot="icon-only"></ion-icon>
       </ion-button>
       <ion-button fill="clear" (click)="exportMercados()" class="action-button">
-        <ion-icon name="download-outline" slot="icon-only" class="text-white"></ion-icon>
+        <ion-icon name="download-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -70,7 +72,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-background-color">
+<ion-content [fullscreen]="true" class="safe-area-content mercados-content ion-background-color">
   <!-- Search Bar -->
   <div class="sticky top-0 z-10 bg-white shadow-sm">
     <ion-searchbar

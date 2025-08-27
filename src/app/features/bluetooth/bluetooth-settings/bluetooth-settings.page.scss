@@ -1,71 +1,105 @@
 /* ===== PRINTER SETTINGS GLASSMORPHISM STYLES ===== */
 
-// Custom Header with Status Bar Coverage
-.custom-header {
-  ion-toolbar {
-    --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+// Safe Area Header - Implementación robusta que funciona
+.manual-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  // Safe area spacer con altura mínima garantizada
+  .safe-area-spacer {
+    height: env(safe-area-inset-top, 44px); // Aumentado de 24px a 44px
+    min-height: 44px; // Altura mínima garantizada
+    background: inherit;
+    width: 100%;
+    
+    // Para dispositivos con notch/punch hole
+    @supports (padding: max(0px)) {
+      height: max(44px, env(safe-area-inset-top));
+      min-height: max(44px, env(safe-area-inset-top));
+    }
+  }
+  
+  .manual-toolbar {
+    --background: transparent;
     --color: white;
     --border-width: 0;
     --min-height: 56px;
+    --padding-start: 16px;
+    --padding-end: 16px;
     
-    // Ensure header covers status bar on mobile
-    @media (max-width: 767px) {
-      --padding-top: calc(var(--ion-safe-area-top, 0px) + 8px);
-      --min-height: calc(56px + var(--ion-safe-area-top, 0px));
-    }
-    
-    ion-title {
+    .manual-title {
       font-weight: 600;
       font-size: 18px;
+      color: white !important;
       
       @media (min-width: 768px) {
         font-size: 20px;
       }
     }
     
-    ion-back-button {
+    .manual-back-button {
       --color: white;
       --icon-font-size: 24px;
     }
   }
 }
 
-// Content Container
-.printer-settings-content {
+// Manual Content - Padding calculado con safe area robusto
+.manual-content {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  padding: 20px; // Optimized spacing
-  --padding-start: 0;
-  --padding-end: 0;
-  --padding-top: 0;
-  --padding-bottom: 0;
-  position: relative;
-  z-index: 1;
   
-  // Add top padding to account for translucent header
-  padding-top: calc(var(--ion-safe-area-top, 0px) + 80px);
+  // Padding que considera el header fijo + safe area con altura mínima
+  --safe-area-top: env(safe-area-inset-top, 44px);
+  --header-total-height: calc(var(--safe-area-top) + 56px);
+  --content-padding-top: calc(var(--header-total-height) + 16px);
+  
+  // Altura mínima garantizada para el padding superior
+  padding-top: max(116px, var(--content-padding-top)) !important; // 44px + 56px + 16px = 116px mínimo
+  padding-left: max(env(safe-area-inset-left, 0px), 20px) !important;
+  padding-right: max(env(safe-area-inset-right, 0px), 20px) !important;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px) !important;
+  
+  // Para dispositivos con notch/punch hole
+  @supports (padding: max(0px)) {
+    --safe-area-top-robust: max(44px, env(safe-area-inset-top));
+    --header-total-height-robust: calc(var(--safe-area-top-robust) + 56px);
+    --content-padding-top-robust: calc(var(--header-total-height-robust) + 16px);
+    
+    padding-top: var(--content-padding-top-robust) !important;
+  }
 
   @media (min-width: 768px) {
-    padding: 32px; // Better spacing for tablets
-    padding-top: calc(var(--ion-safe-area-top, 0px) + 88px);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); // Ensure background on desktop
+    --padding-start: env(safe-area-inset-left, 32px);
+    --padding-end: env(safe-area-inset-right, 32px);
+    --padding-bottom: env(safe-area-inset-bottom, 32px);
+    --padding-top: calc(env(safe-area-inset-top, 0px) + 56px + 32px);
+    
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     overflow-x: visible;
     overflow-y: auto;
   }
 
-  // Desktop optimizations
   @media (min-width: 1024px) {
-    padding: 48px; // Better spacing
-    padding-top: calc(var(--ion-safe-area-top, 0px) + 96px);
+    --padding-start: env(safe-area-inset-left, 48px);
+    --padding-end: env(safe-area-inset-right, 48px);
+    --padding-bottom: env(safe-area-inset-bottom, 48px);
+    --padding-top: calc(env(safe-area-inset-top, 0px) + 56px + 48px);
+    
     max-width: 1400px;
     margin: 0 auto;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; // Force background
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     min-height: 100vh !important;
   }
 
   @media (min-width: 1200px) {
-    padding: 64px; // Optimal spacing for large screens
-    padding-top: calc(var(--ion-safe-area-top, 0px) + 104px);
+    --padding-start: env(safe-area-inset-left, 64px);
+    --padding-end: env(safe-area-inset-right, 64px);
+    --padding-bottom: env(safe-area-inset-bottom, 64px);
+    --padding-top: calc(env(safe-area-inset-top, 0px) + 56px + 64px);
   }
 
   &::before {
@@ -110,26 +144,27 @@
     background: rgba(255, 255, 255, 0.35);
   }
 
-  // Force black text for all content
+  // Mejorar contraste y legibilidad del texto
   * {
-    color: #000000 !important;
-    text-shadow: none !important;
+    color: #1a202c !important; // Gris muy oscuro en lugar de negro puro
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important; // Sombra blanca sutil
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: #000000 !important;
-    font-weight: 600;
-    text-shadow: none !important;
+    color: #1a202c !important;
+    font-weight: 700; // Más peso para mejor legibilidad
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9) !important;
   }
   
   p, span, div {
-    color: #000000 !important;
-    text-shadow: none !important;
+    color: #2d3748 !important; // Gris oscuro para texto secundario
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7) !important;
   }
 
   .card-title {
-    color: #000000 !important;
-    text-shadow: none !important;
+    color: #1a202c !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9) !important;
   }
 
   // Desktop optimizations
@@ -549,6 +584,17 @@
             background: linear-gradient(135deg, #ff7043 0%, #e53e3e 100%);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(255, 138, 128, 0.4);
+          }
+        }
+
+        // Info button (diagnostics)
+        &.info-btn {
+          background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+          
+          &:hover:not(:disabled) {
+            background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(66, 153, 225, 0.4);
           }
         }
       }

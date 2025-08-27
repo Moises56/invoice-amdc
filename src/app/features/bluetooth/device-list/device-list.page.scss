@@ -1,1 +1,474 @@
-/* Estilos para el modal de lista de dispositivos Bluetooth */
+/* ===== DEVICE LIST SAFE AREA STYLES ===== */
+
+// Safe Area Header para Device List - Implementación robusta
+.device-list-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  &::after {
+    display: none; // Remover línea de separación
+  }
+  
+  // Safe area spacer con altura mínima garantizada
+  .device-safe-area-spacer {
+    height: env(safe-area-inset-top, 44px); // Aumentado de 24px a 44px
+    min-height: 44px; // Altura mínima garantizada
+    background: inherit;
+    width: 100%;
+    
+    // Para dispositivos con notch/punch hole
+    @supports (padding: max(0px)) {
+      height: max(44px, env(safe-area-inset-top));
+      min-height: max(44px, env(safe-area-inset-top));
+    }
+  }
+
+  .device-list-toolbar {
+    --background: transparent;
+    --color: white;
+    --border-width: 0;
+    --min-height: 56px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        
+        .header-icon {
+          font-size: 24px;
+          color: white;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .device-list-title {
+          font-weight: 600;
+          font-size: 18px;
+          color: white !important;
+          margin: 0;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+          @media (min-width: 768px) {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+
+    .close-button {
+      --color: white;
+      --background: rgba(255, 255, 255, 0.15);
+      --border-radius: 50%;
+      --padding-start: 8px;
+      --padding-end: 8px;
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      width: 40px;
+      height: 40px;
+      
+      ion-icon {
+        font-size: 20px;
+        color: white;
+      }
+      
+      &:hover {
+        --background: rgba(255, 255, 255, 0.25);
+      }
+    }
+  }
+}
+
+// Manual Content para Device List - Padding calculado con safe area robusto
+.device-list-content {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh; // Asegurar altura completa
+
+  // Padding que considera el header fijo + safe area con altura mínima
+  --safe-area-top: env(safe-area-inset-top, 44px);
+  --header-total-height: calc(var(--safe-area-top) + 56px);
+  --content-padding-top: calc(var(--header-total-height) + 32px); // Aumentado de 24px a 32px
+  
+  // Altura mínima garantizada para el padding superior (significativamente aumentada)
+  padding-top: max(140px, var(--content-padding-top)) !important; // 44px + 56px + 32px + margen = 140px mínimo
+  padding-left: max(env(safe-area-inset-left, 0px), 20px) !important; // Aumentado de 16px a 20px
+  padding-right: max(env(safe-area-inset-right, 0px), 20px) !important; // Aumentado de 16px a 20px
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 24px) !important; // Aumentado de 16px a 24px
+  
+  // Para dispositivos con notch/punch hole
+  @supports (padding: max(0px)) {
+    --safe-area-top-robust: max(44px, env(safe-area-inset-top));
+    --header-total-height-robust: calc(var(--safe-area-top-robust) + 56px);
+    --content-padding-top-robust: calc(var(--header-total-height-robust) + 32px); // Aumentado de 24px a 32px
+    
+    padding-top: max(140px, var(--content-padding-top-robust)) !important;
+  }
+
+  @media (min-width: 768px) {
+    padding-left: max(env(safe-area-inset-left, 0px), 32px) !important; // Aumentado de 24px a 32px
+    padding-right: max(env(safe-area-inset-right, 0px), 32px) !important; // Aumentado de 24px a 32px
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 32px) !important; // Aumentado de 24px a 32px
+  }
+  
+  // Mejorar el espaciado entre secciones
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  // Primer elemento con margen superior adicional para asegurar visibilidad
+  > *:first-child {
+    margin-top: 8px; // Margen adicional para el primer elemento
+  }
+}
+
+// Estilos para el spinner de carga
+.ion-text-center {
+  margin-top: 40px;
+
+  ion-spinner {
+    width: 32px;
+    height: 32px;
+    color: #667eea;
+  }
+
+  p {
+    margin-top: 16px;
+    color: #4a5568;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+// Estilos para la lista de dispositivos
+ion-list {
+  background: transparent;
+
+  ion-item {
+    --background: white;
+    --border-radius: 12px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+
+    margin-bottom: 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    ion-label {
+      h2 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0 0 4px 0;
+      }
+
+      p {
+        font-size: 14px;
+        color: #718096;
+        margin: 0;
+        font-family: "Courier New", monospace;
+      }
+    }
+  }
+}
+
+// Secciones de dispositivos mejoradas
+.device-section {
+  margin-bottom: 32px; // Aumentado de 24px a 32px
+
+  .section-header {
+    margin-bottom: 16px; // Aumentado de 12px a 16px
+    padding: 16px 20px; // Aumentado padding
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid transparent;
+
+    h3 {
+      font-size: 20px; // Aumentado de 18px a 20px
+      font-weight: 700;
+      color: #2d3748;
+      margin: 0 0 6px 0; // Aumentado margen
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      &::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+    }
+
+    ion-note {
+      font-size: 15px; // Aumentado de 14px a 15px
+      color: #718096;
+      font-weight: 500;
+    }
+
+    &.paired-header {
+      border-left-color: #38a169;
+      background: linear-gradient(135deg, rgba(56, 161, 105, 0.1) 0%, rgba(56, 161, 105, 0.05) 100%);
+      
+      h3 {
+        color: #38a169; // Verde para emparejados
+        
+        &::before {
+          background: #38a169;
+          box-shadow: 0 0 8px rgba(56, 161, 105, 0.4);
+        }
+      }
+      
+      ion-note {
+        color: #2f855a;
+      }
+    }
+
+    &.unpaired-header {
+      border-left-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%);
+      
+      h3 {
+        color: #667eea;
+        
+        &::before {
+          background: #667eea;
+          box-shadow: 0 0 8px rgba(102, 126, 234, 0.4);
+        }
+      }
+      
+      ion-note {
+        color: #5a67d8;
+      }
+      
+      .scanning-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .small-spinner {
+          width: 16px;
+          height: 16px;
+          color: #667eea;
+        }
+      }
+    }
+  }
+}
+
+// Estilos específicos para dispositivos emparejados
+.paired-devices-list {
+  background: transparent;
+
+  .paired-device {
+    --background: linear-gradient(
+      135deg,
+      rgba(56, 161, 105, 0.1) 0%,
+      rgba(56, 161, 105, 0.05) 100%
+    );
+    border: 1px solid rgba(56, 161, 105, 0.2);
+
+    .paired-icon {
+      ion-icon {
+        color: #38a169;
+        font-size: 24px;
+      }
+    }
+
+    .device-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+
+      ion-icon {
+        font-size: 14px;
+      }
+
+      span {
+        font-size: 12px;
+        color: #38a169;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Estilos específicos para dispositivos no emparejados
+.unpaired-devices-list {
+  background: transparent;
+
+  .unpaired-device {
+    --background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    .unpaired-icon {
+      ion-icon {
+        color: #718096;
+        font-size: 24px;
+      }
+    }
+
+    .device-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+
+      ion-icon {
+        font-size: 14px;
+      }
+
+      span {
+        font-size: 12px;
+        color: #718096;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Estilos comunes para items de dispositivos
+.device-item {
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+
+  margin-bottom: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .device-icon {
+    margin-right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  ion-label {
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 0 0 4px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: #718096;
+      margin: 0 0 4px 0;
+      font-family: "Courier New", monospace;
+    }
+  }
+}
+
+// Estado de carga
+.loading-state {
+  margin-top: 40px;
+
+  ion-spinner {
+    width: 32px;
+    height: 32px;
+    color: #667eea;
+  }
+
+  p {
+    margin-top: 16px;
+    color: #4a5568;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+// Estado sin dispositivos
+.no-devices-state {
+  margin-top: 40px;
+
+  .no-devices-icon {
+    font-size: 64px;
+    color: #cbd5e0;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 12px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: #718096;
+    margin: 0 0 16px 0;
+  }
+
+  .troubleshooting-list {
+    text-align: left;
+    margin: 0 auto;
+    max-width: 300px;
+    padding-left: 20px;
+
+    li {
+      font-size: 14px;
+      color: #4a5568;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (min-width: 768px) {
+  .device-section {
+    .section-header {
+      h3 {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .device-item {
+    --padding-start: 20px;
+    --padding-end: 20px;
+
+    ion-label {
+      h2 {
+        font-size: 18px;
+      }
+
+      p {
+        font-size: 15px;
+      }
+    }
+  }
+}

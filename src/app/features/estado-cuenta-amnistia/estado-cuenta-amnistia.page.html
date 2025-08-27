@@ -1,14 +1,15 @@
 
-<ion-header class="amnistia-header">
-  <ion-toolbar class="amnistia-toolbar">
+<ion-header class="safe-area-header estado-cuenta-amnistia-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title class="amnistia-title">Estado de Cuenta con Amnistía</ion-title>
+    <ion-title class="header-title">Estado de Cuenta con Amnistía</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="estado-cuenta-amnistia-bg">
+<ion-content [fullscreen]="true" class="safe-area-content estado-cuenta-amnistia-content estado-cuenta-amnistia-bg">
   <div class="estado-cuenta-container">
     <div class="search-form glass-card">
       <app-search-input

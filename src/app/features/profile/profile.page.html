@@ -1,44 +1,60 @@
-<ion-header [translucent]="true" class="profile-header">
-  <ion-toolbar class="profile-toolbar">
+<ion-header class="profile-header safe-area-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard" icon="arrow-back-outline"></ion-back-button>
+      <ion-back-button
+        defaultHref="/dashboard"
+        icon="arrow-back-outline"
+      ></ion-back-button>
     </ion-buttons>
-    <ion-title class="profile-title">Profile Settings</ion-title>
+    <ion-title class="header-title">Profile Settings</ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="refreshProfile()" [disabled]="isLoading()">
-        <ion-icon name="refresh-outline" [class.rotating]="isLoading()"></ion-icon>
+      <ion-button
+        fill="clear"
+        (click)="refreshProfile()"
+        [disabled]="isLoading()"
+      >
+        <ion-icon
+          name="refresh-outline"
+          [class.rotating]="isLoading()"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="profile-content">
+<ion-content [fullscreen]="true" class="safe-area-content profile-content">
   <div class="profile-container">
-    
     <!-- Profile Info Section -->
     <div class="profile-info-section">
       <div class="profile-avatar-container">
         <div class="profile-avatar">
           <span class="avatar-text">
-            {{ currentUser() ? getInitials(currentUser()!.name || currentUser()!.nombre || 'U') : 'U' }}
+            {{ currentUser() ? getInitials(currentUser()!.name ||
+            currentUser()!.nombre || 'U') : 'U' }}
           </span>
         </div>
       </div>
-      
+
       <div class="profile-details">
-        <h2 class="profile-name">{{ currentUser()?.name || currentUser()?.nombre || 'Sara Anderson' }}</h2>
-        <p class="profile-email">{{ currentUser()?.email || 'sara.anderson@example.com' }}</p>
+        <h2 class="profile-name">
+          {{ currentUser()?.name || currentUser()?.nombre || 'Sara Anderson' }}
+        </h2>
+        <p class="profile-email">
+          {{ currentUser()?.email || 'sara.anderson@example.com' }}
+        </p>
         <div class="profile-role-badge">
           <ion-icon name="shield-outline"></ion-icon>
           <span>{{ getRoleDisplay(currentUser()?.role) }}</span>
         </div>
       </div>
-      
-      <ion-button 
-        fill="clear" 
+
+      <ion-button
+        fill="clear"
         class="edit-profile-btn"
         (click)="toggleEditMode()"
-        [disabled]="isLoading()">
+        [disabled]="isLoading()"
+      >
         <ion-icon name="create-outline"></ion-icon>
         Edit Profile
       </ion-button>
@@ -47,8 +63,12 @@
     <!-- Profile Settings Form -->
     <div class="profile-settings-section">
       <h3 class="section-title">Profile Settings</h3>
-      
-      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="profile-form">
+
+      <form
+        [formGroup]="profileForm"
+        (ngSubmit)="updateProfile()"
+        class="profile-form"
+      >
         <div class="form-grid">
           <!-- Username -->
           <div class="form-group">
@@ -58,7 +78,8 @@
                 formControlName="username"
                 placeholder="Enter username"
                 [readonly]="!editMode"
-                class="profile-input">
+                class="profile-input"
+              >
               </ion-input>
             </div>
           </div>
@@ -72,7 +93,8 @@
                 type="email"
                 placeholder="Enter email address"
                 [readonly]="!editMode"
-                class="profile-input">
+                class="profile-input"
+              >
               </ion-input>
             </div>
           </div>
@@ -85,7 +107,8 @@
                 formControlName="firstName"
                 placeholder="Enter first name"
                 [readonly]="!editMode"
-                class="profile-input">
+                class="profile-input"
+              >
               </ion-input>
             </div>
           </div>
@@ -98,7 +121,8 @@
                 formControlName="lastName"
                 placeholder="Enter last name"
                 [readonly]="!editMode"
-                class="profile-input">
+                class="profile-input"
+              >
               </ion-input>
             </div>
           </div>
@@ -110,7 +134,8 @@
               <ion-input
                 [value]="getRoleDisplay(currentUser()?.role)"
                 readonly="true"
-                class="profile-input readonly">
+                class="profile-input readonly"
+              >
               </ion-input>
             </div>
           </div>
@@ -118,13 +143,22 @@
 
         <!-- Save Button -->
         <div class="form-actions" *ngIf="editMode">
-          <ion-button 
+          <ion-button
             type="submit"
             expand="block"
             class="save-btn"
-            [disabled]="profileForm.invalid || isLoading()">
-            <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
-            <ion-icon *ngIf="!isLoading()" name="save-outline" slot="start"></ion-icon>
+            [disabled]="profileForm.invalid || isLoading()"
+          >
+            <ion-spinner
+              *ngIf="isLoading()"
+              name="crescent"
+              slot="start"
+            ></ion-spinner>
+            <ion-icon
+              *ngIf="!isLoading()"
+              name="save-outline"
+              slot="start"
+            ></ion-icon>
             Save Changes
           </ion-button>
         </div>
@@ -132,12 +166,13 @@
 
       <!-- Logout Button -->
       <div class="logout-section">
-        <ion-button 
-          fill="outline" 
+        <ion-button
+          fill="outline"
           color="medium"
           expand="block"
           class="logout-btn"
-          (click)="logout()">
+          (click)="logout()"
+        >
           <ion-icon name="log-out-outline" slot="start"></ion-icon>
           Log out
         </ion-button>
@@ -147,8 +182,12 @@
     <!-- Change Password Section -->
     <div class="password-section">
       <h3 class="section-title">Change Password</h3>
-      
-      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
+
+      <form
+        [formGroup]="passwordForm"
+        (ngSubmit)="changePassword()"
+        class="password-form"
+      >
         <!-- Current Password -->
         <div class="form-group full-width">
           <label class="form-label">Current Password</label>
@@ -157,7 +196,8 @@
               formControlName="currentPassword"
               type="password"
               placeholder="••••••••"
-              class="profile-input">
+              class="profile-input"
+            >
             </ion-input>
           </div>
         </div>
@@ -171,7 +211,8 @@
                 formControlName="newPassword"
                 type="password"
                 placeholder="••••••••"
-                class="profile-input">
+                class="profile-input"
+              >
               </ion-input>
             </div>
           </div>
@@ -184,7 +225,8 @@
                 formControlName="confirmPassword"
                 type="password"
                 placeholder="••••••••"
-                class="profile-input">
+                class="profile-input"
+              >
               </ion-input>
             </div>
           </div>
@@ -192,17 +234,25 @@
 
         <!-- Update Password Button -->
         <div class="form-actions">
-          <ion-button 
+          <ion-button
             type="submit"
             class="update-password-btn"
-            [disabled]="passwordForm.invalid || isLoading()">
-            <ion-spinner *ngIf="isLoading()" name="crescent" slot="start"></ion-spinner>
-            <ion-icon *ngIf="!isLoading()" name="key-outline" slot="start"></ion-icon>
+            [disabled]="passwordForm.invalid || isLoading()"
+          >
+            <ion-spinner
+              *ngIf="isLoading()"
+              name="crescent"
+              slot="start"
+            ></ion-spinner>
+            <ion-icon
+              *ngIf="!isLoading()"
+              name="key-outline"
+              slot="start"
+            ></ion-icon>
             Update Password
           </ion-button>
         </div>
       </form>
     </div>
-
   </div>
 </ion-content>

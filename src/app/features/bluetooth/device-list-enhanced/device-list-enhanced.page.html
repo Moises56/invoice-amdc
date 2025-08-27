@@ -1,0 +1,117 @@
+<ion-header class="safe-area-header">
+  <ion-toolbar class="safe-area-toolbar">
+    <ion-title class="safe-title">Seleccionar Impresora</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()" class="safe-close-button">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="device-list-content safe-area-content">
+  <!-- Información del escaneo -->
+  <ion-card class="scan-info-card" *ngIf="scanDuration">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+        Escaneo Completado
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="scan-stats">
+        <div class="stat-item">
+          <ion-icon name="bluetooth-outline"></ion-icon>
+          <span>{{ devices.length }} dispositivo(s) encontrado(s)</span>
+        </div>
+        <div class="stat-item">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Duración: {{ getFormattedScanDuration() }}</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Lista de dispositivos -->
+  <div class="devices-section">
+    <div class="section-header" *ngIf="devices.length > 0">
+      <h2>Dispositivos Encontrados</h2>
+      <ion-note>Seleccione su impresora Bluetooth</ion-note>
+    </div>
+
+    <ion-list *ngIf="devices.length > 0; else noDevices" class="devices-list">
+      <ion-item
+        button
+        class="device-item"
+        *ngFor="let device of devices; trackBy: trackByDeviceId"
+        (click)="selectDevice(device)"
+      >
+        <div class="device-icon" slot="start">
+          <ion-icon [name]="getDeviceIcon(device)" [color]="isPrinterDevice(device) ? 'success' : 'medium'"></ion-icon>
+        </div>
+        
+        <ion-label class="device-label">
+          <h2 class="device-name">{{ device.name || 'Dispositivo sin nombre' }}</h2>
+          <p class="device-address">{{ device.address }}</p>
+          <div class="device-details">
+            <span class="device-class">Clase: {{ device.class || 'Desconocida' }}</span>
+          </div>
+        </ion-label>
+
+        <div class="device-badges" slot="end">
+          <ion-badge [color]="getDeviceBadgeColor(device)" class="device-type-badge">
+            {{ getDeviceBadgeText(device) }}
+          </ion-badge>
+          <ion-icon name="chevron-forward" color="medium" class="chevron-icon"></ion-icon>
+        </div>
+      </ion-item>
+    </ion-list>
+
+    <ng-template #noDevices>
+      <div class="no-devices-container">
+        <div class="no-devices-content">
+          <ion-icon name="bluetooth-outline" class="no-devices-icon"></ion-icon>
+          <h3>No se encontraron dispositivos</h3>
+          <p>Asegúrese de que su impresora Bluetooth esté:</p>
+          <ul class="troubleshooting-list">
+            <li>Encendida y funcionando</li>
+            <li>En modo de emparejamiento</li>
+            <li>Cerca de este dispositivo (menos de 10 metros)</li>
+            <li>No conectada a otro dispositivo</li>
+          </ul>
+          
+          <ion-button 
+            fill="outline" 
+            color="primary" 
+            (click)="closeModal()"
+            class="retry-button">
+            <ion-icon name="refresh" slot="start"></ion-icon>
+            Reintentar Escaneo
+          </ion-button>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Información adicional -->
+  <ion-card class="help-card">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="information-circle-outline" color="primary"></ion-icon>
+        Consejos
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="help-content">
+        <div class="help-item">
+          <ion-icon name="print-outline" color="success"></ion-icon>
+          <span>Los dispositivos marcados como "Impresora" son más probables de ser compatibles</span>
+        </div>
+        <div class="help-item">
+          <ion-icon name="bluetooth-outline" color="primary"></ion-icon>
+          <span>Si no ve su impresora, asegúrese de que esté en modo de emparejamiento</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

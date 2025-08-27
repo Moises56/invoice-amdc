@@ -1,9 +1,10 @@
-<ion-header>
-  <ion-toolbar class="municipal-toolbar">
+<ion-header class="safe-area-header factura-detail-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/facturas"></ion-back-button>
     </ion-buttons>
-    <ion-title class="text-white font-semibold">
+    <ion-title class="header-title">
       Detalle de Factura
     </ion-title>
     <ion-buttons slot="end" *ngIf="factura() && !isLoading()">
@@ -17,7 +18,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="bg-gray-50">
+<ion-content class="safe-area-content factura-detail-content bg-gray-50">
   <div class="p-4">
     
     <!-- Loading State -->

@@ -3,14 +3,14 @@ import { AndroidPermissions } from '@awesome-cordova-plugins/android-permissions
 import { Platform } from '@ionic/angular';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PermissionsService {
 
   constructor(
     private platform: Platform,
     private androidPermissions: AndroidPermissions
-  ) { }
+  ) {}
 
   async checkAndRequestBluetoothPermissions(): Promise<boolean> {
     if (!this.platform.is('android')) {
@@ -18,32 +18,31 @@ export class PermissionsService {
     }
 
     try {
-      // Check for all permissions
-      const hasScanPermission = await this.hasPermission(this.androidPermissions.PERMISSION.BLUETOOTH_SCAN);
-      const hasConnectPermission = await this.hasPermission(this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT);
-      const hasLocationPermission = await this.hasPermission(this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION);
+      console.log('🔐 Solicitando permisos de Bluetooth...');
+      
+      // Permisos básicos + dispositivos cercanos para Android 12+
+      const permissions = [
+        this.androidPermissions.PERMISSION.BLUETOOTH,
+        this.androidPermissions.PERMISSION.BLUETOOTH_ADMIN,
+        this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION,
+        // Permisos para Android 12+ (dispositivos cercanos)
+        'android.permission.BLUETOOTH_SCAN',
+        'android.permission.BLUETOOTH_CONNECT',
+        'android.permission.BLUETOOTH_ADVERTISE'
+      ];
 
-      if (hasScanPermission && hasConnectPermission && hasLocationPermission) {
-        return true;
-      }
+      console.log('📋 Permisos a solicitar:', permissions);
 
-      // Request permissions if not granted
-      const result = await this.androidPermissions.requestPermissions([
-        this.androidPermissions.PERMISSION.BLUETOOTH_SCAN,
-        this.androidPermissions.PERMISSION.BLUETOOTH_CONNECT,
-        this.androidPermissions.PERMISSION.ACCESS_FINE_LOCATION
-      ]);
-
+      // Verificar y solicitar permisos de forma simple
+      const result = await this.androidPermissions.requestPermissions(permissions);
+      
+      console.log('✅ Resultado de permisos:', result.hasPermission);
       return result.hasPermission;
-
+      
     } catch (error) {
-      console.error('Error checking or requesting permissions', error);
+      console.error('❌ Error with permissions:', error);
       return false;
     }
   }
 
-  private async hasPermission(permission: string): Promise<boolean> {
-    const result = await this.androidPermissions.checkPermission(permission);
-    return result.hasPermission;
-  }
 }

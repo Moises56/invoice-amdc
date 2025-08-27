@@ -1,6 +1,7 @@
 
 @use "tailwindcss";
 @use "theme/print";
+@use "global-safe-area.scss";
 /* Fix: Forzar fondo blanco para evitar pantalla negra entre splash y login */
 body, ion-app, .ion-page {
   background: #fff !important;

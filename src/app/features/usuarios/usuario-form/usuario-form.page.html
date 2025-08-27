@@ -1,9 +1,10 @@
-<ion-header style="background:#5ccedf;">
-  <ion-toolbar class="municipal-toolbar" style="background:#5ccedf; min-height: env(safe-area-inset-top, 24px) + 56px; padding-top: env(safe-area-inset-top, 24px);">
+<ion-header class="safe-area-header usuario-form-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/usuarios"></ion-back-button>
     </ion-buttons>
-    <ion-title style="color:#fff; font-weight:bold;">
+    <ion-title class="header-title">
       {{ isEditing() ? 'Editar Usuario' : 'Nuevo Usuario' }}
     </ion-title>
     <ion-buttons slot="end">
@@ -14,7 +15,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="modern-form-content">
+<ion-content class="safe-area-content usuario-form-content modern-form-content">
   <div class="form-container">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       
