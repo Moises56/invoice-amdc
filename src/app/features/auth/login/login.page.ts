@@ -82,37 +82,36 @@ export class LoginPage {
   }
 
   /**
-   * Verificar estado de autenticación de manera rápida
+   * Verificar estado de autenticación al inicializar
    */
   private async checkAuthenticationStatus(): Promise<void> {
     console.log('🔍 LoginPage: Verificando estado de autenticación...');
-    
-    // Mostrar indicador de carga inicial
     this.isInitializing.set(true);
     
-    // Resetear formulario al verificar autenticación
-    this.resetForm();
-    
-    // Esperar máximo 500ms para la verificación inicial
-    let attempts = 0;
-    const maxAttempts = 5; // 500ms máximo (5 * 100ms)
-
-    while (!this.authService.authCheckComplete() && attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      attempts++;
-    }
-
-    // Verificar si ya está autenticado
-    if (this.authService.isAuthenticated()) {
-      console.log('✅ Usuario ya autenticado, redirigiendo al dashboard');
+    try {
+      // Esperar hasta 300ms para que el AuthService complete su inicialización (reducido)
+      let attempts = 0;
+      const maxAttempts = 3; // 300ms máximo
+      
+      while (!this.authService.authCheckComplete() && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      
+      console.log('🔍 LoginPage: Estado después de espera - isAuthenticated:', this.authService.isAuthenticated());
+      
+      if (this.authService.isAuthenticated()) {
+        console.log('✅ Usuario ya autenticado, redirigiendo al dashboard');
+        await this.router.navigate(['/dashboard'], { replaceUrl: true });
+        return;
+      }
+      
+      console.log('ℹ️ Usuario no autenticado, mostrando formulario de login');
+    } catch (error) {
+      console.error('❌ Error verificando autenticación:', error);
+    } finally {
       this.isInitializing.set(false);
-      this.router.navigate(['/dashboard'], { replaceUrl: true });
-      return;
     }
-
-    // Mostrar formulario de login inmediatamente
-    console.log('ℹ️ Mostrando formulario de login');
-    this.isInitializing.set(false);
   }
 
   /**

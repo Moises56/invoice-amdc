@@ -20,9 +20,9 @@ export class AuthGuard implements CanActivate {
     console.log('🛡️ AuthGuard: Verificando autenticación...');
     console.log('🔍 AuthGuard: Estado inicial - authCheckComplete:', this.authService.authCheckComplete(), 'isAuthenticated:', this.authService.isAuthenticated());
     
-    // Esperar máximo 3 segundos para la inicialización
+    // Esperar máximo 2 segundos para la inicialización (reducido para mejor UX)
     let attempts = 0;
-    const maxAttempts = 30; // 3 segundos máximo (30 * 100ms)
+    const maxAttempts = 20; // 2 segundos máximo (20 * 100ms)
 
     while (!this.authService.authCheckComplete() && attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -43,18 +43,9 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
-    // Si la inicialización no se completó, intentar una verificación manual
+    // Si la inicialización no se completó después del timeout, asumir no autenticado
     if (!this.authService.authCheckComplete()) {
-      console.log('⚠️ AuthGuard: Inicialización no completada, intentando verificación manual...');
-      try {
-        const isAuth = await this.authService.checkAuthStatus();
-        if (isAuth) {
-          console.log('✅ Verificación manual exitosa, permitiendo acceso');
-          return true;
-        }
-      } catch (error) {
-        console.log('❌ Verificación manual falló:', error);
-      }
+      console.log('⚠️ AuthGuard: Timeout en inicialización, asumiendo no autenticado');
     }
 
     // Si no está autenticado, redirigir al login

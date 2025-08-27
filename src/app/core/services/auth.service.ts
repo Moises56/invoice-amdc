@@ -55,8 +55,16 @@ export class AuthService {
 
     try {
       console.log('🔧 AuthService: Enviando petición getProfile...');
-      // Intentar verificación única sin retry para evitar múltiples llamadas
-      const profile = await this.getProfile().toPromise();
+      
+      // Crear un timeout para evitar que la aplicación se quede colgada
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout: No se pudo conectar al servidor')), 10000); // 10 segundos
+      });
+      
+      const profilePromise = this.getProfile().toPromise();
+      
+      // Usar Promise.race para aplicar timeout
+      const profile = await Promise.race([profilePromise, timeoutPromise]) as { user: User };
       console.log('🔧 AuthService: Respuesta getProfile recibida:', profile);
       
       if (profile?.user) {
@@ -80,6 +88,8 @@ export class AuthService {
         console.log('ℹ️ Token expirado o no válido (401)');
       } else if (error.status === 0) {
         console.log('❌ Error de conexión - backend no disponible');
+      } else if (error.message?.includes('Timeout')) {
+        console.log('⏰ Timeout - servidor no responde, continuando sin autenticación');
       } else {
         console.log('❌ Error inesperado en verificación de sesión');
       }
@@ -91,6 +101,14 @@ export class AuthService {
     this._authCheckComplete.set(true);
     console.log('🏁 AuthService: Inicialización completada');
     console.log('🏁 AuthService: Estado final - isAuthenticated:', this._isAuthenticated(), 'user:', this._user());
+    
+    // Si no está autenticado, navegar al login después de un breve delay
+    if (!this._isAuthenticated()) {
+      setTimeout(() => {
+        console.log('🔄 Navegando al login después de inicialización fallida');
+        this.router.navigate(['/login'], { replaceUrl: true });
+      }, 500);
+    }
   }
 
 
