@@ -1,24 +1,28 @@
-# Mejoras Finales - Bluetooth y Safe Area
+[ERROR] TS2307: Cannot find module '@capacitor/device' or its corresponding type declarations. [plugin angular-compiler]
+[ng] src/app/core/services/permissions.service.ts:4:23:
+[ng] 4 │ import { Device } from '@capacitor/device';
+[ng] ╵ ~~~~~~~~~~~~~~~~~~~# Mejoras Finales - Bluetooth y Safe Area
 
 ## Problemas Resueltos ✅
 
 ### 1. Safe Area Corregido Definitivamente
 
 #### Problema Original:
+
 - Header superpuesto con indicadores nativos (batería, hora, WiFi)
 - Implementación incorrecta del safe area
 
 #### Solución Implementada:
+
 **Uso correcto de Ionic `translucent` + `fullscreen`**:
 
 ```html
 <!-- Antes (Problemático) -->
 <ion-header class="safe-area-header">
   <ion-toolbar class="safe-area-toolbar">
-
-<!-- Después (Correcto) -->
-<ion-header [translucent]="true" class="safe-area-header">
-  <ion-toolbar class="safe-area-toolbar">
+    <!-- Después (Correcto) -->
+    <ion-header [translucent]="true" class="safe-area-header"> <ion-toolbar class="safe-area-toolbar"></ion-toolbar></ion-header></ion-toolbar
+></ion-header>
 ```
 
 ```scss
@@ -39,6 +43,7 @@
 ```
 
 **Beneficios**:
+
 - ✅ Ionic maneja automáticamente el safe area
 - ✅ Compatible con todos los dispositivos Android
 - ✅ Funciona en orientación vertical y horizontal
@@ -47,6 +52,7 @@
 ### 2. Compatibilidad Android 12-15 Completa
 
 #### Problema Original:
+
 - Solo soportaba permisos básicos de Bluetooth
 - No funcionaba correctamente en Android 12+
 - Faltaban permisos específicos por versión
@@ -57,33 +63,16 @@
 
 ```typescript
 // Android < 12 (API < 31)
-const legacyPermissions = [
-  'BLUETOOTH',
-  'BLUETOOTH_ADMIN',
-  'ACCESS_FINE_LOCATION',
-  'ACCESS_COARSE_LOCATION'
-];
+const legacyPermissions = ["BLUETOOTH", "BLUETOOTH_ADMIN", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"];
 
 // Android 12+ (API 31+)
-const android12Permissions = [
-  'BLUETOOTH_SCAN',
-  'BLUETOOTH_CONNECT', 
-  'BLUETOOTH_ADVERTISE',
-  'ACCESS_FINE_LOCATION',
-  'ACCESS_COARSE_LOCATION'
-];
+const android12Permissions = ["BLUETOOTH_SCAN", "BLUETOOTH_CONNECT", "BLUETOOTH_ADVERTISE", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"];
 
 // Android 13+ (API 33+)
-const android13Permissions = [
-  ...android12Permissions,
-  'NEARBY_WIFI_DEVICES'
-];
+const android13Permissions = [...android12Permissions, "NEARBY_WIFI_DEVICES"];
 
 // Android 14+ (API 34+)
-const android14Permissions = [
-  ...android13Permissions,
-  'ACCESS_BACKGROUND_LOCATION'
-];
+const android14Permissions = [...android13Permissions, "ACCESS_BACKGROUND_LOCATION"];
 
 // Android 15+ (API 35+) - Preparado para futuro
 ```
@@ -95,16 +84,17 @@ const android14Permissions = [
 async requestAndroid12PlusPermissions() {
   // 1. Permisos de ubicación primero
   await requestPermissions(locationPermissions);
-  
+
   // 2. Permisos de Bluetooth específicos
   await requestPermissions(bluetoothPermissions);
-  
+
   // 3. Permisos adicionales
   await requestPermissions(otherPermissions);
 }
 ```
 
 **Detección Automática de Versión**:
+
 - Detecta automáticamente la versión de Android
 - Aplica los permisos correctos según la versión
 - Maneja fallbacks para versiones no reconocidas
@@ -112,6 +102,7 @@ async requestAndroid12PlusPermissions() {
 ### 3. Funcionalidades Adicionales
 
 #### Diagnósticos Avanzados:
+
 ```typescript
 async getPermissionsDiagnostics() {
   return {
@@ -125,6 +116,7 @@ async getPermissionsDiagnostics() {
 ```
 
 #### Verificación de Soporte:
+
 ```typescript
 async checkBluetoothSupport() {
   return {
@@ -137,21 +129,25 @@ async checkBluetoothSupport() {
 ## Compatibilidad Garantizada
 
 ### ✅ Android 12 (API 31)
+
 - **Permisos**: BLUETOOTH_SCAN, BLUETOOTH_CONNECT, BLUETOOTH_ADVERTISE
 - **Funcionalidad**: Escaneo y conexión completos
 - **Dispositivos**: Samsung S21, Pixel 6, etc.
 
 ### ✅ Android 13 (API 33)
+
 - **Permisos adicionales**: NEARBY_WIFI_DEVICES
 - **Funcionalidad**: Mejor detección de dispositivos cercanos
 - **Dispositivos**: Samsung S23, Pixel 7, etc.
 
 ### ✅ Android 14 (API 34)
+
 - **Permisos adicionales**: ACCESS_BACKGROUND_LOCATION
 - **Funcionalidad**: Reconexión en background
 - **Dispositivos**: Samsung S24, Pixel 8, etc.
 
 ### ✅ Android 15 (API 35)
+
 - **Preparado**: Para nuevos permisos futuros
 - **Funcionalidad**: Totalmente compatible
 - **Dispositivos**: Próximos lanzamientos
@@ -159,6 +155,7 @@ async checkBluetoothSupport() {
 ## Testing Recomendado por Versión
 
 ### Android 12 (Samsung S21, Pixel 6)
+
 ```bash
 # Verificar permisos específicos
 adb shell dumpsys package com.example.factusamdc | grep permission
@@ -170,6 +167,7 @@ adb shell dumpsys package com.example.factusamdc | grep permission
 ```
 
 ### Android 13 (Samsung S23, Pixel 7)
+
 ```bash
 # Verificar permisos de dispositivos cercanos
 adb shell pm list permissions | grep NEARBY
@@ -181,6 +179,7 @@ adb shell pm list permissions | grep NEARBY
 ```
 
 ### Android 14 (Samsung S24, Pixel 8)
+
 ```bash
 # Verificar permisos de background
 adb shell dumpsys package com.example.factusamdc | grep BACKGROUND
@@ -192,6 +191,7 @@ adb shell dumpsys package com.example.factusamdc | grep BACKGROUND
 ```
 
 ### Android 15 (Dispositivos futuros)
+
 - Funcionalidad preparada para nuevos permisos
 - Detección automática de versión
 - Fallbacks seguros implementados
@@ -199,12 +199,14 @@ adb shell dumpsys package com.example.factusamdc | grep BACKGROUND
 ## Archivos Modificados
 
 ### Safe Area:
+
 1. **`bluetooth-settings.page.html`**: `[translucent]="true"` agregado
 2. **`device-list.page.html`**: `[translucent]="true"` agregado
 3. **`bluetooth-settings.page.scss`**: CSS actualizado para translucent
 4. **`device-list.page.scss`**: CSS actualizado para translucent
 
 ### Permisos Android 12-15:
+
 5. **`permissions.service.ts`**: Completamente reescrito
    - Detección automática de versión Android
    - Permisos específicos por versión
@@ -214,21 +216,25 @@ adb shell dumpsys package com.example.factusamdc | grep BACKGROUND
 ## Beneficios Finales
 
 ### 🚀 **Rendimiento**
+
 - Safe area manejado automáticamente por Ionic
 - Permisos solicitados de forma eficiente
 - Menos código personalizado = menos bugs
 
 ### 🎯 **Compatibilidad**
+
 - Android 8.0+ hasta Android 15+
 - Todos los fabricantes (Samsung, Honor, Pixel, etc.)
 - Orientación vertical y horizontal
 
 ### 🔧 **Mantenibilidad**
+
 - Código más limpio y estándar
 - Fácil actualización para futuras versiones de Android
 - Diagnósticos integrados para troubleshooting
 
 ### 👥 **Experiencia de Usuario**
+
 - No más headers superpuestos
 - Permisos solicitados correctamente
 - Funcionalidad completa en todos los dispositivos
@@ -236,6 +242,7 @@ adb shell dumpsys package com.example.factusamdc | grep BACKGROUND
 ## Comandos de Testing
 
 ### Verificar Safe Area:
+
 ```bash
 # Compilar y probar
 npm run build
@@ -249,6 +256,7 @@ npx cap run android
 ```
 
 ### Verificar Permisos:
+
 ```bash
 # Ver permisos concedidos
 adb shell dumpsys package com.example.factusamdc | grep permission

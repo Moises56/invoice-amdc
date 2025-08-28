@@ -3,6 +3,80 @@
   --background: #f8f9fa;
 }
 
+/* Safe Area Variables */
+:root {
+  --header-height: 56px;
+  --safe-area-top-robust: env(safe-area-inset-top, 0px);
+  --safe-area-top-fallback: 20px;
+}
+
+/* Safe Area Spacer */
+.safe-area-spacer {
+  height: var(--safe-area-top-robust);
+  background: var(--ion-color-primary, #3880ff);
+  min-height: env(safe-area-inset-top, 0px);
+}
+
+/* Safe Area Header */
+.safe-area-header {
+  padding-top: 0 !important;
+  
+  .safe-area-spacer {
+    height: env(safe-area-inset-top, var(--safe-area-top-fallback));
+    background: inherit;
+  }
+}
+
+/* Safe Area Content */
+.safe-area-content {
+  --padding-top: 0px;
+  
+  ion-header[collapse="condense"] {
+    margin-top: env(safe-area-inset-top, var(--safe-area-top-fallback));
+  }
+  
+  /* Ensure content doesn't overlap with header */
+  .profile-container {
+    padding-top: calc(var(--header-height) + 20px);
+  }
+}
+
+/* Media Queries for specific devices */
+@media screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 14 Pro */
+  .safe-area-spacer {
+    min-height: 47px;
+  }
+}
+
+@media screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 14 Pro Max */
+  .safe-area-spacer {
+    min-height: 47px;
+  }
+}
+
+/* Landscape orientation */
+@media screen and (orientation: landscape) {
+  .safe-area-spacer {
+    height: env(safe-area-inset-top, 0px);
+    min-height: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* WebView (Capacitor) specific adjustments */
+@media screen and (max-device-width: 480px) {
+  .safe-area-header {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  .safe-area-content {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
 // Header
 .profile-header {
   --background: white;
@@ -38,7 +112,7 @@
 }
 
 .profile-container {
-  padding: 24px;
+  padding: 0 24px 24px 24px;
   max-width: 800px;
   margin: 0 auto;
 }

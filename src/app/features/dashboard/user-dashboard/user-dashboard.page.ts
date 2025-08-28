@@ -221,8 +221,15 @@ export class UserDashboardPage implements OnInit {
   /**
    * Refrescar estadísticas
    */
-  async refreshStats() {
-    await this.loadUserStats();
+  async refreshStats(event?: any) {
+    try {
+      await this.loadUserStats();
+    } finally {
+      // Completar el refresher si existe el evento
+      if (event && event.target && event.target.complete) {
+        event.target.complete();
+      }
+    }
   }
 
   /**

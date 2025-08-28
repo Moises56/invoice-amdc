@@ -1,5 +1,79 @@
 /* Estilos para la página de Estado de Cuenta */
 
+/* Safe Area Variables */
+:root {
+  --header-height: 56px;
+  --safe-area-top-robust: env(safe-area-inset-top, 0px);
+  --safe-area-top-fallback: 20px;
+}
+
+/* Safe Area Spacer */
+.safe-area-spacer {
+  height: var(--safe-area-top-robust);
+  background: var(--ion-color-primary, #3880ff);
+  min-height: env(safe-area-inset-top, 0px);
+}
+
+/* Safe Area Header */
+.safe-area-header {
+  padding-top: 0 !important;
+  
+  .safe-area-spacer {
+    height: env(safe-area-inset-top, var(--safe-area-top-fallback));
+    background: inherit;
+  }
+}
+
+/* Safe Area Content */
+.safe-area-content {
+  --padding-top: 0px;
+  
+  ion-header[collapse="condense"] {
+    margin-top: env(safe-area-inset-top, var(--safe-area-top-fallback));
+  }
+  
+  /* Ensure content doesn't overlap with header */
+  .estado-cuenta-container {
+    padding-top: calc(var(--header-height) + 20px);
+  }
+}
+
+/* Media Queries for specific devices */
+@media screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 14 Pro */
+  .safe-area-spacer {
+    min-height: 47px;
+  }
+}
+
+@media screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 14 Pro Max */
+  .safe-area-spacer {
+    min-height: 47px;
+  }
+}
+
+/* Landscape orientation */
+@media screen and (orientation: landscape) {
+  .safe-area-spacer {
+    height: env(safe-area-inset-top, 0px);
+    min-height: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* WebView (Capacitor) specific adjustments */
+@media screen and (max-device-width: 480px) {
+  .safe-area-header {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  .safe-area-content {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
 .ec-header, .ec-toolbar {
   background: linear-gradient(90deg, #5ccedf 60%, #A4C9F5 100%) !important;
   box-shadow: 0 2px 12px #5ccedf33;
@@ -25,7 +99,7 @@
   --background: linear-gradient(135deg, #f8fdfe 0%, #e8f8fb 100%);
   background: linear-gradient(135deg, #f8fdfe 0%, #e8f8fb 100%);
   min-height: 100vh;
-  padding: 30px 25px;
+  padding: 0 25px 30px 25px;
 }
 
 .estado-cuenta-container {

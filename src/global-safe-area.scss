@@ -1,19 +1,29 @@
 /* ===== SAFE AREA GLOBAL STYLES ===== */
 /* Estilos unificados para safe area en todas las páginas */
 
-// Variables globales para safe area
+// Variables globales para safe area - Mejoradas para dispositivos físicos
 :root {
   --safe-area-color: #5ccedf;
   --safe-area-gradient: linear-gradient(135deg, #5ccedf 0%, #4db6c7 100%);
-  --safe-area-top: env(safe-area-inset-top, 44px);
+  
+  // Safe area con fallbacks más robustos para dispositivos físicos
+  --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-left: env(safe-area-inset-left, 0px);
   --safe-area-right: env(safe-area-inset-right, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  
+  // Fallbacks mínimos para cuando env() no funciona
+  --safe-area-top-fallback: max(env(safe-area-inset-top, 0px), 44px);
+  --safe-area-top-robust: max(env(safe-area-inset-top, 0px), 44px);
+  --safe-area-left-fallback: max(env(safe-area-inset-left, 0px), 0px);
+  --safe-area-right-fallback: max(env(safe-area-inset-right, 0px), 0px);
+  --safe-area-bottom-fallback: max(env(safe-area-inset-bottom, 0px), 0px);
+  
   --header-height: 56px;
-  --header-total-height: calc(var(--safe-area-top) + var(--header-height));
+  --header-total-height: calc(var(--safe-area-top-fallback) + var(--header-height));
 }
 
-// Mixin para headers con safe area
+// Mixin para headers con safe area - Optimizado para dispositivos físicos
 @mixin safe-area-header($background-color: var(--safe-area-color)) {
   position: fixed;
   top: 0;
@@ -26,16 +36,34 @@
     display: none; // Remover línea de separación
   }
   
-  // Safe area spacer
+  // Safe area spacer - Mejorado para dispositivos físicos
   .safe-area-spacer {
-    height: var(--safe-area-top);
+    // Usar la variable con fallback robusto
+    height: var(--safe-area-top-fallback);
     min-height: 44px;
     background: inherit;
     width: 100%;
     
+    // Detección específica para dispositivos con notch/dynamic island
+    @media screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-device-pixel-ratio: 3) {
+      min-height: 44px;
+    }
+    
+    // iPhone 14 Pro y similares con Dynamic Island
+    @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+      min-height: 59px;
+    }
+    
+    // Fallback general para dispositivos modernos
     @supports (padding: max(0px)) {
-      height: max(44px, var(--safe-area-top));
-      min-height: max(44px, var(--safe-area-top));
+      height: var(--safe-area-top-fallback);
+      min-height: var(--safe-area-top-fallback);
+    }
+    
+    // Fallback adicional si env() no está disponible
+    @supports not (padding: env(safe-area-inset-top)) {
+      height: 44px;
+      min-height: 44px;
     }
   }
   
@@ -81,27 +109,35 @@
   }
 }
 
-// Mixin para content con safe area
+// Mixin para content con safe area - Mejorado para dispositivos físicos
 @mixin safe-area-content($padding-top: 32px) {
   --content-padding-top: calc(var(--header-total-height) + #{$padding-top});
   
-  padding-top: max(calc(44px + 56px + #{$padding-top}), var(--content-padding-top)) !important;
-  padding-left: max(var(--safe-area-left), 20px) !important;
-  padding-right: max(var(--safe-area-right), 20px) !important;
-  padding-bottom: max(var(--safe-area-bottom), 24px) !important;
+  // Usar las variables con fallback para mejor compatibilidad
+  padding-top: calc(var(--safe-area-top-fallback) + var(--header-height) + #{$padding-top}) !important;
+  padding-left: max(var(--safe-area-left-fallback), 20px) !important;
+  padding-right: max(var(--safe-area-right-fallback), 20px) !important;
+  padding-bottom: max(var(--safe-area-bottom-fallback), 24px) !important;
   
-  @supports (padding: max(0px)) {
-    --safe-area-top-robust: max(44px, var(--safe-area-top));
-    --header-total-height-robust: calc(var(--safe-area-top-robust) + var(--header-height));
-    --content-padding-top-robust: calc(var(--header-total-height-robust) + #{$padding-top});
-    
-    padding-top: var(--content-padding-top-robust) !important;
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (padding: env(safe-area-inset-top)) {
+    padding-top: calc(44px + 56px + #{$padding-top}) !important;
+  }
+  
+  // Optimización para dispositivos con notch/dynamic island
+  @media screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: calc(44px + 56px + #{$padding-top}) !important;
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: calc(59px + 56px + #{$padding-top}) !important;
   }
   
   @media (min-width: 768px) {
-    padding-left: max(var(--safe-area-left), 32px) !important;
-    padding-right: max(var(--safe-area-right), 32px) !important;
-    padding-bottom: max(var(--safe-area-bottom), 32px) !important;
+    padding-left: max(var(--safe-area-left-fallback), 32px) !important;
+    padding-right: max(var(--safe-area-right-fallback), 32px) !important;
+    padding-bottom: max(var(--safe-area-bottom-fallback), 32px) !important;
   }
   
   // Primer elemento con margen superior adicional
@@ -253,6 +289,43 @@
   .safe-area-content {
     padding-left: max(var(--safe-area-left), 16px) !important;
     padding-right: max(var(--safe-area-right), 16px) !important;
+  }
+}
+
+// Estilos adicionales para mejorar compatibilidad con dispositivos físicos
+
+// Forzar recálculo del safe area en orientación landscape
+@media (orientation: landscape) {
+  :root {
+    --safe-area-top-landscape: max(env(safe-area-inset-top, 0px), 0px);
+    --safe-area-left-landscape: max(env(safe-area-inset-left, 0px), 0px);
+    --safe-area-right-landscape: max(env(safe-area-inset-right, 0px), 0px);
+  }
+  
+  .safe-area-spacer {
+    height: var(--safe-area-top-landscape) !important;
+    min-height: 0 !important;
+  }
+  
+  .safe-area-content {
+    padding-top: calc(var(--safe-area-top-landscape) + var(--header-height) + 20px) !important;
+    padding-left: max(var(--safe-area-left-landscape), 20px) !important;
+    padding-right: max(var(--safe-area-right-landscape), 20px) !important;
+  }
+}
+
+// Estilos específicos para WebView (Capacitor)
+@supports (-webkit-touch-callout: none) {
+  .safe-area-header {
+    // Asegurar que el header esté siempre visible
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .safe-area-spacer {
+    // Forzar repaint en WebView
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 }
 

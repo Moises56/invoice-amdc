@@ -27,7 +27,7 @@
 <ion-content class="dashboard-content safe-area-content">
   
   <!-- Refresher -->
-  <ion-refresher slot="fixed" (ionRefresh)="refreshStats()">
+  <ion-refresher slot="fixed" (ionRefresh)="refreshStats($event)">
     <ion-refresher-content
       pulling-icon="chevron-forward-outline"
       pulling-text="Desliza para actualizar"
@@ -116,7 +116,7 @@
                   <ion-icon name="warning-outline" class="error-icon"></ion-icon>
                   <h3>No se pudieron cargar las estadísticas</h3>
                   <p>{{ statsErrorMessage() }}</p>
-                  <ion-button fill="solid" size="default" (click)="refreshStats()">
+                  <ion-button fill="solid" size="default" (click)="loadUserStats()">
                     <ion-icon name="refresh-outline" slot="start"></ion-icon>
                     Reintentar
                   </ion-button>

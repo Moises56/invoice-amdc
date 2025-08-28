@@ -1,6 +1,92 @@
 // Estilos para Activity Logs Page - Log Viewer Design
 :host {
   --background: #f8f9fa;
+  
+  // Variables CSS para safe area
+  --header-height: 56px;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --total-header-height: calc(var(--safe-area-top) + var(--header-height));
+}
+
+// ========== SAFE AREA STYLES ==========
+.safe-area-spacer {
+  height: var(--safe-area-top);
+  background: white;
+  
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (height: env(safe-area-inset-top)) {
+    height: 44px;
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    height: 59px;
+  }
+  
+  // iPhone 14 Pro Max
+  @media screen and (min-device-width: 428px) and (max-device-width: 926px) and (-webkit-device-pixel-ratio: 3) {
+    height: 59px;
+  }
+}
+
+.safe-area-header {
+  padding-top: var(--safe-area-top);
+  
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (padding-top: env(safe-area-inset-top)) {
+    padding-top: 44px;
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: 59px;
+  }
+  
+  // iPhone 14 Pro Max
+  @media screen and (min-device-width: 428px) and (max-device-width: 926px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: 59px;
+  }
+  
+  // Optimización para WebView
+  @media screen and (max-width: 768px) {
+    @supports (padding: env(safe-area-inset-top)) {
+      padding-top: max(env(safe-area-inset-top, 0px), 44px);
+    }
+  }
+}
+
+.safe-area-content {
+  .logs-container {
+    padding-top: calc(var(--header-height) + 20px);
+  }
+  
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (padding-top: env(safe-area-inset-top)) {
+    .logs-container {
+      padding-top: calc(56px + 20px);
+    }
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    .logs-container {
+      padding-top: calc(56px + 20px);
+    }
+  }
+  
+  // iPhone 14 Pro Max
+  @media screen and (min-device-width: 428px) and (max-device-width: 926px) and (-webkit-device-pixel-ratio: 3) {
+    .logs-container {
+      padding-top: calc(56px + 20px);
+    }
+  }
+  
+  // Optimización para WebView
+  @media screen and (max-width: 768px) {
+    .logs-container {
+      padding-top: calc(var(--header-height) + 20px);
+    }
+  }
 }
 
 // Header personalizado
@@ -39,7 +125,7 @@
 
 // Contenedor principal
 .logs-container {
-  padding: 24px;
+  padding: 0 24px 24px 24px;
   background: #f8f9fa;
   min-height: calc(100vh - 56px);
 }

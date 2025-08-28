@@ -1,3 +1,83 @@
+// ===== SAFE AREA CONFIGURATION - CONSULTA ICS =====
+// Variables CSS para safe area mejoradas para dispositivos físicos
+:root {
+  --consulta-ics-header-height: 56px;
+  --consulta-ics-safe-area-top: var(--safe-area-top-robust, env(safe-area-inset-top, 0px));
+  --consulta-ics-total-header-height: calc(var(--consulta-ics-safe-area-top) + var(--consulta-ics-header-height));
+  --consulta-ics-content-padding: 20px;
+}
+
+// Safe Area Spacer específico para consulta-ics
+.safe-area-spacer {
+  height: var(--consulta-ics-safe-area-top);
+  min-height: var(--safe-area-top-fallback, 44px);
+  background: var(--ion-color-primary, #3ec6e0);
+  width: 100%;
+  
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (padding: env(safe-area-inset-top)) {
+    min-height: 44px;
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    min-height: 59px;
+  }
+}
+
+// Header con Safe Area - Sistema Mejorado para dispositivos físicos
+.safe-area-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--ion-color-primary, #3ec6e0);
+  
+  ion-toolbar {
+    --background: var(--ion-color-primary, #3ec6e0);
+    --color: white;
+    height: var(--consulta-ics-header-height);
+    min-height: var(--consulta-ics-header-height);
+  }
+}
+
+// Main Content con Safe Area - Sistema Mejorado para dispositivos físicos
+.safe-area-content {
+  --background: var(--ion-background-color, #f8f9fa);
+  
+  // Sistema mejorado de padding usando las variables robustas con valores más altos
+  padding-top: calc(var(--safe-area-top-robust, 44px) + 56px + 32px) !important;
+  padding-left: max(env(safe-area-inset-left, 0px), 20px) !important;
+  padding-right: max(env(safe-area-inset-right, 0px), 20px) !important;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 24px) !important;
+  
+  // Mejorar el comportamiento del scroll
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (padding: env(safe-area-inset-top)) {
+    padding-top: calc(44px + 56px + 32px) !important;
+  }
+  
+  // Optimización específica para dispositivos con notch/dynamic island
+  @media screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: calc(44px + 56px + 32px) !important;
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: calc(59px + 56px + 32px) !important;
+  }
+  
+  // Asegurar que el contenedor principal tenga el padding correcto
+  .container {
+    padding-top: 115px !important;
+    margin-top: 0 !important;
+  }
+}
+
 /* Mejora contraste de los botones activos en el buscador ICS */
 .search-modern-card .search-ics-tabs .tab-button.active,
 .search-modern-card .search-ics-tabs .tab-button.selected {
@@ -46,6 +126,18 @@
     .owner-info-desktop {
       display: none !important;
     }
+  }
+  
+  /* Ajustes adicionales para móvil */
+  .safe-area-content {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .search-modern-card {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 1.5rem 1rem !important;
   }
 }
 

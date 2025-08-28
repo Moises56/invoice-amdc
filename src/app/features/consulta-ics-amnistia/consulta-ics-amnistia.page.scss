@@ -1,5 +1,121 @@
 /* Estilos mejorados para ICS con Amnistía */
 
+/* Safe Area Variables - Mejoradas para consulta-ics-amnistia */
+:root {
+  --consulta-ics-amnistia-header-height: 56px;
+  --consulta-ics-amnistia-safe-area-top: var(--safe-area-top-robust, env(safe-area-inset-top, 0px));
+  --consulta-ics-amnistia-total-header-height: calc(var(--consulta-ics-amnistia-safe-area-top) + var(--consulta-ics-amnistia-header-height));
+  --consulta-ics-amnistia-content-padding: 20px;
+  --safe-area-top-fallback: 44px;
+}
+
+/* Safe Area Spacer - Mejorado para consulta-ics-amnistia */
+.safe-area-spacer {
+  height: var(--consulta-ics-amnistia-safe-area-top);
+  min-height: var(--safe-area-top-fallback, 44px);
+  background: var(--ion-color-primary, #3ec6e0);
+  width: 100%;
+  
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (padding: env(safe-area-inset-top)) {
+    min-height: 44px;
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    min-height: 59px;
+  }
+}
+
+/* Safe Area Header - Mejorado para consulta-ics-amnistia */
+.safe-area-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--ion-color-primary, #3ec6e0);
+  
+  ion-toolbar {
+    --background: var(--ion-color-primary, #3ec6e0);
+    --color: white;
+    height: var(--consulta-ics-amnistia-header-height);
+    min-height: var(--consulta-ics-amnistia-header-height);
+  }
+}
+
+/* Safe Area Content - Mejorado para consulta-ics-amnistia */
+.safe-area-content {
+  --background: var(--ion-background-color, #f8f9fa);
+  
+  // Sistema mejorado de padding usando las variables robustas con valores más altos
+  padding-top: calc(var(--safe-area-top-robust, 44px) + 56px + 32px) !important;
+  padding-left: max(env(safe-area-inset-left, 0px), 20px) !important;
+  padding-right: max(env(safe-area-inset-right, 0px), 20px) !important;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 24px) !important;
+  
+  // Mejorar el comportamiento del scroll
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  // Fallback robusto para dispositivos que no soportan env()
+  @supports not (padding: env(safe-area-inset-top)) {
+    padding-top: calc(44px + 56px + 32px) !important;
+  }
+  
+  // Optimización específica para dispositivos con notch/dynamic island
+  @media screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: calc(44px + 56px + 32px) !important;
+  }
+  
+  // iPhone 14 Pro y similares con Dynamic Island
+  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
+    padding-top: calc(59px + 56px + 32px) !important;
+  }
+  
+  // Asegurar que el contenedor principal tenga el padding correcto
+  .container {
+    padding-top: 115px !important;
+    margin-top: 0 !important;
+  }
+}
+
+/* Media Queries for specific devices */
+@media screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 14 Pro */
+  .safe-area-spacer {
+    min-height: 47px;
+  }
+}
+
+@media screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) {
+  /* iPhone 14 Pro Max */
+  .safe-area-spacer {
+    min-height: 47px;
+  }
+}
+
+/* Landscape orientation */
+@media screen and (orientation: landscape) {
+  .safe-area-spacer {
+    height: env(safe-area-inset-top, 0px);
+    min-height: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* WebView (Capacitor) specific adjustments */
+@media screen and (max-device-width: 480px) {
+  .safe-area-header {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  .safe-area-content {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
 /* Mostrar elementos de impresión solo al imprimir */
 @media print {
   .print-header,
@@ -38,6 +154,17 @@
     .owner-info-desktop {
       display: none !important;
     }
+  }
+  
+  /* Ajustes adicionales para móvil */
+  .safe-area-content {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  
+  .container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
 
@@ -229,16 +356,16 @@
 
 // Contenedor principal
 .container {
-  padding: 1rem;
+  padding: 0 1rem 1rem 1rem;
   max-width: 1200px;
   margin: 0 auto;
   
   @media (max-width: 768px) {
-    padding: 0.75rem;
+    padding: 0 0.75rem 0.75rem 0.75rem;
   }
   
   @media (max-width: 480px) {
-    padding: 0.5rem;
+    padding: 0 0.5rem 0.5rem 0.5rem;
   }
 }
 
