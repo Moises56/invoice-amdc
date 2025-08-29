@@ -70,7 +70,8 @@
 
 .safe-area-content {
   .stats-container {
-    padding-top: calc(var(--header-height) + 20px);
+    padding-top: calc(var(--header-height) + 36px) !important;
+  }
   }
   
   // Fallback robusto para dispositivos que no soportan env()
@@ -100,7 +101,6 @@
       padding-top: calc(var(--header-height) + 20px);
     }
   }
-}
 
 // ========== HEADER ==========
 ion-header.stats-header {

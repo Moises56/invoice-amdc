@@ -1,149 +1,193 @@
-<ion-header class="safe-area-header estado-cuenta-header">
+<ion-header [translucent]="true" class="ion-no-border safe-area-header">
   <div class="safe-area-spacer"></div>
-  <ion-toolbar class="header-toolbar">
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-back-button defaultHref="/dashboard/user" color="light"></ion-back-button>
     </ion-buttons>
-    <ion-title class="header-title">Estado de Cuenta</ion-title>
+    <ion-title color="light" class="font-semibold">Estado de Cuenta</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="safe-area-content estado-cuenta-content estado-cuenta-bg">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Estado de Cuenta</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="bg-gray-50 safe-area-content">
+  
+  <!-- Main container with proper spacing -->
+  <div class="px-4 py-6 min-h-full">
+    <!-- Modern Search Card -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6 mx-auto max-w-2xl">
+      <!-- Search Header -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+          <ion-icon name="search-outline" class="text-xl text-blue-600"></ion-icon>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">Buscar Estado de Cuenta</h2>
+          <p class="text-sm text-gray-500">Consulte por Clave Catastral o DNI</p>
+        </div>
+      </div>
 
-  <div class="estado-cuenta-container">
-    <!-- Formulario de búsqueda -->
-    <div class="search-form glass-card">
+      <!-- Search Input Component -->
       <app-search-input
         (search)="onSearch($event)"
         (clear)="onClearSearch()"
         [disabled]="isLoading()"
-        placeholder="Buscar estado de cuenta...">
+        placeholder="Buscar estado de cuenta..."
+        class="block w-full">
       </app-search-input>
-      
-      <!-- Mostrar resumen de búsqueda -->
-      <div *ngIf="lastSearchParams" class="search-summary">
-        <ion-chip color="primary" outline="true">
+
+      <!-- Search Summary -->
+      <div *ngIf="lastSearchParams" class="mt-4">
+        <ion-chip color="primary" outline="true" class="text-sm">
           <ion-icon name="search-outline"></ion-icon>
           <ion-label>{{ getSearchSummary() }}</ion-label>
         </ion-chip>
       </div>
-      
-      <!-- Mostrar errores de búsqueda -->
-      <div *ngIf="searchError()" class="search-error">
-        <ion-item color="danger" lines="none">
-          <ion-icon name="alert-circle" slot="start"></ion-icon>
-          <ion-label class="ion-text-wrap">{{ searchError() }}</ion-label>
-        </ion-item>
+    </div>
+
+    <!-- Error Card -->
+    <div *ngIf="searchError()" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <div class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <ion-icon name="alert-circle" class="text-red-600 text-sm"></ion-icon>
+        </div>
+        <div>
+          <h3 class="font-semibold text-red-800 mb-1">Error en la consulta</h3>
+          <p class="text-red-700 text-sm">{{ searchError() }}</p>
+        </div>
       </div>
     </div>
 
-    <!-- Loading spinner -->
-    <div *ngIf="isLoading()" class="ion-text-center loading-container">
-      <ion-spinner name="crescent" color="primary"></ion-spinner>
-      <p>Consultando estado de cuenta...</p>
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="text-center py-12">
+      <ion-spinner name="crescent" color="primary" class="mb-4"></ion-spinner>
+      <p class="text-gray-600">Consultando estado de cuenta...</p>
     </div>
 
-    <!-- Resultados del estado de cuenta -->
-    <div *ngIf="!isLoading() && estadoCuenta() as data">
+    <!-- Results Section -->
+    <div *ngIf="!isLoading() && estadoCuenta() as data" class="space-y-6">
       
-      <!-- Mostrar múltiples propiedades para consultas por DNI -->
-      <div *ngIf="esDNI && tienePropiedades" class="propiedades-container glass-card">
-        <div class="propiedades-header">
-          <h3>Propiedades Encontradas ({{ numeroPropiedades }})</h3>
-          <ion-chip color="primary" outline="true">
-            <ion-icon name="home-outline"></ion-icon>
-            <ion-label>Total: {{ totalGeneralGrupal }}</ion-label>
-          </ion-chip>
+      <!-- Multiple Properties (DNI Search) -->
+      <div *ngIf="esDNI && tienePropiedades" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+        <!-- Properties Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <ion-icon name="home-outline" class="text-xl text-green-600"></ion-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-800">Propiedades Encontradas</h3>
+              <p class="text-sm text-gray-500">{{ numeroPropiedades }} propiedades registradas</p>
+            </div>
+          </div>
+          <div class="bg-blue-50 px-3 py-1 rounded-full">
+            <span class="text-sm font-semibold text-blue-700">Total: {{ totalGeneralGrupal }}</span>
+          </div>
         </div>
-        
-        <div class="propiedades-list">
-          <ion-item 
-            *ngFor="let propiedad of propiedades; let i = index" 
-            button="true"
+
+        <!-- Properties List -->
+        <div class="space-y-2">
+          <div
+            *ngFor="let propiedad of propiedades; let i = index"
             (click)="seleccionarPropiedad(propiedad, i)"
-            [class.selected]="indicePropiedadSeleccionada() === i"
-            class="propiedad-item">
-            <ion-icon name="home" slot="start" [color]="indicePropiedadSeleccionada() === i ? 'primary' : 'medium'"></ion-icon>
-            <ion-label>
-              <h3>{{ propiedad.claveCatastral }}</h3>
-              <p>{{ propiedad.nombreColonia }}</p>
-              <p class="total-propiedad">Total: {{ formatCurrency(propiedad.totalPropiedadNumerico) }}</p>
-            </ion-label>
-            <ion-icon 
-              *ngIf="indicePropiedadSeleccionada() === i" 
-              name="checkmark-circle" 
-              color="primary" 
-              slot="end">
-            </ion-icon>
-          </ion-item>
-        </div>
-      </div>
-
-      <!-- Tarjeta principal con toda la información -->
-      <div class="info-card glass-card unified-info-card" style="display:flex;align-items:center;gap:1.5rem;padding:1.5rem 2rem;">
-        <div style="flex-shrink:0;">
-          <div style="width:56px;height:56px;background:#6ee0f7;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-            <ion-icon name="person-circle-outline" style="font-size:2.5rem;color:#fff;"></ion-icon>
-          </div>
-        </div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:1.3rem;font-weight:700;color:#3ec6e0;line-height:1.1;">{{ data.nombre }}</div>
-          <div style="font-size:1rem;color:#3ec6e0;font-weight:600;">{{ data.identidad }}</div>
-          <div style="margin-top:1rem;">
-            <span style="font-weight:600;color:#222;">Clave Catastral:</span> <span style="color:#3ec6e0;font-weight:600;">{{ data.claveCatastral }}</span>
-            <br>
-            <span style="font-weight:600;color:#222;">Colonia:</span> <span style="color:#3ec6e0;font-weight:600;">{{ data.nombreColonia }}</span>
-            <br>
-            <span style="font-weight:600;color:#222;">Fecha:</span> <span style="color:#3ec6e0;font-weight:600;">{{ data.fecha }} - {{ data.hora }}</span>
+            [class]="indicePropiedadSeleccionada() === i ? 
+              'bg-blue-50 border-blue-200 shadow-md' : 
+              'bg-gray-50 border-gray-200 hover:bg-gray-100'"
+            class="border rounded-xl p-4 cursor-pointer transition-all duration-200">
+            
+            <div class="flex items-center gap-3">
+              <div [class]="indicePropiedadSeleccionada() === i ? 
+                'w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center' :
+                'w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center'">
+                <ion-icon 
+                  name="home" 
+                  [class]="indicePropiedadSeleccionada() === i ? 'text-blue-600' : 'text-gray-500'"
+                  class="text-sm">
+                </ion-icon>
+              </div>
+              
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-800">{{ propiedad.claveCatastral }}</h4>
+                <p class="text-sm text-gray-600">{{ propiedad.nombreColonia }}</p>
+                <p class="text-sm font-medium text-blue-600 mt-1">
+                  Total: {{ formatCurrency(propiedad.totalPropiedadNumerico) }}
+                </p>
+              </div>
+              
+              <div *ngIf="indicePropiedadSeleccionada() === i" 
+                class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                <ion-icon name="checkmark" class="text-white text-sm"></ion-icon>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Detalle de mora -->
-      <div class="detail-card glass-card">
-        <div class="detail-header">
-          <h3>Detalle de Mora</h3>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <!-- PDF temporalmente deshabilitado
-            <ion-button 
-              fill="outline" 
-              size="small" 
-              (click)="imprimirNavegador()"
-              [disabled]="isLoading()"
-              class="no-print">
-              <ion-icon name="document-outline" slot="start"></ion-icon>
-              PDF
-            </ion-button>
-            -->
+      <!-- Main Info and Details Card -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+        <!-- User Profile Section -->
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+            <ion-icon name="person-circle-outline" class="text-3xl text-white"></ion-icon>
+          </div>
+          
+          <div class="flex-1 min-w-0">
+            <h2 class="text-xl font-bold text-gray-900 truncate">{{ data.nombre }}</h2>
+            <p class="text-blue-600 font-semibold">{{ data.identidad }}</p>
+            
+            <div class="mt-3 space-y-1 text-sm">
+              <div class="flex flex-wrap gap-4">
+                <div class="flex items-center gap-1">
+                  <span class="font-medium text-gray-600">Clave:</span>
+                  <span class="text-blue-600 font-semibold">{{ data.claveCatastral }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="font-medium text-gray-600">Colonia:</span>
+                  <span class="text-blue-600 font-semibold">{{ data.nombreColonia }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="font-medium text-gray-600">Consultado:</span>
+                <span class="text-gray-700">{{ data.fecha }} - {{ data.hora }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Section Header -->
+        <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+              <ion-icon name="receipt-outline" class="text-orange-600"></ion-icon>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">Detalle de Mora</h3>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex gap-2">
             <ion-button 
               fill="outline" 
               size="small" 
               (click)="esDNI ? mostrarOpcionesImpresion() : imprimirRecibo()"
               [disabled]="isLoading()"
-              class="no-print">
-              <ion-icon name="print-outline" slot="start"></ion-icon>
+              class="no-print h-8 text-xs">
+              <ion-icon name="print-outline" slot="start" class="text-sm"></ion-icon>
               {{ esDNI ? 'Opciones' : 'Ticket' }}
             </ion-button>
           </div>
         </div>
-        
-        <div class="table-container printable">
-          <!-- Encabezado de impresión -->
-          <div class="print-header" style="display: none;">
+
+        <!-- Table Container for printing -->
+        <div class="printable">
+          <!-- Print Header (hidden on screen) -->
+          <div class="print-header" style="display: none">
             <div class="print-title">ALCALDÍA MUNICIPAL DEL DISTRITO CENTRAL</div>
             <div class="print-subtitle">Estado de Cuenta</div>
-            <div class="print-info">Fecha: {{ data.fecha }} - {{ data.hora }}</div>
+            <div class="print-info">Fecha: {{ getCurrentDate() }}</div>
           </div>
-          
-          <!-- Información del contribuyente para impresión -->
-          <div class="contributor-info" style="display: none;">
+
+          <!-- Contributor Info for printing (hidden on screen) -->
+          <div class="contributor-info" style="display: none">
             <div class="info-row">
-              <span class="label">Contribuyente:</span>
+              <span class="label">Nombre:</span>
               <span class="value">{{ data.nombre }}</span>
             </div>
             <div class="info-row">
@@ -159,65 +203,57 @@
               <span class="value">{{ data.nombreColonia }}</span>
             </div>
           </div>
-          
-          <div class="table-wrapper">
-            <table class="detail-table print-table estado-cuenta-table">
-              <thead>
+
+          <!-- Details Table -->
+          <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <table class="detail-table print-table estado-cuenta-table w-full">
+              <thead class="bg-gray-50">
                 <tr>
-                  <th>Año</th>
-                  <th>Impto</th>
-                  <th>T.Aseo</th>
-                  <th>Bombero</th>
-                  <th>Recargo</th>
-                  <th>Total</th>
+                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Año</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Impto</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">T.Aseo</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Bombero</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Recargo</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr *ngFor="let detalle of data.detallesMora" class="detail-row avoid-break">
-                  <td class="year-cell">{{ detalle.year }}</td>
-                  <td>{{ formatCurrency(detalle.impuestoNumerico) }}</td>
-                  <td>{{ formatCurrency(detalle.trenDeAseoNumerico) }}</td>
-                  <td>{{ formatCurrency(detalle.tasaBomberosNumerico) }}</td>
-                  <td>{{ formatCurrency(detalle.recargoNumerico) }}</td>
-                  <td class="total-cell">{{ formatCurrency(detalle.totalNumerico) }}</td>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let detalle of data.detallesMora" class="detail-row avoid-break hover:bg-gray-50">
+                  <td class="year-cell px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ detalle.year }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ formatCurrency(detalle.impuestoNumerico) }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ formatCurrency(detalle.trenDeAseoNumerico) }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ formatCurrency(detalle.tasaBomberosNumerico) }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ formatCurrency(detalle.recargoNumerico) }}</td>
+                  <td class="total-cell px-3 py-3 whitespace-nowrap text-sm font-medium text-blue-600 text-right">{{ formatCurrency(detalle.totalNumerico) }}</td>
                 </tr>
               </tbody>
-              <tfoot>
+              <tfoot class="bg-gray-100">
                 <tr class="total-row">
-                  <td colspan="5"><strong>TOTAL GENERAL</strong></td>
-                  <td class="total-cell"><strong>{{ formatCurrency(data.totalGeneralNumerico) }}</strong></td>
+                  <td colspan="5" class="px-3 py-3 text-sm font-bold text-gray-900">TOTAL GENERAL</td>
+                  <td class="total-cell px-3 py-3 text-sm font-bold text-blue-600 text-right">{{ formatCurrency(data.totalGeneralNumerico) }}</td>
                 </tr>
               </tfoot>
             </table>
           </div>
-          
-          <!-- Pie de impresión -->
-          <div class="print-footer" style="display: none;">
+
+          <!-- Print Footer (hidden on screen) -->
+          <div class="print-footer" style="display: none">
             <p>Este documento es válido únicamente para fines informativos.</p>
             <p>Para pagos oficiales, diríjase a las oficinas municipales.</p>
           </div>
         </div>
       </div>
-
-      <!-- Información adicional -->
-      <div class="info-footer glass-card" style="margin-bottom: 4rem;">
-        <ion-text color="medium">
-          <p class="ion-text-center">
-            <ion-icon name="information-circle-outline"></ion-icon>
-            Los datos mostrados están actualizados al momento de la consulta.
-            Para mayor información, contacte a la Gerencia de Recaudación.
-          </p>
-        </ion-text>
-      </div>
     </div>
 
-    <!-- Estado vacío -->
-    <div *ngIf="!isLoading() && !estadoCuenta() && !searchError()" class="empty-state">
-      <div class="empty-content">
-        <ion-icon name="search-outline" color="medium"></ion-icon>
-        <h3>Consultar Estado de Cuenta</h3>
-        <p>Utilice el formulario de búsqueda para consultar el estado de cuenta por Clave Catastral o DNI.</p>
+    <!-- Empty State -->
+    <div *ngIf="!isLoading() && !estadoCuenta() && !searchError()" class="text-center py-16">
+      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <ion-icon name="search-outline" class="text-3xl text-gray-400"></ion-icon>
       </div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Consultar Estado de Cuenta</h3>
+      <p class="text-gray-500 max-w-md mx-auto">
+        Utilice el formulario de búsqueda para consultar el estado de cuenta por Clave Catastral o DNI.
+      </p>
     </div>
   </div>
 </ion-content>

@@ -12,25 +12,26 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   
-  // Fallbacks mínimos para cuando env() no funciona
+  // Fallbacks mínimos para cuando env() no funciona - MEJORADOS
   --safe-area-top-fallback: max(env(safe-area-inset-top, 0px), 44px);
-  --safe-area-top-robust: max(env(safe-area-inset-top, 0px), 44px);
+  --safe-area-top-robust: max(env(safe-area-inset-top, 0px), 48px);
   --safe-area-left-fallback: max(env(safe-area-inset-left, 0px), 0px);
   --safe-area-right-fallback: max(env(safe-area-inset-right, 0px), 0px);
   --safe-area-bottom-fallback: max(env(safe-area-inset-bottom, 0px), 0px);
   
   --header-height: 56px;
-  --header-total-height: calc(var(--safe-area-top-fallback) + var(--header-height));
+  --header-total-height: calc(var(--safe-area-top-robust) + var(--header-height));
 }
 
 // Mixin para headers con safe area - Optimizado para dispositivos físicos
 @mixin safe-area-header($background-color: var(--safe-area-color)) {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: $background-color;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  background: $background-color !important;
+  width: 100vw !important;
   
   &::after {
     display: none; // Remover línea de separación
@@ -39,31 +40,34 @@
   // Safe area spacer - Mejorado para dispositivos físicos
   .safe-area-spacer {
     // Usar la variable con fallback robusto
-    height: var(--safe-area-top-fallback);
-    min-height: 44px;
-    background: inherit;
-    width: 100%;
+    height: var(--safe-area-top-robust) !important;
+    min-height: 48px !important;
+    background: inherit !important;
+    width: 100% !important;
+    display: block !important;
     
     // Detección específica para dispositivos con notch/dynamic island
     @media screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-device-pixel-ratio: 3) {
-      min-height: 44px;
+      min-height: 48px !important;
+      height: max(env(safe-area-inset-top, 48px), 48px) !important;
     }
     
     // iPhone 14 Pro y similares con Dynamic Island
     @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
-      min-height: 59px;
+      min-height: 59px !important;
+      height: max(env(safe-area-inset-top, 59px), 59px) !important;
     }
     
     // Fallback general para dispositivos modernos
     @supports (padding: max(0px)) {
-      height: var(--safe-area-top-fallback);
-      min-height: var(--safe-area-top-fallback);
+      height: var(--safe-area-top-robust) !important;
+      min-height: var(--safe-area-top-robust) !important;
     }
     
     // Fallback adicional si env() no está disponible
     @supports not (padding: env(safe-area-inset-top)) {
-      height: 44px;
-      min-height: 44px;
+      height: 48px !important;
+      min-height: 48px !important;
     }
   }
   
@@ -194,7 +198,9 @@
   }
 }
 
-.estado-cuenta-safe-area {
+.estado-cuenta-safe-area,
+app-estado-cuenta,
+app-estado-cuenta-amnistia {
   ion-header {
     @include safe-area-header(var(--safe-area-gradient));
   }
@@ -202,6 +208,15 @@
   ion-content {
     @include safe-area-content(24px);
   }
+}
+
+// Clase específica para aplicar safe area correctamente
+.safe-area-header {
+  @include safe-area-header(var(--safe-area-gradient));
+}
+
+.safe-area-content {
+  @include safe-area-content(24px);
 }
 
 .reportes-safe-area {

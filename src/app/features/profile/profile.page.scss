@@ -29,15 +29,9 @@
 
 /* Safe Area Content */
 .safe-area-content {
-  --padding-top: 0px;
-  
-  ion-header[collapse="condense"] {
-    margin-top: env(safe-area-inset-top, var(--safe-area-top-fallback));
-  }
-  
-  /* Ensure content doesn't overlap with header */
-  .profile-container {
-    padding-top: calc(var(--header-height) + 20px);
+  padding-top: calc(var(--safe-area-top-robust) + var(--header-height) + 16px) !important;
+  > *:first-child {
+    margin-top: 0 !important;
   }
 }
 

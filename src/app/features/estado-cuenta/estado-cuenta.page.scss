@@ -1,40 +1,61 @@
 /* Estilos para la página de Estado de Cuenta */
 
-/* Safe Area Variables */
+/* Safe Area Variables - MEJORADAS PARA DISPOSITIVOS FÍSICOS */
 :root {
   --header-height: 56px;
-  --safe-area-top-robust: env(safe-area-inset-top, 0px);
-  --safe-area-top-fallback: 20px;
+  --safe-area-top-robust: max(env(safe-area-inset-top, 0px), 48px);
+  --safe-area-top-fallback: 48px;
 }
 
-/* Safe Area Spacer */
+/* Safe Area Spacer - FORZADO PARA DISPOSITIVOS FÍSICOS */
 .safe-area-spacer {
-  height: var(--safe-area-top-robust);
-  background: var(--ion-color-primary, #3880ff);
-  min-height: env(safe-area-inset-top, 0px);
+  height: var(--safe-area-top-robust) !important;
+  background: var(--ion-color-primary, #3880ff) !important;
+  min-height: max(env(safe-area-inset-top, 48px), 48px) !important;
+  width: 100% !important;
+  display: block !important;
 }
 
-/* Safe Area Header */
+/* Safe Area Header - FORZADO */
 .safe-area-header {
   padding-top: 0 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  width: 100vw !important;
   
   .safe-area-spacer {
-    height: env(safe-area-inset-top, var(--safe-area-top-fallback));
-    background: inherit;
+    height: max(env(safe-area-inset-top, 48px), 48px) !important;
+    background: inherit !important;
+  }
+  
+  ion-toolbar {
+    --background: transparent !important;
+    --color: white !important;
+    --border-width: 0 !important;
+    --min-height: var(--header-height) !important;
   }
 }
 
-/* Safe Area Content */
+/* Safe Area Content - AJUSTADO */
 .safe-area-content {
-  --padding-top: 0px;
+  --padding-top: calc(var(--safe-area-top-robust) + var(--header-height) + 24px) !important;
+  padding-top: calc(var(--safe-area-top-robust) + var(--header-height) + 16px) !important;
+  
+  /* Elimina margen superior del primer hijo para evitar doble espacio */
+  > *:first-child {
+    margin-top: 0 !important;
+  }
   
   ion-header[collapse="condense"] {
-    margin-top: env(safe-area-inset-top, var(--safe-area-top-fallback));
+    margin-top: var(--safe-area-top-robust) !important;
   }
   
   /* Ensure content doesn't overlap with header */
   .estado-cuenta-container {
-    padding-top: calc(var(--header-height) + 20px);
+    padding-top: 0 !important; // Ya está incluido en el padding del content
   }
 }
 

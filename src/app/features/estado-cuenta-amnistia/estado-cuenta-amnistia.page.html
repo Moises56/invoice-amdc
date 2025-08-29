@@ -1,150 +1,210 @@
 
-<ion-header class="safe-area-header estado-cuenta-amnistia-header">
+<ion-header [translucent]="true" class="ion-no-border safe-area-header">
   <div class="safe-area-spacer"></div>
-  <ion-toolbar class="header-toolbar">
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-back-button defaultHref="/dashboard/user" color="light"></ion-back-button>
     </ion-buttons>
-    <ion-title class="header-title">Estado de Cuenta con Amnistía</ion-title>
+    <ion-title color="light" class="font-semibold">Estado de Cuenta con Amnistía</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="safe-area-content estado-cuenta-amnistia-content estado-cuenta-amnistia-bg">
-  <div class="estado-cuenta-container">
-    <div class="search-form glass-card">
+<ion-content [fullscreen]="true" class="bg-gray-50 safe-area-content">
+  
+  <!-- Main container with proper spacing -->
+  <div class="px-4 py-6 min-h-full">
+    <!-- Modern Search Card -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6 mx-auto max-w-2xl">
+      <!-- Search Header -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+          <ion-icon name="shield-checkmark-outline" class="text-xl text-green-600"></ion-icon>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">Buscar Estado de Cuenta con Amnistía</h2>
+          <p class="text-sm text-gray-500">Consulte por Clave Catastral o DNI - Incluye beneficios de amnistía</p>
+        </div>
+      </div>
+
+      <!-- Search Input Component -->
       <app-search-input
         (search)="onSearch($event)"
         (clear)="onClearSearch()"
         [disabled]="isLoading()"
-        placeholder="Buscar estado de cuenta...">
+        placeholder="Buscar estado de cuenta con amnistía..."
+        class="block w-full">
       </app-search-input>
-      
-      <!-- Mostrar resumen de búsqueda -->
-      <div *ngIf="lastSearchParams" class="search-summary">
-        <ion-chip color="primary" outline="true">
+
+      <!-- Search Summary -->
+      <div *ngIf="lastSearchParams" class="mt-4">
+        <ion-chip color="primary" outline="true" class="text-sm">
           <ion-icon name="search-outline"></ion-icon>
           <ion-label>{{ getSearchSummary() }}</ion-label>
         </ion-chip>
       </div>
+    </div>
+
+    <!-- Error Card -->
+    <div *ngIf="searchError()" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <div class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+          <ion-icon name="alert-circle" class="text-red-600 text-sm"></ion-icon>
+        </div>
+        <div>
+          <h3 class="font-semibold text-red-800 mb-1">Error en la consulta</h3>
+          <p class="text-red-700 text-sm">{{ searchError() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="text-center py-12">
+      <ion-spinner name="crescent" color="primary" class="mb-4"></ion-spinner>
+      <p class="text-gray-600">Consultando estado de cuenta con amnistía...</p>
+    </div>
+
+    <!-- Results Section -->
+    <div *ngIf="!isLoading() && estadoCuenta() as data" class="space-y-6">
       
-      <!-- Mostrar errores de búsqueda -->
-      <div *ngIf="searchError()" class="search-error">
-        <ion-item color="danger" lines="none">
-          <ion-icon name="alert-circle" slot="start"></ion-icon>
-          <ion-label class="ion-text-wrap">{{ searchError() }}</ion-label>
-        </ion-item>
-      </div>
-    </div>
+      <!-- Multiple Properties (DNI Search) -->
+      <div *ngIf="esDNI && tienePropiedades" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+        <!-- Properties Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <ion-icon name="home-outline" class="text-xl text-green-600"></ion-icon>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-800">Propiedades Encontradas</h3>
+              <p class="text-sm text-gray-500">{{ numeroPropiedades }} propiedades registradas</p>
+            </div>
+          </div>
+          <div class="bg-green-50 px-3 py-1 rounded-full">
+            <span class="text-sm font-semibold text-green-700">Total: {{ totalGeneralGrupal }}</span>
+          </div>
+        </div>
 
-    <div *ngIf="isLoading()" class="ion-text-center amnistia-loading">
-      <ion-spinner name="crescent"></ion-spinner>
-    </div>
-
-    <!-- Sección para múltiples propiedades (consultas por DNI) -->
-    <div *ngIf="!isLoading() && mostrarMultiplesPropiedades() && propiedades.length > 0" class="propiedades-container glass-card">
-      <div class="propiedades-header">
-        <h3>Propiedades Encontradas</h3>
-        <ion-chip>
-          <ion-icon name="home-outline"></ion-icon>
-          <ion-label>{{ numeroPropiedades }} {{ numeroPropiedades === 1 ? 'propiedad' : 'propiedades' }}</ion-label>
-        </ion-chip>
+        <!-- Properties List -->
+        <div class="space-y-2">
+          <div
+            *ngFor="let propiedad of propiedades; let i = index"
+            (click)="seleccionarPropiedad(propiedad, i)"
+            [class]="indicePropiedadSeleccionada() === i ? 
+              'bg-green-50 border-green-200 shadow-md' : 
+              'bg-gray-50 border-gray-200 hover:bg-gray-100'"
+            class="border rounded-xl p-4 cursor-pointer transition-all duration-200">
+            
+            <div class="flex items-center gap-3">
+              <div [class]="indicePropiedadSeleccionada() === i ? 
+                'w-8 h-8 bg-green-100 rounded-full flex items-center justify-center' :
+                'w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center'">
+                <ion-icon 
+                  name="home" 
+                  [class]="indicePropiedadSeleccionada() === i ? 'text-green-600' : 'text-gray-500'"
+                  class="text-sm">
+                </ion-icon>
+              </div>
+              
+              <div class="flex-1">
+                <h4 class="font-semibold text-gray-800">{{ propiedad.claveCatastral }}</h4>
+                <p class="text-sm text-gray-600">{{ propiedad.colonia }}</p>
+                <p class="text-sm text-gray-500">Ruta: {{ propiedad.ruta }}</p>
+                <p class="text-sm font-medium text-green-600 mt-1">
+                  Total: {{ propiedad.totalPropiedad }}
+                </p>
+              </div>
+              
+              <div *ngIf="indicePropiedadSeleccionada() === i" 
+                class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                <ion-icon name="checkmark" class="text-white text-sm"></ion-icon>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <div class="propiedades-list">
-        <ion-item 
-          *ngFor="let propiedad of propiedades; let i = index" 
-          class="propiedad-item"
-          [class.selected]="indicePropiedadSeleccionada() === i"
-          (click)="seleccionarPropiedad(propiedad, i)"
-          button>
-          <ion-icon name="home" slot="start" [color]="indicePropiedadSeleccionada() === i ? 'primary' : 'medium'"></ion-icon>
-          <ion-label>
-            <h3>{{ propiedad.claveCatastral }}</h3>
-            <p><strong>Colonia:</strong> {{ propiedad.colonia }}</p>
-            <p><strong>Ruta:</strong> {{ propiedad.ruta }}</p>
-            <p class="total-propiedad"><strong>Total:</strong> {{ propiedad.totalPropiedad }}</p>
-          </ion-label>
-          <ion-icon 
-            name="checkmark-circle" 
-            slot="end" 
-            color="primary" 
-            *ngIf="indicePropiedadSeleccionada() === i">
-          </ion-icon>
-          <ion-icon 
-            name="chevron-forward" 
-            slot="end" 
-            color="medium" 
-            *ngIf="indicePropiedadSeleccionada() !== i">
-          </ion-icon>
-        </ion-item>
-      </div>
-    </div>
 
-    <div *ngIf="!isLoading() && estadoCuenta() as data">
-      <div class="amnistia-card glass-card">
-        <div class="amnistia-card-header">
-          <div class="amnistia-avatar">
-            <ion-icon name="person-circle-outline" color="primary" style="font-size:2.5rem;"></ion-icon>
+      <!-- Amnesty Alert -->
+      <div *ngIf="data.amnistiaVigente" class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6">
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <ion-icon name="shield-checkmark-outline" class="text-green-600 text-lg"></ion-icon>
           </div>
           <div>
-            <div class="amnistia-nombre">{{ data.nombre }}</div>
-            <div class="amnistia-identidad">{{ data.identidad }}</div>
+            <h3 class="font-bold text-green-800 mb-1">¡Amnistía Vigente!</h3>
+            <p class="text-green-700 text-sm">
+              Aproveche la amnistía hasta el: <span class="font-semibold">{{ data.fechaFinAmnistia }}</span>
+            </p>
           </div>
         </div>
-        <div class="amnistia-card-content">
-          <div><strong>Clave Catastral:</strong> {{ data.claveCatastral }}</div>
-          <div><strong>Colonia:</strong> {{ data.colonia }}</div>
-          <div><strong>Fecha:</strong> {{ data.fecha }} - {{ data.hora }}</div>
-        </div>
       </div>
 
-      <div *ngIf="data.amnistiaVigente" class="amnistia-alert glass-card">
-        <ion-icon name="shield-checkmark-outline" color="success" style="font-size:2rem;"></ion-icon>
-        <div>
-          <div class="amnistia-alert-title">Amnistía Vigente</div>
-          <div class="amnistia-alert-desc">Aproveche la amnistía hasta el: <strong>{{ data.fechaFinAmnistia }}</strong></div>
+      <!-- Main Info and Details Card -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+        <!-- User Profile Section -->
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center">
+            <ion-icon name="person-circle-outline" class="text-3xl text-white"></ion-icon>
+          </div>
+          
+          <div class="flex-1 min-w-0">
+            <h2 class="text-xl font-bold text-gray-900 truncate">{{ data.nombre }}</h2>
+            <p class="text-green-600 font-semibold">{{ data.identidad }}</p>
+            
+            <div class="mt-3 space-y-1 text-sm">
+              <div class="flex flex-wrap gap-4">
+                <div class="flex items-center gap-1">
+                  <span class="font-medium text-gray-600">Clave:</span>
+                  <span class="text-green-600 font-semibold">{{ data.claveCatastral }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="font-medium text-gray-600">Colonia:</span>
+                  <span class="text-green-600 font-semibold">{{ data.colonia }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="font-medium text-gray-600">Consultado:</span>
+                <span class="text-gray-700">{{ data.fecha }} - {{ data.hora }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="detail-card glass-card" style="margin-bottom: 5rem;">
-        <div class="detail-header">
-          <h3>Detalle de Mora con Amnistía</h3>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <!-- PDF temporalmente deshabilitado
-            <ion-button 
-              fill="outline" 
-              size="small" 
-              (click)="imprimirNavegador()"
-              [disabled]="isLoading() || !estadoCuenta()"
-              class="no-print">
-              <ion-icon name="document-outline" slot="start"></ion-icon>
-              PDF
-            </ion-button>
-            -->
+        <!-- Detail Section Header -->
+        <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <ion-icon name="receipt-outline" class="text-green-600"></ion-icon>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">Detalle de Mora con Amnistía</h3>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex gap-2">
             <ion-button 
               fill="outline" 
               size="small" 
               (click)="esDNI ? mostrarOpcionesImpresion() : imprimirRecibo()"
-              [disabled]="isLoading() || !estadoCuenta()"
-              class="no-print">
-              <ion-icon name="print-outline" slot="start"></ion-icon>
+              [disabled]="isLoading()"
+              class="no-print h-8 text-xs">
+              <ion-icon name="print-outline" slot="start" class="text-sm"></ion-icon>
               {{ esDNI ? 'Opciones' : 'Ticket' }}
             </ion-button>
           </div>
         </div>
-        
-        <div class="table-container printable">
-          <!-- Encabezado de impresión -->
-          <div class="print-header" style="display: none;">
+
+        <!-- Table Container for printing -->
+        <div class="printable">
+          <!-- Print Header (hidden on screen) -->
+          <div class="print-header" style="display: none">
             <div class="print-title">ALCALDÍA MUNICIPAL DEL DISTRITO CENTRAL</div>
             <div class="print-subtitle">Estado de Cuenta con Amnistía</div>
             <div class="print-info">Fecha: {{ data.fecha }} - {{ data.hora }}</div>
           </div>
-          
-          <!-- Información del contribuyente para impresión -->
-          <div class="contributor-info" style="display: none;">
+
+          <!-- Contributor Info for printing (hidden on screen) -->
+          <div class="contributor-info" style="display: none">
             <div class="info-row">
-              <span class="label">Contribuyente:</span>
+              <span class="label">Nombre:</span>
               <span class="value">{{ data.nombre }}</span>
             </div>
             <div class="info-row">
@@ -160,208 +220,63 @@
               <span class="value">{{ data.colonia }}</span>
             </div>
           </div>
-          
-          <!-- Aviso de amnistía para impresión -->
-          <div class="amnesty-notice" style="display: none;" *ngIf="data.amnistiaVigente">
+
+          <!-- Amnesty Notice for printing (hidden on screen) -->
+          <div class="amnesty-notice" style="display: none" *ngIf="data.amnistiaVigente">
             <div class="amnesty-title">AMNISTÍA VIGENTE</div>
             <div class="amnesty-date">Válida hasta: {{ data.fechaFinAmnistia }}</div>
           </div>
-          
-          <table class="detail-table print-table estado-cuenta-table">
-            <thead>
-              <tr>
-                <th>Año</th>
-                <th>Impto</th>
-                <th>T.Aseo</th>
-                <th>Bombero</th>
-                <th>Recargo</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let detalle of data.detallesMora" class="detail-row avoid-break">
-                <td class="year-cell">{{ detalle.year }}</td>
-                <td>{{ detalle.impuesto }}</td>
-                <td>{{ detalle.trenDeAseo }}</td>
-                <td>{{ detalle.tasaBomberos }}</td>
-                <td>{{ detalle.recargo }}</td>
-                <td class="total-cell"><strong>{{ detalle.total }}</strong></td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr class="total-row">
-                <td colspan="5"><strong>TOTAL GENERAL</strong></td>
-                <td class="total-cell"><strong>{{ data.totalGeneral }}</strong></td>
-              </tr>
-            </tfoot>
-          </table>
-          
-          <!-- Pie de impresión -->
-          <div class="print-footer" style="display: none;">
+
+          <!-- Details Table -->
+          <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <table class="detail-table print-table estado-cuenta-table w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Año</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Impto</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">T.Aseo</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Bombero</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Recargo</th>
+                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let detalle of data.detallesMora" class="detail-row avoid-break hover:bg-gray-50">
+                  <td class="year-cell px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ detalle.year }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.impuesto }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.trenDeAseo }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.tasaBomberos }}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.recargo }}</td>
+                  <td class="total-cell px-3 py-3 whitespace-nowrap text-sm font-medium text-green-600 text-right">{{ detalle.total }}</td>
+                </tr>
+              </tbody>
+              <tfoot class="bg-gray-100">
+                <tr class="total-row">
+                  <td colspan="5" class="px-3 py-3 text-sm font-bold text-gray-900">TOTAL GENERAL</td>
+                  <td class="total-cell px-3 py-3 text-sm font-bold text-green-600 text-right">{{ data.totalGeneral }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Print Footer (hidden on screen) -->
+          <div class="print-footer" style="display: none">
             <p>Este documento incluye beneficios de amnistía vigente.</p>
             <p>Para pagos oficiales, diríjase a las oficinas municipales.</p>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading() && !estadoCuenta() && !searchError()" class="text-center py-16">
+      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <ion-icon name="shield-checkmark-outline" class="text-3xl text-gray-400"></ion-icon>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Consultar Estado de Cuenta con Amnistía</h3>
+      <p class="text-gray-500 max-w-md mx-auto">
+        Utilice el formulario de búsqueda para consultar el estado de cuenta con beneficios de amnistía.
+      </p>
+    </div>
   </div>
 </ion-content>
-
-<style>
-.amnistia-bg {
-  --background: linear-gradient(135deg, #e0f7fa 0%, #f8fafc 100%) !important;
-  background: linear-gradient(135deg, #e0f7fa 0%, #f8fafc 100%) !important;
-}
-.amnistia-header, .amnistia-toolbar {
-  background: linear-gradient(90deg, #5ccedf 60%, #A4C9F5 100%) !important;
-  box-shadow: 0 2px 12px #5ccedf33;
-}
-.amnistia-title {
-  color: #222;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-.amnistia-container {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 2rem 0.5rem 2.5rem 0.5rem;
-}
-.glass-card {
-  background: rgba(255,255,255,0.95);
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 16px #5ccedf22;
-  margin-bottom: 1.2rem;
-  padding: 1.2rem 1.2rem 1rem 1.2rem;
-}
-.amnistia-form ion-item {
-  background: transparent;
-  border-radius: 1rem;
-  box-shadow: 0 1px 6px #5ccedf11;
-  margin-bottom: 0.5rem;
-}
-.amnistia-card-header {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  margin-bottom: 0.7rem;
-}
-.amnistia-avatar {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #5ccedf 60%, #A4C9F5 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px #5ccedf33;
-  border: 2.5px solid #fff;
-}
-.amnistia-avatar ion-icon {
-  color: #fff !important;
-  filter: drop-shadow(0 1px 2px #2ca0b899);
-}
-.amnistia-nombre {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2ca0b8;
-}
-.amnistia-identidad {
-  font-size: 1rem;
-  color: #495057;
-  opacity: 0.85;
-}
-.amnistia-card-content > div {
-  margin-bottom: 0.3rem;
-  font-size: 1rem;
-}
-.amnistia-alert {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: #e6fff6;
-  border: 1.5px solid #2dd36f44;
-  color: #059669;
-  margin-bottom: 1.2rem;
-  padding: 1rem 1.2rem;
-}
-.amnistia-alert-title {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #059669;
-}
-.amnistia-alert-desc {
-  font-size: 1rem;
-}
-.amnistia-table-card {
-  padding: 1.2rem 0.5rem 0.7rem 0.5rem;
-}
-.amnistia-table-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #2ca0b8;
-  margin-bottom: 0.7rem;
-}
-.amnistia-table-responsive {
-  overflow-x: auto;
-}
-.amnistia-table-responsive table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.98rem;
-}
-.amnistia-table-responsive th, .amnistia-table-responsive td {
-  padding: 0.45rem 0.5rem;
-  text-align: center;
-}
-.amnistia-table-responsive th {
-  background: #e0f7fa;
-  color: #2ca0b8;
-  font-weight: 600;
-}
-.amnistia-table-responsive tr:nth-child(even) {
-  background: #f8fafc;
-}
-.amnistia-total-row {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 1.2rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-top: 0.7rem;
-  color: #2ca0b8;
-}
-.amnistia-total {
-  font-size: 1.2rem;
-  color: #059669;
-  font-weight: 700;
-}
-.amnistia-btn-row {
-  display: flex;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
-.amnistia-loading {
-  margin: 2.5rem 0 2rem 0;
-}
-@media (max-width: 600px) {
-  .amnistia-container {
-    padding: 1rem 0.1rem 1.5rem 0.1rem;
-  }
-  .glass-card {
-    padding: 0.7rem 0.5rem 0.7rem 0.5rem;
-    margin-bottom: 0.7rem;
-  }
-  .amnistia-table-title {
-    font-size: 1rem;
-  }
-  .amnistia-table-responsive th, .amnistia-table-responsive td {
-    padding: 0.3rem 0.2rem;
-    font-size: 0.93rem;
-  }
-  .amnistia-total-row {
-    font-size: 1rem;
-    gap: 0.7rem;
-  }
-}
-</style>

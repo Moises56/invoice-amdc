@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonContent, 
@@ -9,18 +9,11 @@ import {
   IonMenuButton,
   IonButton,
   IonIcon,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonSpinner,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonChip,
   IonRefresher,
   IonRefresherContent,
-  IonAvatar
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -32,6 +25,8 @@ import {
   analyticsOutline,
   checkmarkCircleOutline,
   closeCircleOutline,
+  checkmarkCircle,
+  closeCircle,
   searchOutline,
   trendingUpOutline,
   trendingDownOutline,
@@ -52,8 +47,13 @@ import {
   ribbonOutline,
   bluetoothOutline,
   menuOutline,
-  notificationsOutline
+  notificationsOutline,
+  alertCircleOutline,
+  arrowForwardOutline,
+  arrowDownOutline
 } from 'ionicons/icons';
+import { Subscription, interval } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -70,180 +70,307 @@ import {
     IonMenuButton,
     IonButton,
     IonIcon,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonSpinner,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonChip,
     IonRefresher,
-    IonRefresherContent,
-    IonAvatar
+    IonRefresherContent
   ]
 })
+export class UserDashboardPage implements OnInit, OnDestroy {
+  // Injected Services
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly statsService = inject(StatsService);
+  private readonly alertController = inject(AlertController);
+  private readonly toastController = inject(ToastController);
 
-export class UserDashboardPage implements OnInit {
-  userName = '';
-  private statsService = inject(StatsService);
+  // Component State
+  userName = signal<string>('');
+  lastRefreshTime = signal<Date>(new Date());
   
-  // Señales para las estadísticas del usuario
+  // Stats State Management
   userStats = signal<UserStats | null>(null);
   isLoadingStats = signal<boolean>(false);
   hasStatsError = signal<boolean>(false);
   statsErrorMessage = signal<string>('');
   
-  // Computed para determinar si se pueden mostrar estadísticas generales
+  // Auto-refresh subscription
+  private refreshSubscription?: Subscription;
+
+  // Computed Properties
   canAccessGeneralStats = computed(() => {
     const user = this.authService.user();
     return user?.role === 'USER-ADMIN';
   });
 
-  // Computed para estadísticas con formato
   formattedStats = computed(() => {
     const stats = this.userStats();
     if (!stats) return null;
     
     return {
       ...stats,
-      // Cálculos básicos basados en los datos disponibles
-      percentageEC: stats.totalConsultas > 0 
-        ? Math.round((stats.consultasEC / stats.totalConsultas) * 100) 
-        : 0,
-      percentageICS: stats.totalConsultas > 0 
-        ? Math.round((stats.consultasICS / stats.totalConsultas) * 100) 
-        : 0,
-      successRate: stats.totalConsultas > 0 
-        ? Math.round((stats.consultasExitosas / stats.totalConsultas) * 100) 
-        : 0,
-      errorRate: stats.totalConsultas > 0 
-        ? Math.round((stats.consultasConError / stats.totalConsultas) * 100) 
-        : 0,
-      // Mapeo de campos para compatibilidad con el template
+      // Performance calculations
+      percentageEC: this.calculatePercentage(stats.consultasEC, stats.totalConsultas),
+      percentageICS: this.calculatePercentage(stats.consultasICS, stats.totalConsultas),
+      successRate: this.calculatePercentage(stats.consultasExitosas, stats.totalConsultas),
+      errorRate: this.calculatePercentage(stats.consultasConError, stats.totalConsultas),
+      
+      // Growth indicators
+      hasActivity: stats.totalConsultas > 0,
+      isActiveUser: this.isRecentActivity(stats.ultimaConsulta),
+      
+      // Data mapping for template compatibility
       consultasPorModulo: {
         ics: stats.consultasICS,
         ec: stats.consultasEC,
-        amnistia: 0 // No tenemos este dato en la nueva estructura
+        amnistia: 0
       },
-      ultimaActividad: stats.ultimaConsulta
+      ultimaActividad: stats.ultimaConsulta,
+      
+      // User engagement metrics
+      engagementLevel: this.calculateEngagementLevel(stats)
     };
   });
 
-  constructor(private router: Router, private authService: AuthService) {
-    addIcons({notificationsOutline,personOutline,calendarOutline,searchOutline,documentTextOutline,statsChartOutline,eyeOutline,barChartOutline,warningOutline,refreshOutline,analyticsOutline,trendingUpOutline,checkmarkCircleOutline,closeCircleOutline,timeOutline,pieChartOutline,businessOutline,shieldCheckmarkOutline,chevronForwardOutline,listOutline,ribbonOutline,bluetoothOutline,trendingDownOutline,settingsOutline});
+  constructor() {
+    // Register all required icons
+    addIcons({
+      notificationsOutline,
+      personOutline,
+      documentTextOutline,
+      shieldCheckmarkOutline,
+      analyticsOutline,
+      barChartOutline,
+      warningOutline,
+      refreshOutline,
+      settingsOutline,
+      chevronForwardOutline,
+      bluetoothOutline,
+      eyeOutline,
+      timeOutline,
+      checkmarkCircle,
+      closeCircle,
+      calendarOutline,
+      searchOutline,
+      statsChartOutline,
+      trendingUpOutline,
+      checkmarkCircleOutline,
+      closeCircleOutline,
+      pieChartOutline,
+      businessOutline,
+      listOutline,
+      ribbonOutline,
+      trendingDownOutline,
+      alertCircleOutline,
+      arrowForwardOutline,
+      arrowDownOutline
+    });
   }
 
-  ngOnInit() {
-    const name = this.authService.userName();
-    this.userName = name && name.trim() ? name : '';
-    this.loadUserStats();
+  async ngOnInit() {
+    await this.initializeComponent();
+    this.setupAutoRefresh();
+  }
+
+  ngOnDestroy() {
+    this.refreshSubscription?.unsubscribe();
   }
 
   /**
-   * Cargar estadísticas del usuario
+   * Initialize component with user data and stats
    */
-  async loadUserStats() {
-    if (!this.authService.isAuthenticated()) return;
+  private async initializeComponent(): Promise<void> {
+    try {
+      // Set user name
+      const name = this.authService.userName();
+      this.userName.set(name && name.trim() ? name : 'Usuario');
+      
+      // Load initial stats
+      await this.loadUserStats();
+      
+      // Show welcome message for first-time users
+      if (!this.userStats()?.totalConsultas) {
+        await this.showWelcomeMessage();
+      }
+    } catch (error) {
+      console.error('Error initializing dashboard:', error);
+      await this.showErrorToast('Error al inicializar el dashboard');
+    }
+  }
+
+  /**
+   * Setup automatic refresh every 5 minutes
+   */
+  private setupAutoRefresh(): void {
+    this.refreshSubscription = interval(300000) // 5 minutes
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.loadUserStats(true); // Silent refresh
+      });
+  }
+
+  /**
+   * Load user statistics with enhanced error handling
+   */
+  async loadUserStats(silentRefresh: boolean = false): Promise<void> {
+    if (!this.authService.isAuthenticated()) {
+      this.handleAuthError();
+      return;
+    }
     
-    this.isLoadingStats.set(true);
+    if (!silentRefresh) {
+      this.isLoadingStats.set(true);
+    }
+    
     this.hasStatsError.set(false);
     this.statsErrorMessage.set('');
     
     try {
-      console.log('🔄 Cargando estadísticas del usuario...');
+      console.log('Loading user statistics...');
       const response = await this.statsService.getMyStats().toPromise() as UserStats;
       
-      console.log('📊 Respuesta del servidor (my-stats):', response);
-      
-      // El backend devuelve los datos directamente, no en un wrapper con success/data
       if (response && response.userId) {
         this.userStats.set(response);
-        console.log('✅ Estadísticas cargadas exitosamente:', response);
+        this.lastRefreshTime.set(new Date());
+        console.log('Statistics loaded successfully:', response);
+        
+        if (!silentRefresh) {
+          await this.showSuccessToast('Datos actualizados');
+        }
       } else {
-        console.warn('⚠️ Respuesta sin datos válidos:', response);
-        this.hasStatsError.set(true);
-        this.statsErrorMessage.set('No se pudieron obtener las estadísticas');
+        throw new Error('Invalid response format');
       }
     } catch (error: any) {
-      console.error('❌ Error al cargar estadísticas del usuario:', error);
+      console.error('Error loading user statistics:', error);
       this.hasStatsError.set(true);
-      
-      // Mensaje de error más específico
-      if (error.status === 403) {
-        this.statsErrorMessage.set('No tienes permisos para ver las estadísticas');
-      } else if (error.status === 404) {
-        this.statsErrorMessage.set('Endpoint de estadísticas no encontrado');
-      } else if (error.status === 0) {
-        this.statsErrorMessage.set('No se puede conectar con el servidor');
-      } else {
-        this.statsErrorMessage.set(`Error del servidor: ${error.status || 'Desconocido'}`);
-      }
+      this.handleStatsError(error, silentRefresh);
     } finally {
       this.isLoadingStats.set(false);
     }
   }
 
   /**
-   * Navegar a una ruta específica
+   * Handle different types of errors
    */
-  goTo(path: string) {
-    this.router.navigate([path]);
-  }
-
-  /**
-   * Navegar a estadísticas generales (solo para USER-ADMIN)
-   */
-  goToGeneralStats() {
-    if (this.canAccessGeneralStats()) {
-      this.router.navigate(['/general-stats']);
+  private handleStatsError(error: any, silentRefresh: boolean): void {
+    let errorMessage = 'Error desconocido';
+    
+    switch (error.status) {
+      case 0:
+        errorMessage = 'Sin conexión a internet';
+        break;
+      case 401:
+        errorMessage = 'Sesión expirada';
+        this.handleAuthError();
+        return;
+      case 403:
+        errorMessage = 'Sin permisos suficientes';
+        break;
+      case 404:
+        errorMessage = 'Servicio no disponible';
+        break;
+      case 500:
+        errorMessage = 'Error del servidor';
+        break;
+      default:
+        errorMessage = `Error ${error.status}: ${error.message || 'Error del servidor'}`;
+    }
+    
+    this.statsErrorMessage.set(errorMessage);
+    
+    if (!silentRefresh) {
+      this.showErrorToast(errorMessage);
     }
   }
 
   /**
-   * Navegar a estadísticas del usuario actual
+   * Handle authentication errors
    */
-  goToUserStats() {
-    // Navegar a la página de estadísticas personales que consume /api/user-stats/my-stats
-    this.router.navigate(['/general-stats']);
+  private async handleAuthError(): Promise<void> {
+    await this.showAuthErrorAlert();
+    this.router.navigate(['/login']);
   }
 
   /**
-   * Navegar a logs de actividad (solo para USER-ADMIN)
+   * Navigation methods with loading states
    */
-  goToActivityLogs() {
-    if (this.canAccessGeneralStats()) {
-      this.router.navigate(['/activity-logs']);
+  async goTo(path: string): Promise<void> {
+    try {
+      await this.router.navigate([path]);
+    } catch (error) {
+      console.error(`Navigation error to ${path}:`, error);
+      await this.showErrorToast('Error de navegación');
     }
   }
 
+  async goToGeneralStats(): Promise<void> {
+    if (!this.canAccessGeneralStats()) {
+      await this.showErrorToast('No tienes permisos para acceder a esta sección');
+      return;
+    }
+    await this.goTo('/general-stats');
+  }
+
+  async goToActivityLogs(): Promise<void> {
+    if (!this.canAccessGeneralStats()) {
+      await this.showErrorToast('No tienes permisos para acceder a esta sección');
+      return;
+    }
+    await this.goTo('/activity-logs');
+  }
+
   /**
-   * Refrescar estadísticas
+   * Refresh stats with pull-to-refresh
    */
-  async refreshStats(event?: any) {
+  async refreshStats(event?: any): Promise<void> {
     try {
       await this.loadUserStats();
     } finally {
-      // Completar el refresher si existe el evento
-      if (event && event.target && event.target.complete) {
-        event.target.complete();
-      }
+      event?.target?.complete?.();
     }
   }
 
   /**
-   * Obtener fecha actual formateada
+   * Utility methods
    */
-  getCurrentDate(): string {
-    return new Date().toLocaleDateString('es-ES');
+  private calculatePercentage(value: number, total: number): number {
+    return total > 0 ? Math.round((value / total) * 100) : 0;
+  }
+
+  private isRecentActivity(dateString: string | undefined): boolean {
+    if (!dateString) return false;
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    return diffHours <= 24; // Active if last activity was within 24 hours
+  }
+
+  private calculateEngagementLevel(stats: UserStats): 'low' | 'medium' | 'high' {
+    const totalConsultas = stats.totalConsultas || 0;
+    const successRate = this.calculatePercentage(stats.consultasExitosas, totalConsultas);
+    
+    if (totalConsultas === 0) return 'low';
+    if (totalConsultas >= 50 && successRate >= 80) return 'high';
+    if (totalConsultas >= 20 || successRate >= 60) return 'medium';
+    return 'low';
   }
 
   /**
-   * Formatear fecha
+   * Date formatting utilities
    */
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
   formatDate(dateString: string | undefined): string {
     if (!dateString) return 'No disponible';
+    
     const date = new Date(dateString);
     return date.toLocaleString('es-ES', {
       day: '2-digit',
@@ -254,11 +381,8 @@ export class UserDashboardPage implements OnInit {
     });
   }
 
-  /**
-   * Obtener tiempo relativo
-   */
   getRelativeTime(dateString: string | undefined): string {
-    if (!dateString) return 'No disponible';
+    if (!dateString) return 'Sin actividad';
     
     const date = new Date(dateString);
     const now = new Date();
@@ -267,27 +391,140 @@ export class UserDashboardPage implements OnInit {
     const diffHours = Math.floor(diffMinutes / 60);
     const diffDays = Math.floor(diffHours / 24);
     
-    if (diffMinutes < 1) return 'Ahora';
-    if (diffMinutes < 60) return `Hace ${diffMinutes}m`;
-    if (diffHours < 24) return `Hace ${diffHours}h`;
-    if (diffDays < 7) return `Hace ${diffDays}d`;
-    return date.toLocaleDateString();
+    if (diffMinutes < 1) return 'Ahora mismo';
+    if (diffMinutes < 60) return `Hace ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
+    if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+    if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+    if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semana${Math.floor(diffDays / 7) > 1 ? 's' : ''}`;
+    
+    return date.toLocaleDateString('es-ES');
   }
 
   /**
-   * Calcular altura de barra para el gráfico basado en proporción
+   * Chart visualization utility
    */
   getBarHeight(field: keyof UserStats): number {
     const stats = this.formattedStats();
-    if (!stats) return 5; // Altura mínima si no hay datos
+    if (!stats) return 15;
     
     const value = stats[field] as number || 0;
-    const total = stats.totalConsultas || 1;
     
-    if (value === 0) return 5; // Altura mínima para mostrar la barra
+    // Find maximum value for normalization
+    const maxValue = Math.max(
+      stats.totalConsultas || 0,
+      stats.consultasEC || 0,
+      stats.consultasICS || 0,
+      stats.consultasExitosas || 0
+    );
     
-    // Calcular porcentaje con altura mínima de 10% y máxima de 100%
-    const percentage = Math.max(10, Math.min(100, (value / total) * 100));
+    if (maxValue === 0) return 15;
+    if (value === 0) return 15;
+    
+    // Calculate percentage with min 20% and max 100%
+    const percentage = Math.max(20, Math.min(100, (value / maxValue) * 100));
     return percentage;
+  }
+
+  /**
+   * UI Feedback methods
+   */
+  private async showSuccessToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'top',
+      color: 'success',
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
+  }
+
+  private async showErrorToast(message: string): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      position: 'top',
+      color: 'danger',
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
+  }
+
+  private async showWelcomeMessage(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Bienvenido',
+      message: `Hola ${this.userName()}, este es tu panel de control. Aquí podrás acceder a todos los servicios disponibles.`,
+      buttons: ['Entendido'],
+      cssClass: 'custom-alert'
+    });
+    await alert.present();
+  }
+
+  private async showAuthErrorAlert(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Sesión Expirada',
+      message: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+      buttons: ['OK'],
+      cssClass: 'custom-alert'
+    });
+    await alert.present();
+  }
+
+  /**
+   * Performance monitoring
+   */
+  getStatsHealthStatus(): 'excellent' | 'good' | 'warning' | 'critical' {
+    const stats = this.formattedStats();
+    if (!stats) return 'critical';
+    
+    const successRate = stats.successRate || 0;
+    const hasRecentActivity = stats.isActiveUser;
+    
+    if (successRate >= 90 && hasRecentActivity) return 'excellent';
+    if (successRate >= 75 && hasRecentActivity) return 'good';
+    if (successRate >= 50 || hasRecentActivity) return 'warning';
+    return 'critical';
+  }
+
+  getHealthStatusColor(): string {
+    const status = this.getStatsHealthStatus();
+    const colors = {
+      excellent: 'var(--color-success)',
+      good: 'var(--color-info)',
+      warning: 'var(--color-warning)',
+      critical: 'var(--color-error)'
+    };
+    return colors[status];
+  }
+
+  getHealthStatusMessage(): string {
+    const status = this.getStatsHealthStatus();
+    const messages = {
+      excellent: 'Excelente rendimiento',
+      good: 'Buen rendimiento',
+      warning: 'Rendimiento regular',
+      critical: 'Requiere atención'
+    };
+    return messages[status];
+  }
+
+  /**
+   * Accessibility helpers
+   */
+  getStatCardAriaLabel(title: string, value: number | string): string {
+    return `${title}: ${value}`;
+  }
+
+  getServiceCardAriaLabel(title: string, description: string): string {
+    return `Servicio ${title}: ${description}`;
+  }
+
+  /**
+   * Debug helpers (development only)
+   */
+  logCurrentStats(): void {
+    if (typeof window !== 'undefined' && (window as any).location?.hostname === 'localhost') {
+      console.table(this.formattedStats());
+    }
   }
 }

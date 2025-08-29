@@ -27,7 +27,7 @@ import {
   printOutline,
   timeOutline,
   checkmarkCircleOutline,
-  informationCircleOutline
+  informationCircleOutline,
 } from 'ionicons/icons';
 
 @Component({
@@ -66,7 +66,7 @@ export class DeviceListEnhancedPage implements OnInit {
       printOutline,
       timeOutline,
       checkmarkCircleOutline,
-      informationCircleOutline
+      informationCircleOutline,
     });
   }
 
@@ -93,13 +93,21 @@ export class DeviceListEnhancedPage implements OnInit {
    */
   isPrinterDevice(device: BluetoothDevice): boolean {
     if (!device.name) return false;
-    
+
     const printerPatterns = [
-      /printer/i, /print/i, /pos/i, /thermal/i, /receipt/i,
-      /ticket/i, /epson/i, /citizen/i, /star/i, /bixolon/i
+      /printer/i,
+      /print/i,
+      /pos/i,
+      /thermal/i,
+      /receipt/i,
+      /ticket/i,
+      /epson/i,
+      /citizen/i,
+      /star/i,
+      /bixolon/i,
     ];
-    
-    return printerPatterns.some(pattern => pattern.test(device.name));
+
+    return printerPatterns.some((pattern) => pattern.test(device.name));
   }
 
   /**
@@ -128,7 +136,7 @@ export class DeviceListEnhancedPage implements OnInit {
    */
   getFormattedScanDuration(): string {
     if (!this.scanDuration) return '';
-    
+
     const seconds = Math.round(this.scanDuration / 1000);
     return `${seconds}s`;
   }

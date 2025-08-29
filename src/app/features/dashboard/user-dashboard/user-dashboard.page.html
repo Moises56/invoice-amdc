@@ -1,439 +1,297 @@
-<ion-header class="dashboard-header safe-area-header">
-  <div class="safe-area-spacer"></div>
-  <ion-toolbar class="header-toolbar">
+<ion-header class="ion-no-border">
+  <!-- Status Bar Safe Area -->
+  <div class="safe-area-spacer bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700"></div>
+  
+  <ion-toolbar class="header-toolbar bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700">
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button class="menu-btn"></ion-menu-button>
     </ion-buttons>
+    
     <ion-title class="header-title">
-      <span>Mi Dashboard</span>
+      <div class="title-content">
+        <span class="title-main">Dashboard</span>
+        <span class="title-sub">Panel de Control</span>
+      </div>
     </ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" class="notification-btn">
+    
+    <ion-buttons slot="end" class="header-actions">
+      <!-- Notifications -->
+      <ion-button fill="clear" class="action-btn notification-btn">
         <ion-icon name="notifications-outline"></ion-icon>
+        <div class="notification-badge"></div>
       </ion-button>
-      <div class="user-info">
-        <div class="user-details">
-          <span class="user-name">{{ userName || 'Usuario' }}</span>
-          <span class="user-role">{{ canAccessGeneralStats() ? 'Administrador' : 'Usuario' }}</span>
+      
+      <!-- User Profile -->
+      <div class="user-profile" (click)="goTo('/perfil')">
+        <div class="user-info">
+          <div class="user-name">{{ userName || 'Usuario' }}</div>
+          <div class="user-role">{{ canAccessGeneralStats() ? 'Administrador' : 'Usuario' }}</div>
         </div>
-        <ion-avatar class="user-avatar">
+        <div class="user-avatar">
           <ion-icon name="person-outline"></ion-icon>
-        </ion-avatar>
+        </div>
       </div>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="dashboard-content safe-area-content">
-  
-  <!-- Refresher -->
+<ion-content class="dashboard-content">
+  <!-- Pull to Refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="refreshStats($event)">
     <ion-refresher-content
-      pulling-icon="chevron-forward-outline"
+      pulling-icon="arrow-down-outline"
       pulling-text="Desliza para actualizar"
       refreshing-spinner="circular"
-      refreshing-text="Actualizando...">
+      refreshing-text="Actualizando datos...">
     </ion-refresher-content>
   </ion-refresher>
 
-  <!-- Main Dashboard Container -->
   <div class="dashboard-container">
     
-    <!-- Top Stats Cards - Similar to image -->
-    <div class="top-stats-grid">
-      <ion-card class="stat-card blue-card" (click)="goTo('/estado-cuenta')">
-        <ion-card-content>
-          <div class="card-icon">
-            <ion-icon name="document-text-outline"></ion-icon>
-          </div>
-          <div class="card-info">
-            <h3>Estado de Cuenta</h3>
-            <p>{{ formattedStats()?.consultasICS || 0 }} consultas</p>
-          </div>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="stat-card green-card" (click)="goTo('/estado-cuenta-amnistia')">
-        <ion-card-content>
-          <div class="card-icon">
-            <ion-icon name="shield-checkmark-outline"></ion-icon>
-          </div>
-          <div class="card-info">
-            <h3>Estado de Cuenta con Amnistía</h3>
-            <p>Consulta amnistía</p>
-          </div>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="stat-card purple-card" (click)="goTo('/consulta-ics')">
-        <ion-card-content>
-          <div class="card-icon">
-            <ion-icon name="analytics-outline"></ion-icon>
-          </div>
-          <div class="card-info">
-            <h3>Volumen de Ventas</h3>
-            <p>{{ formattedStats()?.consultasEC || 0 }} consultas</p>
-          </div>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="stat-card red-card" (click)="goTo('/consulta-ics-amnistia')">
-        <ion-card-content>
-          <div class="card-icon">
-            <ion-icon name="bar-chart-outline"></ion-icon>
-          </div>
-          <div class="card-info">
-            <h3>Volumen de Ventas con Amnistía</h3>
-            <!-- <p>Reportes y análisis</p> -->
-          </div>
-        </ion-card-content>
-      </ion-card>
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <div class="welcome-content">
+        <h1 class="welcome-title">
+          Hola, <span class="welcome-name">{{ userName || 'Usuario' }}</span>
+        </h1>
+        <p class="welcome-subtitle">
+          Aquí tienes un resumen de tu actividad reciente
+        </p>
+      </div>
+      <div class="welcome-date">
+        <ion-icon name="calendar-outline" class="date-icon"></ion-icon>
+        <span>{{ getCurrentDate() }}</span>
+      </div>
     </div>
 
-    <!-- Two Column Layout -->
-    <ion-grid class="main-grid">
-      <ion-row>
-        
-        <!-- Left Column - Statistics -->
-        <ion-col size="12" sizeMd="8" class="left-column">
-          
-          <!-- Statistics Chart Section -->
-          <ion-card class="chart-card">
-            <ion-card-header>
-              <ion-card-title>Mis Estadísticas</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              
-              <!-- Loading State -->
-              <div class="loading-container" *ngIf="isLoadingStats()">
-                <ion-spinner name="crescent" color="primary"></ion-spinner>
-                <p class="loading-text">Cargando estadísticas...</p>
-              </div>
-
-              <!-- Error State -->
-              <div class="error-container" *ngIf="hasStatsError() && !isLoadingStats()">
-                <div class="error-content">
-                  <ion-icon name="warning-outline" class="error-icon"></ion-icon>
-                  <h3>No se pudieron cargar las estadísticas</h3>
-                  <p>{{ statsErrorMessage() }}</p>
-                  <ion-button fill="solid" size="default" (click)="loadUserStats()">
-                    <ion-icon name="refresh-outline" slot="start"></ion-icon>
-                    Reintentar
-                  </ion-button>
-                </div>
-              </div>
-
-              <!-- Chart Placeholder -->
-              <div class="chart-placeholder" *ngIf="!isLoadingStats() && !hasStatsError()">
-                <div class="chart-visual">
-                  <div class="chart-frame">
-                    <!-- Comparación por tipo de consulta -->
-                    <div class="chart-bars">
-                      <!-- Total Consultas -->
-                      <div class="bar total-bar" 
-                           [style.height.%]="getBarHeight('totalConsultas')"
-                           [title]="'Total Consultas: ' + (formattedStats()?.totalConsultas || 0)"></div>
-                      
-                      <!-- Consultas EC -->
-                      <div class="bar ec-bar" 
-                           [style.height.%]="getBarHeight('consultasEC')"
-                           [title]="'Consultas EC: ' + (formattedStats()?.consultasEC || 0)"></div>
-                      
-                      <!-- Consultas ICS -->
-                      <div class="bar ics-bar" 
-                           [style.height.%]="getBarHeight('consultasICS')"
-                           [title]="'Consultas ICS: ' + (formattedStats()?.consultasICS || 0)"></div>
-                      
-                      <!-- Consultas exitosas -->
-                      <div class="bar success-bar" 
-                           [style.height.%]="getBarHeight('consultasExitosas')"
-                           [title]="'Consultas Exitosas: ' + (formattedStats()?.consultasExitosas || 0)"></div>
-                    </div>
-                    
-                    <!-- Etiquetas del gráfico -->
-                    <div class="chart-labels">
-                      <span class="chart-label">Total</span>
-                      <span class="chart-label">EC</span>
-                      <span class="chart-label">ICS</span>
-                      <span class="chart-label">Éxito</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="chart-stats">
-                  <div class="stat-item">
-                    <span class="stat-value">{{ formattedStats()?.totalConsultas || 0 }}</span>
-                    <span class="stat-label">Total Consultas</span>
-                  </div>
-                  <div class="stat-item">
-                    <span class="stat-value">{{ formattedStats()?.consultasEC || 0 }}</span>
-                    <span class="stat-label">Consultas EC</span>
-                  </div>
-                  <div class="stat-item">
-                    <span class="stat-value">{{ formattedStats()?.consultasICS || 0 }}</span>
-                    <span class="stat-label">Consultas ICS</span>
-                  </div>
-                </div>
-              </div>
-
-            </ion-card-content>
-          </ion-card>
-          
-        </ion-col>
-        
-        <!-- Right Column - Configurations -->
-        <ion-col size="12" sizeMd="4" class="right-column">
-          
-          <ion-card class="config-card">
-            <ion-card-header>
-              <ion-card-title>Configuraciones</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              
-              <div class="config-list">
-                
-                <div class="config-item" (click)="goTo('/perfil')">
-                  <div class="config-icon">
-                    <ion-icon name="person-outline"></ion-icon>
-                  </div>
-                  <div class="config-info">
-                    <span class="config-title">Mi Perfil</span>
-                  </div>
-                  <ion-icon name="chevron-forward-outline" class="config-arrow"></ion-icon>
-                </div>
-                
-                <div class="config-item" (click)="goTo('/bluetooth')">
-                  <div class="config-icon">
-                    <ion-icon name="bluetooth-outline"></ion-icon>
-                  </div>
-                  <div class="config-info">
-                    <span class="config-title">Bluetooth</span>
-                  </div>
-                  <ion-icon name="chevron-forward-outline" class="config-arrow"></ion-icon>
-                </div>
-                
-                <div class="config-item" *ngIf="canAccessGeneralStats()" (click)="goToGeneralStats()">
-                  <div class="config-icon">
-                    <ion-icon name="analytics-outline"></ion-icon>
-                  </div>
-                  <div class="config-info">
-                    <span class="config-title">Estadísticas Generales</span>
-                  </div>
-                  <ion-icon name="chevron-forward-outline" class="config-arrow"></ion-icon>
-                </div>
-                
-                <div class="config-item" *ngIf="canAccessGeneralStats()" (click)="goToActivityLogs()">
-                  <div class="config-icon">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-                  <div class="config-info">
-                    <span class="config-title">Logs del Sistema</span>
-                  </div>
-                  <ion-icon name="chevron-forward-outline" class="config-arrow"></ion-icon>
-                </div>
-                
-              </div>
-              
-            </ion-card-content>
-          </ion-card>
-          
-        </ion-col>
-
-      </ion-row>
+    <!-- Quick Stats Overview -->
+    <div class="stats-overview" *ngIf="!isLoadingStats() && formattedStats(); else loadingStats">
+      <div class="stats-header">
+        <h2>Resumen de Actividad</h2>
+        <div class="stats-period">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Últimos 30 días</span>
+        </div>
+      </div>
       
-      <!-- Second Row for Mobile - Compact Stats and Config Side by Side -->
-      <ion-row class="mobile-compact-row">
-        
-        <!-- Mobile Stats Column -->
-        <ion-col size="6" sizeMd="0" class="mobile-stats-col">
-          
-          <ion-card class="mobile-chart-card">
-            <ion-card-header>
-              <ion-card-title>Mis Estadísticas</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              
-              <!-- Chart Placeholder -->
-              <div class="mobile-chart-placeholder" *ngIf="!isLoadingStats() && !hasStatsError()">
-                <div class="mobile-chart-visual">
-                  <div class="mobile-chart-frame">
-                    <!-- Comparación por tipo de consulta -->
-                    <div class="mobile-chart-bars">
-                      <!-- Total Consultas -->
-                      <div class="bar total-bar" 
-                           [style.height.%]="getBarHeight('totalConsultas')"
-                           [title]="'Total: ' + (formattedStats()?.totalConsultas || 0)"></div>
-                      
-                      <!-- Consultas EC -->
-                      <div class="bar ec-bar" 
-                           [style.height.%]="getBarHeight('consultasEC')"
-                           [title]="'EC: ' + (formattedStats()?.consultasEC || 0)"></div>
-                      
-                      <!-- Consultas ICS -->
-                      <div class="bar ics-bar" 
-                           [style.height.%]="getBarHeight('consultasICS')"
-                           [title]="'ICS: ' + (formattedStats()?.consultasICS || 0)"></div>
-                    </div>
-                    
-                    <!-- Etiquetas del gráfico -->
-                    <div class="mobile-chart-labels">
-                      <span class="mobile-chart-label">Total</span>
-                      <span class="mobile-chart-label">EC</span>
-                      <span class="mobile-chart-label">ICS</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="mobile-chart-stats">
-                  <div class="mobile-stat-item">
-                    <span class="mobile-stat-value">{{ formattedStats()?.totalConsultas || 0 }}</span>
-                    <span class="mobile-stat-label">Total</span>
-                  </div>
-                  <div class="mobile-stat-item">
-                    <span class="mobile-stat-value">{{ formattedStats()?.consultasEC || 0 }}</span>
-                    <span class="mobile-stat-label">EC</span>
-                  </div>
-                  <div class="mobile-stat-item">
-                    <span class="mobile-stat-value">{{ formattedStats()?.consultasICS || 0 }}</span>
-                    <span class="mobile-stat-label">ICS</span>
-                  </div>
-                </div>
-              </div>
+      <div class="stats-grid">
+        <!-- Total Consultas -->
+        <div class="stat-card primary">
+          <div class="stat-icon">
+            <ion-icon name="analytics-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ formattedStats()?.totalConsultas || 0 }}</div>
+            <div class="stat-label">Total Consultas</div>
+            <div class="stat-trend positive" *ngIf="(formattedStats()?.totalConsultas || 0) > 0">
+              <ion-icon name="trending-up-outline"></ion-icon>
+              <span>Activo</span>
+            </div>
+          </div>
+        </div>
 
-            </ion-card-content>
-          </ion-card>
-          
-        </ion-col>
-        
-        <!-- Mobile Config Column -->
-        <ion-col size="6" sizeMd="0" class="mobile-config-col">
-          
-          <ion-card class="mobile-config-card">
-            <ion-card-header>
-              <ion-card-title>Configuraciones</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              
-              <div class="mobile-config-list">
-                
-                <div class="mobile-config-item" (click)="goTo('/perfil')">
-                  <div class="mobile-config-icon">
-                    <ion-icon name="person-outline"></ion-icon>
-                  </div>
-                  <div class="mobile-config-info">
-                    <span class="mobile-config-title">Mi Perfil</span>
-                  </div>
-                </div>
-                
-                <div class="mobile-config-item" (click)="goTo('/bluetooth')">
-                  <div class="mobile-config-icon">
-                    <ion-icon name="bluetooth-outline"></ion-icon>
-                  </div>
-                  <div class="mobile-config-info">
-                    <span class="mobile-config-title">Bluetooth</span>
-                  </div>
-                </div>
-                
-                <div class="mobile-config-item" *ngIf="canAccessGeneralStats()" (click)="goToGeneralStats()">
-                  <div class="mobile-config-icon">
-                    <ion-icon name="analytics-outline"></ion-icon>
-                  </div>
-                  <div class="mobile-config-info">
-                    <span class="mobile-config-title">Stats Grales</span>
-                  </div>
-                </div>
-                
-                <div class="mobile-config-item" *ngIf="canAccessGeneralStats()" (click)="goToActivityLogs()">
-                  <div class="mobile-config-icon">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-                  <div class="mobile-config-info">
-                    <span class="mobile-config-title">Logs</span>
-                  </div>
-                </div>
-                
-              </div>
-              
-            </ion-card-content>
-          </ion-card>
-          
-        </ion-col>
-        
-      </ion-row>
+        <!-- Consultas Exitosas -->
+        <div class="stat-card success">
+          <div class="stat-icon">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ formattedStats()?.consultasExitosas || 0 }}</div>
+            <div class="stat-label">Exitosas</div>
+            <div class="stat-trend positive" *ngIf="formattedStats()?.successRate">
+              <span>{{ formattedStats()?.successRate }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consultas con Error -->
+        <div class="stat-card warning">
+          <div class="stat-icon">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ formattedStats()?.consultasConError || 0 }}</div>
+            <div class="stat-label">Con Error</div>
+            <div class="stat-trend negative" *ngIf="formattedStats()?.errorRate">
+              <span>{{ formattedStats()?.errorRate }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Última Actividad -->
+        <div class="stat-card info">
+          <div class="stat-icon">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value-small">{{ getRelativeTime(formattedStats()?.ultimaConsulta) }}</div>
+            <div class="stat-label">Última Actividad</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <ng-template #loadingStats>
+      <div class="loading-section">
+        <ion-spinner name="dots" class="loading-spinner"></ion-spinner>
+        <p class="loading-text">Cargando estadísticas...</p>
+      </div>
+    </ng-template>
+
+    <!-- Main Services Grid -->
+    <div class="services-section">
+      <div class="section-header">
+        <h2>Servicios Disponibles</h2>
+        <p>Accede a todas las funcionalidades del sistema</p>
+      </div>
       
-      <!-- Third Row - Activity Table -->
-      <ion-row>
-        <ion-col size="12">
+      <div class="services-grid">
+        <!-- Estado de Cuenta -->
+        <div class="service-card blue" (click)="goTo('/estado-cuenta')">
+          <div class="service-header">
+            <div class="service-icon">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
+            <div class="service-badge">{{ formattedStats()?.consultasICS || 0 }}</div>
+          </div>
+          <div class="service-content">
+            <h3>Estado de Cuenta</h3>
+            <p>Consulta tu estado financiero actual</p>
+          </div>
+          <div class="service-footer">
+            <span class="service-status active">Disponible</span>
+            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+          </div>
+        </div>
 
-          <!-- Recent Activity Table -->
-          <ion-card class="activity-card">
-            <ion-card-header>
-              <ion-card-title>Actividad Reciente</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              
-              <div class="activity-table">
-                <div class="table-header">
-                  <div class="header-cell">TIPO DE CONSULTA</div>
-                  <div class="header-cell">DETALLE</div>
-                  <div class="header-cell">FECHA</div>
-                  <div class="header-cell">ESTADO</div>
-                </div>
-                
-                <div class="table-row" *ngIf="formattedStats()?.ultimaConsulta; else noActivity">
-                  <div class="table-cell">Estado de Cuenta</div>
-                  <div class="table-cell">Consulta de saldo cliente #12345</div>
-                  <div class="table-cell">{{ formatDate(formattedStats()?.ultimaConsulta) }}</div>
-                  <div class="table-cell">
-                    <ion-chip color="success" outline="true">Exitosa</ion-chip>
-                  </div>
-                </div>
-                
-                <!-- Sample rows for demonstration -->
-                <div class="table-row">
-                  <div class="table-cell">Volumen de Ventas</div>
-                  <div class="table-cell">Revisión de ventas de la última semana</div>
-                  <div class="table-cell">25/05/2024, 09:15</div>
-                  <div class="table-cell">
-                    <ion-chip color="success" outline="true">Exitosa</ion-chip>
-                  </div>
-                </div>
-                
-                <div class="table-row">
-                  <div class="table-cell">Estado de Cuenta con Amnistía</div>
-                  <div class="table-cell">Consulta para cliente #67890</div>
-                  <div class="table-cell">24/05/2024, 15:45</div>
-                  <div class="table-cell">
-                    <ion-chip color="warning" outline="true">Pendiente</ion-chip>
-                  </div>
-                </div>
-                
-                <div class="table-row">
-                  <div class="table-cell">Configuración Bluetooth</div>
-                  <div class="table-cell">Conexión con impresora térmica</div>
-                  <div class="table-cell">24/05/2024, 11:00</div>
-                  <div class="table-cell">
-                    <ion-chip color="danger" outline="true">Falló</ion-chip>
-                  </div>
-                </div>
-                
-                <ng-template #noActivity>
-                  <div class="table-row">
-                    <div class="table-cell" colspan="4">
-                      <div class="no-activity-message">
-                        <ion-icon name="time-outline"></ion-icon>
-                        <span>No hay actividad reciente</span>
-                      </div>
-                    </div>
-                  </div>
-                </ng-template>
-              </div>
-              
-            </ion-card-content>
-          </ion-card>
-          
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+        <!-- Estado de Cuenta con Amnistía -->
+        <div class="service-card green" (click)="goTo('/estado-cuenta-amnistia')">
+          <div class="service-header">
+            <div class="service-icon">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+            </div>
+            <div class="service-badge new">Nuevo</div>
+          </div>
+          <div class="service-content">
+            <h3>EC con Amnistía</h3>
+            <p>Estado con beneficios de amnistía fiscal</p>
+          </div>
+          <div class="service-footer">
+            <span class="service-status active">Disponible</span>
+            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+          </div>
+        </div>
+
+        <!-- Volumen de Ventas -->
+        <div class="service-card purple" (click)="goTo('/consulta-ics')">
+          <div class="service-header">
+            <div class="service-icon">
+              <ion-icon name="bar-chart-outline"></ion-icon>
+            </div>
+            <div class="service-badge">{{ formattedStats()?.consultasEC || 0 }}</div>
+          </div>
+          <div class="service-content">
+            <h3>Volumen de Ventas</h3>
+            <p>Análisis detallado de ventas</p>
+          </div>
+          <div class="service-footer">
+            <span class="service-status active">Disponible</span>
+            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+          </div>
+        </div>
+
+        <!-- Volumen de Ventas con Amnistía -->
+        <div class="service-card orange" (click)="goTo('/consulta-ics-amnistia')">
+          <div class="service-header">
+            <div class="service-icon">
+              <ion-icon name="trending-up-outline"></ion-icon>
+            </div>
+            <div class="service-badge new">Nuevo</div>
+          </div>
+          <div class="service-content">
+            <h3>VV con Amnistía</h3>
+            <p>Reportes con beneficios aplicados</p>
+          </div>
+          <div class="service-footer">
+            <span class="service-status active">Disponible</span>
+            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration & Tools -->
+    <div class="tools-section">
+      <div class="section-header">
+        <h2>Configuración & Herramientas</h2>
+        <p>Gestiona tu cuenta y preferencias</p>
+      </div>
+      
+      <div class="tools-grid">
+        <!-- Mi Perfil -->
+        <div class="tool-item" (click)="goTo('/perfil')">
+          <div class="tool-icon blue">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+          <div class="tool-content">
+            <h4>Mi Perfil</h4>
+            <p>Información personal y configuración</p>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+        </div>
+
+        <!-- Bluetooth -->
+        <div class="tool-item" (click)="goTo('/bluetooth')">
+          <div class="tool-icon purple">
+            <ion-icon name="bluetooth-outline"></ion-icon>
+          </div>
+          <div class="tool-content">
+            <h4>Bluetooth</h4>
+            <p>Configuración de dispositivos</p>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+        </div>
+
+        <!-- Admin Tools -->
+        <div class="tool-item" *ngIf="canAccessGeneralStats()" (click)="goToGeneralStats()">
+          <div class="tool-icon green">
+            <ion-icon name="analytics-outline"></ion-icon>
+          </div>
+          <div class="tool-content">
+            <h4>Estadísticas Generales</h4>
+            <p>Panel de administración completo</p>
+          </div>
+          <div class="admin-badge">Admin</div>
+          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+        </div>
+
+        <!-- System Logs -->
+        <div class="tool-item" *ngIf="canAccessGeneralStats()" (click)="goToActivityLogs()">
+          <div class="tool-icon orange">
+            <ion-icon name="eye-outline"></ion-icon>
+          </div>
+          <div class="tool-content">
+            <h4>Logs del Sistema</h4>
+            <p>Monitoreo y auditoría</p>
+          </div>
+          <div class="admin-badge">Admin</div>
+          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions (Mobile) -->
+    <div class="quick-actions-mobile lg:hidden">
+      <div class="action-button primary" (click)="refreshStats()">
+        <ion-icon name="refresh-outline"></ion-icon>
+        <span>Actualizar</span>
+      </div>
+      <div class="action-button secondary" (click)="goTo('/perfil')">
+        <ion-icon name="settings-outline"></ion-icon>
+        <span>Configurar</span>
+      </div>
+    </div>
 
   </div>
-
 </ion-content>

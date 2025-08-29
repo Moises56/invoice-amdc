@@ -334,6 +334,10 @@ export class EstadoCuentaPage implements OnInit {
     }).format(amount);
   }
 
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString('es-HN');
+  }
+
   getTotalDeuda(): number {
     const data = this.estadoCuenta();
     return data ? data.totalGeneralNumerico : 0;
