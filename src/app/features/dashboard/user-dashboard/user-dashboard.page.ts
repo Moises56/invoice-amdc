@@ -1,10 +1,18 @@
-import { Component, OnInit, inject, signal, computed, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  OnDestroy,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonContent, 
-  IonHeader, 
-  IonTitle, 
-  IonToolbar, 
+import {
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonToolbar,
   IonButtons,
   IonMenuButton,
   IonButton,
@@ -13,7 +21,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   AlertController,
-  ToastController
+  ToastController,
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -46,13 +54,12 @@ import {
   listOutline,
   ribbonOutline,
   bluetoothOutline,
-  menuOutline,
   notificationsOutline,
   alertCircleOutline,
   arrowForwardOutline,
-  arrowDownOutline
+  arrowDownOutline,
 } from 'ionicons/icons';
-import { Subscription, interval } from 'rxjs';
+import { interval } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -72,8 +79,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     IonIcon,
     IonSpinner,
     IonRefresher,
-    IonRefresherContent
-  ]
+    IonRefresherContent,
+  ],
 })
 export class UserDashboardPage implements OnInit, OnDestroy {
   // Injected Services
@@ -82,19 +89,22 @@ export class UserDashboardPage implements OnInit, OnDestroy {
   private readonly statsService = inject(StatsService);
   private readonly alertController = inject(AlertController);
   private readonly toastController = inject(ToastController);
+  private readonly destroyRef = inject(DestroyRef);
 
   // Component State
   userName = signal<string>('');
   lastRefreshTime = signal<Date>(new Date());
-  
+
   // Stats State Management
   userStats = signal<UserStats | null>(null);
   isLoadingStats = signal<boolean>(false);
   hasStatsError = signal<boolean>(false);
   statsErrorMessage = signal<string>('');
-  
-  // Auto-refresh subscription
-  private refreshSubscription?: Subscription;
+
+  // Auto-refresh setup using takeUntilDestroyed in injection context
+  private autoRefresh$ = interval(300000).pipe(
+    takeUntilDestroyed(this.destroyRef)
+  );
 
   // Computed Properties
   canAccessGeneralStats = computed(() => {
@@ -105,29 +115,41 @@ export class UserDashboardPage implements OnInit, OnDestroy {
   formattedStats = computed(() => {
     const stats = this.userStats();
     if (!stats) return null;
-    
+
     return {
       ...stats,
       // Performance calculations
-      percentageEC: this.calculatePercentage(stats.consultasEC, stats.totalConsultas),
-      percentageICS: this.calculatePercentage(stats.consultasICS, stats.totalConsultas),
-      successRate: this.calculatePercentage(stats.consultasExitosas, stats.totalConsultas),
-      errorRate: this.calculatePercentage(stats.consultasConError, stats.totalConsultas),
-      
+      percentageEC: this.calculatePercentage(
+        stats.consultasEC,
+        stats.totalConsultas
+      ),
+      percentageICS: this.calculatePercentage(
+        stats.consultasICS,
+        stats.totalConsultas
+      ),
+      successRate: this.calculatePercentage(
+        stats.consultasExitosas,
+        stats.totalConsultas
+      ),
+      errorRate: this.calculatePercentage(
+        stats.consultasConError,
+        stats.totalConsultas
+      ),
+
       // Growth indicators
       hasActivity: stats.totalConsultas > 0,
       isActiveUser: this.isRecentActivity(stats.ultimaConsulta),
-      
+
       // Data mapping for template compatibility
       consultasPorModulo: {
         ics: stats.consultasICS,
         ec: stats.consultasEC,
-        amnistia: 0
+        amnistia: 0,
       },
       ultimaActividad: stats.ultimaConsulta,
-      
+
       // User engagement metrics
-      engagementLevel: this.calculateEngagementLevel(stats)
+      engagementLevel: this.calculateEngagementLevel(stats),
     };
   });
 
@@ -162,7 +184,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       trendingDownOutline,
       alertCircleOutline,
       arrowForwardOutline,
-      arrowDownOutline
+      arrowDownOutline,
     });
   }
 
@@ -172,7 +194,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.refreshSubscription?.unsubscribe();
+    // DestroyRef handles cleanup automatically
   }
 
   /**
@@ -183,10 +205,10 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       // Set user name
       const name = this.authService.userName();
       this.userName.set(name && name.trim() ? name : 'Usuario');
-      
+
       // Load initial stats
       await this.loadUserStats();
-      
+
       // Show welcome message for first-time users
       if (!this.userStats()?.totalConsultas) {
         await this.showWelcomeMessage();
@@ -201,11 +223,9 @@ export class UserDashboardPage implements OnInit, OnDestroy {
    * Setup automatic refresh every 5 minutes
    */
   private setupAutoRefresh(): void {
-    this.refreshSubscription = interval(300000) // 5 minutes
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => {
-        this.loadUserStats(true); // Silent refresh
-      });
+    this.autoRefresh$.subscribe(() => {
+      this.loadUserStats(true); // Silent refresh
+    });
   }
 
   /**
@@ -216,23 +236,28 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       this.handleAuthError();
       return;
     }
-    
+
     if (!silentRefresh) {
       this.isLoadingStats.set(true);
     }
-    
+
     this.hasStatsError.set(false);
     this.statsErrorMessage.set('');
-    
+
     try {
       console.log('Loading user statistics...');
-      const response = await this.statsService.getMyStats().toPromise() as UserStats;
-      
+      const response = await new Promise<UserStats>((resolve, reject) => {
+        this.statsService.getMyStats().subscribe({
+          next: (data) => resolve(data),
+          error: (error) => reject(error),
+        });
+      });
+
       if (response && response.userId) {
         this.userStats.set(response);
         this.lastRefreshTime.set(new Date());
         console.log('Statistics loaded successfully:', response);
-        
+
         if (!silentRefresh) {
           await this.showSuccessToast('Datos actualizados');
         }
@@ -253,7 +278,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
    */
   private handleStatsError(error: any, silentRefresh: boolean): void {
     let errorMessage = 'Error desconocido';
-    
+
     switch (error.status) {
       case 0:
         errorMessage = 'Sin conexión a internet';
@@ -272,11 +297,13 @@ export class UserDashboardPage implements OnInit, OnDestroy {
         errorMessage = 'Error del servidor';
         break;
       default:
-        errorMessage = `Error ${error.status}: ${error.message || 'Error del servidor'}`;
+        errorMessage = `Error ${error.status}: ${
+          error.message || 'Error del servidor'
+        }`;
     }
-    
+
     this.statsErrorMessage.set(errorMessage);
-    
+
     if (!silentRefresh) {
       this.showErrorToast(errorMessage);
     }
@@ -304,7 +331,9 @@ export class UserDashboardPage implements OnInit, OnDestroy {
 
   async goToGeneralStats(): Promise<void> {
     if (!this.canAccessGeneralStats()) {
-      await this.showErrorToast('No tienes permisos para acceder a esta sección');
+      await this.showErrorToast(
+        'No tienes permisos para acceder a esta sección'
+      );
       return;
     }
     await this.goTo('/general-stats');
@@ -312,7 +341,9 @@ export class UserDashboardPage implements OnInit, OnDestroy {
 
   async goToActivityLogs(): Promise<void> {
     if (!this.canAccessGeneralStats()) {
-      await this.showErrorToast('No tienes permisos para acceder a esta sección');
+      await this.showErrorToast(
+        'No tienes permisos para acceder a esta sección'
+      );
       return;
     }
     await this.goTo('/activity-logs');
@@ -338,18 +369,23 @@ export class UserDashboardPage implements OnInit, OnDestroy {
 
   private isRecentActivity(dateString: string | undefined): boolean {
     if (!dateString) return false;
-    
+
     const date = new Date(dateString);
     const now = new Date();
     const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     return diffHours <= 24; // Active if last activity was within 24 hours
   }
 
-  private calculateEngagementLevel(stats: UserStats): 'low' | 'medium' | 'high' {
+  private calculateEngagementLevel(
+    stats: UserStats
+  ): 'low' | 'medium' | 'high' {
     const totalConsultas = stats.totalConsultas || 0;
-    const successRate = this.calculatePercentage(stats.consultasExitosas, totalConsultas);
-    
+    const successRate = this.calculatePercentage(
+      stats.consultasExitosas,
+      totalConsultas
+    );
+
     if (totalConsultas === 0) return 'low';
     if (totalConsultas >= 50 && successRate >= 80) return 'high';
     if (totalConsultas >= 20 || successRate >= 60) return 'medium';
@@ -364,39 +400,44 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
   formatDate(dateString: string | undefined): string {
     if (!dateString) return 'No disponible';
-    
+
     const date = new Date(dateString);
     return date.toLocaleString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 
   getRelativeTime(dateString: string | undefined): string {
     if (!dateString) return 'Sin actividad';
-    
+
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMinutes / 60);
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffMinutes < 1) return 'Ahora mismo';
-    if (diffMinutes < 60) return `Hace ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
-    if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+    if (diffMinutes < 60)
+      return `Hace ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
+    if (diffHours < 24)
+      return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
     if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
-    if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semana${Math.floor(diffDays / 7) > 1 ? 's' : ''}`;
-    
+    if (diffDays < 30)
+      return `Hace ${Math.floor(diffDays / 7)} semana${
+        Math.floor(diffDays / 7) > 1 ? 's' : ''
+      }`;
+
     return date.toLocaleDateString('es-ES');
   }
 
@@ -406,9 +447,9 @@ export class UserDashboardPage implements OnInit, OnDestroy {
   getBarHeight(field: keyof UserStats): number {
     const stats = this.formattedStats();
     if (!stats) return 15;
-    
-    const value = stats[field] as number || 0;
-    
+
+    const value = (stats[field] as number) || 0;
+
     // Find maximum value for normalization
     const maxValue = Math.max(
       stats.totalConsultas || 0,
@@ -416,10 +457,10 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       stats.consultasICS || 0,
       stats.consultasExitosas || 0
     );
-    
+
     if (maxValue === 0) return 15;
     if (value === 0) return 15;
-    
+
     // Calculate percentage with min 20% and max 100%
     const percentage = Math.max(20, Math.min(100, (value / maxValue) * 100));
     return percentage;
@@ -434,7 +475,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       duration: 2000,
       position: 'top',
       color: 'success',
-      cssClass: 'custom-toast'
+      cssClass: 'custom-toast',
     });
     await toast.present();
   }
@@ -445,7 +486,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       duration: 3000,
       position: 'top',
       color: 'danger',
-      cssClass: 'custom-toast'
+      cssClass: 'custom-toast',
     });
     await toast.present();
   }
@@ -455,7 +496,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       header: 'Bienvenido',
       message: `Hola ${this.userName()}, este es tu panel de control. Aquí podrás acceder a todos los servicios disponibles.`,
       buttons: ['Entendido'],
-      cssClass: 'custom-alert'
+      cssClass: 'custom-alert',
     });
     await alert.present();
   }
@@ -465,7 +506,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       header: 'Sesión Expirada',
       message: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
       buttons: ['OK'],
-      cssClass: 'custom-alert'
+      cssClass: 'custom-alert',
     });
     await alert.present();
   }
@@ -476,10 +517,10 @@ export class UserDashboardPage implements OnInit, OnDestroy {
   getStatsHealthStatus(): 'excellent' | 'good' | 'warning' | 'critical' {
     const stats = this.formattedStats();
     if (!stats) return 'critical';
-    
+
     const successRate = stats.successRate || 0;
     const hasRecentActivity = stats.isActiveUser;
-    
+
     if (successRate >= 90 && hasRecentActivity) return 'excellent';
     if (successRate >= 75 && hasRecentActivity) return 'good';
     if (successRate >= 50 || hasRecentActivity) return 'warning';
@@ -492,7 +533,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       excellent: 'var(--color-success)',
       good: 'var(--color-info)',
       warning: 'var(--color-warning)',
-      critical: 'var(--color-error)'
+      critical: 'var(--color-error)',
     };
     return colors[status];
   }
@@ -503,7 +544,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       excellent: 'Excelente rendimiento',
       good: 'Buen rendimiento',
       warning: 'Rendimiento regular',
-      critical: 'Requiere atención'
+      critical: 'Requiere atención',
     };
     return messages[status];
   }
@@ -523,7 +564,10 @@ export class UserDashboardPage implements OnInit, OnDestroy {
    * Debug helpers (development only)
    */
   logCurrentStats(): void {
-    if (typeof window !== 'undefined' && (window as any).location?.hostname === 'localhost') {
+    if (
+      typeof window !== 'undefined' &&
+      (window as any).location?.hostname === 'localhost'
+    ) {
       console.table(this.formattedStats());
     }
   }
