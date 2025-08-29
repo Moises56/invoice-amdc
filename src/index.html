@@ -17,23 +17,43 @@
   <!-- add to homescreen for ios -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <!-- Cloudflare optimizations -->
+  <meta name="cf-2fa-verify" content="false" />
+  
+  <!-- Preload hints with crossorigin -->
+  <link rel="preload" href="/polyfills-RQ52UMDF.js" as="script" crossorigin="anonymous">
+  <link rel="preload" href="/main-KUGY2NHD.js" as="script" crossorigin="anonymous">
 </head>
 
-
+<body>
   <!-- Splash Screen Web (se oculta al cargar Angular) -->
   <div id="web-splash" style="position:fixed;z-index:99999;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;transition:opacity 0.4s;">
     <img src="assets/icon/splash.png" alt="Splash" style="max-width:60vw;max-height:60vh;border-radius:16px;box-shadow:0 4px 24px #0002;" />
   </div>
+  
   <app-root></app-root>
-  <script>
-    // Oculta el splash cuando Angular termina de cargar
+  
+  <!-- Cloudflare Rocket Loader bypass -->
+  <script data-cfasync="false">
+    // Deshabilita Rocket Loader para scripts críticos
     window.addEventListener('DOMContentLoaded', function() {
+      // Oculta el splash cuando Angular termina de cargar
       setTimeout(function() {
         var splash = document.getElementById('web-splash');
         if(splash) splash.style.opacity = '0';
         setTimeout(function(){ if(splash) splash.remove(); }, 400);
-      }, 400); // Puedes ajustar el tiempo si lo ves muy rápido o lento
+      }, 1000); // Aumentado el tiempo para dar más margen
     });
+
+    // Detecta si Angular no carga correctamente
+    setTimeout(function() {
+      var appRoot = document.querySelector('app-root');
+      if (appRoot && appRoot.children.length === 0) {
+        console.warn('Angular no se cargó correctamente, recargando página...');
+        window.location.reload();
+      }
+    }, 5000);
   </script>
 </body>
 
