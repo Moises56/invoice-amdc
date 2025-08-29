@@ -119,7 +119,12 @@ export class GeneralStatsPage implements OnInit {
     
     try {
       console.log('🔄 Cargando estadísticas generales...');
-      const response = await this.statsService.getGeneralStats().toPromise();
+      
+      // Simular un pequeño delay mínimo para mostrar el loading
+      const [response] = await Promise.all([
+        this.statsService.getGeneralStats().toPromise(),
+        new Promise(resolve => setTimeout(resolve, 800)) // Mínimo 800ms para UX
+      ]);
       
       console.log('📊 Respuesta del servidor (estadísticas generales):', response);
       
@@ -148,7 +153,10 @@ export class GeneralStatsPage implements OnInit {
         this.errorMessage.set(`Error del servidor: ${error.status || 'Desconocido'}`);
       }
     } finally {
-      this.isLoading.set(false);
+      // Pequeño delay adicional para suavizar la transición
+      setTimeout(() => {
+        this.isLoading.set(false);
+      }, 200);
     }
   }
 
@@ -156,10 +164,22 @@ export class GeneralStatsPage implements OnInit {
    * Refrescar estadísticas
    */
   async refreshStats(event?: any) {
-    await this.loadGeneralStats();
-    
+    // Si es un refresh manual (pull-to-refresh), no mostrar loading overlay
     if (event) {
-      event.target.complete();
+      try {
+        const response = await this.statsService.getGeneralStats().toPromise();
+        if (response && response.totalUsuarios !== undefined) {
+          this.generalStats.set(response);
+          this.lastUpdated.set(new Date().toISOString());
+        }
+      } catch (error) {
+        console.error('Error al refrescar:', error);
+      } finally {
+        event.target.complete();
+      }
+    } else {
+      // Refresh normal con loading
+      await this.loadGeneralStats();
     }
   }
 

@@ -69,43 +69,47 @@
 }
 
 .safe-area-content {
+  // Asegurar que el contenido no se oculte detrás del header
   .stats-container {
-    padding-top: calc(var(--header-height) + 36px) !important;
-  }
+    padding-top: calc(var(--total-header-height) + 20px) !important;
+    min-height: calc(100vh - var(--total-header-height));
   }
   
   // Fallback robusto para dispositivos que no soportan env()
   @supports not (padding-top: env(safe-area-inset-top)) {
     .stats-container {
-      padding-top: calc(56px + 20px);
+      padding-top: calc(56px + 44px + 20px) !important; // header + safe-area + spacing
     }
   }
   
   // iPhone 14 Pro y similares con Dynamic Island
   @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
     .stats-container {
-      padding-top: calc(56px + 20px);
+      padding-top: calc(56px + 59px + 20px) !important;
     }
   }
   
   // iPhone 14 Pro Max
   @media screen and (min-device-width: 428px) and (max-device-width: 926px) and (-webkit-device-pixel-ratio: 3) {
     .stats-container {
-      padding-top: calc(56px + 20px);
+      padding-top: calc(56px + 59px + 20px) !important;
     }
   }
   
-  // Optimización para WebView
+  // Optimización para WebView y móviles
   @media screen and (max-width: 768px) {
     .stats-container {
-      padding-top: calc(var(--header-height) + 20px);
+      padding-top: calc(var(--total-header-height) + 16px) !important;
+      padding-left: 16px;
+      padding-right: 16px;
     }
   }
+}
 
 // ========== HEADER ==========
 ion-header.stats-header {
   ion-toolbar.header-toolbar {
-    --background: white;
+    --background: rgb(20, 19, 19);
     --color: #1e293b;
     --border-color: #e2e8f0;
     
@@ -1375,6 +1379,175 @@ ion-header.stats-header {
     ion-card-content {
       .roles-list {
         grid-template-columns: 1fr;
+      }
+    }
+  }
+}
+
+// ========== LOADING OVERLAY MEJORADO ==========
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-width: 280px;
+    width: 90%;
+    
+    .loading-spinner {
+      margin-bottom: 1.5rem;
+      
+      ion-spinner {
+        width: 48px;
+        height: 48px;
+      }
+    }
+    
+    .loading-text {
+      margin-bottom: 1.5rem;
+      
+      h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--stats-text-primary);
+        margin: 0 0 0.5rem 0;
+      }
+      
+      p {
+        font-size: 0.875rem;
+        color: var(--stats-text-secondary);
+        margin: 0;
+      }
+    }
+    
+    .loading-progress {
+      width: 100%;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      overflow: hidden;
+      
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--stats-primary), var(--stats-secondary));
+        border-radius: 2px;
+        animation: loading-progress 2s ease-in-out infinite;
+      }
+    }
+  }
+}
+
+.refresh-indicator {
+  position: fixed;
+  top: calc(var(--total-header-height) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  
+  ion-spinner {
+    width: 16px;
+    height: 16px;
+  }
+  
+  span {
+    font-size: 0.875rem;
+    color: var(--stats-text-primary);
+    font-weight: 500;
+  }
+}
+
+// ========== ANIMACIONES MEJORADAS ==========
+@keyframes loading-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// ========== CORRECCIÓN SAFE AREA ESPECÍFICA ==========
+.general-stats-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  
+  .safe-area-spacer {
+    background: white;
+  }
+  
+  .header-toolbar {
+    --background: #296a73;
+    --border-color: #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+}
+
+.general-stats-content {
+  --background: var(--stats-bg);
+  
+  // Asegurar que el contenido principal no se oculte
+  .stats-container {
+    padding-top: calc(var(--total-header-height) + 24px) !important;
+    padding-bottom: 24px;
+    
+    // Fallback para dispositivos sin soporte de env()
+    @supports not (padding-top: env(safe-area-inset-top)) {
+      padding-top: calc(56px + 44px + 24px) !important;
+    }
+  }
+}
+
+// ========== RESPONSIVE MEJORADO ==========
+@media (max-width: 768px) {
+  .general-stats-content {
+    .stats-container {
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-top: calc(var(--total-header-height) + 16px) !important;
+    }
+  }
+  
+  .loading-overlay {
+    .loading-content {
+      margin: 0 16px;
+      padding: 1.5rem;
+      
+      .loading-spinner ion-spinner {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .loading-text h3 {
+        font-size: 1rem;
       }
     }
   }
