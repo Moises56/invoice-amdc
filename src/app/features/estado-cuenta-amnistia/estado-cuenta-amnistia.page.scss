@@ -575,6 +575,681 @@ ion-card-title {
    }
 }
 
+// Modern Table Container with Amnesty Theme
+.modern-table-container {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 20px;
+  padding: 0;
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  overflow: hidden;
+  
+  &.amnesty-theme {
+    // Tema específico para amnistía con colores verdes
+    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+  
+  // Table Stats Header with Green Theme
+  .table-stats-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    padding: 0;
+    
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+      position: relative;
+      
+      &:first-child::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 20%;
+        bottom: 20%;
+        width: 1px;
+        background: rgba(255, 255, 255, 0.3);
+      }
+      
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        
+        &.total-icon {
+          background: rgba(255, 255, 255, 0.25);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        ion-icon {
+          font-size: 24px;
+          color: white;
+        }
+      }
+      
+      .stat-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        .stat-value {
+          font-size: 20px;
+          font-weight: 700;
+          color: white;
+          line-height: 1;
+          
+          &.total-value {
+            font-size: 22px;
+            font-weight: 800;
+          }
+        }
+        
+        .stat-label {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+    }
+  }
+  
+  // Table Wrapper
+  .table-wrapper {
+    overflow-x: auto;
+    
+    .modern-detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      
+      // Table Headers
+      thead {
+        tr {
+          background: #f8fafc;
+          
+          th {
+            padding: 20px 16px;
+            text-align: left;
+            border-bottom: 2px solid #e2e8f0;
+            position: relative;
+            
+            &.year-header {
+              width: 15%;
+              min-width: 100px;
+            }
+            
+            &.amount-header {
+              width: 17%;
+              min-width: 120px;
+              text-align: right;
+            }
+            
+            &.total-header {
+              width: 17%;
+              min-width: 130px;
+              text-align: right;
+              background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+            }
+            
+            .header-content {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              font-size: 13px;
+              font-weight: 600;
+              color: #475569;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              
+              ion-icon {
+                font-size: 16px;
+                color: #22c55e;
+              }
+              
+              span {
+                white-space: nowrap;
+              }
+            }
+            
+            &.amount-header .header-content,
+            &.total-header .header-content {
+              justify-content: flex-end;
+            }
+          }
+        }
+      }
+      
+      // Table Body
+      tbody {
+        .table-row {
+          transition: all 0.2s ease;
+          border-bottom: 1px solid #f1f5f9;
+          
+          &:hover {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.04) 0%, rgba(34, 197, 94, 0.02) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+          }
+          
+          &.even-row {
+            background: rgba(248, 250, 252, 0.5);
+          }
+          
+          td {
+            padding: 16px;
+            vertical-align: middle;
+            
+            // Year Cell
+            &.year-cell {
+              .year-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 60px;
+                height: 32px;
+                background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
+                
+                .year-number {
+                  font-size: 14px;
+                  font-weight: 700;
+                  color: white;
+                }
+              }
+            }
+            
+            // Amount Cells
+            &.amount-cell {
+              text-align: right;
+              
+              .amount-container {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 4px;
+                
+                .currency-symbol {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: #64748b;
+                }
+                
+                .amount-value {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #334155;
+                }
+              }
+              
+              &.recargo-cell .amount-container {
+                .currency-symbol {
+                  color: #dc2626;
+                }
+                
+                .amount-value {
+                  color: #dc2626;
+                }
+              }
+            }
+            
+            // Total Cell
+            &.total-cell {
+              text-align: right;
+              background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.04) 100%);
+              
+              .total-container {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 4px;
+                
+                .currency-symbol {
+                  font-size: 13px;
+                  font-weight: 600;
+                  color: #22c55e;
+                }
+                
+                .total-value {
+                  font-size: 15px;
+                  font-weight: 700;
+                  color: #22c55e;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Table Footer with Amnesty Theme
+      tfoot {
+        .grand-total-row {
+          background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+          
+          td {
+            padding: 20px 16px;
+            border: none;
+            
+            &.grand-total-label {
+              .total-label-container {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                
+                ion-icon {
+                  font-size: 20px;
+                  color: white;
+                }
+                
+                span {
+                  font-size: 15px;
+                  font-weight: 700;
+                  color: white;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                }
+              }
+            }
+            
+            &.grand-total-cell {
+              text-align: right;
+              
+              .grand-total-container {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 6px;
+                
+                .currency-symbol {
+                  font-size: 16px;
+                  font-weight: 700;
+                  color: white;
+                }
+                
+                .grand-total-value {
+                  font-size: 20px;
+                  font-weight: 800;
+                  color: white;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Table Footer Info
+  .table-footer-info {
+    padding: 20px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      
+      ion-icon {
+        font-size: 16px;
+        color: #22c55e;
+        flex-shrink: 0;
+      }
+      
+      span {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.4;
+      }
+    }
+  }
+}
+
+// Mobile Cards View with Amnesty Theme
+.mobile-cards-view {
+  display: none;
+  
+  .detail-card-mobile {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    
+    &.amnesty-card {
+      border-color: rgba(34, 197, 94, 0.2);
+    }
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+      transform: translateY(-1px);
+    }
+    
+    .card-header-mobile {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .year-badge-mobile {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        
+        ion-icon {
+          font-size: 16px;
+        }
+      }
+      
+      .total-badge-mobile {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 12px;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        
+        .currency {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.9);
+          font-weight: 500;
+        }
+        
+        .amount {
+          font-size: 15px;
+          color: white;
+          font-weight: 700;
+        }
+      }
+    }
+    
+    .card-content-mobile {
+      padding: 16px;
+      
+      .amount-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 12px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .amount-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding: 12px;
+          background: #f8fafc;
+          border-radius: 8px;
+          border: 1px solid #e2e8f0;
+          
+          &.recargo {
+            background: rgba(220, 38, 38, 0.05);
+            border-color: rgba(220, 38, 38, 0.2);
+            
+            ion-icon {
+              color: #dc2626;
+            }
+            
+            .value {
+              color: #dc2626;
+            }
+          }
+          
+          ion-icon {
+            font-size: 16px;
+            color: #22c55e;
+            align-self: flex-start;
+          }
+          
+          .label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .value {
+            font-size: 13px;
+            color: #334155;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+  
+  .total-card-mobile {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+    
+    &.amnesty-total {
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+    
+    .total-header-mobile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      
+      ion-icon {
+        font-size: 20px;
+        color: white;
+      }
+      
+      span {
+        font-size: 14px;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    }
+    
+    .total-amount-mobile {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      
+      .currency {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+      }
+      
+      .amount {
+        font-size: 24px;
+        color: white;
+        font-weight: 800;
+      }
+    }
+  }
+}
+
+// Responsive Design for Amnesty Table
+@media (max-width: 768px) {
+  .modern-table-container {
+    margin: 0 -16px;
+    border-radius: 0;
+    
+    .table-stats-header {
+      grid-template-columns: 1fr;
+      
+      .stat-card {
+        padding: 20px 24px;
+        
+        &:first-child::after {
+          display: none;
+        }
+        
+        &:first-child {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+      }
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(34, 197, 94, 0.3) transparent;
+      
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(34, 197, 94, 0.1);
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: rgba(34, 197, 94, 0.4);
+        border-radius: 3px;
+        
+        &:hover {
+          background: rgba(34, 197, 94, 0.6);
+        }
+      }
+      
+      .modern-detail-table {
+        min-width: 650px;
+        
+        thead th {
+          padding: 14px 10px;
+          
+          .header-content {
+            font-size: 11px;
+            gap: 6px;
+            
+            ion-icon {
+              font-size: 13px;
+            }
+          }
+        }
+        
+        tbody .table-row td {
+          padding: 10px 8px;
+          
+          &.year-cell .year-badge {
+            width: 45px;
+            height: 26px;
+            
+            .year-number {
+              font-size: 12px;
+            }
+          }
+          
+          &.amount-cell .amount-container {
+            gap: 2px;
+            
+            .currency-symbol {
+              font-size: 10px;
+            }
+            
+            .amount-value {
+              font-size: 12px;
+            }
+          }
+          
+          &.total-cell .total-container {
+            gap: 2px;
+            
+            .currency-symbol {
+              font-size: 11px;
+            }
+            
+            .total-value {
+              font-size: 13px;
+            }
+          }
+        }
+        
+        tfoot .grand-total-row td {
+          padding: 14px 10px;
+          
+          &.grand-total-label .total-label-container {
+            gap: 6px;
+            
+            ion-icon {
+              font-size: 16px;
+            }
+            
+            span {
+              font-size: 13px;
+            }
+          }
+          
+          &.grand-total-cell .grand-total-container {
+            gap: 3px;
+            
+            .currency-symbol {
+              font-size: 13px;
+            }
+            
+            .grand-total-value {
+              font-size: 16px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mostrar vista de cards solo en móvil
+@media (max-width: 640px) {
+  .modern-table-container {
+    .table-wrapper {
+      .desktop-table {
+        display: none;
+      }
+      
+      .mobile-cards-view {
+        display: block;
+      }
+    }
+  }
+}
+
+// Ocultar cards en desktop/tablet
+@media (min-width: 641px) {
+  .mobile-cards-view {
+    display: none !important;
+  }
+  
+  .desktop-table {
+    display: table !important;
+  }
+}
+
 // Estilos para múltiples propiedades (consultas por DNI)
 .propiedades-container {
   margin-bottom: 25px;

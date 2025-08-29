@@ -6,7 +6,6 @@ import {
   EstadoCuentaResponse, 
   ConsultaECResponseNueva, 
   ConsultaParams,
-  OpcionesImpresion,
   PropiedadDto 
 } from 'src/app/shared/interfaces/estado-cuenta.interface';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -14,6 +13,26 @@ import { FormsModule } from '@angular/forms';
 import { EstadoCuentaPrinterService } from 'src/app/shared/services/estado-cuenta-printer.service';
 import { BluetoothService } from '../bluetooth/bluetooth.service';
 import { SearchInputComponent } from 'src/app/shared/components/search-input/search-input.component';
+import { addIcons } from 'ionicons';
+import {
+  searchOutline,
+  alertCircle,
+  shieldCheckmarkOutline,
+  homeOutline,
+  home,
+  checkmark,
+  personCircleOutline,
+  receiptOutline,
+  printOutline,
+  calendarOutline,
+  walletOutline,
+  trashOutline,
+  flameOutline,
+  trendingUpOutline,
+  calculatorOutline,
+  informationCircleOutline,
+  timeOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-estado-cuenta-amnistia',
@@ -46,7 +65,28 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
   propiedadSeleccionada = signal<PropiedadDto | null>(null);
   indicePropiedadSeleccionada = signal<number>(0);
 
-  constructor() { }
+  constructor() {
+    // Registrar iconos necesarios
+    addIcons({
+      searchOutline,
+      alertCircle,
+      shieldCheckmarkOutline,
+      homeOutline,
+      home,
+      checkmark,
+      personCircleOutline,
+      receiptOutline,
+      printOutline,
+      calendarOutline,
+      walletOutline,
+      trashOutline,
+      flameOutline,
+      trendingUpOutline,
+      calculatorOutline,
+      informationCircleOutline,
+      timeOutline
+    });
+  }
 
   ngOnInit() {
     // Inicialización automática removida para permitir búsqueda manual
@@ -356,5 +396,24 @@ export class EstadoCuentaAmnistiaPage implements OnInit {
   get propiedades() {
     const response = this.consultaResponse();
     return response?.propiedades || [];
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('es-HN', {
+      style: 'currency',
+      currency: 'HNL',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  }
+
+  formatNumber(amount: number): string {
+    return new Intl.NumberFormat('es-HN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  }
+
+  getCurrentDate(): string {
+    return new Date().toLocaleDateString('es-HN');
   }
 }

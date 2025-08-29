@@ -1,28 +1,42 @@
-
 <ion-header [translucent]="true" class="ion-no-border safe-area-header">
   <div class="safe-area-spacer"></div>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard/user" color="light"></ion-back-button>
+      <ion-back-button
+        defaultHref="/dashboard/user"
+        color="light"
+      ></ion-back-button>
     </ion-buttons>
-    <ion-title color="light" class="font-semibold">Estado de Cuenta con Amnistía</ion-title>
+    <ion-title color="light" class="font-semibold"
+      >Estado de Cuenta con Amnistía</ion-title
+    >
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="bg-gray-50 safe-area-content">
-  
   <!-- Main container with proper spacing -->
   <div class="px-4 py-6 min-h-full">
     <!-- Modern Search Card -->
-    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6 mx-auto max-w-2xl">
+    <div
+      class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6 mx-auto max-w-2xl"
+    >
       <!-- Search Header -->
       <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-          <ion-icon name="shield-checkmark-outline" class="text-xl text-green-600"></ion-icon>
+        <div
+          class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"
+        >
+          <ion-icon
+            name="shield-checkmark-outline"
+            class="text-xl text-green-600"
+          ></ion-icon>
         </div>
         <div>
-          <h2 class="text-lg font-bold text-gray-800">Buscar Estado de Cuenta con Amnistía</h2>
-          <p class="text-sm text-gray-500">Consulte por Clave Catastral o DNI - Incluye beneficios de amnistía</p>
+          <h2 class="text-lg font-bold text-gray-800">
+            Buscar Estado de Cuenta con Amnistía
+          </h2>
+          <p class="text-sm text-gray-500">
+            Consulte por Clave Catastral o DNI - Incluye beneficios de amnistía
+          </p>
         </div>
       </div>
 
@@ -32,7 +46,8 @@
         (clear)="onClearSearch()"
         [disabled]="isLoading()"
         placeholder="Buscar estado de cuenta con amnistía..."
-        class="block w-full">
+        class="block w-full"
+      >
       </app-search-input>
 
       <!-- Search Summary -->
@@ -45,9 +60,14 @@
     </div>
 
     <!-- Error Card -->
-    <div *ngIf="searchError()" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+    <div
+      *ngIf="searchError()"
+      class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6"
+    >
       <div class="flex items-start gap-3">
-        <div class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+        <div
+          class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+        >
           <ion-icon name="alert-circle" class="text-red-600 text-sm"></ion-icon>
         </div>
         <div>
@@ -65,22 +85,35 @@
 
     <!-- Results Section -->
     <div *ngIf="!isLoading() && estadoCuenta() as data" class="space-y-6">
-      
       <!-- Multiple Properties (DNI Search) -->
-      <div *ngIf="esDNI && tienePropiedades" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+      <div
+        *ngIf="esDNI && tienePropiedades"
+        class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6"
+      >
         <!-- Properties Header -->
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-              <ion-icon name="home-outline" class="text-xl text-green-600"></ion-icon>
+            <div
+              class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"
+            >
+              <ion-icon
+                name="home-outline"
+                class="text-xl text-green-600"
+              ></ion-icon>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-gray-800">Propiedades Encontradas</h3>
-              <p class="text-sm text-gray-500">{{ numeroPropiedades }} propiedades registradas</p>
+              <h3 class="text-lg font-bold text-gray-800">
+                Propiedades Encontradas
+              </h3>
+              <p class="text-sm text-gray-500">
+                {{ numeroPropiedades }} propiedades registradas
+              </p>
             </div>
           </div>
           <div class="bg-green-50 px-3 py-1 rounded-full">
-            <span class="text-sm font-semibold text-green-700">Total: {{ totalGeneralGrupal }}</span>
+            <span class="text-sm font-semibold text-green-700"
+              >Total: {{ totalGeneralGrupal }}</span
+            >
           </div>
         </div>
 
@@ -92,31 +125,41 @@
             [class]="indicePropiedadSeleccionada() === i ? 
               'bg-green-50 border-green-200 shadow-md' : 
               'bg-gray-50 border-gray-200 hover:bg-gray-100'"
-            class="border rounded-xl p-4 cursor-pointer transition-all duration-200">
-            
+            class="border rounded-xl p-4 cursor-pointer transition-all duration-200"
+          >
             <div class="flex items-center gap-3">
-              <div [class]="indicePropiedadSeleccionada() === i ? 
+              <div
+                [class]="indicePropiedadSeleccionada() === i ? 
                 'w-8 h-8 bg-green-100 rounded-full flex items-center justify-center' :
-                'w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center'">
-                <ion-icon 
-                  name="home" 
+                'w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center'"
+              >
+                <ion-icon
+                  name="home"
                   [class]="indicePropiedadSeleccionada() === i ? 'text-green-600' : 'text-gray-500'"
-                  class="text-sm">
+                  class="text-sm"
+                >
                 </ion-icon>
               </div>
-              
+
               <div class="flex-1">
-                <h4 class="font-semibold text-gray-800">{{ propiedad.claveCatastral }}</h4>
+                <h4 class="font-semibold text-gray-800">
+                  {{ propiedad.claveCatastral }}
+                </h4>
                 <p class="text-sm text-gray-600">{{ propiedad.colonia }}</p>
                 <p class="text-sm text-gray-500">Ruta: {{ propiedad.ruta }}</p>
                 <p class="text-sm font-medium text-green-600 mt-1">
                   Total: {{ propiedad.totalPropiedad }}
                 </p>
               </div>
-              
-              <div *ngIf="indicePropiedadSeleccionada() === i" 
-                class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-                <ion-icon name="checkmark" class="text-white text-sm"></ion-icon>
+
+              <div
+                *ngIf="indicePropiedadSeleccionada() === i"
+                class="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center"
+              >
+                <ion-icon
+                  name="checkmark"
+                  class="text-white text-sm"
+                ></ion-icon>
               </div>
             </div>
           </div>
@@ -124,15 +167,24 @@
       </div>
 
       <!-- Amnesty Alert -->
-      <div *ngIf="data.amnistiaVigente" class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6">
+      <div
+        *ngIf="data.amnistiaVigente"
+        class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 mb-6"
+      >
         <div class="flex items-start gap-3">
-          <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-            <ion-icon name="shield-checkmark-outline" class="text-green-600 text-lg"></ion-icon>
+          <div
+            class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+          >
+            <ion-icon
+              name="shield-checkmark-outline"
+              class="text-green-600 text-lg"
+            ></ion-icon>
           </div>
           <div>
             <h3 class="font-bold text-green-800 mb-1">¡Amnistía Vigente!</h3>
             <p class="text-green-700 text-sm">
-              Aproveche la amnistía hasta el: <span class="font-semibold">{{ data.fechaFinAmnistia }}</span>
+              Aproveche la amnistía hasta el:
+              <span class="font-semibold">{{ data.fechaFinAmnistia }}</span>
             </p>
           </div>
         </div>
@@ -142,51 +194,78 @@
       <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
         <!-- User Profile Section -->
         <div class="flex items-center gap-4 mb-6">
-          <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center">
-            <ion-icon name="person-circle-outline" class="text-3xl text-white"></ion-icon>
+          <div
+            class="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center"
+          >
+            <ion-icon
+              name="person-circle-outline"
+              class="text-3xl text-white"
+            ></ion-icon>
           </div>
-          
+
           <div class="flex-1 min-w-0">
-            <h2 class="text-xl font-bold text-gray-900 truncate">{{ data.nombre }}</h2>
+            <h2 class="text-xl font-bold text-gray-900 truncate">
+              {{ data.nombre }}
+            </h2>
             <p class="text-green-600 font-semibold">{{ data.identidad }}</p>
-            
+
             <div class="mt-3 space-y-1 text-sm">
               <div class="flex flex-wrap gap-4">
                 <div class="flex items-center gap-1">
                   <span class="font-medium text-gray-600">Clave:</span>
-                  <span class="text-green-600 font-semibold">{{ data.claveCatastral }}</span>
+                  <span class="text-green-600 font-semibold"
+                    >{{ data.claveCatastral }}</span
+                  >
                 </div>
                 <div class="flex items-center gap-1">
                   <span class="font-medium text-gray-600">Colonia:</span>
-                  <span class="text-green-600 font-semibold">{{ data.colonia }}</span>
+                  <span class="text-green-600 font-semibold"
+                    >{{ data.colonia }}</span
+                  >
                 </div>
               </div>
               <div class="flex items-center gap-1">
                 <span class="font-medium text-gray-600">Consultado:</span>
-                <span class="text-gray-700">{{ data.fecha }} - {{ data.hora }}</span>
+                <span class="text-gray-700"
+                  >{{ data.fecha }} - {{ data.hora }}</span
+                >
               </div>
             </div>
           </div>
         </div>
 
         <!-- Detail Section Header -->
-        <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
+        <div
+          class="flex items-center justify-between mb-4 pb-4 border-b border-gray-200"
+        >
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-              <ion-icon name="receipt-outline" class="text-green-600"></ion-icon>
+            <div
+              class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+            >
+              <ion-icon
+                name="receipt-outline"
+                class="text-green-600"
+              ></ion-icon>
             </div>
-            <h3 class="text-lg font-bold text-gray-800">Detalle de Mora con Amnistía</h3>
+            <h3 class="text-lg font-bold text-gray-800">
+              Detalle de Mora con Amnistía
+            </h3>
           </div>
-          
+
           <!-- Action Buttons -->
           <div class="flex gap-2">
-            <ion-button 
-              fill="outline" 
-              size="small" 
+            <ion-button
+              fill="outline"
+              size="small"
               (click)="esDNI ? mostrarOpcionesImpresion() : imprimirRecibo()"
               [disabled]="isLoading()"
-              class="no-print h-8 text-xs">
-              <ion-icon name="print-outline" slot="start" class="text-sm"></ion-icon>
+              class="no-print h-8 text-xs"
+            >
+              <ion-icon
+                name="print-outline"
+                slot="start"
+                class="text-sm"
+              ></ion-icon>
               {{ esDNI ? 'Opciones' : 'Ticket' }}
             </ion-button>
           </div>
@@ -196,9 +275,13 @@
         <div class="printable">
           <!-- Print Header (hidden on screen) -->
           <div class="print-header" style="display: none">
-            <div class="print-title">ALCALDÍA MUNICIPAL DEL DISTRITO CENTRAL</div>
+            <div class="print-title">
+              ALCALDÍA MUNICIPAL DEL DISTRITO CENTRAL
+            </div>
             <div class="print-subtitle">Estado de Cuenta con Amnistía</div>
-            <div class="print-info">Fecha: {{ data.fecha }} - {{ data.hora }}</div>
+            <div class="print-info">
+              Fecha: {{ data.fecha }} - {{ data.hora }}
+            </div>
           </div>
 
           <!-- Contributor Info for printing (hidden on screen) -->
@@ -222,41 +305,243 @@
           </div>
 
           <!-- Amnesty Notice for printing (hidden on screen) -->
-          <div class="amnesty-notice" style="display: none" *ngIf="data.amnistiaVigente">
+          <div
+            class="amnesty-notice"
+            style="display: none"
+            *ngIf="data.amnistiaVigente"
+          >
             <div class="amnesty-title">AMNISTÍA VIGENTE</div>
-            <div class="amnesty-date">Válida hasta: {{ data.fechaFinAmnistia }}</div>
+            <div class="amnesty-date">
+              Válida hasta: {{ data.fechaFinAmnistia }}
+            </div>
           </div>
 
-          <!-- Details Table -->
-          <div class="overflow-x-auto rounded-lg border border-gray-200">
-            <table class="detail-table print-table estado-cuenta-table w-full">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Año</th>
-                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Impto</th>
-                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">T.Aseo</th>
-                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Bombero</th>
-                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Recargo</th>
-                  <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr *ngFor="let detalle of data.detallesMora" class="detail-row avoid-break hover:bg-gray-50">
-                  <td class="year-cell px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ detalle.year }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.impuesto }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.trenDeAseo }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.tasaBomberos }}</td>
-                  <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-700 text-right">{{ detalle.recargo }}</td>
-                  <td class="total-cell px-3 py-3 whitespace-nowrap text-sm font-medium text-green-600 text-right">{{ detalle.total }}</td>
-                </tr>
-              </tbody>
-              <tfoot class="bg-gray-100">
-                <tr class="total-row">
-                  <td colspan="5" class="px-3 py-3 text-sm font-bold text-gray-900">TOTAL GENERAL</td>
-                  <td class="total-cell px-3 py-3 text-sm font-bold text-green-600 text-right">{{ data.totalGeneral }}</td>
-                </tr>
-              </tfoot>
-            </table>
+          <!-- Modern Details Table with Amnesty Theme -->
+          <div class="modern-table-container amnesty-theme">
+            <!-- Table Header Stats -->
+            <div class="table-stats-header">
+              <div class="stat-card">
+                <div class="stat-icon">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-value">{{ data.detallesMora.length }}</span>
+                  <span class="stat-label">Años</span>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon total-icon">
+                  <ion-icon name="wallet-outline"></ion-icon>
+                </div>
+                <div class="stat-info">
+                  <span class="stat-value total-value"
+                    >{{ data.totalGeneral }}</span
+                  >
+                  <span class="stat-label">Total con amnistía</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enhanced Table -->
+            <div class="table-wrapper">
+              <!-- Desktop/Tablet Table View -->
+              <table class="modern-detail-table desktop-table">
+                <thead>
+                  <tr>
+                    <th class="year-header">
+                      <div class="header-content">
+                        <ion-icon name="calendar-outline"></ion-icon>
+                        <span>Año</span>
+                      </div>
+                    </th>
+                    <th class="amount-header">
+                      <div class="header-content">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span>Impuesto</span>
+                      </div>
+                    </th>
+                    <th class="amount-header">
+                      <div class="header-content">
+                        <ion-icon name="trash-outline"></ion-icon>
+                        <span>T. Aseo</span>
+                      </div>
+                    </th>
+                    <th class="amount-header">
+                      <div class="header-content">
+                        <ion-icon name="flame-outline"></ion-icon>
+                        <span>Bomberos</span>
+                      </div>
+                    </th>
+                    <th class="amount-header">
+                      <div class="header-content">
+                        <ion-icon name="trending-up-outline"></ion-icon>
+                        <span>Recargo</span>
+                      </div>
+                    </th>
+                    <th class="total-header">
+                      <div class="header-content">
+                        <ion-icon name="calculator-outline"></ion-icon>
+                        <span>Total</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let detalle of data.detallesMora; let i = index"
+                    class="table-row"
+                    [class.even-row]="i % 2 === 0"
+                    [class.odd-row]="i % 2 === 1"
+                  >
+                    <td class="year-cell">
+                      <div class="year-badge">
+                        <span class="year-number">{{ detalle.year }}</span>
+                      </div>
+                    </td>
+
+                    <td class="amount-cell">
+                      <div class="amount-container">
+                        <span class="currency-symbol">L.</span>
+                        <span class="amount-value">{{ detalle.impuesto }}</span>
+                      </div>
+                    </td>
+
+                    <td class="amount-cell">
+                      <div class="amount-container">
+                        <span class="currency-symbol">L.</span>
+                        <span class="amount-value"
+                          >{{ detalle.trenDeAseo }}</span
+                        >
+                      </div>
+                    </td>
+
+                    <td class="amount-cell">
+                      <div class="amount-container">
+                        <span class="currency-symbol">L.</span>
+                        <span class="amount-value"
+                          >{{ detalle.tasaBomberos }}</span
+                        >
+                      </div>
+                    </td>
+
+                    <td class="amount-cell recargo-cell">
+                      <div class="amount-container">
+                        <span class="currency-symbol">L.</span>
+                        <span class="amount-value">{{ detalle.recargo }}</span>
+                      </div>
+                    </td>
+
+                    <td class="total-cell">
+                      <div class="total-container">
+                        <span class="currency-symbol">L.</span>
+                        <span class="total-value">{{ detalle.total }}</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="grand-total-row">
+                    <td colspan="5" class="grand-total-label">
+                      <div class="total-label-container">
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>TOTAL CON AMNISTÍA</span>
+                      </div>
+                    </td>
+                    <td class="grand-total-cell">
+                      <div class="grand-total-container">
+                        <span class="currency-symbol">L.</span>
+                        <span class="grand-total-value"
+                          >{{ data.totalGeneral }}</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <!-- Mobile Card View -->
+              <div class="mobile-cards-view">
+                <div
+                  *ngFor="let detalle of data.detallesMora; let i = index"
+                  class="detail-card-mobile amnesty-card"
+                >
+                  <!-- Card Header -->
+                  <div class="card-header-mobile">
+                    <div class="year-badge-mobile">
+                      <ion-icon name="calendar-outline"></ion-icon>
+                      <span>{{ detalle.year }}</span>
+                    </div>
+                    <div class="total-badge-mobile">
+                      <span class="currency">L.</span>
+                      <span class="amount">{{ detalle.total }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Card Content -->
+                  <div class="card-content-mobile">
+                    <div class="amount-row">
+                      <div class="amount-item">
+                        <ion-icon name="home-outline"></ion-icon>
+                        <span class="label">Impuesto</span>
+                        <span class="value">{{ detalle.impuesto }}</span>
+                      </div>
+                      <div class="amount-item">
+                        <ion-icon name="trash-outline"></ion-icon>
+                        <span class="label">T. Aseo</span>
+                        <span class="value">{{ detalle.trenDeAseo }}</span>
+                      </div>
+                    </div>
+
+                    <div class="amount-row">
+                      <div class="amount-item">
+                        <ion-icon name="flame-outline"></ion-icon>
+                        <span class="label">Bomberos</span>
+                        <span class="value">{{ detalle.tasaBomberos }}</span>
+                      </div>
+                      <div class="amount-item recargo">
+                        <ion-icon name="trending-up-outline"></ion-icon>
+                        <span class="label">Recargo</span>
+                        <span class="value">{{ detalle.recargo }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Mobile Total Card with Amnesty Theme -->
+                <div class="total-card-mobile amnesty-total">
+                  <div class="total-header-mobile">
+                    <ion-icon name="shield-checkmark-outline"></ion-icon>
+                    <span>TOTAL CON AMNISTÍA</span>
+                  </div>
+                  <div class="total-amount-mobile">
+                    <span class="currency">L.</span>
+                    <span class="amount">{{ data.totalGeneral }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table Footer Info -->
+            <div class="table-footer-info">
+              <div class="info-item" *ngIf="data.amnistiaVigente">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                <span>Amnistía vigente hasta: {{ data.fechaFinAmnistia }}</span>
+              </div>
+              <div class="info-item">
+                <ion-icon name="information-circle-outline"></ion-icon>
+                <span
+                  >Los montos incluyen beneficios de amnistía según normativa
+                  municipal</span
+                >
+              </div>
+              <div class="info-item">
+                <ion-icon name="time-outline"></ion-icon>
+                <span
+                  >Consulta realizada: {{ data.fecha }} {{ data.hora }}</span
+                >
+              </div>
+            </div>
           </div>
 
           <!-- Print Footer (hidden on screen) -->
@@ -269,13 +554,24 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!isLoading() && !estadoCuenta() && !searchError()" class="text-center py-16">
-      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <ion-icon name="shield-checkmark-outline" class="text-3xl text-gray-400"></ion-icon>
+    <div
+      *ngIf="!isLoading() && !estadoCuenta() && !searchError()"
+      class="text-center py-16"
+    >
+      <div
+        class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+      >
+        <ion-icon
+          name="shield-checkmark-outline"
+          class="text-3xl text-gray-400"
+        ></ion-icon>
       </div>
-      <h3 class="text-lg font-semibold text-gray-700 mb-2">Consultar Estado de Cuenta con Amnistía</h3>
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">
+        Consultar Estado de Cuenta con Amnistía
+      </h3>
       <p class="text-gray-500 max-w-md mx-auto">
-        Utilice el formulario de búsqueda para consultar el estado de cuenta con beneficios de amnistía.
+        Utilice el formulario de búsqueda para consultar el estado de cuenta con
+        beneficios de amnistía.
       </p>
     </div>
   </div>
