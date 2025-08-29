@@ -1,31 +1,37 @@
 <ion-header class="ion-no-border">
   <!-- Status Bar Safe Area -->
-  <div class="safe-area-spacer bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700"></div>
-  
-  <ion-toolbar class="header-toolbar bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700">
+  <div
+    class="safe-area-spacer bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700"
+  ></div>
+
+  <ion-toolbar
+    class="header-toolbar bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700"
+  >
     <ion-buttons slot="start">
       <ion-menu-button class="menu-btn"></ion-menu-button>
     </ion-buttons>
-    
+
     <ion-title class="header-title">
       <div class="title-content">
         <span class="title-main">Dashboard</span>
         <span class="title-sub">Panel de Control</span>
       </div>
     </ion-title>
-    
+
     <ion-buttons slot="end" class="header-actions">
       <!-- Notifications -->
       <ion-button fill="clear" class="action-btn notification-btn">
         <ion-icon name="notifications-outline"></ion-icon>
         <div class="notification-badge"></div>
       </ion-button>
-      
+
       <!-- User Profile -->
       <div class="user-profile" (click)="goTo('/perfil')">
         <div class="user-info">
           <div class="user-name">{{ userName || 'Usuario' }}</div>
-          <div class="user-role">{{ canAccessGeneralStats() ? 'Administrador' : 'Usuario' }}</div>
+          <div class="user-role">
+            {{ canAccessGeneralStats() ? 'Administrador' : 'Usuario' }}
+          </div>
         </div>
         <div class="user-avatar">
           <ion-icon name="person-outline"></ion-icon>
@@ -42,12 +48,12 @@
       pulling-icon="arrow-down-outline"
       pulling-text="Desliza para actualizar"
       refreshing-spinner="circular"
-      refreshing-text="Actualizando datos...">
+      refreshing-text="Actualizando datos..."
+    >
     </ion-refresher-content>
   </ion-refresher>
 
   <div class="dashboard-container">
-    
     <!-- Welcome Section -->
     <div class="welcome-section">
       <div class="welcome-content">
@@ -65,7 +71,10 @@
     </div>
 
     <!-- Quick Stats Overview -->
-    <div class="stats-overview" *ngIf="!isLoadingStats() && formattedStats(); else loadingStats">
+    <div
+      class="stats-overview"
+      *ngIf="!isLoadingStats() && formattedStats(); else loadingStats"
+    >
       <div class="stats-header">
         <h2>Resumen de Actividad</h2>
         <div class="stats-period">
@@ -73,7 +82,7 @@
           <span>Últimos 30 días</span>
         </div>
       </div>
-      
+
       <div class="stats-grid">
         <!-- Total Consultas -->
         <div class="stat-card primary">
@@ -81,12 +90,10 @@
             <ion-icon name="analytics-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ formattedStats()?.totalConsultas || 0 }}</div>
-            <div class="stat-label">Total Consultas</div>
-            <div class="stat-trend positive" *ngIf="(formattedStats()?.totalConsultas || 0) > 0">
-              <ion-icon name="trending-up-outline"></ion-icon>
-              <span>Activo</span>
+            <div class="stat-value">
+              {{ formattedStats()?.totalConsultas || 0 }}
             </div>
+            <div class="stat-label">Total</div>
           </div>
         </div>
 
@@ -96,11 +103,10 @@
             <ion-icon name="checkmark-circle-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ formattedStats()?.consultasExitosas || 0 }}</div>
-            <div class="stat-label">Exitosas</div>
-            <div class="stat-trend positive" *ngIf="formattedStats()?.successRate">
-              <span>{{ formattedStats()?.successRate }}%</span>
+            <div class="stat-value">
+              {{ formattedStats()?.consultasExitosas || 0 }}
             </div>
+            <div class="stat-label">Exitosas</div>
           </div>
         </div>
 
@@ -110,11 +116,10 @@
             <ion-icon name="alert-circle-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value">{{ formattedStats()?.consultasConError || 0 }}</div>
-            <div class="stat-label">Con Error</div>
-            <div class="stat-trend negative" *ngIf="formattedStats()?.errorRate">
-              <span>{{ formattedStats()?.errorRate }}%</span>
+            <div class="stat-value">
+              {{ formattedStats()?.consultasConError || 0 }}
             </div>
+            <div class="stat-label">Errores</div>
           </div>
         </div>
 
@@ -124,8 +129,10 @@
             <ion-icon name="time-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="stat-value-small">{{ getRelativeTime(formattedStats()?.ultimaConsulta) }}</div>
-            <div class="stat-label">Última Actividad</div>
+            <div class="stat-value-small">
+              {{ getRelativeTime(formattedStats()?.ultimaConsulta) }}
+            </div>
+            <div class="stat-label">Última</div>
           </div>
         </div>
       </div>
@@ -145,7 +152,7 @@
         <h2>Servicios Disponibles</h2>
         <p>Accede a todas las funcionalidades del sistema</p>
       </div>
-      
+
       <div class="services-grid">
         <!-- Estado de Cuenta -->
         <div class="service-card blue" (click)="goTo('/estado-cuenta')">
@@ -153,7 +160,9 @@
             <div class="service-icon">
               <ion-icon name="document-text-outline"></ion-icon>
             </div>
-            <div class="service-badge">{{ formattedStats()?.consultasICS || 0 }}</div>
+            <div class="service-badge">
+              {{ formattedStats()?.consultasICS || 0 }}
+            </div>
           </div>
           <div class="service-content">
             <h3>Estado de Cuenta</h3>
@@ -161,12 +170,18 @@
           </div>
           <div class="service-footer">
             <span class="service-status active">Disponible</span>
-            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+            <ion-icon
+              name="arrow-forward-outline"
+              class="service-arrow"
+            ></ion-icon>
           </div>
         </div>
 
         <!-- Estado de Cuenta con Amnistía -->
-        <div class="service-card green" (click)="goTo('/estado-cuenta-amnistia')">
+        <div
+          class="service-card green"
+          (click)="goTo('/estado-cuenta-amnistia')"
+        >
           <div class="service-header">
             <div class="service-icon">
               <ion-icon name="shield-checkmark-outline"></ion-icon>
@@ -179,7 +194,10 @@
           </div>
           <div class="service-footer">
             <span class="service-status active">Disponible</span>
-            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+            <ion-icon
+              name="arrow-forward-outline"
+              class="service-arrow"
+            ></ion-icon>
           </div>
         </div>
 
@@ -189,7 +207,9 @@
             <div class="service-icon">
               <ion-icon name="bar-chart-outline"></ion-icon>
             </div>
-            <div class="service-badge">{{ formattedStats()?.consultasEC || 0 }}</div>
+            <div class="service-badge">
+              {{ formattedStats()?.consultasEC || 0 }}
+            </div>
           </div>
           <div class="service-content">
             <h3>Volumen de Ventas</h3>
@@ -197,12 +217,18 @@
           </div>
           <div class="service-footer">
             <span class="service-status active">Disponible</span>
-            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+            <ion-icon
+              name="arrow-forward-outline"
+              class="service-arrow"
+            ></ion-icon>
           </div>
         </div>
 
         <!-- Volumen de Ventas con Amnistía -->
-        <div class="service-card orange" (click)="goTo('/consulta-ics-amnistia')">
+        <div
+          class="service-card orange"
+          (click)="goTo('/consulta-ics-amnistia')"
+        >
           <div class="service-header">
             <div class="service-icon">
               <ion-icon name="trending-up-outline"></ion-icon>
@@ -215,7 +241,10 @@
           </div>
           <div class="service-footer">
             <span class="service-status active">Disponible</span>
-            <ion-icon name="arrow-forward-outline" class="service-arrow"></ion-icon>
+            <ion-icon
+              name="arrow-forward-outline"
+              class="service-arrow"
+            ></ion-icon>
           </div>
         </div>
       </div>
@@ -227,7 +256,7 @@
         <h2>Configuración & Herramientas</h2>
         <p>Gestiona tu cuenta y preferencias</p>
       </div>
-      
+
       <div class="tools-grid">
         <!-- Mi Perfil -->
         <div class="tool-item" (click)="goTo('/perfil')">
@@ -238,7 +267,10 @@
             <h4>Mi Perfil</h4>
             <p>Información personal y configuración</p>
           </div>
-          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="tool-arrow"
+          ></ion-icon>
         </div>
 
         <!-- Bluetooth -->
@@ -250,11 +282,18 @@
             <h4>Bluetooth</h4>
             <p>Configuración de dispositivos</p>
           </div>
-          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="tool-arrow"
+          ></ion-icon>
         </div>
 
         <!-- Admin Tools -->
-        <div class="tool-item" *ngIf="canAccessGeneralStats()" (click)="goToGeneralStats()">
+        <div
+          class="tool-item"
+          *ngIf="canAccessGeneralStats()"
+          (click)="goToGeneralStats()"
+        >
           <div class="tool-icon green">
             <ion-icon name="analytics-outline"></ion-icon>
           </div>
@@ -263,11 +302,18 @@
             <p>Panel de administración completo</p>
           </div>
           <div class="admin-badge">Admin</div>
-          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="tool-arrow"
+          ></ion-icon>
         </div>
 
         <!-- System Logs -->
-        <div class="tool-item" *ngIf="canAccessGeneralStats()" (click)="goToActivityLogs()">
+        <div
+          class="tool-item"
+          *ngIf="canAccessGeneralStats()"
+          (click)="goToActivityLogs()"
+        >
           <div class="tool-icon orange">
             <ion-icon name="eye-outline"></ion-icon>
           </div>
@@ -276,22 +322,12 @@
             <p>Monitoreo y auditoría</p>
           </div>
           <div class="admin-badge">Admin</div>
-          <ion-icon name="chevron-forward-outline" class="tool-arrow"></ion-icon>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="tool-arrow"
+          ></ion-icon>
         </div>
       </div>
     </div>
-
-    <!-- Quick Actions (Mobile) -->
-    <div class="quick-actions-mobile lg:hidden">
-      <div class="action-button primary" (click)="refreshStats()">
-        <ion-icon name="refresh-outline"></ion-icon>
-        <span>Actualizar</span>
-      </div>
-      <div class="action-button secondary" (click)="goTo('/perfil')">
-        <ion-icon name="settings-outline"></ion-icon>
-        <span>Configurar</span>
-      </div>
-    </div>
-
   </div>
 </ion-content>
