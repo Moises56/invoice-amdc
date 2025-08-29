@@ -31,7 +31,7 @@
 .safe-area-content {
   padding-top: calc(var(--safe-area-top-robust) + var(--header-height) + 16px) !important;
   > *:first-child {
-    margin-top: 0 !important;
+    margin-top: 100px !important;
   }
 }
 

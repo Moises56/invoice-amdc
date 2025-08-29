@@ -1,12 +1,8 @@
 <ion-header class="ion-no-border">
   <!-- Status Bar Safe Area -->
-  <div
-    class="safe-area-spacer bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700"
-  ></div>
+  <div class="safe-area-spacer"></div>
 
-  <ion-toolbar
-    class="header-toolbar bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700"
-  >
+  <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
       <ion-menu-button class="menu-btn"></ion-menu-button>
     </ion-buttons>
@@ -28,7 +24,7 @@
       <!-- User Profile -->
       <div class="user-profile" (click)="goTo('/perfil')">
         <div class="user-info">
-          <div class="user-name">{{ userName || 'Usuario' }}</div>
+          <div class="user-name">{{ userName() || 'Usuario' }}</div>
           <div class="user-role">
             {{ canAccessGeneralStats() ? 'Administrador' : 'Usuario' }}
           </div>
@@ -58,7 +54,7 @@
     <div class="welcome-section">
       <div class="welcome-content">
         <h1 class="welcome-title">
-          Hola, <span class="welcome-name">{{ userName || 'Usuario' }}</span>
+          Hola, <span class="welcome-name">{{ userName() || 'Usuario' }}</span>
         </h1>
         <p class="welcome-subtitle">
           Aquí tienes un resumen de tu actividad reciente
@@ -253,7 +249,7 @@
     <!-- Configuration & Tools -->
     <div class="tools-section">
       <div class="section-header">
-        <h2>Configuración & Herramientas</h2>
+        <h2>Configuraciones</h2>
         <p>Gestiona tu cuenta y preferencias</p>
       </div>
 
