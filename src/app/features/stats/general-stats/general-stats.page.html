@@ -23,10 +23,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content
-  [fullscreen]="true"
-  class="safe-area-content general-stats-content stats-content"
->
+<ion-content [fullscreen]="false" class="general-stats-content stats-content">
   <!-- Pull to refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="refreshStats($event)">
     <ion-refresher-content></ion-refresher-content>

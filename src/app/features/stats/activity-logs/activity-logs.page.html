@@ -1,24 +1,30 @@
-<ion-header class="safe-area-header activity-logs-header">
+<ion-header class="activity-logs-header safe-area-header">
   <div class="safe-area-spacer"></div>
   <ion-toolbar class="header-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard/user" icon="arrow-back-outline"></ion-back-button>
+      <ion-back-button
+        defaultHref="/dashboard/user"
+        icon="arrow-back-outline"
+      ></ion-back-button>
     </ion-buttons>
     <ion-title class="header-title">
       <div class="title-with-icon">
-        <ion-icon name="analytics" class="header-icon"></ion-icon>
+        <ion-icon name="analytics" class="header-icon text-black"></ion-icon>
         Logs del Sistema
       </div>
     </ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="refreshLogs()" [disabled]="isLoading()">
-        <ion-icon name="refresh-outline" [class.rotating]="isLoading()"></ion-icon>
+        <ion-icon
+          name="refresh-outline"
+          [class.rotating]="isLoading()"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="safe-area-content activity-logs-content logs-content">
+<ion-content [fullscreen]="false" class="activity-logs-content logs-content" >
   <!-- Pull to refresh -->
   <ion-refresher slot="fixed" (ionRefresh)="refreshLogs($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -26,7 +32,10 @@
 
   <div class="logs-container">
     <!-- Loading State -->
-    <div class="loading-container" *ngIf="isLoading() && !activityLogs().length">
+    <div
+      class="loading-container"
+      *ngIf="isLoading() && !activityLogs().length"
+    >
       <ion-spinner name="crescent"></ion-spinner>
       <p>Cargando logs del sistema...</p>
     </div>
@@ -45,8 +54,10 @@
     </div>
 
     <!-- Logs Content -->
-    <div class="logs-content-area" *ngIf="!isLoading() && !hasError() && activityLogs().length > 0">
-      
+    <div
+      class="logs-content-area"
+      *ngIf="!isLoading() && !hasError() && activityLogs().length > 0"
+    >
       <!-- Page Header -->
       <div class="page-header">
         <h1 class="page-title">Registro de Actividad</h1>
@@ -59,7 +70,8 @@
           placeholder="Filtrar por Username"
           [debounce]="300"
           (ionInput)="onSearchChange($event)"
-          class="username-filter">
+          class="username-filter"
+        >
         </ion-searchbar>
       </div>
 
@@ -80,13 +92,21 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let log of paginatedLogs(); trackBy: trackByLogId" class="log-row">
+              <tr
+                *ngFor="let log of paginatedLogs(); trackBy: trackByLogId"
+                class="log-row"
+              >
                 <td class="fecha">{{ formatDate(log.createdAt) }}</td>
                 <td class="tipo-consulta">{{ log.consultaType || 'N/A' }}</td>
-                <td class="subtipo-consulta">{{ log.consultaSubtype || 'normal' }}</td>
+                <td class="subtipo-consulta">
+                  {{ log.consultaSubtype || 'normal' }}
+                </td>
                 <td class="parametros">{{ formatParameters(log) }}</td>
                 <td class="resultado">
-                  <span class="status-badge" [class]="getResultClass(log.resultado)">
+                  <span
+                    class="status-badge"
+                    [class]="getResultClass(log.resultado)"
+                  >
                     {{ log.resultado || 'UNKNOWN' }}
                   </span>
                   <div class="result-detail" *ngIf="log.errorMessage">
@@ -104,38 +124,45 @@
         <!-- Pagination -->
         <div class="pagination-container" *ngIf="totalPages() > 1">
           <div class="pagination-info">
-            <span>Showing {{ getStartRecord() }} to {{ getEndRecord() }} of {{ totalRecords() }} results</span>
+            <span
+              >Showing {{ getStartRecord() }} to {{ getEndRecord() }} of {{
+              totalRecords() }} results</span
+            >
           </div>
           <div class="pagination-controls">
-            <ion-button 
-              fill="clear" 
+            <ion-button
+              fill="clear"
               class="page-button"
               [disabled]="currentPage() === 1"
-              (click)="goToPage(currentPage() - 1)">
+              (click)="goToPage(currentPage() - 1)"
+            >
               <ion-icon name="chevron-back-outline"></ion-icon>
             </ion-button>
-            
-            <ion-button 
-              *ngFor="let page of getVisiblePages()" 
+
+            <ion-button
+              *ngFor="let page of getVisiblePages()"
               [class]="page === currentPage() ? 'page-button active' : 'page-button'"
-              (click)="goToPage(page)">
+              (click)="goToPage(page)"
+            >
               {{ page }}
             </ion-button>
-            
+
             <span *ngIf="shouldShowEllipsis()" class="ellipsis">...</span>
-            
-            <ion-button 
+
+            <ion-button
               *ngIf="totalPages() > 5 && currentPage() < totalPages() - 2"
               class="page-button"
-              (click)="goToPage(totalPages())">
+              (click)="goToPage(totalPages())"
+            >
               {{ totalPages() }}
             </ion-button>
-            
-            <ion-button 
-              fill="clear" 
+
+            <ion-button
+              fill="clear"
               class="page-button"
               [disabled]="currentPage() === totalPages()"
-              (click)="goToPage(currentPage() + 1)">
+              (click)="goToPage(currentPage() + 1)"
+            >
               <ion-icon name="chevron-forward-outline"></ion-icon>
             </ion-button>
           </div>
@@ -144,7 +171,10 @@
     </div>
 
     <!-- Empty State -->
-    <div class="empty-state" *ngIf="!isLoading() && !hasError() && activityLogs().length === 0">
+    <div
+      class="empty-state"
+      *ngIf="!isLoading() && !hasError() && activityLogs().length === 0"
+    >
       <ion-icon name="document-outline"></ion-icon>
       <h3>No hay logs disponibles</h3>
       <p>No se encontraron logs de actividad</p>
@@ -153,6 +183,5 @@
         Actualizar
       </ion-button>
     </div>
-
   </div>
 </ion-content>

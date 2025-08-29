@@ -1,146 +1,96 @@
-// Estilos para Activity Logs Page - Log Viewer Design
+// ========== ACTIVITY LOGS STYLES ==========
 :host {
   --background: #f8f9fa;
-  
-  // Variables CSS para safe area
-  --header-height: 56px;
-  --safe-area-top: env(safe-area-inset-top, 0px);
-  --total-header-height: calc(var(--safe-area-top) + var(--header-height));
 }
 
-// ========== SAFE AREA STYLES ==========
+// ========== SAFE AREA SUPPORT ==========
 .safe-area-spacer {
-  height: var(--safe-area-top);
+  height: env(safe-area-inset-top, 0px);
   background: white;
-  
-  // Fallback robusto para dispositivos que no soportan env()
+
+  // Fallback para dispositivos que no soportan env()
   @supports not (height: env(safe-area-inset-top)) {
     height: 44px;
   }
-  
-  // iPhone 14 Pro y similares con Dynamic Island
+
+  // iPhone con Dynamic Island
   @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
     height: 59px;
   }
-  
-  // iPhone 14 Pro Max
+
+  // iPhone Pro Max
   @media screen and (min-device-width: 428px) and (max-device-width: 926px) and (-webkit-device-pixel-ratio: 3) {
     height: 59px;
   }
 }
 
 .safe-area-header {
-  padding-top: var(--safe-area-top);
-  
-  // Fallback robusto para dispositivos que no soportan env()
-  @supports not (padding-top: env(safe-area-inset-top)) {
-    padding-top: 44px;
-  }
-  
-  // iPhone 14 Pro y similares con Dynamic Island
-  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
-    padding-top: 59px;
-  }
-  
-  // iPhone 14 Pro Max
-  @media screen and (min-device-width: 428px) and (max-device-width: 926px) and (-webkit-device-pixel-ratio: 3) {
-    padding-top: 59px;
-  }
-  
-  // Optimización para WebView
-  @media screen and (max-width: 768px) {
-    @supports (padding: env(safe-area-inset-top)) {
-      padding-top: max(env(safe-area-inset-top, 0px), 44px);
-    }
-  }
+  // El safe area spacer maneja el padding superior
 }
 
-.safe-area-content {
-  .logs-container {
-    padding-top: calc(var(--header-height) + 36px) !important;
-  }
-  }
-  
-  // Fallback robusto para dispositivos que no soportan env()
-  @supports not (padding-top: env(safe-area-inset-top)) {
-    .logs-container {
-      padding-top: calc(56px + 20px);
-    }
-  }
-  
-  // iPhone 14 Pro y similares con Dynamic Island
-  @media screen and (min-device-width: 393px) and (max-device-width: 852px) and (-webkit-device-pixel-ratio: 3) {
-    .logs-container {
-      padding-top: calc(56px + 20px);
-    }
-  }
-  
-  // iPhone 14 Pro Max
-  @media screen and (min-device-width: 428px) and (max-device-width: 926px) and (-webkit-device-pixel-ratio: 3) {
-    .logs-container {
-      padding-top: calc(56px + 20px);
-    }
-  }
-  
-  // Optimización para WebView
-  @media screen and (max-width: 768px) {
-    .logs-container {
-      padding-top: calc(var(--header-height) + 20px);
-    }
-  }
-
-// Header personalizado
-.logs-header {
-  --background: white;
-  --color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  
+// ========== HEADER ==========
+.activity-logs-header {
   .header-toolbar {
-    --background: white;
-    
+    --background: #5ccedf;
+    --color: #333;
+    border-bottom: 1px solid #e2e8f0;
+
     .title-with-icon {
       display: flex;
       align-items: center;
       gap: 8px;
-      
+      color: #333;
+
       .header-icon {
-        color: #007bff;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
+        color: #2563eb;
       }
     }
-    
-    ion-back-button {
-      --color: #666;
-    }
-    
-    ion-button {
-      --color: #666;
-      
-      .rotating {
-        animation: spin 1s linear infinite;
+
+    ion-buttons {
+      ion-back-button {
+        --color: #64748b;
+      }
+
+      ion-button {
+        --color: #64748b;
+
+        ion-icon.rotating {
+          animation: rotate 1s linear infinite;
+        }
       }
     }
   }
 }
 
-// Contenedor principal
-.logs-container {
-  padding: 0 24px 24px 24px;
-  background: #f8f9fa;
-  min-height: calc(100vh - 56px);
+// ========== CONTENT ==========
+.activity-logs-content {
+  --background: #f8f9fa;
 }
 
-// Page Header
+.logs-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: 125px;
+
+  @media screen and (max-width: 768px) {
+    padding: 16px;
+    padding-top: 125px;
+  }
+}
+
+// ========== PAGE HEADER ==========
 .page-header {
   margin-bottom: 24px;
-  
+
   .page-title {
     font-size: 2rem;
     font-weight: 700;
     color: #333;
     margin: 0 0 8px 0;
   }
-  
+
   .page-subtitle {
     color: #6c757d;
     font-size: 1rem;
@@ -148,10 +98,10 @@
   }
 }
 
-// Filter Section
+// ========== FILTER SECTION ==========
 .filter-section {
   margin-bottom: 24px;
-  
+
   .username-filter {
     --background: white;
     --border-radius: 8px;
@@ -160,26 +110,26 @@
   }
 }
 
-// Tabla de logs - Diseño Log Viewer
+// ========== LOGS TABLE ==========
 .logs-table-container {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   border: 1px solid #e9ecef;
-  
+
   .table-wrapper {
     overflow-x: auto;
-    
+
     .logs-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.875rem;
-      
+
       thead {
         background: #f8f9fa;
         border-bottom: 2px solid #dee2e6;
-        
+
         th {
           padding: 16px 12px;
           text-align: left;
@@ -190,94 +140,95 @@
           letter-spacing: 0.5px;
           white-space: nowrap;
           border-right: 1px solid #dee2e6;
-          
+
           &:last-child {
             border-right: none;
           }
         }
       }
-      
+
       tbody {
-        tr {
-          border-bottom: 1px solid #e9ecef;
+        .log-row {
+          border-bottom: 1px solid #f1f3f4;
           transition: background-color 0.2s ease;
-          
+
           &:hover {
             background-color: #f8f9fa;
           }
-          
+
           &:last-child {
             border-bottom: none;
           }
-          
+
           td {
             padding: 12px;
-            vertical-align: middle;
-            color: #495057;
+            vertical-align: top;
             border-right: 1px solid #f1f3f4;
-            
+
             &:last-child {
               border-right: none;
             }
-            
+
             &.fecha {
-              font-family: 'SF Mono', 'Monaco', 'Consolas', 'Roboto Mono', monospace;
+              font-family: "Courier New", monospace;
               font-size: 0.8rem;
               color: #6c757d;
               white-space: nowrap;
-              min-width: 120px;
             }
-            
+
             &.tipo-consulta {
               font-weight: 600;
               color: #495057;
             }
-            
+
             &.subtipo-consulta {
-              color: #6c757d;
-              font-style: italic;
-            }
-            
-            &.parametros {
-              font-family: 'SF Mono', 'Monaco', 'Consolas', 'Roboto Mono', monospace;
               font-size: 0.8rem;
-              background: #f8f9fa;
-              border-radius: 4px;
-              padding: 8px;
+              color: #6c757d;
+              text-transform: uppercase;
+            }
+
+            &.parametros {
+              font-family: "Courier New", monospace;
+              font-size: 0.8rem;
+              color: #6c757d;
               max-width: 200px;
               word-break: break-all;
-              color: #6f42c1;
             }
-            
+
             &.resultado {
               .status-badge {
                 display: inline-block;
-                padding: 4px 12px;
-                border-radius: 16px;
+                padding: 4px 8px;
+                border-radius: 4px;
                 font-size: 0.75rem;
                 font-weight: 600;
                 text-transform: uppercase;
-                letter-spacing: 0.5px;
-                
+
                 &.success {
-                  background: #d4edda;
+                  background-color: #d4edda;
                   color: #155724;
                   border: 1px solid #c3e6cb;
                 }
-                
+
                 &.error {
-                  background: #f8d7da;
+                  background-color: #f8d7da;
                   color: #721c24;
                   border: 1px solid #f5c6cb;
                 }
-                
+
+                &.not-found {
+                  background-color: #fff3cd;
+                  color: #856404;
+                  border: 1px solid #ffeaa7;
+                }
+
                 &.unknown {
-                  background: #e2e3e5;
+                  background-color: #e2e3e5;
                   color: #383d41;
                   border: 1px solid #d6d8db;
                 }
               }
-              
+
               .result-detail {
                 font-size: 0.75rem;
                 color: #dc3545;
@@ -285,18 +236,20 @@
                 font-style: italic;
               }
             }
-            
+
             &.ip {
-              font-family: 'SF Mono', 'Monaco', 'Consolas', 'Roboto Mono', monospace;
+              font-family: "Courier New", monospace;
+              font-size: 0.8rem;
               color: #6c757d;
             }
-            
+
             &.duracion {
-              text-align: right;
-              font-family: 'SF Mono', 'Monaco', 'Consolas', 'Roboto Mono', monospace;
+              font-family: "Courier New", monospace;
+              font-size: 0.8rem;
               color: #6c757d;
+              text-align: right;
             }
-            
+
             &.usuario {
               font-weight: 500;
               color: #495057;
@@ -308,7 +261,7 @@
   }
 }
 
-// Paginación
+// ========== PAGINATION ==========
 .pagination-container {
   display: flex;
   justify-content: space-between;
@@ -316,502 +269,169 @@
   padding: 16px 20px;
   background: #f8f9fa;
   border-top: 1px solid #dee2e6;
-  
+
   .pagination-info {
-    color: #6c757d;
     font-size: 0.875rem;
-    font-weight: 500;
+    color: #6c757d;
   }
-  
+
   .pagination-controls {
     display: flex;
     align-items: center;
     gap: 4px;
-    
+
     .page-button {
-      --background: white;
-      --color: #495057;
+      --color: #6c757d;
+      --background: transparent;
       --border-color: #dee2e6;
-      --border-style: solid;
-      --border-width: 1px;
-      --border-radius: 6px;
-      --padding-start: 12px;
-      --padding-end: 12px;
-      --padding-top: 8px;
-      --padding-bottom: 8px;
-      height: 40px;
       min-width: 40px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      
+      height: 40px;
+      margin: 0;
+
       &.active {
-        --background: #007bff;
         --color: white;
+        --background: #007bff;
         --border-color: #007bff;
-        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
       }
-      
-      &:hover:not(.active):not([disabled]) {
+
+      &:hover:not(.active) {
         --background: #f8f9fa;
-        --border-color: #adb5bd;
-      }
-      
-      &[disabled] {
-        --color: #adb5bd;
-        --background: #f8f9fa;
-        --border-color: #e9ecef;
-        opacity: 0.6;
       }
     }
-    
+
     .ellipsis {
-      padding: 8px 4px;
+      padding: 0 8px;
       color: #6c757d;
-      font-weight: 500;
     }
   }
 }
 
-// Loading y estados vacíos
+// ========== LOADING & ERROR STATES ==========
 .loading-container {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 60px 20px;
-  
+
   ion-spinner {
     margin-bottom: 16px;
-    --color: #007bff;
   }
-  
+
   p {
     color: #6c757d;
     margin: 0;
-    font-size: 1rem;
   }
 }
 
 .error-container {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 60px 20px;
-  
+
   .error-content {
-    max-width: 400px;
-    margin: 0 auto;
-    
+    text-align: center;
+
     .error-icon {
-      font-size: 4rem;
+      font-size: 48px;
       color: #dc3545;
       margin-bottom: 16px;
     }
-    
+
     h3 {
-      color: #495057;
       margin: 0 0 8px 0;
-      font-size: 1.25rem;
-      font-weight: 600;
+      color: #333;
     }
-    
+
     p {
       color: #6c757d;
-      margin: 0 0 24px 0;
-      font-size: 0.875rem;
-    }
-    
-    ion-button {
-      --border-radius: 8px;
+      margin: 0 0 16px 0;
     }
   }
 }
 
 .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
   text-align: center;
-  padding: 80px 20px;
-  color: #6c757d;
-  
+
   ion-icon {
-    font-size: 4rem;
+    font-size: 48px;
+    color: #6c757d;
     margin-bottom: 16px;
-    opacity: 0.5;
-    color: #adb5bd;
   }
-  
+
   h3 {
     margin: 0 0 8px 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #495057;
+    color: #333;
   }
-  
+
   p {
-    margin: 0 0 24px 0;
-    font-size: 0.875rem;
-  }
-  
-  ion-button {
-    --border-radius: 8px;
+    color: #6c757d;
+    margin: 0 0 16px 0;
   }
 }
 
-// Animaciones
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+// ========== RESPONSIVE ==========
+@media (max-width: 1200px) {
+  .logs-table-container {
+    .table-wrapper {
+      .logs-table {
+        font-size: 0.8rem;
+
+        th,
+        td {
+          padding: 8px;
+        }
+
+        .parametros {
+          max-width: 150px;
+        }
+      }
+    }
   }
 }
 
-// Responsive Design
 @media (max-width: 768px) {
-  .logs-container {
-    padding: 16px;
-  }
-  
   .page-header {
-    margin-bottom: 20px;
-    
     .page-title {
       font-size: 1.5rem;
     }
   }
-  
-  .logs-table-container {
-    border-radius: 8px;
-    margin: 0 -16px;
-    
-    .table-wrapper {
-      .logs-table {
-        font-size: 0.8rem;
-        
-        thead th {
-          padding: 12px 8px;
-          font-size: 0.7rem;
-        }
-        
-        tbody td {
-          padding: 10px 8px;
-          
-          &.fecha {
-            font-size: 0.75rem;
-            min-width: 100px;
-          }
-          
-          &.parametros {
-            max-width: 150px;
-            font-size: 0.75rem;
-          }
-        }
-      }
-    }
-  }
-  
+
   .pagination-container {
     flex-direction: column;
     gap: 12px;
-    padding: 16px;
-    
-    .pagination-controls {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  }
-  
-  .filter-section {
-    .username-filter {
-      max-width: 100%;
-    }
-  }
-}
 
-@media (max-width: 480px) {
-  .logs-container {
-    padding: 12px;
+    .pagination-info {
+      order: 2;
+    }
+
+    .pagination-controls {
+      order: 1;
+    }
   }
-  
+
   .logs-table-container {
-    .pagination-controls {
-      .page-button {
-        min-width: 36px;
-        height: 36px;
-        --padding-start: 8px;
-        --padding-end: 8px;
-      }
-    }
-  }
-}
+    .table-wrapper {
+      .logs-table {
+        font-size: 0.75rem;
 
-// Hero Section
-.hero-section {
-  text-align: center;
-  padding: 2rem 1rem;
-  margin-bottom: 2rem;
-  
-  .hero-content {
-    .hero-icon {
-      font-size: 4rem;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 1rem;
-      
-      ion-icon {
-        font-size: 4rem;
-      }
-    }
-    
-    .hero-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: white;
-      margin: 0 0 0.5rem 0;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    
-    .hero-subtitle {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.8);
-      margin: 0;
-    }
-  }
-}
-
-// Estados de error
-.error-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem 1rem;
-  
-  .error-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 2rem;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 100%;
-    
-    .error-icon {
-      font-size: 4rem;
-      color: #ff6b6b;
-      margin-bottom: 1rem;
-    }
-    
-    h3 {
-      color: white;
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: 0 0 1rem 0;
-    }
-    
-    p {
-      color: rgba(255, 255, 255, 0.8);
-      margin: 0 0 1.5rem 0;
-      line-height: 1.5;
-    }
-    
-    .retry-btn {
-      --background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
-      --color: white;
-      font-weight: 600;
-      border-radius: 12px;
-      text-transform: none;
-    }
-  }
-}
-
-// Sección de búsqueda
-.search-section {
-  margin-bottom: 2rem;
-  
-  .custom-searchbar {
-    --background: rgba(255, 255, 255, 0.15);
-    --color: white;
-    --placeholder-color: rgba(255, 255, 255, 0.7);
-    --border-radius: 16px;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    margin-bottom: 1rem;
-  }
-  
-  .stats-summary {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    
-    .summary-item {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(20px);
-      border-radius: 12px;
-      padding: 12px 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      text-align: center;
-      
-      .summary-count {
-        display: block;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: white;
-      }
-      
-      .summary-label {
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.8);
-        text-transform: uppercase;
-        font-weight: 500;
-      }
-    }
-  }
-}
-
-// Estado de carga
-.loading-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem 1rem;
-  
-  .loading-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 2rem;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    
-    ion-spinner {
-      width: 3rem;
-      height: 3rem;
-      margin-bottom: 1rem;
-    }
-    
-    p {
-      color: rgba(255, 255, 255, 0.9);
-      margin: 0;
-      font-weight: 500;
-    }
-  }
-}
-
-// Contenedor de logs
-.logs-container {
-  .logs-header-info {
-    margin-bottom: 1.5rem;
-    
-    h3 {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      color: white;
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin: 0;
-      
-      ion-icon {
-        font-size: 1.5rem;
-        color: rgba(255, 255, 255, 0.9);
-      }
-      
-      .logs-count {
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.7);
-        font-weight: 400;
-      }
-    }
-  }
-  
-  .logs-grid {
-    display: grid;
-    gap: 1rem;
-    
-    .log-card {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      padding: 1.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        background: rgba(255, 255, 255, 0.2);
-      }
-      
-      .log-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        
-        .log-action {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          
-          .action-icon {
-            font-size: 1.3rem;
-          }
-          
-          .action-text {
-            font-weight: 600;
-            color: white;
-            font-size: 0.95rem;
-          }
+        th {
+          padding: 8px 6px;
+          font-size: 0.7rem;
         }
-        
-        .log-date {
-          font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.7);
-          font-weight: 500;
-        }
-      }
-      
-      .log-content {
-        .log-row {
-          display: flex;
-          margin-bottom: 8px;
-          
-          &:last-child {
-            margin-bottom: 0;
-          }
-          
-          .log-label {
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-            min-width: 80px;
-            font-size: 0.9rem;
-          }
-          
-          .log-value {
-            color: white;
-            font-size: 0.9rem;
-            flex: 1;
-            
-            &.description {
-              font-size: 0.85rem;
-              line-height: 1.4;
-              color: rgba(255, 255, 255, 0.9);
-            }
-            
-            // Estilos para diferentes resultados
-            &.result-success {
-              color: #4caf50;
-              font-weight: 600;
-            }
-            
-            &.result-error {
-              color: #f44336;
-              font-weight: 600;
-            }
-            
-            &.result-not_found {
-              color: #ff9800;
-              font-weight: 600;
-            }
+
+        td {
+          padding: 8px 6px;
+
+          &.parametros {
+            max-width: 100px;
           }
         }
       }
@@ -819,138 +439,7 @@
   }
 }
 
-// Estado vacío
-.empty-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem 1rem;
-  
-  .empty-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    border-radius: 24px;
-    padding: 2rem;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 100%;
-    
-    .empty-icon {
-      font-size: 4rem;
-      color: rgba(255, 255, 255, 0.6);
-      margin-bottom: 1rem;
-    }
-    
-    h3 {
-      color: white;
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: 0 0 1rem 0;
-    }
-    
-    p {
-      color: rgba(255, 255, 255, 0.8);
-      margin: 0 0 1.5rem 0;
-      line-height: 1.5;
-    }
-    
-    ion-button {
-      --background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
-      --color: white;
-      font-weight: 600;
-      border-radius: 12px;
-      text-transform: none;
-    }
-  }
-}
-
-// Filter Modal
-.filter-content {
-  padding: 1rem;
-  
-  ion-item {
-    --background: rgba(255, 255, 255, 0.05);
-    --color: var(--ion-color-dark);
-    border-radius: 12px;
-    margin-bottom: 1rem;
-    --border-color: transparent;
-  }
-  
-  .filter-actions {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    
-    ion-button {
-      border-radius: 12px;
-      font-weight: 600;
-      text-transform: none;
-    }
-  }
-}
-
-// Responsive design
-@media (max-width: 768px) {
-  .main-container {
-    padding: 12px;
-  }
-  
-  .hero-section {
-    padding: 1.5rem 1rem;
-    
-    .hero-content {
-      .hero-title {
-        font-size: 2rem;
-      }
-      
-      .hero-subtitle {
-        font-size: 1rem;
-      }
-    }
-  }
-  
-  .logs-grid {
-    .log-card {
-      padding: 1rem;
-      
-      .log-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-        
-        .log-date {
-          font-size: 0.8rem;
-        }
-      }
-      
-      .log-content {
-        .log-row {
-          flex-direction: column;
-          gap: 4px;
-          margin-bottom: 12px;
-          
-          .log-label {
-            min-width: unset;
-            font-size: 0.85rem;
-          }
-          
-          .log-value {
-            font-size: 0.85rem;
-          }
-        }
-      }
-    }
-  }
-}
-
-// Animaciones
-.rotating {
-  animation: rotate 1s linear infinite;
-}
-
+// ========== ANIMATIONS ==========
 @keyframes rotate {
   from {
     transform: rotate(0deg);
@@ -958,13 +447,4 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-// Mejoras adicionales para el scroll infinito
-ion-infinite-scroll {
-  margin-top: 2rem;
-}
-
-ion-infinite-scroll-content {
-  color: rgba(255, 255, 255, 0.8);
 }
