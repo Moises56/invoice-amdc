@@ -1,0 +1,28 @@
+.modal-toolbar {
+  --background: var(--ion-color-primary);
+  --color: var(--ion-color-primary-contrast);
+  --border-color: transparent;
+
+  .modal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .close-btn {
+    --color: var(--ion-color-primary-contrast);
+    --background-hover: rgba(255, 255, 255, 0.1);
+    --border-radius: 8px;
+    
+    ion-icon {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .modal-toolbar {
+    --background: var(--ion-color-dark-tint);
+    --color: var(--ion-color-dark-contrast);
+  }
+}

@@ -1,0 +1,135 @@
+<!-- Header con estadísticas -->
+<div style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; padding: 24px; margin: 0 0 16px 0; border-radius: 0 0 16px 16px;">
+  <h1 style="margin: 0; font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 12px;">
+    <ion-icon name="location-outline" style="font-size: 28px;"></ion-icon>
+    Historial de Ubicaciones
+  </h1>
+  <p style="margin: 8px 0 0 0; opacity: 0.8; font-size: 14px;">
+    Gestión completa de ubicaciones de todos los usuarios
+  </p>
+  
+  <!-- Stats Cards con datos reales -->
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px;" *ngIf="hasData()">
+    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 20px; font-weight: bold;">{{ totalUsers() }}</div>
+      <div style="font-size: 12px; opacity: 0.8;">Usuarios</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 20px; font-weight: bold;">{{ totalActiveLocations() }}</div>
+      <div style="font-size: 12px; opacity: 0.8;">Activas</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 20px; font-weight: bold;">{{ totalLocationsAssigned() }}</div>
+      <div style="font-size: 12px; opacity: 0.8;">Total</div>
+    </div>
+  </div>
+</div>
+
+<!-- Barra de búsqueda -->
+<ion-searchbar
+  placeholder="Buscar por usuario, ubicación..."
+  [value]="searchTerm()"
+  (ionInput)="onSearchInput($event)"
+  (ionClear)="clearSearch()"
+  show-clear-button="focus"
+  style="margin: 0 0 16px 0;"
+  *ngIf="hasData() || isLoading()"
+>
+</ion-searchbar>
+
+<!-- Estado de carga -->
+<div *ngIf="isLoading() && !hasData()" style="text-align: center; padding: 40px;">
+  <ion-spinner name="circular"></ion-spinner>
+  <p style="margin-top: 16px; color: #666;">Cargando ubicaciones...</p>
+</div>
+
+<!-- Estado de error -->
+<div *ngIf="hasError() && !hasData()" style="text-align: center; padding: 40px;">
+  <ion-icon name="alert-circle-outline" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></ion-icon>
+  <h3 style="color: #333; margin-bottom: 8px;">Error al cargar datos</h3>
+  <p style="color: #666; margin-bottom: 16px;">{{ errorMessage() }}</p>
+  <ion-button fill="solid" color="primary" (click)="refreshData()">
+    <ion-icon name="refresh-outline" slot="start"></ion-icon>
+    Reintentar
+  </ion-button>
+</div>
+
+<!-- Estado vacío -->
+<div *ngIf="!isLoading() && !hasError() && !hasData()" style="text-align: center; padding: 40px;">
+  <ion-icon name="location-outline" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></ion-icon>
+  <h3 style="color: #333; margin-bottom: 8px;">Sin datos disponibles</h3>
+  <p style="color: #666;">No se encontraron ubicaciones asignadas en el sistema</p>
+</div>
+
+<!-- Lista de usuarios con datos reales -->
+<div style="padding: 16px;" *ngIf="filteredUsersData().length > 0">
+  <h2 style="color: #333; margin-bottom: 16px; font-size: 18px;">
+    Lista de Usuarios ({{ filteredUsersData().length }})
+  </h2>
+  
+  <div 
+    *ngFor="let user of filteredUsersData(); trackBy: trackByUserId"
+    style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;"
+    (click)="showUserDetails(user)"
+  >
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+      <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #3b82f6, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">
+        {{ (user.nombre.charAt(0) || '') + (user.apellido.charAt(0) || '') }}
+      </div>
+      <div style="flex: 1;">
+        <h3 style="margin: 0; font-size: 16px; color: #333; font-weight: 600;">{{ user.username }}</h3>
+        <p style="margin: 0; font-size: 14px; color: #666;">{{ user.nombre }} {{ user.apellido }}</p>
+      </div>
+      <div>
+        <ion-badge [color]="user.currentLocation?.isActive ? 'success' : 'medium'">
+          {{ user.currentLocation?.isActive ? 'Activo' : 'Inactivo' }}
+        </ion-badge>
+        <div style="font-size: 12px; color: #666; margin-top: 4px; text-align: center;">
+          {{ user.totalLocations }} ubicaciones
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="user.currentLocation; else noLocationTemplate" style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px;">
+      <div style="display: flex; align-items: center; margin-bottom: 8px;">
+        <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; margin-right: 8px;"></div>
+        <span style="font-size: 12px; font-weight: 500; color: #065f46;">Ubicación Actual</span>
+      </div>
+      <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+        {{ user.currentLocation.locationName }}
+      </h4>
+      <p *ngIf="user.currentLocation.locationCode" style="margin: 0 0 4px 0; font-size: 12px; color: #6b7280;">
+        Código: {{ user.currentLocation.locationCode }}
+      </p>
+      <p style="margin: 0; font-size: 12px; color: #6b7280;">
+        Asignada: {{ formatDate(user.currentLocation.assignedAt) }} | 
+        Duración: {{ getDurationText(user.currentLocation.durationDays) }}
+      </p>
+    </div>
+    
+    <ng-template #noLocationTemplate>
+      <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; text-align: center;">
+        <ion-icon name="location-outline" style="font-size: 24px; color: #9ca3af; margin-bottom: 8px;"></ion-icon>
+        <p style="margin: 0; color: #6b7280; font-size: 14px;">Sin ubicación asignada</p>
+      </div>
+    </ng-template>
+    
+    <div style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 12px;">
+      <span>Toca para ver detalles completos</span>
+      <ion-icon name="chevron-forward-outline" style="margin-left: 4px;"></ion-icon>
+    </div>
+  </div>
+</div>
+
+<!-- Sin resultados de búsqueda -->
+<div *ngIf="hasData() && filteredUsersData().length === 0 && searchTerm()" style="text-align: center; padding: 40px;">
+  <ion-icon name="search-outline" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></ion-icon>
+  <h3 style="color: #333; margin-bottom: 8px;">Sin resultados</h3>
+  <p style="color: #666; margin-bottom: 16px;">
+    No se encontraron usuarios que coincidan con "<strong>{{ searchTerm() }}</strong>"
+  </p>
+  <ion-button fill="clear" color="primary" (click)="clearSearch()">
+    <ion-icon name="close-outline" slot="start"></ion-icon>
+    Limpiar búsqueda
+  </ion-button>
+</div>

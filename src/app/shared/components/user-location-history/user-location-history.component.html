@@ -1,0 +1,230 @@
+<!-- Modo Completo (página dedicada) -->
+<ion-content class="location-history-container" *ngIf="!compact">
+  <!-- Pull to Refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="refreshData($event)">
+    <ion-refresher-content
+      pulling-icon="arrow-down-outline"
+      pulling-text="Desliza para actualizar"
+      refreshing-spinner="circular"
+      refreshing-text="Actualizando..."
+    >
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="content-wrapper">
+    <!-- Header -->
+    <div class="header-section" *ngIf="showHeader">
+      <div class="header-content">
+        <h2 class="header-title">
+          <ion-icon name="location-outline" class="header-icon"></ion-icon>
+          Historial de Ubicaciones
+        </h2>
+        <p class="header-subtitle">
+          {{ isCurrentUser() ? 'Tu historial de asignaciones' : 'Historial del usuario' }}
+        </p>
+      </div>
+      
+      <!-- Stats Summary -->
+      <div class="stats-summary" *ngIf="hasData()">
+        <div class="stat-item">
+          <span class="stat-value">{{ totalRecords() }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ activeLocationsCount() }}</span>
+          <span class="stat-label">Activas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-section" *ngIf="isLoading() && !hasData()">
+      <div class="skeleton-list">
+        <div class="skeleton-item" *ngFor="let item of [1,2,3]">
+          <ion-card class="location-card skeleton">
+            <ion-card-content>
+              <div class="skeleton-content">
+                <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 40%"></ion-skeleton-text>
+                <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-section" *ngIf="hasError() && !hasData()">
+      <div class="error-content">
+        <ion-icon name="close-circle-outline" class="error-icon"></ion-icon>
+        <h3>Error al cargar historial</h3>
+        <p>{{ errorMessage() }}</p>
+        <ion-button fill="outline" (click)="refreshData()">
+          <ion-icon name="refresh-outline" slot="start"></ion-icon>
+          Reintentar
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-section" *ngIf="!isLoading() && !hasError() && !hasData()">
+      <div class="empty-content">
+        <ion-icon name="location-outline" class="empty-icon"></ion-icon>
+        <h3>Sin historial</h3>
+        <p>{{ isCurrentUser() ? 'Aún no tienes ubicaciones asignadas' : 'Este usuario no tiene ubicaciones asignadas' }}</p>
+      </div>
+    </div>
+
+    <!-- Location History List -->
+    <div class="history-list" *ngIf="hasData()">
+      <ion-card 
+        class="location-card" 
+        *ngFor="let location of recentLocations(); trackBy: trackByLocationId"
+        (click)="showLocationDetails(location)"
+      >
+        <ion-card-content>
+          <div class="location-header">
+            <div class="location-info">
+              <h3 class="location-name">{{ location.locationName || location.description }}</h3>
+              <p class="location-code" *ngIf="location.locationCode">{{ location.locationCode }}</p>
+            </div>
+            <ion-badge 
+              [color]="getStatusColor(location.isActive)"
+              class="status-badge"
+            >
+              {{ getStatusText(location.isActive) }}
+            </ion-badge>
+          </div>
+
+          <div class="location-details">
+            <!-- Assignment Date -->
+            <div class="detail-item">
+              <ion-icon name="calendar-outline" class="detail-icon"></ion-icon>
+              <div class="detail-content">
+                <span class="detail-label">Asignada</span>
+                <span class="detail-value">{{ formatDate(location.assignedAt) }}</span>
+              </div>
+            </div>
+
+            <!-- Deactivation Date -->
+            <div class="detail-item" *ngIf="location.deactivatedAt">
+              <ion-icon name="time-outline" class="detail-icon"></ion-icon>
+              <div class="detail-content">
+                <span class="detail-label">Desactivada</span>
+                <span class="detail-value">{{ formatDate(location.deactivatedAt) }}</span>
+              </div>
+            </div>
+
+            <!-- Duration -->
+            <div class="detail-item">
+              <ion-icon name="time-outline" class="detail-icon"></ion-icon>
+              <div class="detail-content">
+                <span class="detail-label">Duración</span>
+                <span class="detail-value">{{ getDurationText(location.durationDays) }}</span>
+              </div>
+            </div>
+
+            <!-- Assigned By -->
+            <div class="detail-item">
+              <ion-icon name="person-outline" class="detail-icon"></ion-icon>
+              <div class="detail-content">
+                <span class="detail-label">Asignada por</span>
+                <span class="detail-value">{{ location.assignedByUsername }}</span>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Infinite Scroll -->
+    <ion-infinite-scroll 
+      threshold="100px" 
+      (ionInfinite)="loadMoreData($event)"
+      *ngIf="canLoadMore()"
+    >
+      <ion-infinite-scroll-content
+        loading-spinner="bubbles"
+        loading-text="Cargando más ubicaciones..."
+      >
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+</ion-content>
+
+<!-- Modo Compacto (para dashboard) -->
+<div class="compact-location-history" *ngIf="compact">
+  <!-- Current Location -->
+  <div class="current-location" *ngIf="currentLocation(); else noCurrentLocation">
+    <div class="current-header">
+      <div class="current-info">
+        <h4 class="current-title">Ubicación Actual</h4>
+        <p class="current-name">{{ currentLocation()?.locationName || currentLocation()?.description }}</p>
+        <p class="current-code" *ngIf="currentLocation()?.locationCode">{{ currentLocation()?.locationCode }}</p>
+      </div>
+      <ion-badge color="success" class="current-badge">
+        Activa
+      </ion-badge>
+    </div>
+    <div class="current-details">
+      <span class="current-duration">
+        <ion-icon name="time-outline"></ion-icon>
+        {{ getDurationText(currentLocation()?.durationDays || 0) }}
+      </span>
+      <span class="current-date">
+        <ion-icon name="calendar-outline"></ion-icon>
+        Desde {{ getRelativeTime(currentLocation()?.assignedAt || '') }}
+      </span>
+    </div>
+  </div>
+
+  <ng-template #noCurrentLocation>
+    <div class="no-current-location">
+      <ion-icon name="location-outline" class="no-location-icon"></ion-icon>
+      <p>Sin ubicación asignada</p>
+    </div>
+  </ng-template>
+
+  <!-- Recent History (if has data) -->
+  <div class="recent-history" *ngIf="hasData() && recentLocations().length > 1">
+    <h5 class="recent-title">Historial Reciente</h5>
+    <div class="recent-list">
+      <div 
+        class="recent-item" 
+        *ngFor="let location of recentLocations().slice(1, 3); trackBy: trackByLocationId"
+        (click)="showLocationDetails(location)"
+      >
+        <div class="recent-info">
+          <span class="recent-name">{{ location.locationName || location.description }}</span>
+          <span class="recent-period">
+            {{ getRelativeTime(location.assignedAt) }}
+            <span *ngIf="location.deactivatedAt"> - {{ getRelativeTime(location.deactivatedAt) }}</span>
+          </span>
+        </div>
+        <ion-badge 
+          [color]="getStatusColor(location.isActive)"
+          size="small"
+        >
+          {{ location.isActive ? 'Activa' : 'Finalizada' }}
+        </ion-badge>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State for Compact -->
+  <div class="compact-loading" *ngIf="isLoading()">
+    <ion-skeleton-text animated style="width: 100%; height: 60px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 80%; height: 20px; margin-top: 8px;"></ion-skeleton-text>
+  </div>
+
+  <!-- Error State for Compact -->
+  <div class="compact-error" *ngIf="hasError()">
+    <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+    <p>Error al cargar ubicaciones</p>
+    <ion-button size="small" fill="clear" (click)="refreshData()">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+</div>

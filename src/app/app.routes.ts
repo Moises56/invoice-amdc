@@ -113,6 +113,17 @@ export const routes: Routes = [
     data: { roles: [Role['USER-ADMIN']] }
   },
   {
+    path: 'location-history',
+    loadComponent: () => import('./features/location-history/location-history.page').then(m => m.LocationHistoryPage),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'all-users-locations',
+    loadComponent: () => import('./features/all-users-locations/all-users-locations.page').then(m => m.AllUsersLocationsPage),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role['USER-ADMIN']] }
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }

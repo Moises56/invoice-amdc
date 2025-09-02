@@ -1,0 +1,23 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="modal-toolbar">
+    <ion-title class="modal-title">
+      {{ getModalTitle() }}
+    </ion-title>
+    
+    <ion-buttons slot="end">
+      <ion-button 
+        fill="clear" 
+        (click)="closeModal()"
+        class="close-btn"
+      >
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<app-user-location-history
+  [userId]="userId"
+  [showHeader]="false"
+>
+</app-user-location-history>

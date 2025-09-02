@@ -216,3 +216,130 @@ export interface LocationStatsFilter extends StatsFilter {
   locationName?: string;
   includeInactive?: boolean;
 }
+
+// User Location History Interfaces - Based on real API responses
+// Consultation Statistics Interface
+export interface ConsultationStats {
+  icsNormal: number;
+  icsAmnistia: number;
+  ecNormal: number;
+  ecAmnistia: number;
+  totalExitosas: number;
+  totalErrores: number;
+  totalConsultas: number;
+  promedioDuracionMs?: number;
+  totalAcumulado?: number;
+}
+
+// User Location History Interfaces
+export interface UserLocationHistoryResponse {
+  userId: string;
+  username: string;
+  nombre: string;
+  apellido: string;
+  currentLocation: CurrentLocationItem | null;
+  locationHistory: UserLocationHistoryItem[];
+  totalLocations: number;
+  firstAssignedAt: string;
+  lastAssignedAt: string;
+  consultationStats: ConsultationStats;
+}
+
+export interface CurrentLocationItem {
+  id: string;
+  locationName: string;
+  locationCode?: string;
+  description?: string;
+  isActive: boolean;
+  assignedAt: string;
+  assignedBy: string;
+  assignedByUsername: string;
+  createdAt: string;
+  updatedAt: string;
+  durationDays: number;
+  consultationStats: ConsultationStats;
+}
+
+export interface UserLocationHistoryItem {
+  id: string;
+  locationName: string;
+  locationCode?: string;
+  description?: string;
+  isActive: boolean;
+  assignedAt: string;
+  assignedBy: string;
+  assignedByUsername: string;
+  createdAt: string;
+  updatedAt: string;
+  durationDays: number;
+  deactivatedAt?: string;
+  consultationStats: ConsultationStats;
+}
+
+export interface AllUsersLocationHistoryResponse {
+  success: boolean;
+  data: {
+    totalRecords: number;
+    currentPage: number;
+    totalPages: number;
+    limit: number;
+    locations: AllUsersLocationHistoryItem[];
+  };
+}
+
+export interface AllUsersLocationHistoryItem {
+  id: number;
+  userId: string;
+  username: string;
+  locationCode: string;
+  description: string;
+  assignedAt: string;
+  deactivatedAt: string | null;
+  durationDays: number;
+  assignedBy: string;
+  assignedByUsername: string;
+  isActive: boolean;
+}
+
+export interface AssignUserLocationRequest {
+  userId: string;
+  locationCode: string;
+  assignedBy: string;
+}
+
+export interface AssignUserLocationResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: number;
+    userId: string;
+    locationCode: string;
+    description: string;
+    assignedAt: string;
+    assignedBy: string;
+    assignedByUsername: string;
+    isActive: boolean;
+    previousLocation?: {
+      id: number;
+      locationCode: string;
+      description: string;
+      deactivatedAt: string;
+      durationDays: number;
+    };
+  };
+}
+
+export interface LocationHistoryFilter {
+  page?: number;
+  limit?: number;
+  sortBy?: 'assignedAt' | 'deactivatedAt' | 'durationDays';
+  sortOrder?: 'asc' | 'desc';
+  locationCode?: string;
+  isActive?: boolean;
+}
+
+// Interface for All Users Location History (Admin view)
+export interface AllUsersLocationHistoryFilter extends LocationHistoryFilter {
+  userId?: string;
+  username?: string;
+}

@@ -1,0 +1,330 @@
+<ion-header class="bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
+  <ion-toolbar class="bg-transparent">
+    <ion-title class="text-white font-bold text-xl">Detalles del Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" fill="clear" class="text-white hover:bg-white/20 rounded-full transition-all duration-200">
+        <ion-icon name="close-outline" class="text-2xl"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50">
+  <div class="p-4 space-y-6" *ngIf="user">
+    <!-- Header del Usuario -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+      <div class="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 p-6">
+        <div class="flex items-center space-x-4">
+          <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg">
+            <span class="text-2xl font-bold text-white">
+              {{ (user.nombre.charAt(0) || '') + (user.apellido.charAt(0) || '') }}
+            </span>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold text-white mb-1">{{ user.nombre }} {{ user.apellido }}</h2>
+            <p class="text-white/80 text-lg mb-3">{{ '@' + user.username }}</p>
+            <div class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold" 
+                 [class]="user.currentLocation?.isActive ? 'bg-green-500/20 text-green-100 border border-green-400/30' : 'bg-red-500/20 text-red-100 border border-red-400/30'">
+              <ion-icon [name]="getStatusIcon(user.currentLocation?.isActive ? 'active' : 'inactive')" class="mr-2"></ion-icon>
+              {{ user.currentLocation?.isActive ? 'Activo' : 'Inactivo' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ubicación Actual -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden" *ngIf="user.currentLocation">
+      <div class="bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <ion-icon name="location-outline" class="text-white text-xl"></ion-icon>
+          </div>
+          <h3 class="text-xl font-bold text-white">Ubicación Actual</h3>
+        </div>
+      </div>
+      <div class="p-6">
+        <h4 class="text-2xl font-bold text-gray-800 mb-4">{{ user.currentLocation.locationName }}</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg" *ngIf="user.currentLocation.locationCode">
+            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <ion-icon name="business-outline" class="text-blue-600"></ion-icon>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Código</p>
+              <p class="font-semibold text-gray-800">{{ user.currentLocation.locationCode }}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+              <ion-icon name="calendar-outline" class="text-green-600"></ion-icon>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Asignado</p>
+              <p class="font-semibold text-gray-800">{{ formatDate(user.currentLocation.assignedAt) }}</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <ion-icon name="time-outline" class="text-purple-600"></ion-icon>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Duración</p>
+              <p class="font-semibold text-gray-800">{{ user.currentLocation.durationDays }} días</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+              <ion-icon name="person-outline" class="text-orange-600"></ion-icon>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Asignado por</p>
+              <p class="font-semibold text-gray-800">{{ user.currentLocation.assignedByUsername }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas del Usuario -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-violet-500 to-purple-600 px-6 py-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <ion-icon name="analytics-outline" class="text-white text-xl"></ion-icon>
+          </div>
+          <h3 class="text-xl font-bold text-white">Estadísticas de Ubicaciones</h3>
+        </div>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+              <ion-icon name="location" class="text-white text-xl"></ion-icon>
+            </div>
+            <h4 class="text-3xl font-bold text-blue-600 mb-1">{{ user.totalLocations }}</h4>
+            <p class="text-blue-700 font-medium">Total Ubicaciones</p>
+          </div>
+          <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+              <ion-icon name="calendar" class="text-white text-xl"></ion-icon>
+            </div>
+            <h4 class="text-lg font-bold text-green-600 mb-1">{{ formatDate(user.firstAssignedAt) }}</h4>
+            <p class="text-green-700 font-medium">Primera Asignación</p>
+          </div>
+          <div class="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-3">
+              <ion-icon name="time" class="text-white text-xl"></ion-icon>
+            </div>
+            <h4 class="text-lg font-bold text-orange-600 mb-1">{{ formatDate(user.lastAssignedAt) }}</h4>
+            <p class="text-orange-700 font-medium">Última Asignación</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas de Consultas -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden" *ngIf="user.consultationStats">
+      <div class="bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <ion-icon name="bar-chart-outline" class="text-white text-xl"></ion-icon>
+          </div>
+          <h3 class="text-xl font-bold text-white">Estadísticas de Consultas</h3>
+        </div>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ion-icon name="document-text" class="text-white"></ion-icon>
+            </div>
+            <h4 class="text-2xl font-bold text-blue-600">{{ user.consultationStats.totalConsultas }}</h4>
+            <p class="text-sm text-blue-700 font-medium">Total</p>
+          </div>
+          <div class="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ion-icon name="checkmark-circle" class="text-white"></ion-icon>
+            </div>
+            <h4 class="text-2xl font-bold text-green-600">{{ user.consultationStats.totalExitosas }}</h4>
+            <p class="text-sm text-green-700 font-medium">Exitosas</p>
+          </div>
+          <div class="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl border border-red-200">
+            <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ion-icon name="close-circle" class="text-white"></ion-icon>
+            </div>
+            <h4 class="text-2xl font-bold text-red-600">{{ user.consultationStats.totalErrores }}</h4>
+            <p class="text-sm text-red-700 font-medium">Errores</p>
+          </div>
+          <div class="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200" *ngIf="user.consultationStats.promedioDuracionMs">
+            <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ion-icon name="time" class="text-white"></ion-icon>
+            </div>
+            <h4 class="text-lg font-bold text-purple-600">{{ user.consultationStats.promedioDuracionMs }}ms</h4>
+            <p class="text-sm text-purple-700 font-medium">Promedio</p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl border border-teal-200">
+            <div class="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ion-icon name="business" class="text-white"></ion-icon>
+            </div>
+            <h4 class="text-2xl font-bold text-teal-600">{{ user.consultationStats.ecNormal + user.consultationStats.ecAmnistia }}</h4>
+            <p class="text-sm text-teal-700 font-medium">Consultas EC</p>
+          </div>
+          <div class="text-center p-4 bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl border border-cyan-200">
+            <div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ion-icon name="shield-checkmark" class="text-white"></ion-icon>
+            </div>
+            <h4 class="text-2xl font-bold text-cyan-600">{{ user.consultationStats.icsNormal + user.consultationStats.icsAmnistia }}</h4>
+            <p class="text-sm text-cyan-700 font-medium">Consultas ICS</p>
+          </div>
+          <div class="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl border border-yellow-200" *ngIf="user.consultationStats.totalAcumulado">
+            <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-2">
+              <ion-icon name="cash" class="text-white"></ion-icon>
+            </div>
+            <h4 class="text-xl font-bold text-yellow-600">₡{{ user.consultationStats.totalAcumulado | number:'1.0-0' }}</h4>
+            <p class="text-sm text-yellow-700 font-medium">Total Acumulado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de Ubicaciones -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden" *ngIf="user.locationHistory && user.locationHistory.length > 0">
+      <div class="bg-gradient-to-r from-rose-500 to-pink-600 px-6 py-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <ion-icon name="location-outline" class="text-white text-xl"></ion-icon>
+          </div>
+          <h3 class="text-xl font-bold text-white">Historial de Ubicaciones ({{ user.locationHistory.length }})</h3>
+        </div>
+      </div>
+      <div class="p-6">
+        <div class="space-y-6">
+          <div class="relative" *ngFor="let location of user.locationHistory; let i = index">
+            <!-- Timeline Line -->
+            <div class="absolute left-6 top-12 w-0.5 h-full bg-gray-200" *ngIf="i < user.locationHistory.length - 1"></div>
+            
+            <div class="flex space-x-4">
+              <!-- Timeline Dot -->
+              <div class="flex-shrink-0">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center border-4" 
+                     [class]="location.isActive ? 'bg-green-500 border-green-200' : 'bg-gray-400 border-gray-200'">
+                  <ion-icon [name]="location.isActive ? 'checkmark' : 'close'" class="text-white text-lg"></ion-icon>
+                </div>
+              </div>
+              
+              <!-- Location Content -->
+              <div class="flex-1 bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div class="flex items-start justify-between mb-3">
+                  <h4 class="text-xl font-bold text-gray-800">{{ location.locationName }}</h4>
+                  <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold" 
+                       [class]="location.isActive ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'">
+                    <ion-icon [name]="location.isActive ? 'checkmark-circle-outline' : 'close-circle-outline'" class="mr-1"></ion-icon>
+                    {{ location.isActive ? 'Activo' : 'Inactivo' }}
+                  </div>
+                </div>
+              
+                <div class="mb-4" *ngIf="location.locationCode || location.description">
+                  <div class="flex items-center space-x-2 mb-2" *ngIf="location.locationCode">
+                    <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <ion-icon name="business-outline" class="text-blue-600 text-sm"></ion-icon>
+                    </div>
+                    <span class="text-gray-700"><strong>Código:</strong> {{ location.locationCode }}</span>
+                  </div>
+                  <p *ngIf="location.description" class="text-gray-600 text-sm ml-8">
+                    {{ location.description }}
+                  </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  <div class="flex items-center space-x-2 text-sm">
+                    <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                      <ion-icon name="calendar-outline" class="text-green-600 text-xs"></ion-icon>
+                    </div>
+                    <span class="text-gray-700"><strong>Asignado:</strong> {{ formatDate(location.assignedAt) }}</span>
+                  </div>
+                  <div class="flex items-center space-x-2 text-sm" *ngIf="location.deactivatedAt">
+                    <div class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                      <ion-icon name="calendar-outline" class="text-red-600 text-xs"></ion-icon>
+                    </div>
+                    <span class="text-gray-700"><strong>Desactivado:</strong> {{ formatDate(location.deactivatedAt) }}</span>
+                  </div>
+                  <div class="flex items-center space-x-2 text-sm">
+                    <div class="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                      <ion-icon name="time-outline" class="text-purple-600 text-xs"></ion-icon>
+                    </div>
+                    <span class="text-gray-700"><strong>Duración:</strong> {{ location.durationDays }} días</span>
+                  </div>
+                  <div class="flex items-center space-x-2 text-sm">
+                    <div class="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center">
+                      <ion-icon name="person-outline" class="text-orange-600 text-xs"></ion-icon>
+                    </div>
+                    <span class="text-gray-700"><strong>Por:</strong> {{ location.assignedByUsername }}</span>
+                  </div>
+                </div>
+              
+                <!-- Estadísticas de Consultas por Ubicación -->
+                <div class="bg-white rounded-lg border border-gray-200 p-4" *ngIf="location.consultationStats">
+                  <div class="flex items-center space-x-2 mb-3">
+                    <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <ion-icon name="analytics-outline" class="text-indigo-600 text-sm"></ion-icon>
+                    </div>
+                    <h5 class="font-semibold text-gray-800">Estadísticas de Consultas</h5>
+                  </div>
+                  
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                    <div class="text-center p-2 bg-blue-50 rounded-lg border border-blue-100">
+                      <div class="text-lg font-bold text-blue-600">{{ location.consultationStats.totalConsultas }}</div>
+                      <div class="text-xs text-blue-700">Total</div>
+                    </div>
+                    <div class="text-center p-2 bg-green-50 rounded-lg border border-green-100">
+                      <div class="text-lg font-bold text-green-600">{{ location.consultationStats.totalExitosas }}</div>
+                      <div class="text-xs text-green-700">Exitosas</div>
+                    </div>
+                    <div class="text-center p-2 bg-red-50 rounded-lg border border-red-100">
+                      <div class="text-lg font-bold text-red-600">{{ location.consultationStats.totalErrores }}</div>
+                      <div class="text-xs text-red-700">Errores</div>
+                    </div>
+                    <div class="text-center p-2 bg-yellow-50 rounded-lg border border-yellow-100" *ngIf="location.consultationStats.totalAcumulado">
+                      <div class="text-sm font-bold text-yellow-600">₡{{ location.consultationStats.totalAcumulado | number:'1.0-0' }}</div>
+                      <div class="text-xs text-yellow-700">Acumulado</div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex flex-wrap gap-2 text-xs" *ngIf="location.consultationStats.ecNormal + location.consultationStats.ecAmnistia + location.consultationStats.icsNormal + location.consultationStats.icsAmnistia > 0">
+                    <div class="flex items-center space-x-1 px-2 py-1 bg-teal-50 rounded-full border border-teal-200" *ngIf="location.consultationStats.ecNormal + location.consultationStats.ecAmnistia > 0">
+                      <span class="text-teal-700 font-medium">EC:</span>
+                      <span class="text-teal-600 font-bold">{{ location.consultationStats.ecNormal + location.consultationStats.ecAmnistia }}</span>
+                    </div>
+                    <div class="flex items-center space-x-1 px-2 py-1 bg-cyan-50 rounded-full border border-cyan-200" *ngIf="location.consultationStats.icsNormal + location.consultationStats.icsAmnistia > 0">
+                      <span class="text-cyan-700 font-medium">ICS:</span>
+                      <span class="text-cyan-600 font-bold">{{ location.consultationStats.icsNormal + location.consultationStats.icsAmnistia }}</span>
+                    </div>
+                    <div class="flex items-center space-x-1 px-2 py-1 bg-purple-50 rounded-full border border-purple-200" *ngIf="location.consultationStats.promedioDuracionMs">
+                      <span class="text-purple-700 font-medium">Promedio:</span>
+                      <span class="text-purple-600 font-bold">{{ location.consultationStats.promedioDuracionMs }}ms</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- Estado de carga o error -->
+  <div class="flex flex-col items-center justify-center p-12 text-center" *ngIf="!user">
+    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+      <ion-icon name="person-outline" class="text-gray-400 text-3xl"></ion-icon>
+    </div>
+    <h3 class="text-xl font-semibold text-gray-700 mb-2">No hay información disponible</h3>
+    <p class="text-gray-500">No se pudieron cargar los detalles del usuario.</p>
+  </div>
+</ion-content>

@@ -1,0 +1,18 @@
+.page-toolbar {
+  --background: var(--ion-color-primary);
+  --color: white;
+}
+
+.safe-area-spacer {
+  height: env(safe-area-inset-top);
+  background: var(--ion-color-primary);
+}
+
+.back-btn {
+  --color: white;
+}
+
+.page-title {
+  --color: white;
+  font-weight: 600;
+}

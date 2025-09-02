@@ -1,0 +1,173 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Historial de Ubicaciones</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="dismiss()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="location-history-content">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-content">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Cargando historial de ubicaciones...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError && !isLoading" class="error-container">
+    <div class="error-content">
+      <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+      <h3>Error al cargar datos</h3>
+      <p>{{ errorMessage || 'No se pudo cargar el historial de ubicaciones' }}</p>
+      <ion-button fill="outline" (click)="dismiss()">
+        <ion-icon name="arrow-back" slot="start"></ion-icon>
+        Volver
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!isLoading && !hasError && locationData" class="modal-content">
+    <!-- Current Location Section -->
+    <div *ngIf="locationData.currentLocation" class="current-location-section">
+      <div class="section-header">
+        <h2>
+          <ion-icon name="location" class="header-icon"></ion-icon>
+          Ubicación Actual
+        </h2>
+      </div>
+      
+      <div class="current-location-card">
+        <div class="location-header">
+          <div class="location-icon">
+            <ion-icon name="business-outline"></ion-icon>
+          </div>
+          <div class="location-info">
+            <h3>{{ locationData.currentLocation.locationName }}</h3>
+            <div class="location-status" [class]="locationData.currentLocation.isActive ? 'active' : 'inactive'">
+              <ion-icon [name]="getStatusIcon(locationData.currentLocation.isActive)"></ion-icon>
+              <span>{{ locationData.currentLocation.isActive ? 'Activa' : 'Inactiva' }}</span>
+            </div>
+          </div>
+          <div class="location-duration">
+            <span class="duration-label">Duración</span>
+            <span class="duration-value">
+              {{ calculateDuration(locationData.currentLocation.assignedAt) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Assignment Details -->
+        <div class="assignment-details">
+          <div class="detail-item">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span class="label">Asignado:</span>
+            <span class="value">{{ formatDate(locationData.currentLocation.assignedAt) }}</span>
+          </div>
+          <div *ngIf="!locationData.currentLocation.isActive" class="detail-item">
+            <ion-icon name="calendar-clear-outline"></ion-icon>
+            <span class="label">Estado:</span>
+            <span class="value">Inactiva</span>
+          </div>
+          <div *ngIf="locationData.currentLocation.assignedBy" class="detail-item">
+            <ion-icon name="person-outline"></ion-icon>
+            <span class="label">Asignado por:</span>
+            <span class="value">{{ locationData.currentLocation.assignedBy }}</span>
+          </div>
+        </div>
+
+        <!-- Consultation Stats -->
+        <div *ngIf="locationData.consultationStats" class="consultation-stats">
+          <h4>Estadísticas de Consultas</h4>
+          <div class="stats-grid">
+            <div class="stat-card total">
+              <div class="stat-value">{{ locationData.consultationStats.totalExitosas || 0 }}</div>
+              <div class="stat-label">Total Exitosas</div>
+            </div>
+            <div class="stat-card ec-normal">
+              <div class="stat-value">{{ locationData.consultationStats.ecNormal || 0 }}</div>
+              <div class="stat-label">EC Normal</div>
+            </div>
+            <div class="stat-card ec-amnistia">
+              <div class="stat-value">{{ locationData.consultationStats.ecAmnistia || 0 }}</div>
+              <div class="stat-label">EC Amnistía</div>
+            </div>
+            <div class="stat-card ics-normal">
+              <div class="stat-value">{{ locationData.consultationStats.icsNormal || 0 }}</div>
+              <div class="stat-label">ICS Normal</div>
+            </div>
+            <div class="stat-card ics-amnistia">
+              <div class="stat-value">{{ locationData.consultationStats.icsAmnistia || 0 }}</div>
+              <div class="stat-label">ICS Amnistía</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location History Section -->
+    <div *ngIf="locationData.locationHistory && locationData.locationHistory.length > 0" class="history-section">
+      <div class="section-header">
+        <h2>
+          <ion-icon name="time-outline" class="header-icon"></ion-icon>
+          Historial de Ubicaciones
+        </h2>
+        <ion-badge color="primary">{{ locationData.locationHistory.length }} ubicaciones</ion-badge>
+      </div>
+
+      <div class="history-timeline">
+        <div *ngFor="let location of locationData.locationHistory; let i = index" class="timeline-item">
+          <div class="timeline-marker">
+            <div class="marker-dot" [class]="location.isActive ? 'active' : 'inactive'"></div>
+            <div *ngIf="i < locationData.locationHistory.length - 1" class="timeline-line"></div>
+          </div>
+          
+          <div class="timeline-content">
+            <div class="location-card">
+              <div class="card-header">
+                <h4>{{ location.locationName }}</h4>
+                <ion-chip [color]="getStatusColor(location.isActive)" class="status-chip">
+                  <ion-icon [name]="getStatusIcon(location.isActive)"></ion-icon>
+                  <ion-label>{{ location.isActive ? 'Activa' : 'Finalizada' }}</ion-label>
+                </ion-chip>
+              </div>
+              
+              <div class="card-details">
+                <div class="detail-row">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  <span>Inicio: {{ formatDate(location.assignedAt) }}</span>
+                </div>
+                <div *ngIf="location.deactivatedAt" class="detail-row">
+                  <ion-icon name="calendar-clear-outline"></ion-icon>
+                  <span>Fin: {{ formatDate(location.deactivatedAt) }}</span>
+                </div>
+                <div class="detail-row">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <span>Duración: {{ calculateDuration(location.assignedAt, location.deactivatedAt) }}</span>
+                </div>
+                <div *ngIf="location.assignedBy" class="detail-row">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <span>Asignado por: {{ location.assignedBy }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No History State -->
+    <div *ngIf="!locationData.currentLocation && (!locationData.locationHistory || locationData.locationHistory.length === 0)" class="no-data-container">
+      <div class="no-data-content">
+        <ion-icon name="location-outline" class="no-data-icon"></ion-icon>
+        <h3>Sin historial de ubicaciones</h3>
+        <p>No se encontraron registros de ubicaciones asignadas.</p>
+      </div>
+    </div>
+  </div>
+</ion-content>

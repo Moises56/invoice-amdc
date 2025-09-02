@@ -1,0 +1,20 @@
+<ion-header class="ion-no-border">
+  <!-- Status Bar Safe Area -->
+  <div class="safe-area-spacer"></div>
+
+  <ion-toolbar class="page-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/dashboard"
+        class="back-btn"
+        text=""
+      ></ion-back-button>
+    </ion-buttons>
+
+    <ion-title class="page-title"> {{ getPageTitle() }} </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <app-all-users-location-history> </app-all-users-location-history>
+</ion-content>

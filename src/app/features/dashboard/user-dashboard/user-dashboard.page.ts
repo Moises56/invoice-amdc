@@ -22,11 +22,14 @@ import {
   IonRefresherContent,
   AlertController,
   ToastController,
+  ModalController,
 } from '@ionic/angular/standalone';
+
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatsService } from 'src/app/shared/services/stats.service';
-import { UserStats } from 'src/app/shared/interfaces/user.interface';
+import { UserStats, UserLocationHistoryResponse } from 'src/app/shared/interfaces/user.interface';
+import { LocationHistoryModalComponent } from './components/location-history-modal/location-history-modal.component';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
@@ -58,6 +61,7 @@ import {
   alertCircleOutline,
   arrowForwardOutline,
   arrowDownOutline,
+  locationOutline,
 } from 'ionicons/icons';
 import { interval } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -89,17 +93,25 @@ export class UserDashboardPage implements OnInit, OnDestroy {
   private readonly statsService = inject(StatsService);
   private readonly alertController = inject(AlertController);
   private readonly toastController = inject(ToastController);
+  private readonly modalController = inject(ModalController);
+
   private readonly destroyRef = inject(DestroyRef);
 
-  // Component State
+  // User data signals
   userName = signal<string>('');
   lastRefreshTime = signal<Date>(new Date());
 
-  // Stats State Management
+  // Stats signals
   userStats = signal<UserStats | null>(null);
   isLoadingStats = signal<boolean>(false);
   hasStatsError = signal<boolean>(false);
   statsErrorMessage = signal<string>('');
+
+  // Location history signals
+  userLocationHistory = signal<UserLocationHistoryResponse | null>(null);
+  isLoadingLocationHistory = signal<boolean>(false);
+  hasLocationError = signal<boolean>(false);
+  locationErrorMessage = signal<string>('');
 
   // Auto-refresh setup using takeUntilDestroyed in injection context
   private autoRefresh$ = interval(300000).pipe(
@@ -185,6 +197,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       alertCircleOutline,
       arrowForwardOutline,
       arrowDownOutline,
+      locationOutline,
     });
   }
 
@@ -206,8 +219,11 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       const name = this.authService.userName();
       this.userName.set(name && name.trim() ? name : 'Usuario');
 
-      // Load initial stats
-      await this.loadUserStats();
+      // Load initial stats and location history
+      await Promise.all([
+        this.loadUserStats(),
+        this.loadUserLocationHistory()
+      ]);
 
       // Show welcome message for first-time users
       if (!this.userStats()?.totalConsultas) {
@@ -225,6 +241,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
   private setupAutoRefresh(): void {
     this.autoRefresh$.subscribe(() => {
       this.loadUserStats(true); // Silent refresh
+      this.loadUserLocationHistory(true); // Silent refresh
     });
   }
 
@@ -270,6 +287,86 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       this.handleStatsError(error, silentRefresh);
     } finally {
       this.isLoadingStats.set(false);
+    }
+  }
+
+  /**
+   * Load user location history with consultation statistics
+   */
+  async loadUserLocationHistory(silentRefresh: boolean = false): Promise<void> {
+    if (!this.authService.isAuthenticated()) {
+      this.handleAuthError();
+      return;
+    }
+
+    if (!silentRefresh) {
+      this.isLoadingLocationHistory.set(true);
+    }
+
+    this.hasLocationError.set(false);
+    this.locationErrorMessage.set('');
+
+    try {
+      console.log('Loading user location history...');
+      const response = await new Promise<UserLocationHistoryResponse>((resolve, reject) => {
+        this.statsService.getMyLocationHistory().subscribe({
+          next: (data) => resolve(data),
+          error: (error) => reject(error),
+        });
+      });
+
+      if (response && response.userId) {
+        this.userLocationHistory.set(response);
+        console.log('Location history loaded successfully:', response);
+
+        if (!silentRefresh) {
+          await this.showSuccessToast('Historial de ubicaciones actualizado');
+        }
+      } else {
+        throw new Error('Invalid location history response format');
+      }
+    } catch (error: any) {
+      console.error('Error loading user location history:', error);
+      this.hasLocationError.set(true);
+      this.handleLocationError(error, silentRefresh);
+    } finally {
+      this.isLoadingLocationHistory.set(false);
+    }
+  }
+
+  /**
+   * Handle location history errors
+   */
+  private handleLocationError(error: any, silentRefresh: boolean): void {
+    let errorMessage = 'Error desconocido al cargar ubicaciones';
+
+    switch (error.status) {
+      case 0:
+        errorMessage = 'Sin conexión a internet';
+        break;
+      case 401:
+        errorMessage = 'Sesión expirada';
+        this.handleAuthError();
+        return;
+      case 403:
+        errorMessage = 'Sin permisos para ver ubicaciones';
+        break;
+      case 404:
+        errorMessage = 'Servicio de ubicaciones no disponible';
+        break;
+      case 500:
+        errorMessage = 'Error del servidor de ubicaciones';
+        break;
+      default:
+        errorMessage = `Error ${error.status}: ${
+          error.message || 'Error del servidor de ubicaciones'
+        }`;
+    }
+
+    this.locationErrorMessage.set(errorMessage);
+
+    if (!silentRefresh) {
+      this.showErrorToast(errorMessage);
     }
   }
 
@@ -349,12 +446,62 @@ export class UserDashboardPage implements OnInit, OnDestroy {
     await this.goTo('/activity-logs');
   }
 
+  async goToAllUsersLocations(): Promise<void> {
+    if (!this.canAccessGeneralStats()) {
+      await this.showErrorToast(
+        'No tienes permisos para acceder a esta sección'
+      );
+      return;
+    }
+    await this.goTo('/all-users-locations');
+  }
+
+  /**
+   * Open location history modal
+   */
+  /**
+   * Open modal with current user's location history
+   */
+  async openMyLocationHistoryModal(): Promise<void> {
+    try {
+      const modal = await this.modalController.create({
+        component: LocationHistoryModalComponent,
+        componentProps: {
+          locationData: this.userLocationHistory(),
+          isLoading: this.isLoadingLocationHistory(),
+          hasError: this.hasLocationError(),
+          errorMessage: this.locationErrorMessage()
+        }
+      });
+
+      await modal.present();
+    } catch (error) {
+      console.error('Error opening location history modal:', error);
+      await this.showErrorToast('Error al abrir historial de ubicaciones');
+    }
+  }
+
+  /**
+   * Navigate to all users locations page (USER-ADMIN only)
+   */
+  async goToLocationHistory(): Promise<void> {
+    try {
+      await this.router.navigate(['/all-users-locations']);
+    } catch (error) {
+      console.error('Error navigating to all users locations:', error);
+      await this.showErrorToast('Error al navegar al historial de ubicaciones');
+    }
+  }
+
   /**
    * Refresh stats with pull-to-refresh
    */
   async refreshStats(event?: any): Promise<void> {
     try {
-      await this.loadUserStats();
+      await Promise.all([
+        this.loadUserStats(),
+        this.loadUserLocationHistory()
+      ]);
     } finally {
       event?.target?.complete?.();
     }

@@ -923,6 +923,161 @@
 }
 
 // ============================================
+// LOCATION SECTION - ENHANCED STYLES
+// ============================================
+
+.location-section {
+  margin: 20px 0;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--color-gray-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      ion-icon {
+        font-size: 24px;
+        color: var(--color-primary);
+      }
+    }
+
+    .refresh-button {
+      --padding-start: 12px;
+      --padding-end: 12px;
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+      height: auto;
+      font-size: 14px;
+    }
+  }
+
+  .location-summary-card {
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-gray-50) 100%);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 1px solid var(--color-primary-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .location-main-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+
+      .location-details {
+        flex: 1;
+
+        h3 {
+          margin: 0 0 16px 0;
+          font-size: 20px;
+          font-weight: var(--font-weight-bold);
+          color: var(--color-gray-900);
+          line-height: 1.2;
+        }
+
+        .total-consultas {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          .consultas-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-primary);
+            line-height: 1;
+          }
+
+          .consultas-label {
+            font-size: 14px;
+            color: var(--color-gray-600);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: var(--font-weight-semibold);
+          }
+        }
+      }
+
+      .location-icon {
+        background: var(--color-primary);
+        color: white;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(92, 206, 223, 0.3);
+
+        ion-icon {
+          font-size: 28px;
+        }
+      }
+    }
+  }
+
+  .no-location-card {
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    border: 2px dashed var(--color-gray-300);
+    margin-bottom: 16px;
+
+    .no-location-icon {
+      font-size: 48px;
+      color: var(--color-gray-400);
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-gray-700);
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--color-gray-500);
+    }
+  }
+
+  .error-section {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 1px solid var(--color-error-light);
+
+    .error-icon {
+      font-size: 48px;
+      color: var(--color-error);
+      margin-bottom: 16px;
+    }
+
+    .error-message {
+      font-size: 14px;
+      color: var(--color-gray-700);
+      margin: 0 0 16px 0;
+    }
+  }
+}
+
+// ============================================
 // RESPONSIVE DESIGN - MOBILE OPTIMIZATIONS
 // ============================================
 
@@ -964,6 +1119,54 @@
 
     .tool-item {
       padding: 16px 20px;
+    }
+  }
+
+  .location-section {
+    .current-location-card {
+      .location-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+
+        .location-info {
+          order: 2;
+        }
+
+        .location-duration {
+          order: 3;
+          text-align: center;
+        }
+      }
+
+      .location-stats .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+
+        .stat-item {
+          padding: 10px;
+
+          .stat-value {
+            font-size: 18px;
+
+            &.currency {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+    }
+
+    .overall-stats-card .stats-summary {
+      grid-template-columns: repeat(2, 1fr);
+
+      .summary-item {
+        padding: 12px 8px;
+
+        .summary-value {
+          font-size: 16px;
+        }
+      }
     }
   }
 }
@@ -1014,5 +1217,185 @@
 
   .dashboard-content {
     --background: #e0e4ec;
+  }
+}
+
+// ============================================
+// LOCATION HISTORY MODAL STYLES
+// ============================================
+
+// Global modal styles for location history
+:global(.location-history-modal) {
+  --border-radius: 16px 16px 0 0;
+  --box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+
+  .modal-wrapper {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+  }
+
+  ion-backdrop {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+  }
+
+  // Responsive breakpoints
+  @media (max-width: 768px) {
+    --border-radius: 12px 12px 0 0;
+    
+    .modal-wrapper {
+      margin: 0;
+      width: 100%;
+      height: auto;
+      max-height: 90vh;
+    }
+  }
+}
+
+// Tool item specific styling for location history
+.tools-grid {
+  .tool-item {
+    &:has(.tool-icon.orange) {
+      &:hover {
+        .tool-icon.orange {
+          background: linear-gradient(135deg, var(--color-warning), var(--color-warning-light));
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+}
+// ============================================
+// LOCATION SECTION STYLES
+// ============================================
+
+.location-section {
+  margin-bottom: 32px;
+  
+  .section-header {
+    text-align: center;
+    margin-bottom: 20px;
+    
+    h2 {
+      color: var(--color-gray-800);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    p {
+      color: var(--color-gray-500);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+  }
+  
+  .location-content {
+    background: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    
+    .location-actions {
+      padding: 16px;
+      background: var(--color-gray-50);
+      border-top: 1px solid var(--color-gray-200);
+      
+      .view-history-btn {
+        --border-radius: var(--border-radius-md);
+        --border-color: var(--color-primary);
+        --color: var(--color-primary);
+        font-weight: 500;
+        
+        &:hover {
+          --background: var(--color-primary);
+          --color: var(--color-white);
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments for location section
+@media (max-width: 768px) {
+  .location-section {
+    margin-bottom: 24px;
+    
+    .section-header {
+      margin-bottom: 16px;
+      
+      h2 {
+        font-size: 1.3rem;
+      }
+      
+      p {
+        font-size: 0.9rem;
+      }
+    }
+    
+    .location-content {
+      .location-actions {
+        padding: 12px;
+      }
+    }
+    
+    .location-summary-card {
+      padding: 20px;
+      
+      .location-main-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+        
+        .location-details {
+          order: 2;
+          
+          h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+          }
+          
+          .total-consultas {
+            .consultas-number {
+              font-size: 28px;
+            }
+          }
+        }
+        
+        .location-icon {
+          order: 1;
+          width: 48px;
+          height: 48px;
+          
+          ion-icon {
+            font-size: 24px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Dark mode support for location section
+@media (prefers-color-scheme: dark) {
+  .location-section {
+    .section-header {
+      h2 {
+        color: var(--ion-color-light);
+      }
+      
+      p {
+        color: var(--ion-color-medium);
+      }
+    }
+    
+    .location-content {
+      background: var(--ion-color-dark-tint);
+      
+      .location-actions {
+        background: var(--ion-color-dark);
+        border-top-color: var(--ion-color-dark-shade);
+      }
+    }
   }
 }

@@ -1,0 +1,417 @@
+// User Details Modal Styles
+
+:host {
+  --background: #ffffff;
+}
+
+.user-details-content {
+  --background: #f8fafc;
+}
+
+.user-details-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  .user-header-section {
+    display: flex;
+    align-items: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: white;
+    margin: 0;
+    
+    .user-avatar-large {
+      width: 70px;
+      height: 70px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      margin-right: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .user-basic-info {
+      flex: 1;
+      
+      .user-full-name {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        line-height: 1.2;
+      }
+      
+      .user-username {
+        font-size: 16px;
+        opacity: 0.9;
+        margin: 0 0 12px 0;
+        font-weight: 500;
+      }
+      
+      .user-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        
+        ion-icon {
+          font-size: 16px;
+        }
+        
+        &.active {
+          background: rgba(16, 185, 129, 0.2);
+          color: #10b981;
+          border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        
+        &.inactive {
+          background: rgba(107, 114, 128, 0.2);
+          color: #6b7280;
+          border: 1px solid rgba(107, 114, 128, 0.4);
+        }
+      }
+    }
+  }
+  
+  .details-section {
+    background: white;
+    margin: 16px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      padding: 20px 24px 16px 24px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #fafbfc;
+      
+      ion-icon {
+        font-size: 22px;
+        color: #3b82f6;
+        margin-right: 12px;
+      }
+      
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+      }
+    }
+    
+    .section-content {
+      padding: 20px 24px 24px 24px;
+    }
+  }
+  
+  .current-location-card {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #bbf7d0;
+    border-radius: 16px;
+    padding: 20px;
+    
+    .location-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    
+    .location-code {
+      font-size: 14px;
+      color: #059669;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    
+    .location-description {
+      font-size: 15px;
+      color: #6b7280;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    
+    .location-meta {
+      .meta-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .meta-label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 14px;
+          color: #6b7280;
+          font-weight: 500;
+          
+          ion-icon {
+            font-size: 16px;
+            color: #059669;
+          }
+        }
+        
+        .meta-value {
+          font-size: 14px;
+          font-weight: 600;
+          color: #1f2937;
+        }
+      }
+    }
+  }
+  
+  .no-location-card {
+    background: #f9fafb;
+    border: 2px dashed #e5e7eb;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    
+    ion-icon {
+      font-size: 40px;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+    
+    p {
+      color: #6b7280;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 500;
+    }
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+    
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      
+      .stat-number {
+        font-size: 32px;
+        font-weight: 800;
+        color: #3b82f6;
+        margin-bottom: 6px;
+        line-height: 1;
+      }
+      
+      .stat-label {
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+  
+  .date-range {
+    .date-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .date-label {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+      }
+      
+      .date-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+    }
+  }
+  
+  .history-list {
+    max-height: 400px;
+    overflow-y: auto;
+    
+    .history-item {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border-left: 4px solid transparent;
+      transition: all 0.2s ease;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      &.active {
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border-left-color: #10b981;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+      }
+      
+      &.inactive {
+        background: #f9fafb;
+        border-left-color: #d1d5db;
+      }
+      
+      .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+        
+        .history-name {
+          font-size: 16px;
+          font-weight: 600;
+          color: #1f2937;
+          line-height: 1.3;
+        }
+        
+        .history-status {
+          font-size: 11px;
+          padding: 4px 10px;
+          border-radius: 12px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          
+          &.active {
+            background: #10b981;
+            color: white;
+          }
+          
+          &.inactive {
+            background: #6b7280;
+            color: white;
+          }
+        }
+      }
+      
+      .history-code {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+      
+      .history-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 500;
+      }
+    }
+  }
+  
+  .no-history-card {
+    background: #f9fafb;
+    border: 2px dashed #e5e7eb;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    
+    ion-icon {
+      font-size: 40px;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+    
+    p {
+      color: #6b7280;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 500;
+    }
+  }
+}
+
+// Modal specific styles
+:host ::ng-deep {
+  .user-details-modal {
+    --width: 95%;
+    --max-width: 600px;
+    --height: 90%;
+    --border-radius: 20px;
+    
+    .modal-wrapper {
+      border-radius: 20px;
+      overflow: hidden;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .user-details-container {
+    .user-header-section {
+      padding: 20px;
+      
+      .user-avatar-large {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        margin-right: 16px;
+      }
+      
+      .user-basic-info {
+        .user-full-name {
+          font-size: 20px;
+        }
+        
+        .user-username {
+          font-size: 15px;
+        }
+      }
+    }
+    
+    .details-section {
+      margin: 12px;
+      
+      .section-header {
+        padding: 16px 20px 12px 20px;
+        
+        h3 {
+          font-size: 16px;
+        }
+      }
+      
+      .section-content {
+        padding: 16px 20px 20px 20px;
+      }
+    }
+    
+    .stats-grid {
+      .stat-item {
+        padding: 16px;
+        
+        .stat-number {
+          font-size: 28px;
+        }
+      }
+    }
+  }
+}
