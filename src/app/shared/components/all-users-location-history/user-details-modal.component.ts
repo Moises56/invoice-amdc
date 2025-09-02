@@ -31,7 +31,8 @@ import {
   cash,
   checkmarkCircle,
   closeCircle,
-  business
+  business,
+  location
 } from 'ionicons/icons';
 
 @Component({
@@ -56,27 +57,7 @@ export class UserDetailsModalComponent {
   private modalController = inject(ModalController);
 
   constructor() {
-    addIcons({
-      closeOutline,
-      locationOutline,
-      businessOutline,
-      calendarOutline,
-      timeOutline,
-      personOutline,
-      analyticsOutline,
-      barChartOutline,
-      documentText,
-      checkmarkCircle,
-      closeCircle,
-      business,
-      shieldCheckmark,
-      cash,
-      mailOutline,
-      callOutline,
-      checkmarkCircleOutline,
-      closeCircleOutline,
-      alertCircleOutline
-    });
+    addIcons({closeOutline,locationOutline,businessOutline,calendarOutline,timeOutline,personOutline,analyticsOutline,location,barChartOutline,documentText,checkmarkCircle,closeCircle,business,shieldCheckmark,cash,mailOutline,callOutline,checkmarkCircleOutline,closeCircleOutline,alertCircleOutline});
   }
 
   dismiss() {
