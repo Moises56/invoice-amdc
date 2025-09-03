@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Historial de Ubicaciones</ion-title>
+    <ion-title>Historial de Ubicacioness</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="dismiss()">
         <ion-icon name="close" slot="icon-only"></ion-icon>
@@ -74,10 +74,10 @@
             <span class="label">Estado:</span>
             <span class="value">Inactiva</span>
           </div>
-          <div *ngIf="locationData.currentLocation.assignedBy" class="detail-item">
+          <div *ngIf="locationData.currentLocation.assignedByUsername" class="detail-item">
             <ion-icon name="person-outline"></ion-icon>
             <span class="label">Asignado por:</span>
-            <span class="value">{{ locationData.currentLocation.assignedBy }}</span>
+            <span class="value">{{ locationData.currentLocation.assignedByUsername }}</span>
           </div>
         </div>
 
@@ -142,17 +142,46 @@
                   <ion-icon name="calendar-outline"></ion-icon>
                   <span>Inicio: {{ formatDate(location.assignedAt) }}</span>
                 </div>
+
                 <div *ngIf="location.deactivatedAt" class="detail-row">
                   <ion-icon name="calendar-clear-outline"></ion-icon>
                   <span>Fin: {{ formatDate(location.deactivatedAt) }}</span>
                 </div>
+                
                 <div class="detail-row">
                   <ion-icon name="time-outline"></ion-icon>
                   <span>Duración: {{ calculateDuration(location.assignedAt, location.deactivatedAt) }}</span>
                 </div>
-                <div *ngIf="location.assignedBy" class="detail-row">
+                <div *ngIf="location.assignedByUsername" class="detail-row">
                   <ion-icon name="person-outline"></ion-icon>
-                  <span>Asignado por: {{ location.assignedBy }}</span>
+                  <span>Asignado por: {{ location.assignedByUsername }}</span>
+                </div>
+              </div>
+
+              <!-- Consultation Stats for History Item -->
+              <div *ngIf="location.consultationStats" class="consultation-stats history-stats">
+                <h5>Estadísticas de Consultas</h5>
+                <div class="stats-grid compact">
+                  <div class="stat-card total">
+                    <div class="stat-value">{{ location.consultationStats.totalConsultas || 0 }}</div>
+                    <div class="stat-label">Total</div>
+                  </div>
+                  <div class="stat-card ec-normal">
+                    <div class="stat-value">{{ location.consultationStats.ecNormal || 0 }}</div>
+                    <div class="stat-label">EC Normal</div>
+                  </div>
+                  <div class="stat-card ec-amnistia">
+                    <div class="stat-value">{{ location.consultationStats.ecAmnistia || 0 }}</div>
+                    <div class="stat-label">EC Amnistía</div>
+                  </div>
+                  <div class="stat-card ics-normal">
+                    <div class="stat-value">{{ location.consultationStats.icsNormal || 0 }}</div>
+                    <div class="stat-label">ICS Normal</div>
+                  </div>
+                  <div class="stat-card ics-amnistia">
+                    <div class="stat-value">{{ location.consultationStats.icsAmnistia || 0 }}</div>
+                    <div class="stat-label">ICS Amnistía</div>
+                  </div>
                 </div>
               </div>
             </div>
