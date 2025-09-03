@@ -29,7 +29,6 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatsService } from 'src/app/shared/services/stats.service';
 import { UserStats, UserLocationHistoryResponse } from 'src/app/shared/interfaces/user.interface';
-import { LocationHistoryModalComponent } from './components/location-history-modal/location-history-modal.component';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
@@ -473,35 +472,14 @@ export class UserDashboardPage implements OnInit, OnDestroy {
    * Open location history modal
    */
   /**
-   * Open modal with current user's location history
+   * Navigate to location history page with tabs
    */
   async openMyLocationHistoryModal(): Promise<void> {
     try {
-      const locationHistory = this.userLocationHistory();
-      
-      // Prepare data with typeConsultaHistory from currentLocation
-      const modalData = {
-        ...locationHistory,
-        typeConsultaHistory: locationHistory?.currentLocation?.typeConsultaHistory || []
-      };
-      
-      console.log('Opening modal with consultation history:', modalData.typeConsultaHistory);
-      console.log('Consultation history count:', modalData.typeConsultaHistory.length);
-      
-      const modal = await this.modalController.create({
-        component: LocationHistoryModalComponent,
-        componentProps: {
-          locationData: modalData,
-          isLoading: this.isLoadingLocationHistory(),
-          hasError: this.hasLocationError(),
-          errorMessage: this.locationErrorMessage()
-        }
-      });
-
-      await modal.present();
+      await this.router.navigate(['/mi-historial-ubicacion']);
     } catch (error) {
-      console.error('Error opening location history modal:', error);
-      await this.showErrorToast('Error al abrir historial de ubicaciones');
+      console.error('Error navigating to location history page:', error);
+      await this.showErrorToast('Error al navegar al historial de ubicaciones');
     }
   }
 

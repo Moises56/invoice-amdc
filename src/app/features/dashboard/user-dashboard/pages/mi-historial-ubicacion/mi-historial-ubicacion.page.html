@@ -1,0 +1,455 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="goBack()" class="back-button">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Mi Historial de Ubicación</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="loadLocationHistory()" class="refresh-button">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <h3>Cargando...</h3>
+    <p>Obteniendo tu historial de ubicaciones</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+    <h3>Error</h3>
+    <p>{{ error }}</p>
+    <ion-button fill="outline" color="primary" (click)="loadLocationHistory()">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Reintentar
+    </ion-button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && !locationData" class="empty-container">
+    <ion-icon name="location-outline" color="medium"></ion-icon>
+    <h3>Sin datos disponibles</h3>
+    <p>No se encontró información de ubicaciones para mostrar</p>
+    <ion-button fill="outline" color="primary" (click)="loadLocationHistory()">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      Cargar datos
+    </ion-button>
+  </div>
+
+
+
+  <!-- Main Content -->
+  <div *ngIf="locationData" class="content-container">
+    <!-- Test: Simple tab structure without ion-tabs -->
+    <div class="simple-tabs">
+      <div class="tab-buttons">
+        <button class="tab-button" [class.active]="selectedTab === 'ubicacion-actual'" (click)="selectedTab = 'ubicacion-actual'">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>Ubicación Actual</span>
+        </button>
+        <button class="tab-button" [class.active]="selectedTab === 'historial-ubicaciones'" (click)="selectedTab = 'historial-ubicaciones'">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>Historial</span>
+          <span *ngIf="locationData.locationHistory?.length" class="badge">{{ locationData.locationHistory.length }}</span>
+        </button>
+        <button class="tab-button" [class.active]="selectedTab === 'historial-consultas'" (click)="selectedTab = 'historial-consultas'">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <span>Consultas</span>
+          <span *ngIf="locationData?.typeConsultaHistory?.length" class="badge">{{ locationData.typeConsultaHistory?.length }}</span>
+        </button>
+      </div>
+
+      <!-- Tab 1: Ubicación Actual -->
+      <div *ngIf="selectedTab === 'ubicacion-actual'" class="tab-content-wrapper">
+        <div class="tab-content">
+          <div class="current-location-container">
+            <!-- Current Location Header -->
+            <div class="location-header">
+              <div class="location-icon">
+                <ion-icon name="location" color="primary"></ion-icon>
+              </div>
+              <div class="location-info">
+                <h2>{{ locationData.currentLocation?.locationName || 'Ubicación no disponible' }}</h2>
+                <p class="location-subtitle">
+                  <ion-icon name="time-outline"></ion-icon>
+                  Estado actual de tu ubicación
+                </p>
+              </div>
+            </div>
+
+            <!-- Current Location Details -->
+            <div class="location-details" *ngIf="locationData.currentLocation; else noLocationTemplate">
+              <ion-card class="detail-card">
+                <ion-card-content>
+                  <div class="detail-grid">
+                    <div class="detail-item">
+                      <ion-icon name="business-outline" color="primary"></ion-icon>
+                      <div class="detail-content">
+                        <span class="detail-label">Nombre</span>
+                        <span class="detail-value">{{ locationData.currentLocation.locationName || 'N/A' }}</span>
+                      </div>
+                    </div>
+
+                    <div class="detail-item">
+                      <ion-icon name="checkmark-circle-outline" [color]="locationData.currentLocation.isActive ? 'success' : 'warning'"></ion-icon>
+                      <div class="detail-content">
+                        <span class="detail-label">Estado</span>
+                        <span class="detail-value" [class]="'status-' + (locationData.currentLocation.isActive ? 'active' : 'inactive')">
+                          {{ locationData.currentLocation.isActive ? 'Activo' : 'Inactivo' }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="detail-item">
+                      <ion-icon name="timer-outline" color="secondary"></ion-icon>
+                      <div class="detail-content">
+                        <span class="detail-label">Duración</span>
+                        <span class="detail-value">{{ locationData.currentLocation.durationDays ? locationData.currentLocation.durationDays + ' días' : 'N/A' }}</span>
+                      </div>
+                    </div>
+
+                    <div class="detail-item" *ngIf="locationData.currentLocation.assignedByUsername">
+                      <ion-icon name="person-outline" color="tertiary"></ion-icon>
+                      <div class="detail-content">
+                        <span class="detail-label">Asignado por</span>
+                        <span class="detail-value">{{ locationData.currentLocation.assignedByUsername }}</span>
+                      </div>
+                    </div>
+
+                    <div class="detail-item" *ngIf="locationData.currentLocation.assignedAt">
+                      <ion-icon name="calendar-outline" color="medium"></ion-icon>
+                      <div class="detail-content">
+                        <span class="detail-label">Fecha de asignación</span>
+                        <span class="detail-value">{{ locationData.currentLocation.assignedAt ? formatDate(locationData.currentLocation.assignedAt!) : 'N/A' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </div>
+
+            <!-- No Location Template -->
+            <ng-template #noLocationTemplate>
+              <div class="no-location-container">
+                <ion-card class="no-location-card">
+                  <ion-card-content>
+                    <div class="no-location-content">
+                      <ion-icon name="location-outline" color="medium" size="large"></ion-icon>
+                      <h3>Sin ubicación asignada</h3>
+                      <p>Actualmente no tienes una ubicación asignada en el sistema.</p>
+                      <ion-button fill="outline" color="primary" (click)="loadLocationHistory()">
+                        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+                        Actualizar información
+                      </ion-button>
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+            </ng-template>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats" *ngIf="locationData.locationHistory?.length || locationData.typeConsultaHistory?.length">
+              <h3>Resumen Rápido</h3>
+              <div class="stats-grid">
+                <div class="stat-item" *ngIf="locationData.locationHistory?.length">
+                  <ion-icon name="time-outline" color="primary"></ion-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ locationData.locationHistory.length }}</span>
+                    <span class="stat-label">Ubicaciones</span>
+                  </div>
+                </div>
+                
+                <div class="stat-item" *ngIf="locationData.typeConsultaHistory?.length">
+                  <ion-icon name="analytics-outline" color="secondary"></ion-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">{{ consultationHistoryStats.total }}</span>
+                    <span class="stat-label">Consultas</span>
+                  </div>
+                </div>
+                
+                <div class="stat-item" *ngIf="consultationHistoryStats.totalAmount > 0">
+                  <ion-icon name="cash-outline" color="success"></ion-icon>
+                  <div class="stat-content">
+                    <span class="stat-value">L.{{ consultationHistoryStats.totalAmount | number:'1.2-2' }}</span>
+                    <span class="stat-label">Total</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Historial de Ubicaciones -->
+      <div *ngIf="selectedTab === 'historial-ubicaciones'" class="tab-content-wrapper">
+        <div class="tab-content">
+          <div class="history-container">
+            <!-- Header with toggle -->
+            <div class="section-header">
+              <h2>
+                <ion-icon name="time-outline" class="header-icon"></ion-icon>
+                Historial de Ubicaciones
+              </h2>
+              <div class="header-actions">
+                <ion-badge color="primary" *ngIf="locationData.locationHistory?.length">
+                  {{ locationData.locationHistory.length }} ubicaciones
+                </ion-badge>
+                <ion-button fill="clear" size="small" (click)="toggleLocationHistory()">
+                  <ion-icon [name]="showLocationHistory ? 'chevron-up-outline' : 'chevron-down-outline'" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- Location History Timeline -->
+            <div *ngIf="showLocationHistory && locationData.locationHistory?.length" class="location-timeline">
+              <div class="timeline-item" *ngFor="let location of locationData.locationHistory; let i = index">
+                <div class="timeline-marker">
+                  <div class="timeline-dot" [class.active]="i === 0"></div>
+                  <div class="timeline-line" *ngIf="i < locationData.locationHistory.length - 1"></div>
+                </div>
+                
+                <ion-card class="timeline-card">
+                  <ion-card-content>
+                    <div class="timeline-header">
+                      <h3>{{ location.locationName }}</h3>
+                      <ion-badge [color]="location.isActive ? 'success' : 'medium'">
+                        {{ location.isActive ? 'Activo' : 'Inactivo' }}
+                      </ion-badge>
+                    </div>
+                    
+                    <div class="timeline-details">
+                      <div class="timeline-detail">
+                        <ion-icon name="timer-outline" color="secondary"></ion-icon>
+                        <span>{{ location.durationDays }} días</span>
+                      </div>
+                      
+                      <div class="timeline-detail" *ngIf="location.assignedByUsername">
+                        <ion-icon name="person-outline" color="tertiary"></ion-icon>
+                        <span>{{ location.assignedByUsername }}</span>
+                      </div>
+                      
+                      <div class="timeline-detail" *ngIf="location.assignedAt">
+                        <ion-icon name="calendar-outline" color="medium"></ion-icon>
+                        <span>{{ formatDate(location.assignedAt) }}</span>
+                      </div>
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!locationData.locationHistory?.length" class="empty-state">
+              <ion-icon name="location-outline" color="medium"></ion-icon>
+              <h3>Sin historial de ubicaciones</h3>
+              <p>No hay ubicaciones registradas en tu historial.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Historial de Consultas -->
+      <div *ngIf="selectedTab === 'historial-consultas'" class="tab-content-wrapper">
+        <div class="tab-content">
+          <div class="consultation-container">
+            <!-- Header with stats -->
+            <div class="section-header">
+              <h2>
+                <ion-icon name="analytics-outline" class="header-icon"></ion-icon>
+                Historial de Consultas
+              </h2>
+              <div class="header-actions">
+                <ion-badge color="secondary" *ngIf="consultationHistoryStats.total > 0">
+                  {{ consultationHistoryStats.total }} consultas
+                </ion-badge>
+                <ion-button fill="clear" size="small" (click)="toggleConsultationHistory()">
+                  <ion-icon [name]="showConsultationHistory ? 'chevron-up-outline' : 'chevron-down-outline'" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- Consultation Stats Summary -->
+            <div class="consultation-summary" *ngIf="consultationHistoryStats.total > 0">
+              <div class="summary-stats">
+                <div class="summary-item">
+                  <ion-icon name="document-text-outline" color="primary"></ion-icon>
+                  <div class="summary-info">
+                    <span class="summary-value">{{ consultationHistoryStats.ec }}</span>
+                    <span class="summary-label">EC</span>
+                  </div>
+                </div>
+                
+                <div class="summary-item">
+                  <ion-icon name="analytics-outline" color="secondary"></ion-icon>
+                  <div class="summary-info">
+                    <span class="summary-value">{{ consultationHistoryStats.ics }}</span>
+                    <span class="summary-label">ICS</span>
+                  </div>
+                </div>
+                
+                <div class="summary-item">
+                  <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+                  <div class="summary-info">
+                    <span class="summary-value">{{ consultationHistoryStats.normal }}</span>
+                    <span class="summary-label">Normal</span>
+                  </div>
+                </div>
+                
+                <div class="summary-item">
+                  <ion-icon name="shield-checkmark-outline" color="warning"></ion-icon>
+                  <div class="summary-info">
+                    <span class="summary-value">{{ consultationHistoryStats.amnistia }}</span>
+                    <span class="summary-label">Amnistía</span>
+                  </div>
+                </div>
+                
+                <div class="summary-item total-amount">
+                  <ion-icon name="cash-outline" color="success"></ion-icon>
+                  <div class="summary-info">
+                    <span class="summary-value currency">L.{{ consultationHistoryStats.totalAmount | number:'1.2-2' }}</span>
+                    <span class="summary-label">Total</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filters and Controls -->
+            <div *ngIf="showConsultationHistory && consultationHistoryStats.total > 0" class="consultation-filters">
+              <div class="filter-row">
+                <ion-select 
+                  [(ngModel)]="selectedConsultationType" 
+                  (ionChange)="onConsultationTypeChange($event)"
+                  placeholder="Filtrar por tipo"
+                  interface="popover"
+                  class="filter-select">
+                  <ion-select-option value="all">Todos los tipos</ion-select-option>
+                  <ion-select-option value="EC">EC</ion-select-option>
+                  <ion-select-option value="ICS">ICS</ion-select-option>
+                </ion-select>
+
+                <ion-select 
+                  [(ngModel)]="selectedConsultationMethod" 
+                  (ionChange)="onConsultationMethodChange($event)"
+                  placeholder="Filtrar por método"
+                  interface="popover"
+                  class="filter-select">
+                  <ion-select-option value="all">Todos los métodos</ion-select-option>
+                  <ion-select-option value="normal">Normal</ion-select-option>
+                  <ion-select-option value="amnistia">Amnistía</ion-select-option>
+                </ion-select>
+              </div>
+
+              <div class="sort-controls">
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  (click)="onConsultationSortChange('date')"
+                  [color]="consultationSortBy === 'date' ? 'primary' : 'medium'">
+                  <ion-icon name="calendar-outline" slot="start"></ion-icon>
+                  Fecha
+                  <ion-icon 
+                    [name]="consultationSortBy === 'date' && consultationSortOrder === 'asc' ? 'chevron-up-outline' : 'chevron-down-outline'" 
+                    slot="end"
+                    *ngIf="consultationSortBy === 'date'">
+                  </ion-icon>
+                </ion-button>
+                
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  (click)="onConsultationSortChange('amount')"
+                  [color]="consultationSortBy === 'amount' ? 'primary' : 'medium'">
+                  <ion-icon name="cash-outline" slot="start"></ion-icon>
+                  Monto
+                  <ion-icon 
+                    [name]="consultationSortBy === 'amount' && consultationSortOrder === 'asc' ? 'chevron-up-outline' : 'chevron-down-outline'" 
+                    slot="end"
+                    *ngIf="consultationSortBy === 'amount'">
+                  </ion-icon>
+                </ion-button>
+                
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  (click)="onConsultationSortChange('type')"
+                  [color]="consultationSortBy === 'type' ? 'primary' : 'medium'">
+                  <ion-icon name="list-outline" slot="start"></ion-icon>
+                  Tipo
+                  <ion-icon 
+                    [name]="consultationSortBy === 'type' && consultationSortOrder === 'asc' ? 'chevron-up-outline' : 'chevron-down-outline'" 
+                    slot="end"
+                    *ngIf="consultationSortBy === 'type'">
+                  </ion-icon>
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- Consultation History List -->
+            <div *ngIf="showConsultationHistory && filteredConsultationHistory.length > 0" class="consultation-list">
+              <ion-card class="consultation-card" *ngFor="let consultation of filteredConsultationHistory">
+                <ion-card-content>
+                  <div class="consultation-header">
+                    <div class="consultation-type">
+                      <ion-icon 
+                        [name]="getConsultationTypeIcon(consultation.type)" 
+                        [color]="getConsultationTypeColor(consultation.type)">
+                      </ion-icon>
+                      <span class="type-label">{{ consultation.type }}</span>
+                    </div>
+                    
+                    <div class="consultation-method">
+                      <ion-icon 
+                        [name]="getConsultationMethodIcon(consultation.method)" 
+                        [color]="getConsultationMethodColor(consultation.method)">
+                      </ion-icon>
+                      <span class="method-label">{{ consultation.method }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="consultation-details">
+                    <div class="consultation-key">
+                      <ion-icon name="key-outline" color="medium"></ion-icon>
+                      <span>{{ consultation.key }}</span>
+                    </div>
+                    
+                    <div class="consultation-amount">
+                      <ion-icon name="cash-outline" color="success"></ion-icon>
+                      <span class="amount">L.{{ consultation.total | number:'1.2-2' }}</span>
+                    </div>
+                    
+                    <div class="consultation-date">
+                      <ion-icon name="time-outline" color="medium"></ion-icon>
+                      <span>{{ formatDate(consultation.consultedAt) }}</span>
+                    </div>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="consultationHistoryStats.total === 0" class="empty-state">
+              <ion-icon name="analytics-outline" color="medium"></ion-icon>
+              <h3>Sin historial de consultas</h3>
+              <p>No hay consultas registradas en tu historial.</p>
+            </div>
+
+            <!-- No Results State -->
+            <div *ngIf="showConsultationHistory && consultationHistoryStats.total > 0 && filteredConsultationHistory.length === 0" class="empty-state">
+              <ion-icon name="filter-outline" color="medium"></ion-icon>
+              <h3>Sin resultados</h3>
+              <p>No se encontraron consultas con los filtros aplicados.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

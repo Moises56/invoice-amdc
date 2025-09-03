@@ -124,6 +124,12 @@ export const routes: Routes = [
     data: { roles: [Role['USER-ADMIN']] }
   },
   {
+    path: 'mi-historial-ubicacion',
+    loadChildren: () => import('./features/dashboard/user-dashboard/pages/mi-historial-ubicacion/mi-historial-ubicacion.module').then(m => m.MiHistorialUbicacionPageModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role.USER, Role['USER-ADMIN']] }
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }
