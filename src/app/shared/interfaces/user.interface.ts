@@ -231,6 +231,15 @@ export interface ConsultationStats {
   totalAcumulado?: number;
 }
 
+// New interface for consultation history
+export interface TypeConsultaHistoryItem {
+  type: 'EC' | 'ICS';
+  method: 'normal' | 'amnistia';
+  key: string | null;
+  total: string;
+  consultedAt: string;
+}
+
 // User Location History Interfaces
 export interface UserLocationHistoryResponse {
   userId: string;
@@ -243,6 +252,7 @@ export interface UserLocationHistoryResponse {
   firstAssignedAt: string;
   lastAssignedAt: string;
   consultationStats: ConsultationStats;
+  typeConsultaHistory?: TypeConsultaHistoryItem[];
 }
 
 export interface CurrentLocationItem {
@@ -258,6 +268,7 @@ export interface CurrentLocationItem {
   updatedAt: string;
   durationDays: number;
   consultationStats: ConsultationStats;
+  typeConsultaHistory?: TypeConsultaHistoryItem[];
 }
 
 export interface UserLocationHistoryItem {
@@ -274,6 +285,7 @@ export interface UserLocationHistoryItem {
   durationDays: number;
   deactivatedAt?: string;
   consultationStats: ConsultationStats;
+  typeConsultaHistory?: TypeConsultaHistoryItem[];
 }
 
 export interface AllUsersLocationHistoryResponse {
@@ -299,6 +311,7 @@ export interface AllUsersLocationHistoryItem {
   assignedBy: string;
   assignedByUsername: string;
   isActive: boolean;
+  typeConsultaHistory?: TypeConsultaHistoryItem[];
 }
 
 export interface AssignUserLocationRequest {

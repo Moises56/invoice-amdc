@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar class="modal-toolbar">
-    <ion-title class="modal-title">Historial de Ubicaciones</ion-title>
+    <ion-title class="modal-title">Historial de Ubicacioness</ion-title>
     <ion-buttons slot="end">
       <ion-button 
         fill="clear" 
@@ -191,6 +191,185 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consultation History Section -->
+    <div *ngIf="locationData.typeConsultaHistory && locationData.typeConsultaHistory.length > 0" class="consultation-history-section">
+      <div class="section-header">
+        <h2>
+          <ion-icon name="analytics-outline" class="header-icon"></ion-icon>
+          Historial de Consultas
+        </h2>
+        <div class="header-actions">
+          <ion-badge color="tertiary">{{ consultationHistoryStats.total }} consultas</ion-badge>
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            (click)="toggleConsultationHistory()">
+            <ion-icon 
+              [name]="showConsultationHistory ? 'chevron-up-outline' : 'chevron-down-outline'" 
+              slot="icon-only">
+            </ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Consultation Stats Summary -->
+      <div class="consultation-summary">
+        <div class="summary-stats">
+          <div class="summary-item">
+            <ion-icon name="document-text-outline" color="primary"></ion-icon>
+            <div class="summary-info">
+              <span class="summary-value">{{ consultationHistoryStats.ec }}</span>
+              <span class="summary-label">EC</span>
+            </div>
+          </div>
+          <div class="summary-item">
+            <ion-icon name="analytics-outline" color="secondary"></ion-icon>
+            <div class="summary-info">
+              <span class="summary-value">{{ consultationHistoryStats.ics }}</span>
+              <span class="summary-label">ICS</span>
+            </div>
+          </div>
+          <div class="summary-item">
+            <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+            <div class="summary-info">
+              <span class="summary-value">{{ consultationHistoryStats.normal }}</span>
+              <span class="summary-label">Normal</span>
+            </div>
+          </div>
+          <div class="summary-item">
+            <ion-icon name="shield-checkmark-outline" color="warning"></ion-icon>
+            <div class="summary-info">
+              <span class="summary-value">{{ consultationHistoryStats.amnistia }}</span>
+              <span class="summary-label">Amnistía</span>
+            </div>
+          </div>
+          <div class="summary-item total-amount">
+            <ion-icon name="cash-outline" color="success"></ion-icon>
+            <div class="summary-info">
+              <span class="summary-value currency">L.{{ consultationHistoryStats.totalAmount | number:'1.2-2' }}</span>
+              <span class="summary-label">Total Acumulado</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters and Controls -->
+      <div *ngIf="showConsultationHistory" class="consultation-filters">
+        <div class="filter-row">
+          <ion-select 
+            [(ngModel)]="selectedConsultationType" 
+            (ionChange)="onConsultationTypeChange($event)"
+            placeholder="Filtrar por tipo"
+            interface="popover"
+            class="filter-select">
+            <ion-select-option value="all">Todos los tipos</ion-select-option>
+            <ion-select-option value="EC">EC</ion-select-option>
+            <ion-select-option value="ICS">ICS</ion-select-option>
+          </ion-select>
+
+          <ion-select 
+            [(ngModel)]="selectedConsultationMethod" 
+            (ionChange)="onConsultationMethodChange($event)"
+            placeholder="Filtrar por método"
+            interface="popover"
+            class="filter-select">
+            <ion-select-option value="all">Todos los métodos</ion-select-option>
+            <ion-select-option value="normal">Normal</ion-select-option>
+            <ion-select-option value="amnistia">Amnistía</ion-select-option>
+          </ion-select>
+        </div>
+
+        <div class="sort-controls">
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            (click)="onConsultationSortChange('date')"
+            [color]="consultationSortBy === 'date' ? 'primary' : 'medium'">
+            <ion-icon name="calendar-outline" slot="start"></ion-icon>
+            Fecha
+            <ion-icon 
+              *ngIf="consultationSortBy === 'date'" 
+              [name]="consultationSortOrder === 'asc' ? 'arrow-up' : 'arrow-down'" 
+              slot="end">
+            </ion-icon>
+          </ion-button>
+
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            (click)="onConsultationSortChange('type')"
+            [color]="consultationSortBy === 'type' ? 'primary' : 'medium'">
+            <ion-icon name="list-outline" slot="start"></ion-icon>
+            Tipo
+            <ion-icon 
+              *ngIf="consultationSortBy === 'type'" 
+              [name]="consultationSortOrder === 'asc' ? 'arrow-up' : 'arrow-down'" 
+              slot="end">
+            </ion-icon>
+          </ion-button>
+
+          <ion-button 
+            fill="clear" 
+            size="small" 
+            (click)="onConsultationSortChange('total')"
+            [color]="consultationSortBy === 'total' ? 'primary' : 'medium'">
+            <ion-icon name="cash-outline" slot="start"></ion-icon>
+            Monto
+            <ion-icon 
+              *ngIf="consultationSortBy === 'total'" 
+              [name]="consultationSortOrder === 'asc' ? 'arrow-up' : 'arrow-down'" 
+              slot="end">
+            </ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <!-- Consultation History List -->
+      <div *ngIf="showConsultationHistory" class="consultation-list">
+        <div *ngFor="let consultation of filteredConsultationHistory; let i = index" class="consultation-card">
+          <div class="consultation-header">
+            <div class="consultation-type">
+              <ion-chip [color]="getConsultationTypeColor(consultation.type)" class="type-chip">
+                <ion-icon [name]="getConsultationTypeIcon(consultation.type)"></ion-icon>
+                <ion-label>{{ consultation.type }}</ion-label>
+              </ion-chip>
+              <ion-chip [color]="getConsultationMethodColor(consultation.method)" class="method-chip">
+                <ion-icon [name]="getConsultationMethodIcon(consultation.method)"></ion-icon>
+                <ion-label>{{ consultation.method === 'normal' ? 'Normal' : 'Amnistía' }}</ion-label>
+              </ion-chip>
+            </div>
+            <div class="consultation-amount">
+              <span class="amount-value">{{ consultation.total }}</span>
+            </div>
+          </div>
+
+          <div class="consultation-details">
+            <div *ngIf="consultation.key" class="detail-row">
+              <ion-icon name="key-outline"></ion-icon>
+              <span class="detail-label">Clave:</span>
+              <span class="detail-value">{{ consultation.key }}</span>
+            </div>
+            <div *ngIf="!consultation.key" class="detail-row">
+              <ion-icon name="help-circle-outline"></ion-icon>
+              <span class="detail-label">Clave:</span>
+              <span class="detail-value no-key">Sin clave especificada</span>
+            </div>
+            <div class="detail-row">
+              <ion-icon name="time-outline"></ion-icon>
+              <span class="detail-label">Consultado:</span>
+              <span class="detail-value">{{ formatDate(consultation.consultedAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- No filtered results -->
+        <div *ngIf="filteredConsultationHistory.length === 0" class="no-results">
+          <ion-icon name="search-outline" class="no-results-icon"></ion-icon>
+          <p>No se encontraron consultas con los filtros aplicados</p>
         </div>
       </div>
     </div>

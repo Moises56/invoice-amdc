@@ -197,7 +197,7 @@ export class StatsService {
   getUserLocationHistory(userId: string, filter?: LocationHistoryFilter): Observable<UserLocationHistoryResponse> {
     console.log('📡 Solicitando historial de ubicaciones para usuario:', userId, filter);
     
-    let params = new HttpParams();
+    let params = new HttpParams().set('includeConsultationStats', 'true');
     if (filter) {
       Object.keys(filter).forEach(key => {
         const value = (filter as any)[key];
@@ -216,7 +216,7 @@ export class StatsService {
   getAllUsersLocationHistory(filter?: LocationHistoryFilter): Observable<UserLocationHistoryResponse[]> {
     console.log('📡 Solicitando historial de ubicaciones de todos los usuarios...', filter);
     
-    let params = new HttpParams();
+    let params = new HttpParams().set('includeConsultationStats', 'true');
     if (filter) {
       Object.keys(filter).forEach(key => {
         const value = (filter as any)[key];

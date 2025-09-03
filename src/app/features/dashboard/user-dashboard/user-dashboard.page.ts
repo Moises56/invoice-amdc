@@ -38,6 +38,11 @@ import {
   closeCircleOutline,
   checkmarkCircle,
   closeCircle,
+  closeOutline,
+  location,
+  calendarClearOutline,
+  chevronUpOutline,
+  chevronDownOutline,
   searchOutline,
   trendingUpOutline,
   trendingDownOutline,
@@ -183,6 +188,11 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       timeOutline,
       checkmarkCircle,
       closeCircle,
+      closeOutline,
+      location,
+      calendarClearOutline,
+      chevronUpOutline,
+      chevronDownOutline,
       calendarOutline,
       searchOutline,
       statsChartOutline,
@@ -318,6 +328,9 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       if (response && response.userId) {
         this.userLocationHistory.set(response);
         console.log('Location history loaded successfully:', response);
+        console.log('TypeConsultaHistory in response:', response.typeConsultaHistory);
+        console.log('TypeConsultaHistory length:', response.typeConsultaHistory?.length || 0);
+        console.log('Full response structure:', JSON.stringify(response, null, 2));
 
         if (!silentRefresh) {
           await this.showSuccessToast('Historial de ubicaciones actualizado');
@@ -464,10 +477,21 @@ export class UserDashboardPage implements OnInit, OnDestroy {
    */
   async openMyLocationHistoryModal(): Promise<void> {
     try {
+      const locationHistory = this.userLocationHistory();
+      
+      // Prepare data with typeConsultaHistory from currentLocation
+      const modalData = {
+        ...locationHistory,
+        typeConsultaHistory: locationHistory?.currentLocation?.typeConsultaHistory || []
+      };
+      
+      console.log('Opening modal with consultation history:', modalData.typeConsultaHistory);
+      console.log('Consultation history count:', modalData.typeConsultaHistory.length);
+      
       const modal = await this.modalController.create({
         component: LocationHistoryModalComponent,
         componentProps: {
-          locationData: this.userLocationHistory(),
+          locationData: modalData,
           isLoading: this.isLoadingLocationHistory(),
           hasError: this.hasLocationError(),
           errorMessage: this.locationErrorMessage()
