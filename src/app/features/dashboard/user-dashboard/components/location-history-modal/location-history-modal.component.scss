@@ -1,3 +1,62 @@
+// Modal Header Styles
+.modal-toolbar {
+  --background: white;
+  --border-color: var(--ion-color-light-shade);
+  --color: var(--ion-color-dark);
+  
+  .modal-title {
+    text-align: center;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--ion-color-dark);
+    padding-left: 16px;
+  }
+  
+  .close-button {
+    --color: var(--ion-color-dark);
+    --background: transparent;
+    --background-activated: rgba(244, 67, 54, 0.2);
+    --background-hover: rgba(244, 67, 54, 0.1);
+    --color-hover: #f44336;
+    --border-radius: 50%;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+    margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    z-index: 1000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      --color: #f44336;
+      --background: rgba(244, 67, 54, 0.1);
+      transform: scale(1.1);
+    }
+    
+    &:active {
+      --background: rgba(244, 67, 54, 0.2);
+      transform: scale(0.95);
+    }
+    
+    ion-icon {
+      font-size: 24px;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      color: var(--ion-color-dark) !important;
+      font-weight: bold;
+    }
+    
+    &:hover ion-icon {
+      color: #f44336 !important;
+      transform: scale(1.1);
+    }
+  }
+}
+
 .location-history-content {
   --background: var(--ion-color-light);
 }
