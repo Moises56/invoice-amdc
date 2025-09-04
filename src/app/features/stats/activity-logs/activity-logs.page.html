@@ -66,13 +66,62 @@
 
       <!-- Filter Section -->
       <div class="filter-section">
-        <ion-searchbar
-          placeholder="Filtrar por Username"
-          [debounce]="300"
-          (ionInput)="onSearchChange($event)"
-          class="username-filter"
-        >
-        </ion-searchbar>
+        <div class="filter-row">
+          <ion-searchbar
+            placeholder="Filtrar por Username"
+            [debounce]="300"
+            (ionInput)="onSearchChange($event)"
+            class="username-filter"
+          >
+          </ion-searchbar>
+          
+          <ion-button class="export-button" (click)="exportToExcel()">
+            <ion-icon name="download-outline" slot="start"></ion-icon>
+            Exportar a Excel
+          </ion-button>
+        </div>
+        
+        <!-- Filtros adicionales -->
+        <div class="additional-filters">
+          <div class="filter-group">
+            <label for="consultaFilter">Consulta:</label>
+            <select id="consultaFilter" [(ngModel)]="currentFilter().consulta" (change)="onFilterChange('consulta', $event)">
+              <option value="">Todas</option>
+              <option value="EC">EC</option>
+              <option value="ICS">ICS</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="tipoConsultaFilter">Tipo Consulta:</label>
+            <select id="tipoConsultaFilter" [(ngModel)]="currentFilter().tipoConsulta" (change)="onFilterChange('tipoConsulta', $event)">
+              <option value="">Todos</option>
+              <option value="normal">Normal</option>
+              <option value="amnistia">Amnistía</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="resultadoFilter">Resultado:</label>
+            <select id="resultadoFilter" [(ngModel)]="currentFilter().resultado" (change)="onFilterChange('resultado', $event)">
+              <option value="">Todos</option>
+              <option value="SUCCESS">SUCCESS</option>
+              <option value="ERROR">ERROR</option>
+              <option value="NOT_FOUND">NOT_FOUND</option>
+            </select>
+          </div>
+          
+          <div class="filter-actions">
+            <ion-button fill="outline" size="small" (click)="clearFilters()">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Limpiar
+            </ion-button>
+            <ion-button fill="solid" size="small" (click)="applyFilters()">
+              <ion-icon name="filter-outline" slot="start"></ion-icon>
+              Aplicar
+            </ion-button>
+          </div>
+        </div>
       </div>
 
       <!-- Logs Table -->
@@ -89,6 +138,7 @@
                 <th>IP</th>
                 <th>DURACIÓN (MS)</th>
                 <th>USUARIO</th>
+                <th>ACCIONES</th>
               </tr>
             </thead>
             <tbody>
@@ -116,54 +166,114 @@
                 <td class="ip">{{ log.ip || '::1' }}</td>
                 <td class="duracion">{{ log.duracionMs || '0' }}</td>
                 <td class="usuario">{{ getUserFullName(log) || 'N/A' }}</td>
+                <td class="acciones">
+                  <ion-button fill="clear" size="small" (click)="openLogDetails(log)" class="detail-button">
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </ion-button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="pagination-container" *ngIf="totalPages() > 1">
+        <!-- Paginación Mejorada -->
+        <div class="modern-pagination-container" *ngIf="totalPagesCalculated() > 1">
           <div class="pagination-info">
-            <span
-              >Showing {{ getStartRecord() }} to {{ getEndRecord() }} of {{
-              totalRecords() }} results</span
-            >
+            <span class="info-text">Mostrando {{ getStartRecord() }} - {{ getEndRecord() }} de {{ totalRecords() }} registros</span>
+            <div class="items-per-page">
+              <label for="itemsPerPage">Registros por página:</label>
+              <select id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+              </select>
+            </div>
           </div>
+          
           <div class="pagination-controls">
             <ion-button
               fill="clear"
-              class="page-button"
+              class="pagination-btn first-last"
+              [disabled]="currentPage() === 1"
+              (click)="goToPage(1)"
+              title="Primera página"
+            >
+              <ion-icon name="play-skip-back-outline"></ion-icon>
+            </ion-button>
+            
+            <ion-button
+              fill="clear"
+              class="pagination-btn prev-next"
               [disabled]="currentPage() === 1"
               (click)="goToPage(currentPage() - 1)"
+              title="Página anterior"
             >
               <ion-icon name="chevron-back-outline"></ion-icon>
             </ion-button>
-
-            <ion-button
-              *ngFor="let page of getVisiblePages()"
-              [class]="page === currentPage() ? 'page-button active' : 'page-button'"
-              (click)="goToPage(page)"
-            >
-              {{ page }}
-            </ion-button>
-
-            <span *ngIf="shouldShowEllipsis()" class="ellipsis">...</span>
-
-            <ion-button
-              *ngIf="totalPages() > 5 && currentPage() < totalPages() - 2"
-              class="page-button"
-              (click)="goToPage(totalPages())"
-            >
-              {{ totalPages() }}
-            </ion-button>
-
+            
+            <!-- Números de página con diseño mejorado -->
+            <div class="page-numbers">
+              <ion-button
+                *ngFor="let page of getVisiblePages()"
+                [class]="page === currentPage() ? 'pagination-number active' : 'pagination-number'"
+                (click)="goToPage(page)"
+                [title]="'Ir a página ' + page"
+              >
+                {{ page }}
+              </ion-button>
+              
+              <span *ngIf="shouldShowEllipsis()" class="pagination-ellipsis">...</span>
+              
+              <ion-button
+                *ngIf="totalPagesCalculated() > 5 && currentPage() < totalPagesCalculated() - 2"
+                class="pagination-number"
+                (click)="goToPage(totalPagesCalculated())"
+                [title]="'Ir a página ' + totalPagesCalculated()"
+              >
+                {{ totalPagesCalculated() }}
+              </ion-button>
+            </div>
+            
             <ion-button
               fill="clear"
-              class="page-button"
-              [disabled]="currentPage() === totalPages()"
+              class="pagination-btn prev-next"
+              [disabled]="currentPage() === totalPagesCalculated()"
               (click)="goToPage(currentPage() + 1)"
+              title="Página siguiente"
             >
               <ion-icon name="chevron-forward-outline"></ion-icon>
+            </ion-button>
+            
+            <ion-button
+              fill="clear"
+              class="pagination-btn first-last"
+              [disabled]="currentPage() === totalPagesCalculated()"
+              (click)="goToPage(totalPagesCalculated())"
+              title="Última página"
+            >
+              <ion-icon name="play-skip-forward-outline"></ion-icon>
+            </ion-button>
+          </div>
+          
+          <div class="quick-jump">
+            <label for="pageJump">Ir a página:</label>
+            <input
+              type="number"
+              id="pageJump"
+              #pageInput
+              [min]="1"
+              [max]="totalPagesCalculated()"
+              placeholder="#"
+              (keyup.enter)="jumpToPage(pageInput.value); pageInput.value = ''"
+            />
+            <ion-button
+              fill="clear"
+              class="jump-btn"
+              (click)="jumpToPage(pageInput.value); pageInput.value = ''"
+              title="Ir a página"
+            >
+              <ion-icon name="arrow-forward-outline"></ion-icon>
             </ion-button>
           </div>
         </div>
@@ -185,3 +295,113 @@
     </div>
   </div>
 </ion-content>
+
+<!-- Modal para detalles del log -->
+<div class="log-details-modal" [class.open]="isModalOpen()" (click)="closeLogDetails()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">Detalles del Log</h2>
+      <ion-button fill="clear" (click)="closeLogDetails()" class="close-button">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedLog()">
+      <div class="detail-section">
+        <h3 class="section-title">Información General</h3>
+        <div class="detail-row">
+          <div class="detail-label">ID:</div>
+          <div class="detail-value">{{ selectedLog()?.id }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Fecha:</div>
+          <div class="detail-value">{{ formatDate(selectedLog()?.createdAt) }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Usuario:</div>
+          <div class="detail-value">{{ getUserFullName(selectedLog()) }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Ubicación:</div>
+          <div class="detail-value">{{ selectedLog()?.userLocation || 'No especificada' }}</div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h3 class="section-title">Detalles de la Consulta</h3>
+        <div class="detail-row">
+          <div class="detail-label">Tipo:</div>
+          <div class="detail-value">{{ selectedLog()?.consultaType || 'N/A' }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Subtipo:</div>
+          <div class="detail-value">{{ selectedLog()?.consultaSubtype || 'normal' }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Parámetros:</div>
+          <div class="detail-value code-block">{{ formatParametersFormatted(selectedLog()) }}</div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h3 class="section-title">Resultado</h3>
+        <div class="detail-row">
+          <div class="detail-label">Estado:</div>
+          <div class="detail-value">
+            <span class="status-badge" [class]="getResultClass(selectedLog()?.resultado || '')">
+              {{ selectedLog()?.resultado || 'UNKNOWN' }}
+            </span>
+          </div>
+        </div>
+        <div class="detail-row" *ngIf="selectedLog()?.errorMessage">
+          <div class="detail-label">Error:</div>
+          <div class="detail-value error-message">{{ selectedLog()?.errorMessage }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Duración:</div>
+          <div class="detail-value">{{ selectedLog()?.duracionMs || '0' }} ms</div>
+        </div>
+      </div>
+      
+      <div class="detail-section">
+        <h3 class="section-title">Información Técnica</h3>
+        <div class="detail-row">
+          <div class="detail-label">IP:</div>
+          <div class="detail-value">{{ selectedLog()?.ip || '::1' }}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">User Agent:</div>
+          <div class="detail-value user-agent">{{ selectedLog()?.userAgent || 'No disponible' }}</div>
+        </div>
+      </div>
+      
+      <div class="detail-section user-agent-details" *ngIf="selectedLog()?.userAgent">
+        <h3 class="section-title">Detalles del User Agent</h3>
+        <div class="user-agent-parsed">
+          <div class="detail-row">
+            <div class="detail-label">Navegador:</div>
+            <div class="detail-value">{{ selectedLog() && selectedLog()?.userAgent ? parseUserAgent(selectedLog()?.userAgent).browser : 'No disponible' }}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">Sistema operativo:</div>
+            <div class="detail-value">{{ selectedLog() && selectedLog()?.userAgent ? parseUserAgent(selectedLog()?.userAgent).os : 'No disponible' }}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">Dispositivo:</div>
+            <div class="detail-value">{{ selectedLog() && selectedLog()?.userAgent ? parseUserAgent(selectedLog()?.userAgent).device : 'No disponible' }}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">Tipo:</div>
+            <div class="detail-value">{{ selectedLog() && selectedLog()?.userAgent ? parseUserAgent(selectedLog()?.userAgent).type : 'No disponible' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <ion-button fill="outline" (click)="closeLogDetails()">
+        Cerrar
+      </ion-button>
+    </div>
+  </div>
+</div>

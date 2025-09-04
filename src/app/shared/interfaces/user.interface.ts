@@ -114,6 +114,9 @@ export interface StatsFilter {
 export interface LogsFilter extends StatsFilter {
   accion?: string;
   ubicacion?: string;
+  consulta?: string;
+  tipoConsulta?: string;
+  resultado?: string;
   page?: number;
   per_page?: number;
 }
