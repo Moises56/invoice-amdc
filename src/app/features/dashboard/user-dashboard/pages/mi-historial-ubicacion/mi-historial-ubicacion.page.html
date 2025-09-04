@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-button fill="clear" (click)="goBack()" class="back-button">
+      <ion-button (click)="goBack()" class="back-button">
         <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -228,7 +228,7 @@
                     <div class="timeline-details">
                       <div class="timeline-detail">
                         <ion-icon name="timer-outline" color="secondary"></ion-icon>
-                        <span>{{ location.durationDays }} días</span>
+                        <span>Duración: {{ location.durationDays }} días</span>
                       </div>
                       
                       <div class="timeline-detail" *ngIf="location.assignedByUsername">
@@ -238,7 +238,12 @@
                       
                       <div class="timeline-detail" *ngIf="location.assignedAt">
                         <ion-icon name="calendar-outline" color="medium"></ion-icon>
-                        <span>{{ formatDate(location.assignedAt) }}</span>
+                        <span>Inicio: {{ formatDate(location.assignedAt) }}</span>
+                      </div>
+                      <!-- fecha de final -->
+                      <div class="timeline-detail" *ngIf="location.deactivatedAt">
+                        <ion-icon name="calendar-outline" color="danger"></ion-icon>
+                        <span>Final: {{ formatDate(location.deactivatedAt) }}</span>
                       </div>
                     </div>
                   </ion-card-content>
@@ -264,7 +269,7 @@
             <div class="section-header">
               <h2>
                 <ion-icon name="analytics-outline" class="header-icon"></ion-icon>
-                Historial de Consultas
+                Historial de Consultas ubicacion-actual
               </h2>
               <div class="header-actions">
                 <ion-badge color="secondary" *ngIf="consultationHistoryStats.total > 0">
@@ -314,8 +319,8 @@
                 <div class="summary-item total-amount">
                   <ion-icon name="cash-outline" color="success"></ion-icon>
                   <div class="summary-info">
-                    <span class="summary-value currency">L.{{ consultationHistoryStats.totalAmount | number:'1.2-2' }}</span>
-                    <span class="summary-label">Total</span>
+                    <span class="summary-value currency">L.{{ consultationHistoryStats.totalAmount.toLocaleString('es-HN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) }}</span>
+                    <span class="summary-label">Total consultado</span>
                   </div>
                 </div>
               </div>
@@ -422,7 +427,7 @@
                     
                     <div class="consultation-amount">
                       <ion-icon name="cash-outline" color="success"></ion-icon>
-                      <span class="amount">L.{{ consultation.total | number:'1.2-2' }}</span>
+                      <span class="amount">{{ consultation.total }}</span>
                     </div>
                     
                     <div class="consultation-date">

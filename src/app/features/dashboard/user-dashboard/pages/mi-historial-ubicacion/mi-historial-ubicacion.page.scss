@@ -10,7 +10,7 @@ ion-content {
 // Header Styles
 ion-header {
   ion-toolbar {
-    .back-button, .refresh-button {
+    .refresh-button {
       --color: white;
       --color-activated: rgba(255, 255, 255, 0.8);
       --color-focused: white;
@@ -24,8 +24,18 @@ ion-header {
     }
     
     .back-button {
+      --color: white;
+      --color-activated: rgba(255, 255, 255, 0.8);
+      --color-focused: white;
+      --color-hover: rgba(255, 255, 255, 0.9);
+      --ripple-color: rgba(255, 255, 255, 0.3);
       --padding-start: 8px;
       --padding-end: 8px;
+      
+      ion-icon {
+        font-size: 1.5rem;
+        color: white;
+      }
     }
     
     .refresh-button {

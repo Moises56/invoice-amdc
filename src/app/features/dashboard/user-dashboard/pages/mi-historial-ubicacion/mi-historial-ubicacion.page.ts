@@ -7,6 +7,8 @@ import { LoadingController, ToastController } from '@ionic/angular';
 import { Subject, takeUntil } from 'rxjs';
 import { StatsService } from '../../../../../shared/services/stats.service';
 import { UserLocationHistoryResponse, TypeConsultaHistoryItem } from '../../../../../shared/interfaces/user.interface';
+import { addIcons } from 'ionicons';
+import { arrowBackOutline, refreshOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-mi-historial-ubicacion',
@@ -41,7 +43,13 @@ export class MiHistorialUbicacionPage implements OnInit, OnDestroy {
     private statsService: StatsService,
     private loadingController: LoadingController,
     private toastController: ToastController
-  ) {}
+  ) {
+    // Registrar los iconos necesarios
+    addIcons({
+      arrowBackOutline,
+      refreshOutline
+    });
+  }
 
   ngOnInit() {
     this.loadLocationHistory();
@@ -151,7 +159,10 @@ export class MiHistorialUbicacionPage implements OnInit, OnDestroy {
       if (this.consultationSortBy === 'date') {
         comparison = new Date(a.consultedAt).getTime() - new Date(b.consultedAt).getTime();
       } else if (this.consultationSortBy === 'amount') {
-        comparison = parseFloat(a.total || '0') - parseFloat(b.total || '0');
+        // Extraer solo la parte numérica eliminando 'L.' y reemplazando comas
+        const aValue = a.total ? parseFloat(a.total.replace('L.', '').replace(/,/g, '')) : 0;
+        const bValue = b.total ? parseFloat(b.total.replace('L.', '').replace(/,/g, '')) : 0;
+        comparison = (isNaN(aValue) ? 0 : aValue) - (isNaN(bValue) ? 0 : bValue);
       } else if (this.consultationSortBy === 'type') {
         comparison = a.type.localeCompare(b.type);
       }
@@ -180,7 +191,11 @@ export class MiHistorialUbicacionPage implements OnInit, OnDestroy {
       ics: history.filter(item => item.type === 'ICS').length,
       normal: history.filter(item => item.method === 'normal').length,
       amnistia: history.filter(item => item.method === 'amnistia').length,
-      totalAmount: history.reduce((sum, item) => sum + parseFloat(item.total || '0'), 0)
+      totalAmount: history.reduce((sum, item) => {
+        // Extraer solo la parte numérica eliminando 'L.' y reemplazando comas
+        const numericValue = item.total ? parseFloat(item.total.replace('L.', '').replace(/,/g, '')) : 0;
+        return sum + (isNaN(numericValue) ? 0 : numericValue);
+      }, 0)
     };
   }
 
