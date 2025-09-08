@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingController, ToastController } from '@ionic/angular';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, timeout } from 'rxjs';
 import { StatsService } from '../../../../../shared/services/stats.service';
 import { UserLocationHistoryResponse, TypeConsultaHistoryItem } from '../../../../../shared/interfaces/user.interface';
 import { addIcons } from 'ionicons';
@@ -52,46 +52,89 @@ export class MiHistorialUbicacionPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadLocationHistory();
+    // Cargar datos de forma optimizada
+    this.loadLocationHistoryOptimized();
   }
-
-
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  async loadLocationHistory() {
+  /**
+   * Método optimizado para cargar el historial de ubicaciones
+   * - Eliminamos el LoadingController doble
+   * - Mejoramos el manejo de errores
+   * - Optimizamos la respuesta
+   */
+  async loadLocationHistoryOptimized() {
+    // Si ya tenemos datos y no es un refresh manual, no cargar de nuevo
+    if (this.locationData && !this.isLoading) {
+      return;
+    }
+
     this.isLoading = true;
     this.error = null;
-    
-    const loading = await this.loadingController.create({
-      message: 'Cargando historial de ubicaciones...'
-    });
-    await loading.present();
 
-    this.statsService.getMyLocationHistory()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response: UserLocationHistoryResponse) => {
-          // Prepare data with typeConsultaHistory at root level
-          this.locationData = {
-            ...response,
-            typeConsultaHistory: response.currentLocation?.typeConsultaHistory || []
-          };
-          
-          this.isLoading = false;
-          loading.dismiss();
-        },
-        error: (error: any) => {
-          console.error('Error loading location history:', error);
-          this.error = 'Error al cargar el historial de ubicaciones';
-          this.isLoading = false;
-          loading.dismiss();
-          this.showErrorToast();
-        }
-      });
+    try {
+      const response = await this.statsService.getMyLocationHistory()
+        .pipe(
+          takeUntil(this.destroy$),
+          // Timeout de 10 segundos para evitar carga infinita
+          timeout(10000)
+        )
+        .toPromise();
+
+      if (response) {
+        // Preparar datos de forma optimizada
+        this.locationData = {
+          ...response,
+          typeConsultaHistory: response.currentLocation?.typeConsultaHistory || []
+        } as UserLocationHistoryResponse;
+        // console.log('✅ Historial de ubicaciones cargado:', this.locationData);
+      }
+    } catch (error: any) {
+      console.error('❌ Error loading location history:', error);
+      
+      // Mejorar el mensaje de error según el tipo
+      if (error.name === 'TimeoutError') {
+        this.error = 'La carga está tomando más tiempo del esperado. Verifica tu conexión.';
+      } else if (error.status === 404) {
+        this.error = 'No se encontraron datos de ubicación para tu usuario.';
+      } else if (error.status === 0) {
+        this.error = 'Sin conexión a internet. Verifica tu conexión de red.';
+      } else {
+        this.error = error.message || 'Error al cargar el historial de ubicaciones';
+      }
+      
+      this.showErrorToast();
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  /**
+   * Método legacy mantenido para compatibilidad con el botón de refresh
+   */
+  async loadLocationHistory() {
+    await this.loadLocationHistoryOptimized();
+  }
+
+  /**
+   * Método para refresh manual (pull-to-refresh o botón)
+   */
+  async refreshLocationHistory() {
+    // Forzar recarga eliminando datos en caché
+    this.locationData = null;
+    await this.loadLocationHistoryOptimized();
+  }
+
+  /**
+   * Manejar pull-to-refresh
+   */
+  async onPullRefresh(event: any) {
+    await this.refreshLocationHistory();
+    event.target.complete();
   }
 
   async showErrorToast() {

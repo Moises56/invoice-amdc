@@ -1,36 +1,86 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+<ion-header class="mi-historial-ubicacion-header safe-area-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar" color="primary">
     <ion-buttons slot="start">
       <ion-button (click)="goBack()" class="back-button">
         <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Mi Historial de Ubicación</ion-title>
+    <ion-title class="header-title">
+      <div class="title-with-icon">
+        <ion-icon name="location-outline" class="header-icon"></ion-icon>
+        Mi Historial de Ubicación
+      </div>
+    </ion-title>
     <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="loadLocationHistory()" class="refresh-button">
-        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      <ion-button fill="clear" (click)="refreshLocationHistory()" class="refresh-button" [disabled]="isLoading">
+        <ion-icon 
+          name="refresh-outline" 
+          slot="icon-only"
+          [class.rotating]="isLoading"
+        ></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-container">
-    <ion-spinner name="crescent" color="primary"></ion-spinner>
-    <h3>Cargando...</h3>
-    <p>Obteniendo tu historial de ubicaciones</p>
+<ion-content [fullscreen]="false" class="mi-historial-ubicacion-content">
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="onPullRefresh($event)">
+    <ion-refresher-content 
+      pullingIcon="arrow-down-outline"
+      pullingText="Desliza para actualizar"
+      refreshingSpinner="crescent"
+      refreshingText="Actualizando...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading State Mejorado -->
+  <div *ngIf="isLoading" class="loading-container improved">
+    <div class="loading-content">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <div class="loading-text">
+        <h3>Cargando historial...</h3>
+        <p>Obteniendo tu información de ubicaciones</p>
+        <div class="loading-steps">
+          <div class="step active">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            <span>Conectando al servidor</span>
+          </div>
+          <div class="step active">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            <span>Consultando base de datos</span>
+          </div>
+          <div class="step loading">
+            <ion-spinner name="dots"></ion-spinner>
+            <span>Procesando información</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="error && !isLoading" class="error-container">
-    <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
-    <h3>Error</h3>
-    <p>{{ error }}</p>
-    <ion-button fill="outline" color="primary" (click)="loadLocationHistory()">
-      <ion-icon name="refresh-outline" slot="start"></ion-icon>
-      Reintentar
-    </ion-button>
+  <!-- Error State Mejorado -->
+  <div *ngIf="error && !isLoading" class="error-container improved">
+    <div class="error-content">
+      <div class="error-icon">
+        <ion-icon name="warning-outline" color="danger"></ion-icon>
+      </div>
+      <div class="error-text">
+        <h3>No se pudo cargar la información</h3>
+        <p>{{ error }}</p>
+        <div class="error-actions">
+          <ion-button fill="solid" color="primary" (click)="loadLocationHistory()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Reintentar
+          </ion-button>
+          <ion-button fill="outline" color="medium" (click)="goBack()">
+            <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+            Volver
+          </ion-button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Empty State -->

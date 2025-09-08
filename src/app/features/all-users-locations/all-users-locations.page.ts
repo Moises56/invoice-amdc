@@ -11,6 +11,7 @@ import {
   IonButtons,
   IonBackButton,
   IonContent,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { AllUsersLocationHistoryComponent } from '../../shared/components/all-users-location-history/all-users-location-history.component';
 import { AuthService } from '../../core/services/auth.service';
@@ -29,6 +30,7 @@ import { Router } from '@angular/router';
     IonButtons,
     IonBackButton,
     IonContent,
+    IonIcon,
     AllUsersLocationHistoryComponent,
   ],
 })
