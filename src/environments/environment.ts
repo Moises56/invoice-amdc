@@ -4,11 +4,12 @@
 
 export const environment = {
   production: false,
-  // apiUrl: 'http://localhost:3000/api', // ✅ Backend local activado
-  apiUrl: 'https://factback.amdc.hn/api',
+  apiUrl: 'http://localhost:3000/api', // ✅ Backend local activado
   // apiUrl: 'https://merc-fact-back.onrender.com/api'
-  // apiUrlE: 'http://localhost:3000' // ✅ Backend local activado
-  apiUrlE: 'https://factback.amdc.hn'
+  // apiUrl: 'https://factback.amdc.hn/api',
+  // apiUrlE: 'https://ec-back.amdc.hn'
+  apiUrlE: 'http://localhost:3000' // ✅ Backend local activado
+  // apiUrlE: 'https://factback.amdc.hn'
 };
 
 /*

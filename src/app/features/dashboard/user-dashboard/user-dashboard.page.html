@@ -142,68 +142,71 @@
       </div>
     </ng-template>
 
-    <!-- My Location Section -->
-    <div class="location-section" *ngIf="!isLoadingLocationHistory()">
-      <div class="section-header">
-        <h2>Mi Ubicación</h2>
-        <!-- <p>Información sobre tu ubicación actual y estadísticas</p> -->
-      </div>
-
+    <!-- My Location Section - COMPACTO Y MODERNO -->
+    <div class="location-section-compact" *ngIf="!isLoadingLocationHistory()">
       <!-- Loading State for Location -->
-      <div *ngIf="isLoadingLocationHistory()" class="loading-section">
+      <div *ngIf="isLoadingLocationHistory()" class="loading-section compact">
         <ion-spinner name="dots" class="loading-spinner"></ion-spinner>
-        <p class="loading-text">Cargando información de ubicación...</p>
+        <p class="loading-text">Cargando ubicación...</p>
       </div>
 
       <!-- Error State for Location -->
-      <div *ngIf="hasLocationError()" class="error-section">
-        <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
-        <p class="error-message">{{ locationErrorMessage() }}</p>
-        <ion-button fill="outline" size="small" (click)="loadUserLocationHistory()">
-          <ion-icon name="refresh-outline" slot="start"></ion-icon>
-          Reintentar
-        </ion-button>
+      <div *ngIf="hasLocationError()" class="error-section compact">
+        <div class="error-content">
+          <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+          <div class="error-text">
+            <p class="error-message">{{ locationErrorMessage() }}</p>
+            <ion-button fill="clear" size="small" (click)="loadUserLocationHistory()">
+              <ion-icon name="refresh-outline" slot="start"></ion-icon>
+              Reintentar
+            </ion-button>
+          </div>
+        </div>
       </div>
 
       <!-- Location Content -->
-      <div class="location-content" *ngIf="userLocationHistory() && !hasLocationError()">
-        <!-- Simplified Location Card -->
-        <div class="location-summary-card" *ngIf="userLocationHistory(); else noLocationCard">
-          <div class="location-main-info">
-            <div class="location-details">
-              <h3>{{ userLocationHistory()?.currentLocation?.locationName || 'Sin ubicación asignada' }}</h3>
-              <div class="total-consultas">
-                <span class="consultas-number">{{ userLocationHistory()?.consultationStats?.totalConsultas || 0 }}</span>
-                <span class="consultas-label">Total Consultas</span>
+      <div class="location-content-compact" *ngIf="userLocationHistory() && !hasLocationError()">
+        <!-- Compact Location Card -->
+        <div class="location-card-compact" 
+             *ngIf="userLocationHistory(); else noLocationCardCompact"
+             (click)="openMyLocationHistoryModal()">
+          <div class="location-card-header">
+            <div class="location-icon-wrapper">
+              <ion-icon name="location" class="location-icon"></ion-icon>
+            </div>
+            <div class="location-info">
+              <h3 class="location-name">{{ userLocationHistory()?.currentLocation?.locationName || 'Sin ubicación asignada' }}</h3>
+              <div class="location-stats">
+                <span class="stat-badge">
+                  <ion-icon name="analytics-outline"></ion-icon>
+                  {{ userLocationHistory()?.consultationStats?.totalConsultas || 0 }} consultas
+                </span>
               </div>
             </div>
-            <div class="location-icon">
-              <ion-icon name="location-outline"></ion-icon>
-            </div>
+            <ion-button 
+              fill="clear" 
+              size="small"
+              class="location-action-btn"
+              (click)="$event.stopPropagation(); openMyLocationHistoryModal()">
+              <ion-icon name="chevron-forward-outline" slot="icon-only"></ion-icon>
+            </ion-button>
           </div>
         </div>
 
-        <!-- No Location Card -->
-        <ng-template #noLocationCard>
-          <div class="no-location-card">
-            <ion-icon name="location-outline" class="no-location-icon"></ion-icon>
-            <h3>Sin Ubicación Asignada</h3>
-            <p>No tienes una ubicación asignada actualmente.</p>
+        <!-- No Location Card Compact -->
+        <ng-template #noLocationCardCompact>
+          <div class="no-location-card-compact" (click)="openMyLocationHistoryModal()">
+            <div class="no-location-content">
+              <div class="no-location-icon-wrapper">
+                <ion-icon name="location" class="no-location-icon"></ion-icon>
+              </div>
+              <div class="no-location-text">
+                <h4>Sin Ubicación</h4>
+                <p>No hay ubicación asignada</p>
+              </div>
+            </div>
           </div>
         </ng-template>
-        
-        <!-- View Full History Button -->
-        <div class="view-history-section">
-          <ion-button 
-            expand="block" 
-            fill="outline" 
-            color="primary"
-            class="view-history-button"
-            (click)="openMyLocationHistoryModal()">
-            <ion-icon name="time-outline" slot="start"></ion-icon>
-            Ver historial completo
-          </ion-button>
-        </div>
       </div>
     </div>
 
