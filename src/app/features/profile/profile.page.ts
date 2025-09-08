@@ -119,13 +119,13 @@ export class ProfilePage implements OnInit {
   async loadProfile() {
     this.isLoading.set(true);
     try {
-      console.log('🔧 Profile: Cargando perfil del usuario...');
+      // console.log('🔧 Profile: Cargando perfil del usuario...');
       
       // Usar el nuevo método getMyProfile() que consume /api/users/me
       const user = await this.usuariosService.getMyProfile().toPromise();
       
       if (user) {
-        console.log('✅ Profile: Datos del usuario recibidos:', user);
+        // console.log('✅ Profile: Datos del usuario recibidos:', user);
         
         // Mapear los campos de la API a los campos del formulario
         const mappedUser = {
@@ -149,7 +149,7 @@ export class ProfilePage implements OnInit {
           address: mappedUser.address
         });
         
-        console.log('✅ Profile: Formulario actualizado con datos del usuario');
+        // console.log('✅ Profile: Formulario actualizado con datos del usuario');
       } else {
         console.warn('⚠️ Profile: Respuesta sin datos de usuario');
         await this.showToast('No se pudieron cargar los datos del perfil', 'warning');

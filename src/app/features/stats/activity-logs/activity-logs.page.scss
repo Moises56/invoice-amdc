@@ -24,10 +24,6 @@
   }
 }
 
-.safe-area-header {
-  // El safe area spacer maneja el padding superior
-}
-
 // ========== HEADER ==========
 .activity-logs-header {
   .header-toolbar {
@@ -109,19 +105,63 @@
     margin-bottom: 16px;
     flex-wrap: wrap;
 
-    .username-filter {
-      --background: white;
-      --border-radius: 8px;
-      --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      flex: 1;
-    }
-
     .export-button {
       --border-radius: 8px;
       --padding-start: 16px;
       --padding-end: 16px;
       height: 44px;
+    }
+    
+    .count-button {
+      --border-radius: 8px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      height: 44px;
+      --color: var(--ion-color-primary);
+      --border-color: var(--ion-color-primary);
+    }
+  }
+
+  // Filtros rápidos
+  .quick-filters {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    flex-wrap: wrap;
+
+    .quick-filters-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #495057;
+      margin-right: 8px;
+    }
+
+    ion-button {
+      --border-radius: 6px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      --padding-top: 6px;
+      --padding-bottom: 6px;
+      font-size: 0.8rem;
+      text-transform: none;
+      height: auto;
+      min-height: 32px;
+
+      &:hover {
+        --background: rgba(var(--ion-color-primary-rgb), 0.1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .quick-filters-label {
+        width: 100%;
+        margin-bottom: 8px;
+      }
     }
   }
 
@@ -149,7 +189,7 @@
         margin: 0;
       }
 
-      select {
+      select, input[type="text"] {
         padding: 8px 12px;
         border: 1px solid #ced4da;
         border-radius: 6px;
@@ -158,6 +198,7 @@
         font-size: 0.875rem;
         cursor: pointer;
         transition: all 0.2s ease;
+        min-width: 140px;
 
         &:focus {
           outline: none;
@@ -167,6 +208,44 @@
 
         &:hover {
           border-color: #adb5bd;
+        }
+      }
+      
+      input[type="text"] {
+        cursor: text;
+        
+        &::placeholder {
+          color: #adb5bd;
+          font-style: italic;
+        }
+      }
+    }
+
+    // Estilos específicos para el filtro de parámetros
+    .parameter-filter {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+
+      .parameter-type-select {
+        flex: 0 0 auto;
+        min-width: 120px;
+        max-width: 140px;
+        font-size: 0.8rem;
+        border-radius: 6px 0 0 6px;
+        border-right: none;
+        background: #f8f9fa;
+        font-weight: 500;
+      }
+
+      .parameter-input {
+        flex: 1;
+        min-width: 180px;
+        border-radius: 0 6px 6px 0;
+        border-left: none;
+        
+        &:focus {
+          border-left: 1px solid var(--ion-color-primary);
         }
       }
     }
@@ -234,6 +313,13 @@
           white-space: nowrap;
           border-right: 1px solid #dee2e6;
 
+          &:first-child {
+            text-align: center;
+            width: 60px;
+            min-width: 60px;
+            background-color: #e9ecef;
+          }
+
           &:last-child {
             border-right: none;
           }
@@ -260,6 +346,16 @@
 
             &:last-child {
               border-right: none;
+            }
+
+            &.numero {
+              font-weight: 600;
+              color: #495057;
+              text-align: center;
+              width: 60px;
+              min-width: 60px;
+              font-size: 0.85rem;
+              background-color: #f8f9fa;
             }
 
             &.fecha {

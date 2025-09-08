@@ -40,7 +40,7 @@ export class AuthService {
   });
 
   constructor() {
-    console.log('🔧 AuthService: Inicializando...');
+    // console.log('🔧 AuthService: Inicializando...');
     this.initializeAuth();
   }
 
@@ -48,13 +48,13 @@ export class AuthService {
    * Inicializar autenticación de manera robusta al cargar la aplicación
    */
   private async initializeAuth(): Promise<void> {
-    console.log('🔧 AuthService: Iniciando verificación de autenticación...');
-    console.log('🔧 AuthService: API URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PROFILE}`);
+    // console.log('🔧 AuthService: Iniciando verificación de autenticación...');
+    // console.log('🔧 AuthService: API URL:', `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PROFILE}`);
     this._initializationState.set('checking');
     this._isLoading.set(true);
 
     try {
-      console.log('🔧 AuthService: Enviando petición getProfile...');
+      // console.log('🔧 AuthService: Enviando petición getProfile...');
       
       // Crear un timeout para evitar que la aplicación se quede colgada
       const timeoutPromise = new Promise((_, reject) => {
@@ -65,7 +65,7 @@ export class AuthService {
       
       // Usar Promise.race para aplicar timeout
       const profile = await Promise.race([profilePromise, timeoutPromise]) as { user: User };
-      console.log('🔧 AuthService: Respuesta getProfile recibida:', profile);
+      // console.log('🔧 AuthService: Respuesta getProfile recibida:', profile);
       
       if (profile?.user) {
         // ✅ Usuario autenticado exitosamente
@@ -73,25 +73,25 @@ export class AuthService {
         this._isAuthenticated.set(true);
         this._initializationState.set('success');
         this.startTokenRefreshTimer();
-        console.log('✅ Usuario autenticado automáticamente:', profile.user);
+        // console.log('✅ Usuario autenticado automáticamente:', profile.user);
       } else {
-        console.log('ℹ️ No hay sesión activa válida - respuesta sin usuario');
+        // console.log('ℹ️ No hay sesión activa válida - respuesta sin usuario');
         this.clearAuthState();
       }
     } catch (error: any) {
-      console.log('❌ Error en initializeAuth:');
-      console.log('   - Status:', error.status);
-      console.log('   - Message:', error.message);
-      console.log('   - Error completo:', error);
+      // console.log('❌ Error en initializeAuth:');
+      // console.log('   - Status:', error.status);
+      // console.log('   - Message:', error.message);
+      // console.log('   - Error completo:', error);
       
       if (error.status === 401) {
-        console.log('ℹ️ Token expirado o no válido (401)');
+        // console.log('ℹ️ Token expirado o no válido (401)');
       } else if (error.status === 0) {
-        console.log('❌ Error de conexión - backend no disponible');
+        // console.log('❌ Error de conexión - backend no disponible');
       } else if (error.message?.includes('Timeout')) {
-        console.log('⏰ Timeout - servidor no responde, continuando sin autenticación');
+        // console.log('⏰ Timeout - servidor no responde, continuando sin autenticación');
       } else {
-        console.log('❌ Error inesperado en verificación de sesión');
+        // console.log('❌ Error inesperado en verificación de sesión');
       }
       
       this.clearAuthState();
@@ -99,13 +99,13 @@ export class AuthService {
 
     this._isLoading.set(false);
     this._authCheckComplete.set(true);
-    console.log('🏁 AuthService: Inicialización completada');
-    console.log('🏁 AuthService: Estado final - isAuthenticated:', this._isAuthenticated(), 'user:', this._user());
+    // console.log('🏁 AuthService: Inicialización completada');
+    // console.log('🏁 AuthService: Estado final - isAuthenticated:', this._isAuthenticated(), 'user:', this._user());
     
     // Si no está autenticado, navegar al login después de un breve delay
     if (!this._isAuthenticated()) {
       setTimeout(() => {
-        console.log('🔄 Navegando al login después de inicialización fallida');
+        // console.log('🔄 Navegando al login después de inicialización fallida');
         this.router.navigate(['/login'], { replaceUrl: true });
       }, 500);
     }
@@ -119,14 +119,14 @@ export class AuthService {
    * Iniciar sesión con manejo robusto
    */
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    console.log('🔐 Iniciando login...');
+    // console.log('🔐 Iniciando login...');
     this._isLoading.set(true);
     
     return this.http.post<AuthResponse>(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.LOGIN}`, credentials, {
       withCredentials: true // Importante para cookies HTTP-only
     }).pipe(
       tap(response => {
-        console.log('✅ Login exitoso:', response.user);
+        // console.log('✅ Login exitoso:', response.user);
         this._user.set(response.user);
         this._isAuthenticated.set(true);
         this._isLoading.set(false);
@@ -148,7 +148,7 @@ export class AuthService {
    * Cerrar sesión con limpieza completa
    */
   logout(): Observable<ApiResponse<any>> {
-    console.log('🚪 Cerrando sesión...');
+    // console.log('🚪 Cerrando sesión...');
     this._isLoading.set(true);
     this.stopTokenRefreshTimer();
     
@@ -156,13 +156,13 @@ export class AuthService {
       withCredentials: true
     }).pipe(
       tap(() => {
-        console.log('✅ Logout exitoso');
+        // console.log('✅ Logout exitoso');
         this.clearAuthState();
         this.router.navigate(['/login']);
         this.showToast('Sesión cerrada exitosamente', 'success');
       }),
       catchError(error => {
-        console.log('⚠️ Error en logout pero limpiando sesión local:', error);
+        // console.log('⚠️ Error en logout pero limpiando sesión local:', error);
         // Aun si hay error en el servidor, limpiar la sesión local
         this.clearAuthState();
         this.router.navigate(['/login']);
@@ -184,7 +184,7 @@ export class AuthService {
    * Verificar estado de autenticación manualmente
    */
   async checkAuthStatus(): Promise<boolean> {
-    console.log('🔍 AuthService: Verificación manual de estado de autenticación...');
+    // console.log('🔍 AuthService: Verificación manual de estado de autenticación...');
     try {
       const profile = await this.getProfile().toPromise();
       if (profile?.user) {
@@ -192,12 +192,12 @@ export class AuthService {
         this._isAuthenticated.set(true);
         this._initializationState.set('success');
         this.startTokenRefreshTimer();
-        console.log('✅ Verificación manual exitosa:', profile.user);
+        // console.log('✅ Verificación manual exitosa:', profile.user);
         return true;
       }
       return false;
     } catch (error) {
-      console.log('❌ Verificación manual falló:', error);
+      // console.log('❌ Verificación manual falló:', error);
       return false;
     }
   }
@@ -207,12 +207,12 @@ export class AuthService {
    */
   refreshToken(): Observable<ApiResponse<any>> {
     if (this.refreshInProgress) {
-      console.log('🔄 Refresh ya en progreso, evitando duplicación');
+      // console.log('🔄 Refresh ya en progreso, evitando duplicación');
       return EMPTY;
     }
 
     this.refreshInProgress = true;
-    console.log('🔄 Renovando token...');
+    // console.log('🔄 Renovando token...');
 
     return this.http.post<ApiResponse<any>>(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REFRESH}`, {}, {
       withCredentials: true
@@ -220,21 +220,21 @@ export class AuthService {
       retry({
         count: 2,
         delay: (error, retryCount) => {
-          console.log(`🔄 Retry ${retryCount} para refresh token...`);
+          // console.log(`🔄 Retry ${retryCount} para refresh token...`);
           return timer(1000 * retryCount);
         }
       }),
       tap(response => {
-        console.log('✅ Token renovado exitosamente');
+        // console.log('✅ Token renovado exitosamente');
         this.refreshInProgress = false;
       }),
       catchError(error => {
-        console.log('❌ Error al renovar token:', error);
+        // console.log('❌ Error al renovar token:', error);
         this.refreshInProgress = false;
         
         // Si el refresh token también expiró, cerrar sesión
         if (error.status === 401) {
-          console.log('🚫 Refresh token expirado, forzando logout');
+          // console.log('🚫 Refresh token expirado, forzando logout');
           this.forceLogout();
         }
         
@@ -249,21 +249,21 @@ export class AuthService {
   private startTokenRefreshTimer(): void {
     this.stopTokenRefreshTimer(); // Limpiar timer anterior si existe
 
-    console.log('⏰ Timer de renovación de token iniciado (cada 13 minutos)');
+    // console.log('⏰ Timer de renovación de token iniciado (cada 13 minutos)');
     
     // Usar setInterval en lugar de RxJS interval para mayor persistencia
     this.tokenRefreshTimer = setInterval(() => {
       if (this._isAuthenticated() && !this.refreshInProgress) {
-        console.log('🔄 Renovando token automáticamente...');
+        // console.log('🔄 Renovando token automáticamente...');
         
         this.refreshToken().subscribe({
           next: () => {
-            console.log('✅ Token renovado automáticamente');
+            // console.log('✅ Token renovado automáticamente');
           },
           error: (error) => {
             console.error('❌ Error en renovación automática:', error);
             if (error.status === 401) {
-              console.log('🚫 Forzando logout por sesión expirada');
+              // console.log('🚫 Forzando logout por sesión expirada');
               this.forceLogout();
             }
           }
@@ -279,7 +279,7 @@ export class AuthService {
     if (this.tokenRefreshTimer) {
       clearInterval(this.tokenRefreshTimer);
       this.tokenRefreshTimer = undefined;
-      console.log('⏹️ Timer de renovación detenido');
+      // console.log('⏹️ Timer de renovación detenido');
     }
   }
 
@@ -287,7 +287,7 @@ export class AuthService {
    * Limpiar estado de autenticación de manera completa
    */
   private clearAuthState(): void {
-    console.log('🧹 Limpiando estado de autenticación...');
+    // console.log('🧹 Limpiando estado de autenticación...');
     this._user.set(null);
     this._isAuthenticated.set(false);
     this._isLoading.set(false);
@@ -302,7 +302,7 @@ export class AuthService {
       localStorage.removeItem('token');
       sessionStorage.clear();
     } catch (error) {
-      console.log('⚠️ Error limpiando localStorage:', error);
+      // console.log('⚠️ Error limpiando localStorage:', error);
     }
   }
 
@@ -345,7 +345,7 @@ export class AuthService {
    * Forzar cierre de sesión (para casos de error de autenticación)
    */
   forceLogout(): void {
-    console.log('🚫 Forzando logout por sesión expirada');
+    // console.log('🚫 Forzando logout por sesión expirada');
     this.clearAuthState();
     this.router.navigate(['/login']);
     this.showToast('Sesión expirada. Por favor, inicie sesión nuevamente.', 'warning');

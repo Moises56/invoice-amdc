@@ -58,7 +58,7 @@ import {
   helpOutline,
   chevronBackOutline,
   chevronForwardOutline,
-  analytics, playSkipBackOutline, playSkipForwardOutline, arrowForwardOutline } from 'ionicons/icons';
+  analytics, playSkipBackOutline, playSkipForwardOutline, arrowForwardOutline, analyticsOutline } from 'ionicons/icons';
 
 import { StatsService } from '../../../shared/services/stats.service';
 import { ExcelService } from '../../../shared/services/excel.service';
@@ -91,7 +91,6 @@ import {
     IonSpinner,
     IonRefresher,
     IonRefresherContent,
-    IonSearchbar,
   ],
 })
 export class ActivityLogsPage implements OnInit {
@@ -115,101 +114,74 @@ export class ActivityLogsPage implements OnInit {
   errorMessage = signal<string>('');
   currentPage = signal<number>(1);
   totalPages = signal<number>(1);
+  totalRecordsFromServer = signal<number>(0); // Total de registros del servidor
   hasMoreData = signal<boolean>(true);
   searchTerm = signal<string>('');
   availableLocations = signal<string[]>([]);
   selectedLog = signal<ActivityLog | null>(null);
   isModalOpen = signal<boolean>(false);
 
-  // Filtros
+  // Signals para filtros y estado
   currentFilter = signal<LogsFilter>({
-    page: 1,
-    per_page: 20,
+    limit: 20, // Paginación del servidor - 20 registros por página
+    offset: 0,
+    timeRange: undefined,
+    // Nuevos filtros específicos
+    consultaType: '',           // Tipo de consulta (EC, RNP, CATASTRO)
+    consultaSubtype: '',        // Subtipo de consulta (amnistia, etc.)
+    resultado: '',              // Resultado (SUCCESS, ERROR)
+    username: '',               // Usuario específico
+    userLocation: '',           // Ubicación del usuario
+    parametros: '',             // Parámetros específicos (dni, claveCatastral)
+    // Filtros legacy mantenidos para compatibilidad
     consulta: '',
-    tipoConsulta: '',
-    resultado: ''
+    tipoConsulta: ''
   });
+
+  // Propiedades para el binding de los filtros en el HTML
+  get filterConsultaType() { return this.currentFilter().consultaType || ''; }
+  set filterConsultaType(value: string) { this.updateFilterField('consultaType', value); }
+  
+  get filterConsultaSubtype() { return this.currentFilter().consultaSubtype || ''; }
+  set filterConsultaSubtype(value: string) { this.updateFilterField('consultaSubtype', value); }
+  
+  get filterResultado() { return this.currentFilter().resultado || ''; }
+  set filterResultado(value: string) { this.updateFilterField('resultado', value); }
+  
+  get filterUsername() { return this.currentFilter().username || ''; }
+  set filterUsername(value: string) { this.updateFilterField('username', value); }
+  
+  get filterUserLocation() { return this.currentFilter().userLocation || ''; }
+  set filterUserLocation(value: string) { this.updateFilterField('userLocation', value); }
+  
+  get filterParametros() { return this.currentFilter().parametros || ''; }
+  set filterParametros(value: string) { this.updateFilterField('parametros', value); }
+  
+  get filterTimeRange() { return this.currentFilter().timeRange || 'week'; }
+  set filterTimeRange(value: string) { this.updateFilterField('timeRange', value); }
+
+  // Filtros legacy mantenidos para compatibilidad
+  get filterConsulta() { return this.currentFilter().consulta || ''; }
+  set filterConsulta(value: string) { this.updateFilterField('consulta', value); }
+  
+  get filterTipoConsulta() { return this.currentFilter().tipoConsulta || ''; }
+  set filterTipoConsulta(value: string) { this.updateFilterField('tipoConsulta', value); }
+
+  private updateFilterField(field: string, value: string) {
+    this.currentFilter.update(filter => ({
+      ...filter,
+      [field]: value
+    }));
+  }
   isFilterModalOpen = signal<boolean>(false);
 
   // Computed para logs filtrados
-  filteredLogs = computed(() => {
-    const logs = this.activityLogs();
-    const searchTerm = this.searchTerm().toLowerCase().trim();
-    const filter = this.currentFilter();
-
-    if (!searchTerm && !filter.consulta && !filter.tipoConsulta && !filter.resultado) {
-      return logs;
-    }
-
-    return logs.filter(log => {
-      // Filtro por término de búsqueda
-      if (searchTerm) {
-        const searchableText = [
-          log.consultaType || '',
-          log.consultaSubtype || '',
-          log.resultado || '',
-          log.parametros || '',
-          log.userAgent || '',
-          log.ip || ''
-        ].join(' ').toLowerCase();
-        
-        if (!searchableText.includes(searchTerm)) {
-          return false;
-        }
-      }
-
-      // Filtro por consulta
-      if (filter.consulta && log.consultaType !== filter.consulta) {
-        return false;
-      }
-
-      // Filtro por tipo de consulta
-      if (filter.tipoConsulta && log.consultaSubtype !== filter.tipoConsulta) {
-        return false;
-      }
-
-      // Filtro por resultado
-      if (filter.resultado && log.resultado !== filter.resultado) {
-        return false;
-      }
-
-      return true;
-    });
-  });
+  // Los logs ya vienen filtrados del servidor, no necesitamos filtrado del lado del cliente
+  filteredLogs = computed(() => this.activityLogs());
 
   constructor() {
     // Configurar iconos
-    addIcons({
-      listOutline,
-      timeOutline,
-      personOutline,
-      refreshOutline,
-      arrowBackOutline,
-      filterOutline,
-      searchOutline,
-      documentTextOutline,
-      businessOutline,
-      eyeOutline,
-      settingsOutline,
-      calendarOutline,
-      checkmarkOutline,
-      warningOutline,
-      documentOutline,
-      logInOutline,
-      logOutOutline,
-      informationCircleOutline,
-      bugOutline,
-      close,
-      closeOutline,
-      downloadOutline,
-      helpOutline,
-      chevronBackOutline,
-      chevronForwardOutline,
-      analytics,
-      playSkipBackOutline,
-      playSkipForwardOutline,
-      arrowForwardOutline
-    });
+    addIcons({analytics,refreshOutline,warningOutline,downloadOutline,analyticsOutline,checkmarkOutline,documentTextOutline,documentOutline,closeOutline,filterOutline,eyeOutline,playSkipBackOutline,chevronBackOutline,chevronForwardOutline,playSkipForwardOutline,arrowForwardOutline,listOutline,timeOutline,personOutline,arrowBackOutline,searchOutline,businessOutline,settingsOutline,calendarOutline,logInOutline,logOutOutline,informationCircleOutline,bugOutline,close,helpOutline});
 
     // Effect para actualizar páginas cuando cambian los logs filtrados
     effect(() => {
@@ -220,6 +192,10 @@ export class ActivityLogsPage implements OnInit {
         
         // Si la página actual es mayor que el total, resetear a la primera
         if (this.currentPage() > totalPages) {
+          console.warn('🚨 RESETEO: currentPage reseteada a 1 porque currentPage > totalPages', {
+            currentPage: this.currentPage(),
+            totalPages: totalPages
+          });
           this.currentPage.set(1);
         }
       }
@@ -246,19 +222,47 @@ export class ActivityLogsPage implements OnInit {
    * Exportar logs a Excel
    */
   async exportToExcel() {
+    let loading: any = null;
+    
     try {
-      const logs = this.filteredLogs();
+      console.log('📊 Iniciando exportación a Excel con filtros aplicados...');
       
-      if (logs.length === 0) {
-        await this.showToast('No hay datos para exportar', 'warning');
+      // Mostrar loading inicial
+      loading = await this.loadingController.create({
+        message: 'Iniciando obtención de registros...',
+        spinner: 'crescent'
+      });
+      await loading.present();
+      
+      // Obtener TODOS los registros usando método de múltiples llamadas
+      const allLogs = await this.getAllLogsForExport(loading);
+      
+      // Cerrar el loading de obtención de registros
+      if (loading) {
+        await loading.dismiss();
+        loading = null;
+      }
+      
+      if (allLogs.length === 0) {
+        await this.showToast('No hay datos para exportar con los filtros aplicados', 'warning');
         return;
       }
 
+      console.log(`📊 Total de registros obtenidos para exportar: ${allLogs.length}`);
+
+      // Mostrar loading para generación de Excel
+      loading = await this.loadingController.create({
+        message: `Generando Excel con ${allLogs.length} registros...`,
+        spinner: 'crescent'
+      });
+      await loading.present();
+
       // Preparar datos para Excel
-      const excelData = logs.map(log => {
+      const excelData = allLogs.map((log, index) => {
         const userInfo = this.parseUserAgent(log.userAgent);
         
         return {
+          'No.': index + 1,
           'Fecha': this.formatDate(log.createdAt),
           'Usuario': this.getUserFullName(log),
           'Consulta': log.consultaType || 'N/A',
@@ -269,21 +273,182 @@ export class ActivityLogsPage implements OnInit {
           'Navegador': userInfo.browser,
           'SO': userInfo.os,
           'Dispositivo': userInfo.device,
-          'Tipo Dispositivo': userInfo.type
+          'Tipo Dispositivo': userInfo.type,
+          'Ubicación': log.userLocation || 'N/A'
         };
       });
 
       // Generar archivo Excel
       this.excelService.exportActivityLogsToExcel(
-        logs,
-        'logs-actividad'
+        allLogs,
+        'logs-actividad-completos'
       );
 
-      await this.showToast('Archivo Excel generado exitosamente', 'success');
+      await this.showToast(
+        `✅ Archivo Excel generado exitosamente con ${allLogs.length} registros`, 
+        'success'
+      );
+      
     } catch (error) {
-      console.error('Error al exportar a Excel:', error);
+      console.error('❌ Error al exportar a Excel:', error);
       await this.showToast('Error al generar archivo Excel', 'danger');
+    } finally {
+      // Asegurar que el loading se cierre siempre
+      if (loading) {
+        try {
+          await loading.dismiss();
+        } catch (dismissError) {
+          console.warn('⚠️ Error al cerrar loading:', dismissError);
+        }
+      }
     }
+  }
+
+  /**
+   * Contar total de registros que se exportarían
+   */
+  async countTotalRecords() {
+    try {
+      console.log('🔢 Contando total de registros...');
+      
+      const loading = await this.loadingController.create({
+        message: 'Contando registros...',
+        spinner: 'dots'
+      });
+      await loading.present();
+      
+      // Hacer una petición simple para obtener el total
+      const countFilter: LogsFilter = {
+        ...this.currentFilter(),
+        limit: 1,  // Solo necesitamos 1 registro para obtener el total
+        offset: 0
+      };
+      
+      const response = await this.statsService.getActivityLogs(countFilter).toPromise();
+      
+      await loading.dismiss();
+      
+      if (response && typeof response.total === 'number') {
+        const totalRecords = response.total;
+        console.log(`📊 Total de registros disponibles: ${totalRecords}`);
+        
+        const message = totalRecords > 0 
+          ? `📊 Se exportarían ${totalRecords} registros con los filtros actuales`
+          : 'No hay registros que coincidan con los filtros aplicados';
+          
+        const color = totalRecords > 0 ? 'primary' : 'warning';
+        
+        await this.showToast(message, color);
+        
+        // También mostrar en consola para debugging
+        console.log(`📋 Filtros aplicados:`, this.currentFilter());
+        
+      } else {
+        await this.showToast('No se pudo obtener el conteo de registros', 'warning');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al contar registros:', error);
+      await this.showToast('Error al contar registros', 'danger');
+    }
+  }
+
+  /**
+   * Obtener TODOS los logs para exportación usando múltiples llamadas si es necesario
+   */
+  private async getAllLogsForExport(loadingRef?: any): Promise<ActivityLog[]> {
+    console.log('🔄 Iniciando obtención de todos los registros...');
+    
+    const allLogs: ActivityLog[] = [];
+    let currentOffset = 0;
+    const batchSize = 1000; // Tamaño de lote más grande
+    let hasMoreData = true;
+    let totalRecords = 0;
+    
+    while (hasMoreData) {
+      const exportFilter: LogsFilter = {
+        ...this.currentFilter(),
+        limit: batchSize,
+        offset: currentOffset,
+        page: undefined,
+        per_page: undefined
+      };
+      
+      console.log(`📋 Obteniendo lote: offset=${currentOffset}, limit=${batchSize}`);
+      
+      // Actualizar mensaje de loading (sin recrear)
+      if (loadingRef) {
+        loadingRef.message = `Obteniendo registros... ${allLogs.length}${totalRecords > 0 ? `/${totalRecords}` : ''}`;
+      }
+      
+      try {
+        const response = await this.statsService.getActivityLogs(exportFilter).toPromise();
+        
+        if (!response || !response.logs || !Array.isArray(response.logs)) {
+          console.error('❌ Respuesta inválida en lote:', response);
+          break;
+        }
+        
+        const logs = response.logs;
+        totalRecords = response.total || 0;
+        
+        console.log(`📊 Lote obtenido: ${logs.length} registros (total server: ${totalRecords})`);
+        console.log(`📋 Ejemplo de parámetros del primer log:`, logs[0]?.parametros);
+        
+        // Log específico para debugging de parámetros
+        if (logs.length > 0) {
+          const firstLog = logs[0];
+          console.log('🔍 DEBUGGING PARÁMETROS:', {
+            original: firstLog.parametros,
+            type: typeof firstLog.parametros,
+            consultaType: firstLog.consultaType,
+            consultaSubtype: firstLog.consultaSubtype
+          });
+          
+          // Intentar parsear para ver qué pasa
+          try {
+            if (firstLog.parametros) {
+              let parsed = JSON.parse(firstLog.parametros);
+              console.log('🔍 PRIMER PARSING:', parsed, typeof parsed);
+              
+              if (typeof parsed === 'string') {
+                let secondParsed = JSON.parse(parsed);
+                console.log('🔍 SEGUNDO PARSING:', secondParsed, typeof secondParsed);
+              }
+            }
+          } catch (e) {
+            console.log('🔍 ERROR EN PARSING:', e);
+          }
+        }
+        
+        if (logs.length === 0) {
+          // No hay más registros
+          hasMoreData = false;
+        } else {
+          // Agregar logs al array total
+          allLogs.push(...logs);
+          currentOffset += logs.length;
+          
+          // Verificar si hemos obtenido todos los registros
+          if (allLogs.length >= totalRecords || logs.length < batchSize) {
+            hasMoreData = false;
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ Error obteniendo lote:', error);
+        hasMoreData = false;
+      }
+      
+      // Límite de seguridad para evitar bucles infinitos
+      if (allLogs.length > 50000) {
+        console.warn('⚠️ Límite de seguridad alcanzado (50,000 registros)');
+        break;
+      }
+    }
+    
+    console.log(`✅ Total de registros obtenidos: ${allLogs.length} de ${totalRecords}`);
+    return allLogs;
   }
 
   ngOnInit() {
@@ -304,94 +469,163 @@ export class ActivityLogsPage implements OnInit {
   }
 
   /**
-   * Cargar logs de actividad
+   * Cargar logs de actividad con paginación completa
    */
-  async loadActivityLogs(loadMore: boolean = false) {
-    if (!loadMore) {
-      this.isLoading.set(true);
-      this.hasError.set(false);
-      this.errorMessage.set('');
-    } else {
-      this.isLoadingMore.set(true);
-    }
-
-    // Verificar autenticación
-    if (!this.authService.isAuthenticated()) {
-      this.hasError.set(true);
-      this.errorMessage.set('Usuario no autenticado');
-      this.isLoading.set(false);
-      this.isLoadingMore.set(false);
-      return;
-    }
-
-    // Verificar permisos
-    if (!this.canAccessGeneralStats()) {
-      this.hasError.set(true);
-      this.errorMessage.set('No tienes permisos para ver los logs de actividad');
-      this.isLoading.set(false);
-      this.isLoadingMore.set(false);
-      return;
-    }
+  async loadActivityLogs() {
+    this.isLoading.set(true);
+    this.hasError.set(false);
+    this.errorMessage.set('');
 
     try {
-      // Cargar todos los registros haciendo múltiples peticiones si es necesario
+      // Verificar autenticación
+      if (!this.authService.isAuthenticated()) {
+        await this.showToast('Sesión expirada. Por favor, inicia sesión nuevamente.', 'warning');
+        return;
+      }
+
+      // Verificar permisos
+      if (!this.canAccessGeneralStats()) {
+        await this.showToast('No tienes permisos para ver los logs de actividad.', 'warning');
+        return;
+      }
+
+      // Cargar todos los logs usando el método existente que funciona
       await this.loadAllActivityLogs();
       
     } catch (error: any) {
-      console.error('❌ Error al cargar logs de actividad:', error);
-      this.handleLoadError(error);
+      console.error('❌ Error al cargar logs:', error);
+      let errorMessage = 'Error al cargar los logs de actividad';
+      
+      if (error?.status === 401) {
+        errorMessage = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+      } else if (error?.status === 403) {
+        errorMessage = 'No tienes permisos para ver los logs de actividad.';
+      } else if (error?.error?.message) {
+        errorMessage = error.error.message;
+      }
+      
+      await this.showToast(errorMessage, 'danger');
     } finally {
       this.isLoading.set(false);
-      this.isLoadingMore.set(false);
     }
   }
 
   /**
-   * Cargar todos los logs de actividad haciendo múltiples peticiones
+   * Cargar logs de actividad con parámetros específicos (bypass del signal)
    */
-  private async loadAllActivityLogs() {
-    let allLogs: ActivityLog[] = [];
-    let currentPage = 1;
-    let totalRecords = 0;
-    let hasMorePages = true;
-
-    while (hasMorePages) {
-      const filter = {
-        ...this.currentFilter(),
-        page: currentPage,
-        per_page: 100 // Usar un tamaño de página más pequeño pero confiable
+  private async loadPageDataWithParams(page: number, limit: number, offset: number) {
+    console.log('🚀 loadPageDataWithParams:', { page, limit, offset });
+    
+    try {
+      // Crear filtro con los parámetros específicos
+      const currentFilters = this.currentFilter();
+      const filter: LogsFilter = {
+        ...currentFilters,
+        limit: limit,
+        offset: offset
       };
 
-      console.log(`🔄 Cargando página ${currentPage}...`, filter);
+      console.log(`🔄 Cargando página ${page} con filtros directos:`, filter);
+      console.log(`📄 URL que se llamará: /api/user-stats/logs?limit=${filter.limit}&offset=${filter.offset}`);
+
+      this.isLoading.set(true);
+      const response = await this.statsService.getActivityLogs(filter).toPromise();
+      
+      if (response && response.logs && Array.isArray(response.logs)) {
+        this.activityLogs.set(response.logs);
+        
+        const totalRecords = response.total || 0;
+        const totalPages = Math.ceil(totalRecords / limit);
+        
+        this.totalRecordsFromServer.set(totalRecords);
+        this.totalPages.set(totalPages);
+        this.hasMoreData.set(page < totalPages);
+        
+        console.log(`✅ Cargados: ${response.logs.length} registros de ${totalRecords} totales`);
+        console.log(`📄 Página ${page} de ${totalPages} páginas`);
+        
+        this.hasError.set(false);
+        this.errorMessage.set('');
+      } else {
+        console.error('❌ Respuesta inválida del servidor:', response);
+        this.hasError.set(true);
+        this.errorMessage.set('No se pudieron cargar los logs');
+      }
+    } catch (error) {
+      console.error('❌ Error cargando logs:', error);
+      this.hasError.set(true);
+      this.errorMessage.set(error instanceof Error ? error.message : 'Error desconocido');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  /**
+   * Cargar logs de actividad con paginación del lado del servidor
+   */
+  private async loadAllActivityLogs() {
+    console.log('🚀 Iniciando loadAllActivityLogs');
+    try {
+      // Validar y corregir el estado de la paginación antes de cargar
+      this.validatePaginationState();
+      
+      const currentFilters = this.currentFilter();
+      const page = this.currentPage();
+      const limit = currentFilters.limit || 20;
+      const offset = currentFilters.offset || 0;
+      
+      console.log('📋 Estado actual:', { 
+        currentFilters, 
+        page, 
+        limit, 
+        offset,
+        calculatedOffset: (page - 1) * limit 
+      });
+      
+      // Verificar si el offset es correcto
+      const expectedOffset = (page - 1) * limit;
+      if (offset !== expectedOffset) {
+        console.warn('⚠️ Offset inconsistente después de validación:', { 
+          current: offset, 
+          expected: expectedOffset 
+        });
+      }
+      
+      const filter: LogsFilter = {
+        ...currentFilters,
+        limit: limit,
+        offset: offset
+      };
+
+      console.log(`🔄 Cargando página ${page} con filtros:`, filter);
+      console.log(`📄 URL que se llamará: /api/user-stats/logs?limit=${filter.limit}&offset=${filter.offset}`);
 
       const response = await this.statsService.getActivityLogs(filter).toPromise();
       
       if (response && response.logs && Array.isArray(response.logs)) {
-        allLogs = [...allLogs, ...response.logs];
-        totalRecords = response.total || 0;
+        this.activityLogs.set(response.logs);
         
-        console.log(`📊 Página ${currentPage} cargada: ${response.logs.length} registros`);
+        const totalRecords = response.total || 0;
+        const totalPages = Math.ceil(totalRecords / limit);
         
-        // Verificar si hay más páginas
-        hasMorePages = response.logs.length > 0 && allLogs.length < totalRecords;
-        currentPage++;
+        this.totalRecordsFromServer.set(totalRecords);
+        this.totalPages.set(totalPages);
+        this.hasMoreData.set(page < totalPages);
         
-        // Límite de seguridad para evitar bucles infinitos
-        if (currentPage > 100) {
-          console.warn('⚠️ Límite de páginas alcanzado, deteniendo carga');
-          break;
-        }
+        console.log(`✅ Cargados: ${response.logs.length} registros de ${totalRecords} totales`);
+        console.log(`📄 Página ${page} de ${totalPages} páginas`);
       } else {
-        hasMorePages = false;
+        this.activityLogs.set([]);
+        this.totalPages.set(1);
+        this.hasMoreData.set(false);
       }
+    } catch (error) {
+      console.error('Error cargando logs:', error);
+      this.activityLogs.set([]);
+      this.totalPages.set(1);
+      this.hasMoreData.set(false);
+      throw error;
     }
-
-    // Establecer todos los logs cargados
-    this.activityLogs.set(allLogs);
-    this.currentPage.set(1);
-    this.hasMoreData.set(false); // Ya tenemos todos los datos
-    
-    console.log(`✅ Carga completa: ${allLogs.length} de ${totalRecords} registros`);
   }
 
   /**
@@ -460,21 +694,17 @@ export class ActivityLogsPage implements OnInit {
    */
   async clearFiltersOld() {
     this.currentFilter.set({
-      page: 1,
-      per_page: 20,
+      limit: 20,
+      offset: 0,
+      timeRange: undefined,
       consulta: '',
       tipoConsulta: '',
-      resultado: ''
+      resultado: '',
+      username: '',
+      userLocation: ''
     });
     this.searchTerm.set('');
     this.currentPage.set(1);
-  }
-
-  /**
-   * Manejar cambio en búsqueda
-   */
-  onSearchChange(event: any) {
-    this.searchTerm.set(event.target.value || '');
   }
 
   /**
@@ -669,34 +899,27 @@ export class ActivityLogsPage implements OnInit {
     }
   }
 
-  /**
-   * Verificar si hay filtros activos
-   */
-  hasActiveFilters(): boolean {
-    const filter = this.currentFilter();
-    return !!(filter.consulta || filter.tipoConsulta || filter.resultado || this.searchTerm());
-  }
+
 
   // Computed properties para paginación
   paginatedLogs = computed(() => {
-    const logs = this.filteredLogs();
-    const page = this.currentPage();
-    const itemsPerPage = this.itemsPerPage;
-    
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    
-    return logs.slice(startIndex, endIndex);
+    // Los logs ya vienen paginados del servidor, no necesitamos slice
+    return this.activityLogs();
   });
 
-  totalRecords = computed(() => this.filteredLogs().length);
+  totalRecords = computed(() => {
+    // El total de registros viene del servidor
+    return this.totalRecordsFromServer();
+  });
 
   /**
    * Calcular total de páginas basado en registros filtrados
    */
   totalPagesCalculated = computed(() => {
-    const totalRecords = this.totalRecords();
-    return totalRecords > 0 ? Math.ceil(totalRecords / this.itemsPerPage) : 1;
+    // Calcular páginas basándose en el total de registros del servidor
+    const totalRecords = this.totalRecordsFromServer();
+    const limit = this.currentFilter().limit || 50;
+    return totalRecords > 0 ? Math.ceil(totalRecords / limit) : 1;
   });
 
   /**
@@ -713,11 +936,36 @@ export class ActivityLogsPage implements OnInit {
     if (!log.parametros) return 'Sin parámetros';
     
     try {
-      const params = JSON.parse(log.parametros);
-      return Object.entries(params)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join(', ');
-    } catch {
+      // Doble parsing para manejar JSON strings anidados
+      let params = log.parametros;
+      
+      // Primer parsing: del string JSON a objeto
+      if (typeof params === 'string') {
+        params = JSON.parse(params);
+      }
+      
+      // Si el resultado es aún un string, hacer segundo parsing
+      if (typeof params === 'string') {
+        params = JSON.parse(params);
+      }
+      
+      // Debug: mostrar parámetros parseados
+      console.log('🔍 Debug formatParameters:', {
+        original: log.parametros,
+        firstParse: typeof log.parametros === 'string' ? JSON.parse(log.parametros) : log.parametros,
+        finalParams: params,
+        keys: typeof params === 'object' ? Object.keys(params) : 'no keys'
+      });
+      
+      if (typeof params === 'object' && params !== null) {
+        return Object.entries(params)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ');
+      } else {
+        return String(params);
+      }
+    } catch (error) {
+      console.error('Error parsing parameters:', error);
       return log.parametros;
     }
   }
@@ -729,11 +977,28 @@ export class ActivityLogsPage implements OnInit {
     if (!log?.parametros) return 'Sin parámetros';
     
     try {
-      const params = JSON.parse(log.parametros);
-      return Object.entries(params)
-        .map(([key, value]) => `${key}: ${value}`)
-        .join('\n');
-    } catch {
+      // Doble parsing para manejar JSON strings anidados
+      let params = log.parametros;
+      
+      // Primer parsing: del string JSON a objeto
+      if (typeof params === 'string') {
+        params = JSON.parse(params);
+      }
+      
+      // Si el resultado es aún un string, hacer segundo parsing
+      if (typeof params === 'string') {
+        params = JSON.parse(params);
+      }
+      
+      if (typeof params === 'object' && params !== null) {
+        return Object.entries(params)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join('\n');
+      } else {
+        return String(params);
+      }
+    } catch (error) {
+      console.error('Error parsing formatted parameters:', error);
       return log.parametros;
     }
   }
@@ -741,29 +1006,118 @@ export class ActivityLogsPage implements OnInit {
   /**
    * Manejar cambios en los filtros
    */
-  onFilterChange(filterType: string, event: any) {
-    const value = event.target.value;
-    const currentFilters = this.currentFilter();
-    
-    this.currentFilter.set({
-      ...currentFilters,
-      [filterType]: value || undefined
-    });
-  }
+  // Método eliminado - ahora se usan los getters/setters para el binding directo
 
   /**
    * Limpiar todos los filtros
    */
   clearFilters() {
-    this.currentFilter.set({});
+    this.currentFilter.set({
+      limit: 20, // Paginación del servidor - 20 registros por página
+      offset: 0,
+      timeRange: undefined,
+      // Nuevos filtros específicos
+      consultaType: '',
+      consultaSubtype: '',
+      resultado: '',
+      username: '',
+      userLocation: '',
+      parametros: '',
+      // Filtros legacy
+      consulta: '',
+      tipoConsulta: ''
+    });
     this.searchTerm.set('');
+    
+    // Resetear página actual
+    this.currentPage.set(1);
+    
+    // Recargar datos
+    this.loadAllActivityLogs();
+  }
+
+  /**
+   * Verificar si hay filtros activos
+   */
+  private hasActiveFilters(): boolean {
+    const filter = this.currentFilter();
+    return !!(
+      // Nuevos filtros específicos
+      filter.consultaType || filter.consultaSubtype || filter.resultado || 
+      filter.username || filter.userLocation || filter.parametros ||
+      // Filtros legacy
+      filter.consulta || filter.tipoConsulta || 
+      // Término de búsqueda
+      this.searchTerm()
+    );
   }
 
   /**
    * Aplicar filtros (recarga los datos)
    */
   applyFilters() {
-    this.loadActivityLogs();
+    console.log('🔍 Aplicando filtros actualizados:', this.currentFilter());
+    
+    // Mostrar en consola los endpoints que se utilizarán
+    this.logFilterExamples();
+    
+    // Resetear a la primera página cuando se aplican filtros
+    this.currentPage.set(1);
+    
+    // Mantener el límite actual pero resetear el offset a 0
+    this.currentFilter.update(filter => ({
+      ...filter,
+      offset: 0  // Solo resetear offset, mantener el límite actual
+    }));
+    
+    // Usar setTimeout para asegurar que el signal se actualice
+    setTimeout(() => {
+      this.loadAllActivityLogs();
+    }, 0);
+  }
+
+  /**
+   * Mostrar ejemplos de endpoints basados en los filtros aplicados
+   */
+  private logFilterExamples() {
+    const filter = this.currentFilter();
+    const baseUrl = '/api/user-stats/logs';
+    const examples: string[] = [];
+
+    if (filter.consultaType) {
+      examples.push(`${baseUrl}?consultaType=${filter.consultaType}`);
+    }
+
+    if (filter.consultaSubtype && filter.resultado) {
+      examples.push(`${baseUrl}?consultaSubtype=${filter.consultaSubtype}&resultado=${filter.resultado}`);
+    }
+
+    if (filter.username) {
+      examples.push(`${baseUrl}?username=${filter.username}`);
+    }
+
+    if (filter.userLocation) {
+      examples.push(`${baseUrl}?userLocation=${encodeURIComponent(filter.userLocation)}`);
+    }
+
+    // Corregido: usar 'dni' o 'claveCatastral' como valores del parámetro
+    if (filter.parametros) {
+      if (filter.parametros === 'dni') {
+        examples.push(`${baseUrl}?parametros=dni`);
+      } else if (filter.parametros === 'claveCatastral') {
+        examples.push(`${baseUrl}?parametros=claveCatastral`);
+      } else {
+        // Si es un valor personalizado, asumir que es el tipo de parámetro
+        examples.push(`${baseUrl}?parametros=${filter.parametros}`);
+      }
+    }
+
+    if (examples.length > 0) {
+      console.log('📡 Endpoints que se utilizarán:');
+      examples.forEach((example, index) => {
+        console.log(`  ${index + 1}. ${example}`);
+      });
+    }
   }
 
   /**
@@ -783,14 +1137,111 @@ export class ActivityLogsPage implements OnInit {
   }
 
   // Métodos de paginación
+
+  /**
+   * Método auxiliar para calcular el offset correcto basado en la página y límite
+   */
+  private calculateOffset(page: number, limit: number): number {
+    return (page - 1) * limit;
+  }
+
+  /**
+   * Validar y corregir el estado de la paginación
+   */
+  private validatePaginationState(): void {
+    const currentFilters = this.currentFilter();
+    const page = this.currentPage();
+    const limit = currentFilters.limit || 20;
+    const expectedOffset = this.calculateOffset(page, limit);
+    
+    if (currentFilters.offset !== expectedOffset) {
+      console.warn('⚠️ Corrigiendo inconsistencia en paginación:', {
+        currentOffset: currentFilters.offset,
+        expectedOffset: expectedOffset,
+        page: page,
+        limit: limit
+      });
+      
+      this.currentFilter.update(filter => ({
+        ...filter,
+        offset: expectedOffset
+      }));
+    }
+  }
+
+  /**
+   * Método auxiliar para actualizar página y offset de forma sincronizada
+   */
+  private updatePageAndOffset(page: number): void {
+    const limit = this.currentFilter().limit || 20;
+    const offset = this.calculateOffset(page, limit);
+    
+    console.log('� Actualizando página y offset:', { page, limit, offset });
+    
+    // Actualizar página
+    this.currentPage.set(page);
+    
+    // Actualizar filtro con nuevo offset
+    this.currentFilter.update(filter => ({
+      ...filter,
+      offset: offset
+    }));
+    
+    console.log('✅ Estado actualizado:', {
+      currentPage: this.currentPage(),
+      currentFilter: this.currentFilter()
+    });
+  }
+
   goToPage(page: number): void {
+    console.log('🔄 Cambiando a página:', page);
+    console.log('DEBUG: totalPagesCalculated:', this.totalPagesCalculated());
+    console.log('FILTRO ANTES:', this.currentFilter());
+    console.log('� Filtro antes:', this.currentFilter());
+    
     if (page >= 1 && page <= this.totalPagesCalculated()) {
+      console.log('DEBUG: Entró al IF - validación pasada');
+      console.log('DEBUG: totalPagesCalculated value:', this.totalPagesCalculated());
+      // Calcular parámetros directamente
+      const limit = this.currentFilter().limit || 20;
+      const offset = (page - 1) * limit;
+      
+      console.log('� Parámetros calculados:', { page, limit, offset });
+      
+      // Actualizar página y filtro
       this.currentPage.set(page);
+      console.log('DEBUG: currentPage actualizada a:', this.currentPage());
+      
+      // Forzar detección de cambios
+      setTimeout(() => {
+        console.log('DEBUG: currentPage después de timeout:', this.currentPage());
+      }, 100);
+      
+      this.currentFilter.update(filter => ({
+        ...filter,
+        offset: offset
+      }));
+      
+      // Cargar datos con parámetros específicos (bypass del signal)
+      console.log('LLAMANDO loadPageDataWithParams con parametros:', { page, limit, offset });
+      console.log('DEBUG: getCurrentPageFromOffset():', this.getCurrentPageFromOffset());
+      console.log('DEBUG: getStartRecord():', this.getStartRecord(), 'getEndRecord():', this.getEndRecord());
+      this.loadPageDataWithParams(page, limit, offset);
+    } else {
+      console.error('DEBUG: Página fuera de rango o totalPages inválido');
+      console.error('DEBUG: page =', page, 'totalPagesCalculated() =', this.totalPagesCalculated());
     }
   }
 
   onItemsPerPageChange(): void {
     this.currentPage.set(1); // Resetear a la primera página
+    this.currentFilter.update(filter => ({
+      ...filter,
+      limit: this.itemsPerPage,
+      offset: 0
+    }));
+    // Cargar datos con parámetros específicos
+    this.loadPageDataWithParams(1, this.itemsPerPage, 0);
   }
 
   jumpToPage(pageValue: string): void {
@@ -801,68 +1252,155 @@ export class ActivityLogsPage implements OnInit {
   }
 
   /**
+   * Ir a la página anterior
+   */
+  previousPage() {
+    const currentPageValue = this.getCurrentPageFromOffset();
+    console.log('⬅️ previousPage - currentPage:', currentPageValue);
+    
+    if (currentPageValue > 1) {
+      const newPage = currentPageValue - 1;
+      console.log('⬅️ Navegando a página anterior:', newPage);
+      this.goToPage(newPage);
+    } else {
+      console.log('⬅️ Ya estamos en la primera página');
+    }
+  }
+
+  /**
+   * Ir a la página siguiente
+   */
+  nextPage() {
+    const currentPageValue = this.getCurrentPageFromOffset();
+    const totalPages = this.totalPagesCalculated();
+    console.log('➡️ nextPage - currentPage:', currentPageValue, 'totalPages:', totalPages);
+    
+    if (currentPageValue < totalPages) {
+      const newPage = currentPageValue + 1;
+      console.log('➡️ Navegando a página siguiente:', newPage);
+      this.goToPage(newPage);
+    } else {
+      console.log('➡️ Ya estamos en la última página');
+    }
+  }
+
+  /**
+   * Cargar datos de una página específica
+   */
+  private loadPageData() {
+    this.loadAllActivityLogs();
+  }
+
+  /**
    * Obtener páginas visibles para la paginación
    */
   getVisiblePages(): number[] {
     const total = this.totalPagesCalculated();
-    const current = this.currentPage();
+    const current = this.getCurrentPageFromOffset(); // Usar método basado en offset
     const pages: number[] = [];
 
-    if (total <= 5) {
-      // Si hay 5 páginas o menos, mostrar todas
+    console.log('🔢 getVisiblePages - total:', total, 'current:', current);
+
+    if (total <= 7) {
+      // Si hay 7 páginas o menos, mostrar todas
       for (let i = 1; i <= total; i++) {
         pages.push(i);
       }
     } else {
-      // Lógica para mostrar páginas con elipsis
-      if (current <= 3) {
-        // Mostrar las primeras 5 páginas
+      // Lógica mejorada para mostrar páginas con elipsis
+      if (current <= 4) {
+        // Mostrar las primeras 5 páginas (sin la primera porque se muestra por separado)
         for (let i = 1; i <= 5; i++) {
           pages.push(i);
         }
-      } else if (current >= total - 2) {
-        // Mostrar las últimas 5 páginas
+      } else if (current >= total - 3) {
+        // Mostrar las últimas 5 páginas (sin la última porque se muestra por separado)
         for (let i = total - 4; i <= total; i++) {
           pages.push(i);
         }
       } else {
-        // Mostrar páginas alrededor de la actual
+        // Mostrar páginas alrededor de la actual (sin primera y última)
         for (let i = current - 2; i <= current + 2; i++) {
           pages.push(i);
         }
       }
     }
 
+    console.log('🔢 getVisiblePages result:', pages);
     return pages;
   }
 
   /**
-   * Verificar si se debe mostrar elipsis
+   * Verificar si se debe mostrar elipsis antes
+   */
+  shouldShowEllipsisBefore(): boolean {
+    const total = this.totalPagesCalculated();
+    const current = this.getCurrentPageFromOffset();
+    return total > 7 && current > 4;
+  }
+
+  /**
+   * Verificar si se debe mostrar elipsis después
+   */
+  shouldShowEllipsisAfter(): boolean {
+    const total = this.totalPagesCalculated();
+    const current = this.getCurrentPageFromOffset();
+    return total > 7 && current < total - 3;
+  }
+
+  /**
+   * Verificar si se debe mostrar elipsis (método original mantenido para compatibilidad)
    */
   shouldShowEllipsis(): boolean {
     const total = this.totalPagesCalculated();
-    const current = this.currentPage();
-    return total > 5 && (current > 3 && current < total - 2);
+    const current = this.getCurrentPageFromOffset(); // Usar método basado en offset
+    return total > 7 && (current > 4 && current < total - 3);
+  }
+
+  /**
+   * Obtener la página actual basada en el offset
+   */
+  getCurrentPageFromOffset(): number {
+    const currentFilters = this.currentFilter();
+    const offset = currentFilters.offset || 0;
+    const limit = currentFilters.limit || 20;
+    return Math.floor(offset / limit) + 1;
   }
 
   /**
    * Obtener número del primer registro mostrado
    */
   getStartRecord(): number {
-    const page = this.currentPage();
-    const itemsPerPage = this.itemsPerPage;
-    return (page - 1) * itemsPerPage + 1;
+    const currentFilters = this.currentFilter();
+    const offset = currentFilters.offset || 0;
+    const limit = currentFilters.limit || 20;
+    const totalRecords = this.totalRecords();
+    
+    console.log('DEBUG getStartRecord:', { offset, limit, totalRecords });
+    
+    if (totalRecords === 0) return 0;
+    
+    const result = offset + 1;
+    console.log('DEBUG getStartRecord result:', result);
+    return result;
   }
 
   /**
    * Obtener número del último registro mostrado
    */
   getEndRecord(): number {
-    const page = this.currentPage();
-    const itemsPerPage = this.itemsPerPage;
+    const currentFilters = this.currentFilter();
+    const offset = currentFilters.offset || 0;
     const totalRecords = this.totalRecords();
-    const endRecord = page * itemsPerPage;
-    return Math.min(endRecord, totalRecords);
+    const logsInCurrentPage = this.activityLogs().length;
+    
+    console.log('DEBUG getEndRecord:', { offset, totalRecords, logsInCurrentPage });
+    
+    if (totalRecords === 0) return 0;
+    
+    const result = offset + logsInCurrentPage;
+    console.log('DEBUG getEndRecord result:', result);
+    return result;
   }
 
   /**
@@ -981,5 +1519,121 @@ export class ActivityLogsPage implements OnInit {
     }
 
     return { browser, os, device, type };
+  }
+
+  /**
+   * Obtener el número de registro considerando la paginación
+   */
+  getRecordNumber(index: number): number {
+    const currentPageValue = this.currentPage();
+    const itemsPerPageValue = this.currentFilter().limit || 50;
+    return (currentPageValue - 1) * itemsPerPageValue + index + 1;
+  }
+
+  /**
+   * Validar formato de DNI hondureño
+   */
+  isValidDNI(dni: string): boolean {
+    // DNI hondureño: 13 dígitos (DDMMAAAANNNNNN)
+    const dniRegex = /^\d{13}$/;
+    return dniRegex.test(dni);
+  }
+
+  /**
+   * Validar formato de clave catastral
+   */
+  isValidClaveCatastral(clave: string): boolean {
+    // Formato típico de clave catastral: números y posibles separadores
+    const claveRegex = /^[\d\-\.]+$/;
+    return claveRegex.test(clave) && clave.length >= 6;
+  }
+
+  /**
+   * Obtener sugerencias para filtros de parámetros
+   */
+  getParameterSuggestions(value: string): string[] {
+    const suggestions: string[] = [];
+    
+    if (value === 'dni') {
+      suggestions.push('✓ Filtrar por consultas que usen DNI como parámetro');
+    } else if (value === 'claveCatastral') {
+      suggestions.push('✓ Filtrar por consultas que usen Clave Catastral como parámetro');
+    } else if (value === '') {
+      suggestions.push('Seleccionar tipo de parámetro para filtrar');
+    }
+    
+    return suggestions;
+  }
+
+  /**
+   * Manejar cambios en el filtro de parámetros
+   */
+  onParameterFilterChange(value: string) {
+    this.filterParametros = value;
+    
+    const suggestions = this.getParameterSuggestions(value);
+    console.log('💡 Filtro de parámetros:', suggestions);
+  }
+
+  /**
+   * Limpiar filtro específico
+   */
+  clearSpecificFilter(filterName: string) {
+    this.currentFilter.update(filter => ({
+      ...filter,
+      [filterName]: ''
+    }));
+    
+    console.log(`🧹 Filtro '${filterName}' limpiado`);
+    this.applyFilters();
+  }
+
+  /**
+   * Aplicar filtro rápido predefinido
+   */
+  applyQuickFilter(type: 'amnistia-success' | 'ec-only' | 'ics-only' | 'errors-today' | 'user-specific', value?: string) {
+    let newFilter: Partial<LogsFilter> = {};
+    
+    switch (type) {
+      case 'amnistia-success':
+        newFilter = {
+          consultaSubtype: 'amnistia',
+          resultado: 'SUCCESS'
+        };
+        break;
+      case 'ec-only':
+        newFilter = {
+          consultaType: 'EC'
+        };
+        break;
+      case 'ics-only':
+        newFilter = {
+          consultaType: 'ICS'
+        };
+        break;
+      case 'errors-today':
+        newFilter = {
+          resultado: 'ERROR',
+          timeRange: 'day'
+        };
+        break;
+      case 'user-specific':
+        if (value) {
+          newFilter = {
+            username: value
+          };
+        }
+        break;
+    }
+    
+    this.currentFilter.update(filter => ({
+      ...filter,
+      ...newFilter,
+      offset: 0
+    }));
+    
+    this.currentPage.set(1);
+    console.log(`⚡ Filtro rápido aplicado: ${type}`, newFilter);
+    this.loadAllActivityLogs();
   }
 }

@@ -17,8 +17,8 @@ export class AuthGuard implements CanActivate {
   }
 
   private async checkAuth(): Promise<boolean | UrlTree> {
-    console.log('🛡️ AuthGuard: Verificando autenticación...');
-    console.log('🔍 AuthGuard: Estado inicial - authCheckComplete:', this.authService.authCheckComplete(), 'isAuthenticated:', this.authService.isAuthenticated());
+    // console.log('🛡️ AuthGuard: Verificando autenticación...');
+    // console.log('🔍 AuthGuard: Estado inicial - authCheckComplete:', this.authService.authCheckComplete(), 'isAuthenticated:', this.authService.isAuthenticated());
     
     // Esperar máximo 2 segundos para la inicialización (reducido para mejor UX)
     let attempts = 0;
@@ -33,23 +33,23 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    console.log('🔍 AuthGuard: Después de espera - authCheckComplete:', this.authService.authCheckComplete(), 'isAuthenticated:', this.authService.isAuthenticated());
-    console.log('🔍 AuthGuard: Usuario actual:', this.authService.user());
-    console.log('🔍 AuthGuard: Estado de inicialización:', this.authService.initializationState());
+    // console.log('🔍 AuthGuard: Después de espera - authCheckComplete:', this.authService.authCheckComplete(), 'isAuthenticated:', this.authService.isAuthenticated());
+    // console.log('🔍 AuthGuard: Usuario actual:', this.authService.user());
+    // console.log('🔍 AuthGuard: Estado de inicialización:', this.authService.initializationState());
 
     // Verificar estado actual
     if (this.authService.isAuthenticated()) {
-      console.log('✅ Usuario autenticado, permitiendo acceso');
+      // console.log('✅ Usuario autenticado, permitiendo acceso');
       return true;
     }
 
     // Si la inicialización no se completó después del timeout, asumir no autenticado
     if (!this.authService.authCheckComplete()) {
-      console.log('⚠️ AuthGuard: Timeout en inicialización, asumiendo no autenticado');
+      // console.log('⚠️ AuthGuard: Timeout en inicialización, asumiendo no autenticado');
     }
 
     // Si no está autenticado, redirigir al login
-    console.log('🚫 Usuario no autenticado, redirigiendo al login');
+    // console.log('🚫 Usuario no autenticado, redirigiendo al login');
     return this.router.createUrlTree(['/login']);
   }
 

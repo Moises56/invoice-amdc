@@ -67,7 +67,7 @@ export class LoginPage {
    * Resetear formulario y estado de componente
    */
   private resetForm(): void {
-    console.log('🔄 Reseteando formulario de login...');
+    // console.log('🔄 Reseteando formulario de login...');
     this.loginForm.reset();
     this.loginForm.markAsUntouched();
     this.loginForm.markAsPristine();
@@ -85,7 +85,7 @@ export class LoginPage {
    * Verificar estado de autenticación al inicializar
    */
   private async checkAuthenticationStatus(): Promise<void> {
-    console.log('🔍 LoginPage: Verificando estado de autenticación...');
+    // console.log('🔍 LoginPage: Verificando estado de autenticación...');
     this.isInitializing.set(true);
     
     try {
@@ -98,15 +98,15 @@ export class LoginPage {
         attempts++;
       }
       
-      console.log('🔍 LoginPage: Estado después de espera - isAuthenticated:', this.authService.isAuthenticated());
+      // console.log('🔍 LoginPage: Estado después de espera - isAuthenticated:', this.authService.isAuthenticated());
       
       if (this.authService.isAuthenticated()) {
-        console.log('✅ Usuario ya autenticado, redirigiendo al dashboard');
+        // console.log('✅ Usuario ya autenticado, redirigiendo al dashboard');
         await this.router.navigate(['/dashboard'], { replaceUrl: true });
         return;
       }
       
-      console.log('ℹ️ Usuario no autenticado, mostrando formulario de login');
+      // console.log('ℹ️ Usuario no autenticado, mostrando formulario de login');
     } catch (error) {
       console.error('❌ Error verificando autenticación:', error);
     } finally {
@@ -133,7 +133,7 @@ export class LoginPage {
    */
   onSubmit(): void {
     if (this.loginForm.valid && !this.isLoading()) {
-      console.log('🔐 Enviando formulario de login...');
+      // console.log('🔐 Enviando formulario de login...');
       
       const formValue = this.loginForm.value;
       const credentials = {
@@ -147,7 +147,7 @@ export class LoginPage {
 
       this.authService.login(credentials).subscribe({
         next: (response) => {
-          console.log('✅ Login exitoso en component:', response);
+          // console.log('✅ Login exitoso en component:', response);
           // Navegar al dashboard con replaceUrl para limpiar historial
           this.router.navigate(['/dashboard'], { replaceUrl: true });
         },
@@ -157,7 +157,7 @@ export class LoginPage {
         }
       });
     } else {
-      console.log('⚠️ Formulario inválido o cargando');
+      // console.log('⚠️ Formulario inválido o cargando');
       this.markFormGroupTouched();
     }
   }

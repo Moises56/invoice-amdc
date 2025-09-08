@@ -25,7 +25,7 @@ export class StatsService {
    * Obtener estadísticas del usuario actual
    */
   getMyStats(): Observable<UserStats> {
-    console.log('📡 Solicitando estadísticas del usuario...');
+    // console.log('📡 Solicitando estadísticas del usuario...');
     return this.apiClient.get<UserStats>('/api/user-stats/my-stats', new HttpParams(), true);
   }
 
@@ -33,7 +33,7 @@ export class StatsService {
    * Obtener historial de ubicaciones del usuario actual con estadísticas de consultas
    */
   getMyLocationHistory(): Observable<UserLocationHistoryResponse> {
-    console.log('📡 Solicitando historial de ubicaciones del usuario con estadísticas...');
+    // console.log('📡 Solicitando historial de ubicaciones del usuario con estadísticas...');
     const params = new HttpParams().set('includeConsultationStats', 'true');
     return this.apiClient.get<UserLocationHistoryResponse>('/api/user-stats/my-location-history', params, true);
   }
@@ -42,7 +42,7 @@ export class StatsService {
    * Obtener estadísticas generales del sistema (solo USER-ADMIN)
    */
   getGeneralStats(filter?: StatsFilter): Observable<GeneralStats> {
-    console.log('📡 Solicitando estadísticas generales...', filter);
+    // console.log('📡 Solicitando estadísticas generales...', filter);
     
     let params = new HttpParams();
     if (filter) {
@@ -84,7 +84,7 @@ export class StatsService {
    * Mock data for location history (temporary - remove when backend is ready)
    */
   private getMockLocationHistory(filter?: LocationHistoryFilter): Observable<UserLocationHistoryResponse> {
-    console.log('🔄 Using mock data for location history');
+    // console.log('🔄 Using mock data for location history');
     
     const mockData: UserLocationHistoryResponse = {
       userId: '123',
@@ -184,7 +184,7 @@ export class StatsService {
 
     return new Observable(observer => {
       setTimeout(() => {
-        console.log('✅ Mock data delivered successfully');
+        // console.log('✅ Mock data delivered successfully');
         observer.next(mockData);
         observer.complete();
       }, 800); // Simulate realistic network delay
@@ -195,7 +195,7 @@ export class StatsService {
    * Obtener historial de ubicaciones de un usuario específico (solo USER-ADMIN)
    */
   getUserLocationHistory(userId: string, filter?: LocationHistoryFilter): Observable<UserLocationHistoryResponse> {
-    console.log('📡 Solicitando historial de ubicaciones para usuario:', userId, filter);
+    // console.log('📡 Solicitando historial de ubicaciones para usuario:', userId, filter);
     
     let params = new HttpParams().set('includeConsultationStats', 'true');
     if (filter) {
@@ -214,7 +214,7 @@ export class StatsService {
    * Obtener historial de ubicaciones de todos los usuarios (solo USER-ADMIN)
    */
   getAllUsersLocationHistory(filter?: LocationHistoryFilter): Observable<UserLocationHistoryResponse[]> {
-    console.log('📡 Solicitando historial de ubicaciones de todos los usuarios...', filter);
+    // console.log('📡 Solicitando historial de ubicaciones de todos los usuarios...', filter);
     
     let params = new HttpParams().set('includeConsultationStats', 'true');
     if (filter) {
@@ -233,7 +233,7 @@ export class StatsService {
    * Asignar ubicación a un usuario (solo USER-ADMIN)
    */
   assignUserLocation(request: AssignUserLocationRequest): Observable<AssignUserLocationResponse> {
-    console.log('📡 Asignando ubicación a usuario...', request);
+    // console.log('📡 Asignando ubicación a usuario...', request);
     
     return this.apiClient.post<AssignUserLocationResponse>('/api/user-stats/user-location', request, true);
   }

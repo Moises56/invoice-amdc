@@ -271,7 +271,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
     this.statsErrorMessage.set('');
 
     try {
-      console.log('Loading user statistics...');
+      // console.log('Loading user statistics...');
       const response = await new Promise<UserStats>((resolve, reject) => {
         this.statsService.getMyStats().subscribe({
           next: (data) => resolve(data),
@@ -282,7 +282,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       if (response && response.userId) {
         this.userStats.set(response);
         this.lastRefreshTime.set(new Date());
-        console.log('Statistics loaded successfully:', response);
+        // console.log('Statistics loaded successfully:', response);
 
         if (!silentRefresh) {
           await this.showSuccessToast('Datos actualizados');
@@ -316,7 +316,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
     this.locationErrorMessage.set('');
 
     try {
-      console.log('Loading user location history...');
+      // console.log('Loading user location history...');
       const response = await new Promise<UserLocationHistoryResponse>((resolve, reject) => {
         this.statsService.getMyLocationHistory().subscribe({
           next: (data) => resolve(data),
@@ -326,10 +326,10 @@ export class UserDashboardPage implements OnInit, OnDestroy {
 
       if (response && response.userId) {
         this.userLocationHistory.set(response);
-        console.log('Location history loaded successfully:', response);
-        console.log('TypeConsultaHistory in response:', response.typeConsultaHistory);
-        console.log('TypeConsultaHistory length:', response.typeConsultaHistory?.length || 0);
-        console.log('Full response structure:', JSON.stringify(response, null, 2));
+        // console.log('Location history loaded successfully:', response);
+        // console.log('TypeConsultaHistory in response:', response.typeConsultaHistory);
+        // console.log('TypeConsultaHistory length:', response.typeConsultaHistory?.length || 0);
+        // console.log('Full response structure:', JSON.stringify(response, null, 2));
 
         if (!silentRefresh) {
           await this.showSuccessToast('Historial de ubicaciones actualizado');

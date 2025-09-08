@@ -118,7 +118,7 @@ export class GeneralStatsPage implements OnInit {
     this.errorMessage.set('');
     
     try {
-      console.log('🔄 Cargando estadísticas generales...');
+      // console.log('🔄 Cargando estadísticas generales...');
       
       // Simular un pequeño delay mínimo para mostrar el loading
       const [response] = await Promise.all([
@@ -126,13 +126,13 @@ export class GeneralStatsPage implements OnInit {
         new Promise(resolve => setTimeout(resolve, 800)) // Mínimo 800ms para UX
       ]);
       
-      console.log('📊 Respuesta del servidor (estadísticas generales):', response);
+      // console.log('📊 Respuesta del servidor (estadísticas generales):', response);
       
       // El backend devuelve los datos directamente
       if (response && response.totalUsuarios !== undefined) {
         this.generalStats.set(response);
         this.lastUpdated.set(new Date().toISOString());
-        console.log('✅ Estadísticas generales cargadas exitosamente:', response);
+        // console.log('✅ Estadísticas generales cargadas exitosamente:', response);
       } else {
         console.warn('⚠️ Respuesta sin datos válidos:', response);
         this.hasError.set(true);

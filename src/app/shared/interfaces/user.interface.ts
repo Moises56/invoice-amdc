@@ -112,11 +112,31 @@ export interface StatsFilter {
 }
 
 export interface LogsFilter extends StatsFilter {
+  // Filtros básicos
   accion?: string;
   ubicacion?: string;
+
+  // Nuevos filtros específicos basados en los endpoints actualizados
+  consultaType?: string; // Filtrar por tipo de consulta (EC, RNP, CATASTRO)
+  consultaSubtype?: string; // Filtrar por subtipo (amnistia, etc.)
+  resultado?: string; // Filtrar por resultado (SUCCESS, ERROR)
+  username?: string; // Buscar por usuario específico
+  userLocation?: string; // Filtrar por ubicación del usuario
+  parametros?: string; // Buscar por parámetros específicos (dni, claveCatastral)
+
+  // Filtros de fecha y tiempo
+  timeRange?: 'day' | 'week' | 'month' | 'year' | 'custom';
+  startDate?: string;
+  endDate?: string;
+
+  // Filtros legacy (mantener compatibilidad)
   consulta?: string;
   tipoConsulta?: string;
-  resultado?: string;
+  userId?: string;
+
+  // Paginación
+  limit?: number;
+  offset?: number;
   page?: number;
   per_page?: number;
 }

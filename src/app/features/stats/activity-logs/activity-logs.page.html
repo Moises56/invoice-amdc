@@ -67,50 +67,150 @@
       <!-- Filter Section -->
       <div class="filter-section">
         <div class="filter-row">
-          <ion-searchbar
-            placeholder="Filtrar por Username"
-            [debounce]="300"
-            (ionInput)="onSearchChange($event)"
-            class="username-filter"
-          >
-          </ion-searchbar>
-          
           <ion-button class="export-button" (click)="exportToExcel()">
             <ion-icon name="download-outline" slot="start"></ion-icon>
             Exportar a Excel
           </ion-button>
+          
+          <ion-button 
+            class="count-button" 
+            fill="outline" 
+            (click)="countTotalRecords()"
+            title="Ver cuántos registros se exportarían"
+          >
+            <ion-icon name="analytics-outline" slot="start"></ion-icon>
+            Contar Registros
+          </ion-button>
+        </div>
+
+        <!-- Filtros rápidos -->
+        <div class="quick-filters">
+          <span class="quick-filters-label">Filtros rápidos:</span>
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="applyQuickFilter('amnistia-success')"
+            title="Consultas de amnistía exitosas"
+          >
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+            Amnistía OK
+          </ion-button>
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="applyQuickFilter('ec-only')"
+            title="Solo consultas EC"
+          >
+            <ion-icon name="document-text-outline" slot="start"></ion-icon>
+            Solo EC
+          </ion-button>
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="applyQuickFilter('ics-only')"
+            title="Solo consultas ICS"
+          >
+            <ion-icon name="document-outline" slot="start"></ion-icon>
+            Solo ICS
+          </ion-button>
+          <ion-button 
+            fill="outline" 
+            size="small" 
+            (click)="applyQuickFilter('errors-today')"
+            title="Errores del día de hoy"
+          >
+            <ion-icon name="warning-outline" slot="start"></ion-icon>
+            Errores Hoy
+          </ion-button>
         </div>
         
-        <!-- Filtros adicionales -->
+        <!-- Filtros mejorados con nuevos endpoints -->
         <div class="additional-filters">
+          <!-- Filtro por Tipo de Consulta (consultaType) -->
           <div class="filter-group">
-            <label for="consultaFilter">Consulta:</label>
-            <select id="consultaFilter" [(ngModel)]="currentFilter().consulta" (change)="onFilterChange('consulta', $event)">
-              <option value="">Todas</option>
+            <label for="consultaTypeFilter">Tipo de Consulta:</label>
+            <select id="consultaTypeFilter" [(ngModel)]="filterConsultaType">
+              <option value="">Todas las consultas</option>
               <option value="EC">EC</option>
               <option value="ICS">ICS</option>
             </select>
           </div>
           
+          <!-- Filtro por Subtipo de Consulta (consultaSubtype) -->
           <div class="filter-group">
-            <label for="tipoConsultaFilter">Tipo Consulta:</label>
-            <select id="tipoConsultaFilter" [(ngModel)]="currentFilter().tipoConsulta" (change)="onFilterChange('tipoConsulta', $event)">
-              <option value="">Todos</option>
-              <option value="normal">Normal</option>
+            <label for="consultaSubtypeFilter">Subtipo de Consulta:</label>
+            <select id="consultaSubtypeFilter" [(ngModel)]="filterConsultaSubtype">
+              <option value="">Todos los subtipos</option>
               <option value="amnistia">Amnistía</option>
+              <option value="normal">Normal</option>
+              <option value="urgente">Urgente</option>
+              <option value="especial">Especial</option>
             </select>
           </div>
           
+          <!-- Filtro por Resultado -->
           <div class="filter-group">
             <label for="resultadoFilter">Resultado:</label>
-            <select id="resultadoFilter" [(ngModel)]="currentFilter().resultado" (change)="onFilterChange('resultado', $event)">
-              <option value="">Todos</option>
+            <select id="resultadoFilter" [(ngModel)]="filterResultado">
+              <option value="">Todos los resultados</option>
               <option value="SUCCESS">SUCCESS</option>
               <option value="ERROR">ERROR</option>
               <option value="NOT_FOUND">NOT_FOUND</option>
+              <option value="WARNING">WARNING</option>
             </select>
           </div>
           
+          <!-- Filtro por Usuario Específico -->
+          <div class="filter-group">
+            <label for="usernameFilter">Usuario:</label>
+            <input 
+              type="text" 
+              id="usernameFilter" 
+              [(ngModel)]="filterUsername" 
+              placeholder="ej: zgomez, mlopez..."
+              title="Buscar por nombre de usuario específico"
+            >
+          </div>
+          
+          <!-- Filtro por Ubicación del Usuario -->
+          <div class="filter-group">
+            <label for="userLocationFilter">Ubicación:</label>
+            <input 
+              type="text" 
+              id="userLocationFilter" 
+              [(ngModel)]="filterUserLocation" 
+              placeholder="ej: Mall Premier, Mercado Central..."
+              title="Buscar por ubicación del usuario"
+            >
+          </div>
+          
+          <!-- Filtro por Parámetros Específicos -->
+          <div class="filter-group">
+            <label for="parametrosFilter">Tipo de Parámetro:</label>
+            <select 
+              id="parametrosFilter" 
+              [(ngModel)]="filterParametros"
+              title="Seleccionar tipo de parámetro para filtrar"
+            >
+              <option value="">Todos los parámetros</option>
+              <option value="dni">DNI</option>
+              <option value="claveCatastral">Clave Catastral</option>
+            </select>
+          </div>
+          
+          <!-- Filtro por Período -->
+          <div class="filter-group">
+            <label for="timeRangeFilter">Período:</label>
+            <select id="timeRangeFilter" [(ngModel)]="filterTimeRange">
+              <option value="day">Último día</option>
+              <option value="week">Última semana</option>
+              <option value="month">Último mes</option>
+              <option value="year">Último año</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+          
+          <!-- Acciones de filtros -->
           <div class="filter-actions">
             <ion-button fill="outline" size="small" (click)="clearFilters()">
               <ion-icon name="close-outline" slot="start"></ion-icon>
@@ -130,6 +230,7 @@
           <table class="logs-table">
             <thead>
               <tr>
+                <th>No.</th>
                 <th>FECHA</th>
                 <th>CONSULTA</th>
                 <th>TIPO CONSULTA</th>
@@ -143,9 +244,10 @@
             </thead>
             <tbody>
               <tr
-                *ngFor="let log of paginatedLogs(); trackBy: trackByLogId"
+                *ngFor="let log of paginatedLogs(); let i = index; trackBy: trackByLogId"
                 class="log-row"
               >
+                <td class="numero">{{ getRecordNumber(i) }}</td>
                 <td class="fecha">{{ formatDate(log.createdAt) }}</td>
                 <td class="tipo-consulta">{{ log.consultaType || 'N/A' }}</td>
                 <td class="subtipo-consulta">
@@ -195,7 +297,7 @@
             <ion-button
               fill="clear"
               class="pagination-btn first-last"
-              [disabled]="currentPage() === 1"
+              [disabled]="getCurrentPageFromOffset() === 1"
               (click)="goToPage(1)"
               title="Primera página"
             >
@@ -205,8 +307,8 @@
             <ion-button
               fill="clear"
               class="pagination-btn prev-next"
-              [disabled]="currentPage() === 1"
-              (click)="goToPage(currentPage() - 1)"
+              [disabled]="getCurrentPageFromOffset() === 1"
+              (click)="previousPage()"
               title="Página anterior"
             >
               <ion-icon name="chevron-back-outline"></ion-icon>
@@ -214,19 +316,35 @@
             
             <!-- Números de página con diseño mejorado -->
             <div class="page-numbers">
+              <!-- Primera página si no está en las páginas visibles -->
+              <ion-button
+                *ngIf="shouldShowEllipsisBefore()"
+                class="pagination-number"
+                (click)="goToPage(1)"
+                title="Ir a página 1"
+              >
+                1
+              </ion-button>
+              
+              <!-- Elipsis antes -->
+              <span *ngIf="shouldShowEllipsisBefore()" class="pagination-ellipsis">...</span>
+              
+              <!-- Páginas visibles -->
               <ion-button
                 *ngFor="let page of getVisiblePages()"
-                [class]="page === currentPage() ? 'pagination-number active' : 'pagination-number'"
+                [class]="page === getCurrentPageFromOffset() ? 'pagination-number active' : 'pagination-number'"
                 (click)="goToPage(page)"
                 [title]="'Ir a página ' + page"
               >
                 {{ page }}
               </ion-button>
               
-              <span *ngIf="shouldShowEllipsis()" class="pagination-ellipsis">...</span>
+              <!-- Elipsis después -->
+              <span *ngIf="shouldShowEllipsisAfter()" class="pagination-ellipsis">...</span>
               
+              <!-- Última página si no está en las páginas visibles -->
               <ion-button
-                *ngIf="totalPagesCalculated() > 5 && currentPage() < totalPagesCalculated() - 2"
+                *ngIf="shouldShowEllipsisAfter()"
                 class="pagination-number"
                 (click)="goToPage(totalPagesCalculated())"
                 [title]="'Ir a página ' + totalPagesCalculated()"
@@ -238,8 +356,8 @@
             <ion-button
               fill="clear"
               class="pagination-btn prev-next"
-              [disabled]="currentPage() === totalPagesCalculated()"
-              (click)="goToPage(currentPage() + 1)"
+              [disabled]="getCurrentPageFromOffset() === totalPagesCalculated()"
+              (click)="nextPage()"
               title="Página siguiente"
             >
               <ion-icon name="chevron-forward-outline"></ion-icon>
@@ -248,7 +366,7 @@
             <ion-button
               fill="clear"
               class="pagination-btn first-last"
-              [disabled]="currentPage() === totalPagesCalculated()"
+              [disabled]="getCurrentPageFromOffset() === totalPagesCalculated()"
               (click)="goToPage(totalPagesCalculated())"
               title="Última página"
             >

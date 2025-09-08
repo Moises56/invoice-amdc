@@ -111,7 +111,7 @@ export class AllUsersLocationHistoryComponent implements OnInit {
   });
 
   constructor() {
-    console.log('🏗️ AllUsersLocationHistoryComponent constructor called');
+    // console.log('🏗️ AllUsersLocationHistoryComponent constructor called');
     
     // Register icons
     addIcons({
@@ -132,18 +132,18 @@ export class AllUsersLocationHistoryComponent implements OnInit {
   }
 
   async ngOnInit() {
-    console.log('🔄 AllUsersLocationHistory ngOnInit started');
+    // console.log('🔄 AllUsersLocationHistory ngOnInit started');
     const user = this.authService.user();
-    console.log('👤 Current user:', user);
-    console.log('🔐 Can view location history:', this.canViewLocationHistory());
+    // console.log('👤 Current user:', user);
+    // console.log('🔐 Can view location history:', this.canViewLocationHistory());
     
     if (!this.canViewLocationHistory()) {
-      console.log('❌ User does not have permission to view location history');
+      // console.log('❌ User does not have permission to view location history');
       await this.showErrorToast('No tienes permisos para acceder a esta información');
       return;
     }
     
-    console.log('✅ Loading all users location history...');
+    // console.log('✅ Loading all users location history...');
     await this.loadAllUsersLocationHistory();
   }
 
@@ -158,14 +158,14 @@ export class AllUsersLocationHistoryComponent implements OnInit {
 
     try {
       const filter = this.currentFilter();
-      console.log('🔄 Loading all users location history with filter:', filter);
+      // console.log('🔄 Loading all users location history with filter:', filter);
 
       this.statsService
         .getAllUsersLocationHistory(filter)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (response) => {
-            console.log('📡 Raw response received:', response);
+            // console.log('📡 Raw response received:', response);
             this.processAllUsersLocationHistoryResponse(response, append);
           },
           error: (error) => {
@@ -188,7 +188,7 @@ export class AllUsersLocationHistoryComponent implements OnInit {
    */
   private processAllUsersLocationHistoryResponse(response: any, append: boolean): void {
     try {
-      console.log('🔍 Processing all users response:', response);
+      // console.log('🔍 Processing all users response:', response);
       
       // Validate response structure
       if (!response) {
@@ -209,27 +209,27 @@ export class AllUsersLocationHistoryComponent implements OnInit {
         usersData = Array.isArray(response) ? response : [response];
       }
 
-      console.log('📋 Processing users data:', usersData.length, 'users');
-      console.log('📋 Sample user data:', usersData[0]);
+      // console.log('📋 Processing users data:', usersData.length, 'users');
+      // console.log('📋 Sample user data:', usersData[0]);
 
       if (append) {
         // Append new data (not typically used for this endpoint)
         const currentData = this.allUsersData();
         this.allUsersData.set([...currentData, ...usersData]);
-        console.log('📋 Appended data, total users now:', this.allUsersData().length);
+        // console.log('📋 Appended data, total users now:', this.allUsersData().length);
       } else {
         // Replace data for refresh
         this.allUsersData.set(usersData);
-        console.log('📋 Set new data, total users:', this.allUsersData().length);
+        // console.log('📋 Set new data, total users:', this.allUsersData().length);
       }
 
-      console.log('✅ All users location history processed successfully:', {
-        totalUsers: this.totalUsers(),
-        totalActiveLocations: this.totalActiveLocations(),
-        totalLocationsAssigned: this.totalLocationsAssigned(),
-        hasData: this.hasData(),
-        filteredUsersCount: this.filteredUsersData().length
-      });
+      // console.log('✅ All users location history processed successfully:', {
+      //   totalUsers: this.totalUsers(),
+      //   totalActiveLocations: this.totalActiveLocations(),
+      //   totalLocationsAssigned: this.totalLocationsAssigned(),
+      //   hasData: this.hasData(),
+      //   filteredUsersCount: this.filteredUsersData().length
+      // });
     } catch (error: any) {
       console.error('❌ Error processing all users response:', error);
       this.hasError.set(true);
