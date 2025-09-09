@@ -216,7 +216,10 @@
       </div>
 
       <!-- Pagos App -->
-      <div class="kpi-card warning">
+      <div class="kpi-card warning featured-metric">
+        <div class="priority-badge">
+          <span class="badge-text">IMPORTANTE</span>
+        </div>
         <div class="kpi-icon">
           <ion-icon name="card-outline"></ion-icon>
         </div>
@@ -234,7 +237,7 @@
         </div>
         <div class="kpi-content">
           <h3 class="kpi-number">{{ formatNumber(matchStats()!.totalPagosPrevios) }}</h3>
-          <p class="kpi-label">Pagos Previos</p>
+          <p class="kpi-label">Pagos fuera de la app</p>
           <span class="kpi-subtitle">{{ formatPercentage(computedStats()!.tasaPagoPrevio) }} del total</span>
         </div>
       </div>
@@ -275,10 +278,13 @@
       </div>
 
       <!-- Pagado App -->
-      <div class="financial-card">
+      <div class="financial-card featured-metric">
+        <div class="priority-badge">
+          <span class="badge-text">CLAVE</span>
+        </div>
         <div class="financial-header">
           <ion-icon name="card-outline"></ion-icon>
-          <h4>Pagado vía App</h4>
+          <h4>Total Pagado vía App</h4>
         </div>
         <div class="financial-amount warning">
           {{ formatCurrency(matchStats()!.sumaTotalPagadoMedianteApp) }}
@@ -292,7 +298,7 @@
       <div class="financial-card">
         <div class="financial-header">
           <ion-icon name="time-outline"></ion-icon>
-          <h4>Pagos Previos</h4>
+          <h4>Pagos fuera de la app</h4>
         </div>
         <div class="financial-amount info">
           {{ formatCurrency(matchStats()!.sumaTotalPagosPrevios) }}
@@ -309,22 +315,25 @@
     </div>
 
     <div class="summary-metrics">
-      <div class="metric-item">
+      <!-- <div class="metric-item">
         <div class="metric-label">Promedio por Match</div>
         <div class="metric-value">{{ formatCurrency(computedStats()!.promedioMontoPagado) }}</div>
-      </div>
+      </div> -->
       
-      <div class="metric-item">
+      <!-- <div class="metric-item">
         <div class="metric-label">Promedio por Consulta</div>
         <div class="metric-value">{{ formatCurrency(computedStats()!.promedioMontoEncontrado) }}</div>
-      </div>
+      </div> -->
       
       <div class="metric-item">
-        <div class="metric-label">Tasa de Match</div>
+        <div class="metric-label">Efectividad de consultas</div>
         <div class="metric-value">{{ formatPercentage(computedStats()!.tasaMatch) }}</div>
       </div>
       
-      <div class="metric-item">
+      <div class="metric-item featured-metric">
+        <div class="priority-badge">
+          <span class="badge-text">META</span>
+        </div>
         <div class="metric-label">Efectividad de Recaudo</div>
         <div class="metric-value">{{ formatPercentage(computedStats()!.efectividadRecaudo) }}</div>
       </div>

@@ -77,9 +77,9 @@ export class StatsService {
       });
     }
     
-    console.log('📡 URL completa:', '/api/user-stats/logs');
-    console.log('📡 Parámetros:', params.toString());
-    console.log('📡 Enviando petición con credenciales HTTP-only...');
+    // console.log('📡 URL completa:', '/api/user-stats/logs');
+    // console.log('📡 Parámetros:', params.toString());
+    // console.log('📡 Enviando petición con credenciales HTTP-only...');
     
     return this.apiClient.get<ActivityLogResponse>('/api/user-stats/logs', params, true);
   }
@@ -88,7 +88,7 @@ export class StatsService {
    * Obtener estadísticas de recaudación (match between consultas and pagos)
    */
   getMatchStats(filter?: MatchFilters): Observable<MatchStatsResponse> {
-    console.log('📡 Solicitando estadísticas de recaudación...', filter);
+    // console.log('📡 Solicitando estadísticas de recaudación...', filter);
     
     let params = new HttpParams();
     if (filter) {
@@ -100,9 +100,9 @@ export class StatsService {
       });
     }
     
-    console.log('📡 URL completa:', '/api/user-stats/match');
-    console.log('📡 Parámetros:', params.toString());
-    console.log('📡 Enviando petición con credenciales HTTP-only...');
+    // console.log('📡 URL completa:', '/api/user-stats/match');
+    // console.log('📡 Parámetros:', params.toString());
+    // console.log('📡 Enviando petición con credenciales HTTP-only...');
     
     return this.apiClient.get<MatchStatsResponse>('/api/user-stats/match', params, true);
   }

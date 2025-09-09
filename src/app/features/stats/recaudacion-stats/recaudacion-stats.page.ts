@@ -233,19 +233,19 @@ export class RecaudacionStatsPage implements OnInit {
     this.errorMessage.set('');
     
     try {
-      console.log('🔄 Cargando estadísticas de recaudación...', filters);
+    //   console.log('🔄 Cargando estadísticas de recaudación...', filters);
       
       const [response] = await Promise.all([
         this.statsService.getMatchStats(filters).toPromise(),
         new Promise(resolve => setTimeout(resolve, 800)) // Mínimo 800ms para UX
       ]);
 
-      console.log('📊 Respuesta del servidor (match stats):', response);
+    //   console.log('📊 Respuesta del servidor (match stats):', response);
       
       if (response) {
         this.matchStats.set(response);
         this.lastUpdated.set(new Date().toISOString());
-        console.log('✅ Estadísticas de recaudación cargadas exitosamente');
+        // console.log('✅ Estadísticas de recaudación cargadas exitosamente');
       } else {
         console.warn('⚠️ Respuesta sin datos válidos:', response);
         this.hasError.set(true);
