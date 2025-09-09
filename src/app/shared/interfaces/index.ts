@@ -451,3 +451,6 @@ export interface AuditUserActivity {
     count: number;
   }[];
 }
+
+// Export match statistics interfaces
+export * from './match-stats.interface';

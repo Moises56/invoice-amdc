@@ -65,8 +65,7 @@ import {
   alertCircleOutline,
   arrowForwardOutline,
   arrowDownOutline,
-  locationOutline,
-} from 'ionicons/icons';
+  locationOutline, cashOutline } from 'ionicons/icons';
 import { interval } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -171,43 +170,7 @@ export class UserDashboardPage implements OnInit, OnDestroy {
 
   constructor() {
     // Register all required icons
-    addIcons({
-      notificationsOutline,
-      personOutline,
-      documentTextOutline,
-      shieldCheckmarkOutline,
-      analyticsOutline,
-      barChartOutline,
-      warningOutline,
-      refreshOutline,
-      settingsOutline,
-      chevronForwardOutline,
-      bluetoothOutline,
-      eyeOutline,
-      timeOutline,
-      checkmarkCircle,
-      closeCircle,
-      closeOutline,
-      location,
-      calendarClearOutline,
-      chevronUpOutline,
-      chevronDownOutline,
-      calendarOutline,
-      searchOutline,
-      statsChartOutline,
-      trendingUpOutline,
-      checkmarkCircleOutline,
-      closeCircleOutline,
-      pieChartOutline,
-      businessOutline,
-      listOutline,
-      ribbonOutline,
-      trendingDownOutline,
-      alertCircleOutline,
-      arrowForwardOutline,
-      arrowDownOutline,
-      locationOutline,
-    });
+    addIcons({notificationsOutline,personOutline,calendarOutline,timeOutline,analyticsOutline,checkmarkCircleOutline,alertCircleOutline,refreshOutline,location,chevronForwardOutline,documentTextOutline,arrowForwardOutline,shieldCheckmarkOutline,barChartOutline,trendingUpOutline,locationOutline,bluetoothOutline,eyeOutline,cashOutline,warningOutline,settingsOutline,checkmarkCircle,closeCircle,closeOutline,calendarClearOutline,chevronUpOutline,chevronDownOutline,searchOutline,statsChartOutline,closeCircleOutline,pieChartOutline,businessOutline,listOutline,ribbonOutline,trendingDownOutline,arrowDownOutline,});
   }
 
   async ngOnInit() {
@@ -456,6 +419,16 @@ export class UserDashboardPage implements OnInit, OnDestroy {
       return;
     }
     await this.goTo('/activity-logs');
+  }
+
+  async goToRecaudacionStats(): Promise<void> {
+    if (!this.canAccessGeneralStats()) {
+      await this.showErrorToast(
+        'No tienes permisos para acceder a esta sección'
+      );
+      return;
+    }
+    await this.goTo('/recaudacion-stats');
   }
 
   async goToAllUsersLocations(): Promise<void> {

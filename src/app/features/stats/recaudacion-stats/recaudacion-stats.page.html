@@ -1,0 +1,339 @@
+<ion-header class="safe-area-header recaudacion-stats-header">
+  <div class="safe-area-spacer"></div>
+  <ion-toolbar class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/dashboard/user"
+        icon="arrow-back-outline"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title class="header-title">📊 Estadísticas de Recaudación</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        fill="clear"
+        (click)="refreshStats()"
+        [disabled]="isLoading()"
+      >
+        <ion-icon
+          name="refresh-outline"
+          [class.rotating]="isLoading()"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="false" class="recaudacion-stats-content">
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="refreshStats($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading() && !matchStats()">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+      </div>
+      <div class="loading-text">
+        <h3>💰 Analizando Recaudación</h3>
+        <p>Procesando consultas y pagos...</p>
+      </div>
+      <div class="loading-progress">
+        <div class="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh indicator -->
+  <div class="refresh-indicator" *ngIf="isLoading() && matchStats()">
+    <ion-spinner name="lines-small" color="primary"></ion-spinner>
+    <span>Actualizando recaudación...</span>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="hasError() && !isLoading()">
+    <div class="error-content">
+      <ion-icon name="analytics-outline" class="error-icon"></ion-icon>
+      <h3>No se pudieron cargar las estadísticas</h3>
+      <p>{{ errorMessage() }}</p>
+      <ion-button fill="solid" size="default" (click)="refreshStats()">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
+        Reintentar
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="stats-container" *ngIf="matchStats()">
+    
+    <!-- Filter Presets -->
+    <div class="section-header">
+      <h2 class="section-title">🎯 Período de Análisis</h2>
+      <p class="section-subtitle">{{ computedStats()?.periodoConsultado || 'Selecciona un período' }}</p>
+    </div>
+
+    <div class="filter-presets">
+      <div class="preset-buttons">
+        <button 
+          *ngFor="let preset of filterPresets"
+          class="preset-btn"
+          [class.active]="selectedPreset() === preset.key"
+          (click)="applyPreset(preset.key)">
+          <span class="preset-label">{{ preset.label }}</span>
+          <span class="preset-description">{{ preset.description }}</span>
+        </button>
+      </div>
+      
+      <!-- Custom Filters Panel -->
+      <ion-accordion-group *ngIf="selectedPreset() === 'custom'">
+        <ion-accordion value="filters" [readonly]="false">
+          <div slot="header" class="accordion-header">
+            <ion-icon name="filter-outline"></ion-icon>
+            <span>Filtros Personalizados</span>
+          </div>
+          
+          <div slot="content" class="accordion-content">
+            <!-- Tipo de consulta -->
+            <div class="filter-group">
+              <ion-item>
+                <ion-label position="stacked">Tipo de Consulta</ion-label>
+                <ion-select 
+                  [(ngModel)]="tempConsultaType"
+                  interface="popover"
+                  placeholder="Todos los tipos">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option value="EC">Estado de Cuenta</ion-select-option>
+                  <ion-select-option value="ICS">ICS</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </div>
+
+            <!-- Fechas de consultas -->
+            <div class="filter-group">
+              <h4>📅 Rango de Consultas</h4>
+              <div class="date-range">
+                <ion-item>
+                  <ion-label position="stacked">Desde</ion-label>
+                  <ion-input 
+                    type="date" 
+                    [(ngModel)]="tempConsultaStartDate">
+                  </ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Hasta</ion-label>
+                  <ion-input 
+                    type="date" 
+                    [(ngModel)]="tempConsultaEndDate">
+                  </ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <!-- Fechas de pagos -->
+            <div class="filter-group">
+              <h4>💳 Rango de Pagos</h4>
+              <div class="date-range">
+                <ion-item>
+                  <ion-label position="stacked">Desde</ion-label>
+                  <ion-input 
+                    type="date" 
+                    [(ngModel)]="tempStartDate">
+                  </ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">Hasta</ion-label>
+                  <ion-input 
+                    type="date" 
+                    [(ngModel)]="tempEndDate">
+                  </ion-input>
+                </ion-item>
+              </div>
+            </div>
+
+            <!-- Año específico -->
+            <div class="filter-group">
+              <ion-item>
+                <ion-label position="stacked">Año Específico</ion-label>
+                <ion-input 
+                  type="number" 
+                  [(ngModel)]="tempYear"
+                  placeholder="2025">
+                </ion-input>
+              </ion-item>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="filter-actions">
+              <ion-button 
+                fill="outline" 
+                size="default" 
+                (click)="clearFilters()">
+                <ion-icon name="close-outline" slot="start"></ion-icon>
+                Limpiar
+              </ion-button>
+              <ion-button 
+                fill="solid" 
+                size="default" 
+                (click)="applyCustomFilters()">
+                <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                Aplicar Filtros
+              </ion-button>
+            </div>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+    </div>
+
+    <!-- Main KPIs -->
+    <div class="section-header">
+      <h2 class="section-title">📈 Indicadores Principales</h2>
+    </div>
+
+    <div class="kpi-grid">
+      <!-- Total Consultas -->
+      <div class="kpi-card primary">
+        <div class="kpi-icon">
+          <ion-icon name="document-text-outline"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <h3 class="kpi-number">{{ formatNumber(matchStats()!.totalConsultasAnalizadas) }}</h3>
+          <p class="kpi-label">Consultas Analizadas</p>
+          <span class="kpi-subtitle">Consultas procesadas exitosamente</span>
+        </div>
+      </div>
+
+      <!-- Total Matches -->
+      <div class="kpi-card success">
+        <div class="kpi-icon">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <h3 class="kpi-number">{{ formatNumber(matchStats()!.totalMatches) }}</h3>
+          <p class="kpi-label">Matches Encontrados</p>
+          <span class="kpi-subtitle">{{ formatPercentage(computedStats()!.tasaMatch) }} tasa de match</span>
+        </div>
+      </div>
+
+      <!-- Pagos App -->
+      <div class="kpi-card warning">
+        <div class="kpi-icon">
+          <ion-icon name="card-outline"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <h3 class="kpi-number">{{ formatNumber(matchStats()!.totalPagosMedianteApp) }}</h3>
+          <p class="kpi-label">Pagos vía App</p>
+          <span class="kpi-subtitle">{{ formatPercentage(computedStats()!.tasaPagoApp) }} del total</span>
+        </div>
+      </div>
+
+      <!-- Pagos Previos -->
+      <div class="kpi-card info">
+        <div class="kpi-icon">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="kpi-content">
+          <h3 class="kpi-number">{{ formatNumber(matchStats()!.totalPagosPrevios) }}</h3>
+          <p class="kpi-label">Pagos Previos</p>
+          <span class="kpi-subtitle">{{ formatPercentage(computedStats()!.tasaPagoPrevio) }} del total</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Metrics -->
+    <div class="section-header">
+      <h2 class="section-title">💰 Métricas Financieras</h2>
+    </div>
+
+    <div class="financial-grid">
+      <!-- Total Encontrado -->
+      <div class="financial-card">
+        <div class="financial-header">
+          <ion-icon name="eye-outline"></ion-icon>
+          <h4>Total Encontrado</h4>
+        </div>
+        <div class="financial-amount primary">
+          {{ formatCurrency(matchStats()!.sumaTotalEncontrado) }}
+        </div>
+        <div class="financial-subtitle">
+          Suma de deudas en consultas
+        </div>
+      </div>
+
+      <!-- Total Pagado -->
+      <div class="financial-card">
+        <div class="financial-header">
+          <ion-icon name="wallet-outline"></ion-icon>
+          <h4>Total Pagado</h4>
+        </div>
+        <div class="financial-amount success">
+          {{ formatCurrency(matchStats()!.sumaTotalPagado) }}
+        </div>
+        <div class="financial-subtitle">
+          {{ formatPercentage(computedStats()!.efectividadRecaudo) }} efectividad de recaudo
+        </div>
+      </div>
+
+      <!-- Pagado App -->
+      <div class="financial-card">
+        <div class="financial-header">
+          <ion-icon name="card-outline"></ion-icon>
+          <h4>Pagado vía App</h4>
+        </div>
+        <div class="financial-amount warning">
+          {{ formatCurrency(matchStats()!.sumaTotalPagadoMedianteApp) }}
+        </div>
+        <div class="financial-subtitle">
+          Después de consultar en app
+        </div>
+      </div>
+
+      <!-- Pagos Previos -->
+      <div class="financial-card">
+        <div class="financial-header">
+          <ion-icon name="time-outline"></ion-icon>
+          <h4>Pagos Previos</h4>
+        </div>
+        <div class="financial-amount info">
+          {{ formatCurrency(matchStats()!.sumaTotalPagosPrevios) }}
+        </div>
+        <div class="financial-subtitle">
+          Pagado antes de consultar
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="section-header">
+      <h2 class="section-title">📊 Métricas de Rendimiento</h2>
+    </div>
+
+    <div class="summary-metrics">
+      <div class="metric-item">
+        <div class="metric-label">Promedio por Match</div>
+        <div class="metric-value">{{ formatCurrency(computedStats()!.promedioMontoPagado) }}</div>
+      </div>
+      
+      <div class="metric-item">
+        <div class="metric-label">Promedio por Consulta</div>
+        <div class="metric-value">{{ formatCurrency(computedStats()!.promedioMontoEncontrado) }}</div>
+      </div>
+      
+      <div class="metric-item">
+        <div class="metric-label">Tasa de Match</div>
+        <div class="metric-value">{{ formatPercentage(computedStats()!.tasaMatch) }}</div>
+      </div>
+      
+      <div class="metric-item">
+        <div class="metric-label">Efectividad de Recaudo</div>
+        <div class="metric-value">{{ formatPercentage(computedStats()!.efectividadRecaudo) }}</div>
+      </div>
+    </div>
+
+    <!-- Last Updated -->
+    <div class="last-updated" *ngIf="lastUpdated()">
+      <ion-icon name="time-outline"></ion-icon>
+      <span>Actualizado: {{ lastUpdated() | date:'short':'es-HN' }}</span>
+    </div>
+  </div>
+</ion-content>

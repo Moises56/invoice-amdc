@@ -99,35 +99,52 @@ export class UsuariosService {
 
   /**
    * Activar usuario
+   * Utiliza el método principal toggleUserStatus
    */
   activateUser(id: string): Observable<User> {
-    return this.http.patch<User>(`${this.baseUrl}/${id}/activate`, {}).pipe(
-      tap(updatedUser => {
-        const currentUsers = this.usuariosSubject.value;
-        const index = currentUsers.findIndex(u => u.id === id);
-        if (index !== -1) {
-          currentUsers[index] = updatedUser;
-          this.usuariosSubject.next([...currentUsers]);
-        }
-      })
-    );
+    return this.toggleUserStatus(id, true);
+  }
+
+  /**
+   * Desactivar usuario (soft delete)
+   * DELETE /api/users/{id}
+   * Utiliza el método principal toggleUserStatus
+   */
+  deactivateUser(id: string): Observable<User> {
+    return this.toggleUserStatus(id, false);
   }
 
   /**
    * Cambiar estado de usuario (activar/desactivar)
+   * Desactivar: DELETE /api/users/{id}
+   * Activar: PATCH /api/users/{id}/activate
    */
   toggleUserStatus(id: string, isActive: boolean): Observable<User> {
-    const endpoint = isActive ? 'activate' : 'deactivate';
-    return this.http.patch<User>(`${this.baseUrl}/${id}/${endpoint}`, {}).pipe(
-      tap(updatedUser => {
-        const currentUsers = this.usuariosSubject.value;
-        const index = currentUsers.findIndex(u => u.id === id);
-        if (index !== -1) {
-          currentUsers[index] = updatedUser;
-          this.usuariosSubject.next([...currentUsers]);
-        }
-      })
-    );
+    if (isActive) {
+      // Activar usuario - PATCH /api/users/{id}/activate
+      return this.http.patch<User>(`${this.baseUrl}/${id}/activate`, {}).pipe(
+        tap(updatedUser => {
+          const currentUsers = this.usuariosSubject.value;
+          const index = currentUsers.findIndex(u => u.id === id);
+          if (index !== -1) {
+            currentUsers[index] = updatedUser;
+            this.usuariosSubject.next([...currentUsers]);
+          }
+        })
+      );
+    } else {
+      // Desactivar usuario - DELETE /api/users/{id}
+      return this.http.delete<User>(`${this.baseUrl}/${id}`).pipe(
+        tap(updatedUser => {
+          const currentUsers = this.usuariosSubject.value;
+          const index = currentUsers.findIndex(u => u.id === id);
+          if (index !== -1) {
+            currentUsers[index] = updatedUser;
+            this.usuariosSubject.next([...currentUsers]);
+          }
+        })
+      );
+    }
   }
 
   /**
@@ -261,8 +278,9 @@ export class UsuariosService {
 
   /**
    * Actualizar estado de usuario (activo/inactivo)
+   * Utiliza el método principal toggleUserStatus que maneja los endpoints correctos
    */
   updateUserStatus(userId: string, isActive: boolean): Observable<User> {
-    return this.http.patch<User>(`${this.baseUrl}/${userId}/status`, { isActive });
+    return this.toggleUserStatus(userId, isActive);
   }
 }

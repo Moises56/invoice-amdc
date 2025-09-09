@@ -14,6 +14,10 @@ import {
   AssignUserLocationResponse,
   LocationHistoryFilter
 } from '../interfaces/user.interface';
+import {
+  MatchStatsResponse,
+  MatchFilters
+} from '../interfaces/match-stats.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -78,6 +82,29 @@ export class StatsService {
     console.log('📡 Enviando petición con credenciales HTTP-only...');
     
     return this.apiClient.get<ActivityLogResponse>('/api/user-stats/logs', params, true);
+  }
+
+  /**
+   * Obtener estadísticas de recaudación (match between consultas and pagos)
+   */
+  getMatchStats(filter?: MatchFilters): Observable<MatchStatsResponse> {
+    console.log('📡 Solicitando estadísticas de recaudación...', filter);
+    
+    let params = new HttpParams();
+    if (filter) {
+      Object.keys(filter).forEach(key => {
+        const value = (filter as any)[key];
+        if (value !== undefined && value !== null && value !== '') {
+          params = params.set(key, value.toString());
+        }
+      });
+    }
+    
+    console.log('📡 URL completa:', '/api/user-stats/match');
+    console.log('📡 Parámetros:', params.toString());
+    console.log('📡 Enviando petición con credenciales HTTP-only...');
+    
+    return this.apiClient.get<MatchStatsResponse>('/api/user-stats/match', params, true);
   }
 
   /**

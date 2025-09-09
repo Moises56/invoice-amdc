@@ -407,6 +407,26 @@
           ></ion-icon>
         </div>
 
+        <!-- Estadísticas de Recaudación -->
+        <div
+          class="tool-item"
+          *ngIf="canAccessGeneralStats()"
+          (click)="goToRecaudacionStats()"
+        >
+          <div class="tool-icon teal">
+            <ion-icon name="cash-outline"></ion-icon>
+          </div>
+          <div class="tool-content">
+            <h4>Estadísticas de Recaudación</h4>
+            <p>Análisis de cobros y cuentas</p>
+          </div>
+          <div class="admin-badge">Admin</div>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="tool-arrow"
+          ></ion-icon>
+        </div>
+
 
       </div>
     </div>

@@ -107,6 +107,12 @@ export const routes: Routes = [
     data: { roles: [Role['USER-ADMIN']] }
   },
   {
+    path: 'recaudacion-stats',
+    loadComponent: () => import('./features/stats/recaudacion-stats/recaudacion-stats.page').then(m => m.RecaudacionStatsPage),
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: [Role.ADMIN, Role['USER-ADMIN']] }
+  },
+  {
     path: 'activity-logs',
     loadComponent: () => import('./features/stats/activity-logs/activity-logs.page').then(m => m.ActivityLogsPage),
     canActivate: [AuthGuard, RoleGuard],
