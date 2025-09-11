@@ -42,8 +42,7 @@ import {
   chevronDownOutline,
   chevronUpOutline,
   closeOutline,
-  documentTextOutline
-} from 'ionicons/icons';
+  documentTextOutline, copyOutline } from 'ionicons/icons';
 
 import { StatsService } from '../../../shared/services/stats.service';
 import { 
@@ -177,37 +176,37 @@ export class RecaudacionStatsPage implements OnInit {
       ? stats.sumaTotalEncontrado / stats.totalConsultasAnalizadas 
       : 0;
 
+    // Cálculos de duplicados
+    const duplicateStats = stats.estadisticasDuplicados || {
+      totalArticulosUnicos: 0,
+      totalArticulosDuplicados: 0,
+      totalArticulosConMultiplesPagos: 0,
+      detalleArticulosDuplicados: []
+    };
+
+    const matchesUnicos = stats.totalMatches - duplicateStats.totalArticulosDuplicados;
+    const tasaDuplicados = stats.totalMatches > 0 
+      ? (duplicateStats.totalArticulosDuplicados / stats.totalMatches) * 100 
+      : 0;
+
     return {
       ...stats,
+      totalArticulosUnicos: duplicateStats.totalArticulosUnicos,
+      totalArticulosDuplicados: duplicateStats.totalArticulosDuplicados,
+      totalArticulosConMultiplesPagos: duplicateStats.totalArticulosConMultiplesPagos,
+      matchesUnicos,
       tasaMatch,
       tasaPagoApp,
       tasaPagoPrevio,
       efectividadRecaudo,
       promedioMontoPagado,
-      promedioMontoEncontrado
+      promedioMontoEncontrado,
+      tasaDuplicados
     };
   });
 
   constructor() {
-    addIcons({
-      refreshOutline,
-      analyticsOutline,
-      cashOutline,
-      trendingUpOutline,
-      calendarOutline,
-      arrowBackOutline,
-      filterOutline,
-      statsChartOutline,
-      cardOutline,
-      walletOutline,
-      checkmarkCircleOutline,
-      timeOutline,
-      eyeOutline,
-      chevronDownOutline,
-      chevronUpOutline,
-      closeOutline,
-      documentTextOutline
-    });
+    addIcons({refreshOutline,analyticsOutline,filterOutline,closeOutline,checkmarkCircleOutline,documentTextOutline,copyOutline,cardOutline,timeOutline,eyeOutline,walletOutline,cashOutline,trendingUpOutline,calendarOutline,arrowBackOutline,statsChartOutline,chevronDownOutline,chevronUpOutline});
   }
 
   ngOnInit() {
@@ -404,6 +403,18 @@ export class RecaudacionStatsPage implements OnInit {
     const date = new Date();
     date.setDate(date.getDate() + daysOffset);
     return date.toISOString().split('T')[0];
+  }
+
+  /**
+   * Verificar si hay duplicados para mostrar
+   */
+  hasDuplicates(): boolean {
+    const stats = this.matchStats();
+    const computed = this.computedStats();
+    return !!(computed && 
+              computed.totalArticulosDuplicados > 0 && 
+              stats?.estadisticasDuplicados?.detalleArticulosDuplicados &&
+              stats.estadisticasDuplicados.detalleArticulosDuplicados.length > 0);
   }
 
   /**

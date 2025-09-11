@@ -10,6 +10,21 @@ export interface MatchStatsResponse {
   sumaTotalPagosPrevios: number;
   periodoConsultado: string;
   matches: MatchItem[];
+  estadisticasDuplicados: DuplicateStats;
+}
+
+export interface DuplicateStats {
+  totalArticulosUnicos: number;
+  totalArticulosDuplicados: number;
+  totalArticulosConMultiplesPagos: number;
+  detalleArticulosDuplicados: DuplicateDetail[];
+}
+
+export interface DuplicateDetail {
+  articulo: string;
+  vecesConsultado: number;
+  numerosPagosEncontrados: number;
+  totalPagadoAcumulado: number;
 }
 
 export interface MatchItem {
@@ -50,6 +65,12 @@ export interface ComputedMatchStats {
   sumaTotalPagosPrevios: number;
   periodoConsultado: string;
   
+  // Duplicate statistics
+  totalArticulosUnicos: number;
+  totalArticulosDuplicados: number;
+  totalArticulosConMultiplesPagos: number;
+  matchesUnicos: number;        // totalMatches - totalArticulosDuplicados
+  
   // Computed metrics
   tasaMatch: number;              // (totalMatches / totalConsultasAnalizadas) * 100
   tasaPagoApp: number;            // (totalPagosMedianteApp / totalMatches) * 100
@@ -57,6 +78,7 @@ export interface ComputedMatchStats {
   efectividadRecaudo: number;     // (sumaTotalPagado / sumaTotalEncontrado) * 100
   promedioMontoPagado: number;    // sumaTotalPagado / totalMatches
   promedioMontoEncontrado: number; // sumaTotalEncontrado / totalConsultasAnalizadas
+  tasaDuplicados: number;         // (totalArticulosDuplicados / totalMatches) * 100
 }
 
 // Filter preset definitions

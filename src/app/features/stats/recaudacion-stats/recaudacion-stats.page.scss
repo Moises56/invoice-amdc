@@ -392,6 +392,64 @@
         color: var(--recaudo-gray);
         font-weight: 500;
       }
+
+      // Matches breakdown específico para mostrar únicos vs duplicados
+      .matches-breakdown {
+        .kpi-number {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+
+          .primary-number {
+            color: #059669; // Verde para matches únicos
+            font-weight: 800;
+          }
+
+          .separator {
+            color: #6b7280;
+            font-weight: 400;
+            font-size: 1.5rem;
+          }
+
+          .secondary-number {
+            color: #ea580c; // Naranja para duplicados
+            font-weight: 600;
+            font-size: 1.5rem;
+          }
+        }
+
+        .matches-details {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 0.75rem;
+          font-size: 0.8rem;
+
+          .unique-matches {
+            color: #059669;
+            font-weight: 600;
+            background: rgba(5, 150, 105, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+          }
+
+          .duplicate-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: #ea580c;
+            font-weight: 600;
+            background: rgba(234, 88, 12, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+
+            ion-icon {
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -775,6 +833,126 @@
 
     .metric-item {
       padding: 0.75rem;
+    }
+  }
+}
+
+// Duplicate Details Section
+.duplicate-details-section {
+  margin-bottom: 2rem;
+
+  ion-accordion-group {
+    border-radius: var(--recaudo-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--recaudo-shadow);
+
+    ion-accordion {
+      .duplicate-accordion-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem;
+        background: var(--recaudo-white);
+        border-bottom: 1px solid #e5e7eb;
+
+        .duplicate-summary {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+
+          ion-icon {
+            color: #ea580c;
+            font-size: 1.5rem;
+          }
+
+          .summary-info {
+            display: flex;
+            flex-direction: column;
+
+            .summary-title {
+              font-weight: 600;
+              color: #1f2937;
+              font-size: 1rem;
+            }
+
+            .summary-subtitle {
+              font-size: 0.875rem;
+              color: var(--recaudo-gray);
+            }
+          }
+        }
+
+        .accordion-arrow {
+          color: var(--recaudo-gray);
+          font-size: 1.25rem;
+          transition: transform 0.3s ease;
+        }
+      }
+
+      &[aria-expanded="true"] {
+        .duplicate-accordion-header .accordion-arrow {
+          transform: rotate(180deg);
+        }
+      }
+
+      .duplicate-content {
+        padding: 1.5rem;
+        background: #f9fafb;
+
+        .duplicate-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+
+          .duplicate-item {
+            background: var(--recaudo-white);
+            border-radius: var(--recaudo-radius);
+            padding: 1rem;
+            border-left: 3px solid #ea580c;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+            .duplicate-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 0.75rem;
+
+              .article-code {
+                font-weight: 600;
+                color: #1f2937;
+                font-family: 'Courier New', monospace;
+                background: rgba(234, 88, 12, 0.1);
+                padding: 4px 8px;
+                border-radius: 4px;
+              }
+
+              .total-paid {
+                font-weight: 700;
+                color: #059669;
+                font-size: 1.1rem;
+              }
+            }
+
+            .duplicate-stats {
+              display: flex;
+              gap: 1.5rem;
+
+              .stat-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.875rem;
+                color: var(--recaudo-gray);
+
+                ion-icon {
+                  font-size: 1rem;
+                  color: #ea580c;
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
